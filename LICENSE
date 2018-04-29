@@ -1,0 +1,5 @@
+Many open source projects do not provide a license file. In this case, however, it is usually not clear whether the developer(s) just forgot to add a license or they chose not to license their project. Thus, we decided to add this file to avoid this ambiguity.
+
+Currently, SnowHaze is not licensed. This means you are free to look at the source code and compile SnowHaze for your personal device. However, you may not redistribute, sell, use, license, publish or modify SnowHaze or any portions thereof, except where otherwise specified.
+
+All rights reserved, Illotros GmbH 2018.

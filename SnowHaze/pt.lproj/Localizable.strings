@@ -1,0 +1,1504 @@
+/* Localizable.strings
+	SnowHaze
+	Copyright © 2017 Illotros GmbH. All rights reserved. */
+
+/* code used to identify the current locale */
+"localization code" = "pt";
+
+/* title of prompt to warn user that their snowhaze version is old */
+"old snowhaze version prompt title" = "Antiga versão SnowHaze";
+
+/* format string of message of prompt to warn user that their snowhaze version is old */
+"old snowhaze version prompt message format" = "Por favor faça a atualização da sua versão de SnowHaze. A versão que está a utilizar atualmente (%@) tem agora seis meses e não vai ser continuada.";
+
+/* title of button to lead users to the app store to update snowhaze */
+"old snowhaze version prompt update button title" = "App Store";
+
+/* title of button to ignore old snowhaze version warning */
+"old snowhaze version prompt ignore button title" = "Ignorar";
+
+/* title of home page displayed in url bar */
+"home screen page title" = "Página inicial";
+
+/* displayed instead of title for masked tabs in app snapshots */
+"masked tab title" = "Mascarado";
+
+/* title for settings controller navigation item */
+"settings title" = "Definições";
+
+/* title for general settings section */
+"general settings title" = "GERAL";
+
+/* title for premium settings section */
+"premium settings title" = "PREMIUM";
+
+/* title for privacy settings section */
+"privacy settings title" = "PRIVACIDADE";
+
+/* title for default settings section */
+"default settings title" = "PADRÃO";
+
+/* title for about settings section */
+"about settings title" = "SOBRE";
+
+/* title for bookmark section */
+"bookmarks view title" = "Favoritos";
+
+/* title for history section */
+"history view title" = "Histórico";
+
+/* Used to confirm message */
+"js alert panel confirmation button title" = "OK";
+
+/* Used to accept message */
+"js confirm panel confirm button title" = "OK";
+
+/* Used to decline message */
+"js confirm panel cancel button title" = "Cancelar";
+
+/* Used to enter text */
+"js text prompt confirm button title" = "OK";
+
+/* Used to not enter text */
+"js text prompt cancel button title" = "Cancelar";
+
+/* title of button to ignore further alerts by this site */
+"ignore alerts from this site alert button title" = "Ignorar alertas";
+
+/* title of the activity to create a new bookmark */
+"add bookmark activity title" = "Adicionar favoritos";
+
+/* title of the activity to enter reader mode */
+"reader mode activity title" = "Modo de leitura";
+
+/* preposition indication offset in set e.g. page 5 'of' 7 */
+"page offset indication preposition" = "no";
+
+/* name of document that has not been given a name */
+"untitled document name" = "Sem título";
+
+/* title of button to delete bookmark in bookmark view */
+"delete bookmark button title" = "Excluir";
+
+/* title of button to refresh bookmark in bookmark view */
+"refresh bookmark button title" = "Recarregar";
+
+/* title of button to rename bookmark in bookmark view */
+"rename bookmark button title" = "Renomear";
+
+/* title of button to delete all history section of a day */
+"delete history section button title" = "Excluir";
+
+/* title of cancel button of passcodecontroller */
+"passcodecontroller cancel button title" = "Cancelar";
+
+/* passcodecontrollers prompt to provide biometric authentication or enter passcode for verification */
+"passcodecontroller biometrics or passcode prompt" = "ID biométrica ou insira palavra passe";
+
+/* passcodecontrollers prompt to enter passcode for verification */
+"passcodecontroller passcode prompt" = "Inserir a sua palavra passe";
+
+/* passcodecontrollers prompt to provide new passcode */
+"passcodecontroller new passcode prompt" = "Inserir a sua nova palavra passe";
+
+/* passcodecontrollers prompt to provide biometric authentication or enter old passcode for verification before passcode change */
+"passcodecontroller biometrics or old passcode prompt" = "ID biométrica ou palavra passe antiga";
+
+/* passcodecontrollers prompt to enter old passcode for verification before passcode change */
+"passcodecontroller old passcode prompt" = "Inserir a sua antiga palavra passe";
+
+/* passcodecontrollers prompt to confirm new passcode before setting it up or changing it */
+"passcodecontroller new passcode confirm prompt" = "Confirmar a nova palavra passe";
+
+/* text to indicate that the passcode is currently being verified */
+"passcodecontroller verifying passcode notice" = "Verificando a palavra passe";
+
+/* text to indicate that the provided passcode is correct */
+"passcodecontroller passcode correct notice" = "Palavra passe Correta";
+
+/* text to indicate that the provided passcode is incorrect */
+"passcodecontroller passcode incorrect notice" = "Palavra passe Incorreta";
+
+/* text to indicate that the provided passcodes did not match when setting up or changing passcode */
+"passcodecontroller passcodes do not match notice" = "Palavras passe não correspondem";
+
+/* text to indicate that passcode is being set up */
+"passcodecontroller setting up passcode notice" = "Definição de palavra passe…";
+
+/* text to indicate that passcode is being changed */
+"passcodecontroller changing up passcode notice" = "Mudança de palavra passe…";
+
+/* text to indicate that the passcode setup succeeded */
+"passcodecontroller passcode setup succeeded notice" = "Definição de palavra passe";
+
+/* text to indicate that the passcode change succeeded */
+"passcodecontroller passcode change succeeded notice" = "Palavra passe mudada";
+
+/* text to indicate that the passcode setup failed */
+"passcodecontroller passcode setup failed notice" = "Erro na definição de palavra passe";
+
+/* text to indicate that the passcode change failed */
+"passcodecontroller passcode change failed notice" = "Erro na mudança";
+
+/* text to indicate why the user should authenticate with biometrics when updating the passcode stored in the keychain */
+"passcodecontroller update keychain passcode biometrics prompt" = "Atualize a sua palavra passe";
+
+/* text to indicate why the user should authenticate to snowhaze using biometrics */
+"passcodecontroller authenticate with biometrics prompt" = "Autentificar o uso de ID biométrica";
+
+/* error message displayed when app launch fails due to keychain error */
+"app launch failed keychain error message" = "SnowHaze não pôde desbloquear porque o Porta-chaves iCloud encontrou um erro.";
+
+/* title of button to retry when app launch fails due to keychain error */
+"app launch failed keychain error retry button title" = "Tente novamente";
+
+/* accessibility label of the passcode controllers number pad enter button */
+"passcodecontroller enter button accessibility label" = "Enter";
+
+/* accessibility label of the passcode controllers number pad backspace button */
+"passcodecontroller backspace button accessibility label" = "Retrocesso";
+
+/* accessibility label of the passcode controllers biometrics button */
+"passcodecontroller biometrics button accessibility label" = "ID biométrica";
+
+/* accessibility label of the passcode controllers code display when it is empty */
+"passcodecontroller code display 0 characters accessibility label" = "Texto seguro – 0 caracteres";
+
+/* accessibility label of the passcode controllers code display when it is has 1 character */
+"passcodecontroller code display 1 character accessibility label" = "Texto seguro – 1 caracteres";
+
+/* accessibility label of the passcode controllers code display when it is has more than 1 character */
+"passcodecontroller code display many characters accessibility label" = "Texto seguro – %@ caracteres";
+
+/* title of the activity to scan a (QR) code */
+"scan code activity title" = "Scanear um código";
+
+/* title of button to cancel code scanning */
+"code scan view controller cancel button title" = "Cancelar";
+
+/* title of button to finish code scanning */
+"code scan view controller done button title" = "Concluído";
+
+/* title of button to preview scanned code */
+"code scan view controller preview button title" = "Pré-visualização";
+
+/* error message displayed when user tries to scan a code but has not (yet) granted camera access */
+"code scan no camera access error message" = "Não é possível utilizar a câmara\nVocê pode conceder acesso no aplicativo Configurações.";
+
+/* discoverability title of key command to make a new tab */
+"new tab key command title" = "Novo separador";
+
+/* discoverability title of key command to cancel user input */
+"cancel key command title" = "Cancelar";
+
+/* discoverability title of key command to start search input */
+"search key command title" = "Pesquisa";
+
+/* discoverability title of key command to select next suggestion */
+"next suggestion key command title" = "Próxima sugestão";
+
+/* discoverability title of key command to select previous suggestion */
+"previous suggestion key command title" = "Sugestão anterior";
+
+/* discoverability title of key command to open selected suggestion */
+"open key command title" = "Abrir";
+
+/* title of preview action to open a link in a new tab */
+"open in new tab preview action title" = "Abrir em separador novo";
+
+/* title of preview action to open the url of a history item */
+"open history item preview action title" = "Abrir";
+
+/* title of preview action to copy the url of a history item */
+"copy history item preview action title" = "Copiar";
+
+/* title of preview action to share the url of a history item */
+"share history item preview action title" = "Partilhar...";
+
+/* title of preview action to open the url of a bookmark */
+"open bookmark preview action title" = "Abrir";
+
+/* title of preview action to copy the url of a bookmark */
+"copy bookmark preview action title" = "Copiar";
+
+/* title of preview action to share the url of a bookmark */
+"share bookmark preview action title" = "Partilhar...";
+
+/* title for acknowledgements */
+"acknowledgements settings title" = "Menções legais";
+
+/* title for website data settings */
+"website data settings title" = "Dados web";
+
+/* title for content type blockers settings */
+"content type blockers settings title" = "Content Blocker";
+
+/* title for defaults settings */
+"defaults settings title" = "Definições padrão";
+
+/* title for application settings */
+"application settings title" = "SnowHaze";
+
+/* title for javascript settings */
+"javascript settings title" = "JavaScript";
+
+/* title for search engine settings */
+"search engine settings title" = "Motor de busca";
+
+/* title for contact section */
+"contact settings title" = "Contato";
+
+/* title for user agent settings */
+"user agent settings title" = "Agente do utilizador";
+
+/* title for history settings */
+"history settings title" = "Histórico";
+
+/* title for media playback settings */
+"media playback settings title" = "Leitura Multimédia";
+
+/* title of mark as trusted setting */
+"mark as trusted setting title" = "Confiável";
+
+/* title of show local site suggestions setting */
+"show local site suggestions setting title" = "Sugestões sites locais";
+
+/* title of suggest private sites setting */
+"suggest private sites setting title" = "Sugerir sites privados";
+
+/* title of update site lists setting */
+"update site lists setting title" = "Auto-update a lista de sites";
+
+/* indication that the currently installed site lists are up to date */
+"site lists 0 weeks old notice" = "atualizado";
+
+/* indication that the currently installed site lists are 1 week old */
+"site lists 1 week old notice" = "1 semana de idade";
+
+/* format string of indication that the currently installed site lists are > 1 week old */
+"site lists > 1 week old notice format" = "%@ semanas de idade";
+
+/* title of setting to prevent site lists updates from using cellular data */
+"no cellular data for site lists update setting title" = "Somente Wi-Fi";
+
+/* indication that subscribing to premium gives access to frequent site lists updates */
+"subscribe to premium for daily site lists update notice" = "Update frequente com Premium";
+
+/* title of settings to manage site lists */
+"site lists settings title" = "Lista do site";
+
+/* title of settings for undoing tab closing */
+"allow tab closing undo settings title" = "RESTAURAR UM SEPARADOR";
+
+/* title of settings for tab masking */
+"tab masking settings title" = "MASCARAR OS SEPARADOS";
+
+/* title of setting for the duration during which closing a tab can be undone */
+"allow tab closing undo duration settings title" = "Permitir";
+
+/* title of setting to allow tab closing to be undone for all tabs */
+"allow tab closing undo for all tabs settings title" = "Permitir todas";
+
+/* string used to indicate that tab closing cannot be undone */
+"tab closing undo time limit 0 seconds time" = "0 seg";
+
+/* string used to indicate that tab closing can be undone for 1 second */
+"tab closing undo time limit 1 second time" = "1 seg";
+
+/* format string used to indicate how long tab closing can be undone */
+"tab closing undo time limit many seconds time format" = "%@ seg";
+
+/* title of allow application controlled javascript setting */
+"allow application script setting title" = "Autorizar Script da aplicação";
+
+/* title of allow password manager gather script setting */
+"allow password manager gather script setting title" = "Gerenciador de senha";
+
+/* title of allow javascript setting */
+"allow javascript setting title" = "Autorizar JavaScript";
+
+/* title of button to delete all website data records */
+"delete all data button title" = "Apagar todos os dados web";
+
+/* title for confirm option of dialog to cancel deletion of all website data records */
+"delete all data cancel option title" = "Cancelar";
+
+/* title for dialog to confirm deletion of all website data records */
+"delete all data confirm dialog title" = "Confirmação da eliminação";
+
+/* title for confirm option of dialog to confirm deletion of all website data records */
+"delete all data confirm option title" = "Excluir";
+
+/* message format for dialog to confirm deletion of all website data records */
+"delete all data message format" = "Tem a certeza de querer apagar os %@ dados Web?";
+
+/* title of button to delete tracking cookies */
+"delete tracking cookies button title" = "Apagar os cookies de rastreio";
+
+/* title of save website data records setting */
+"save website data setting title" = "Armazenar dados Web";
+
+/* title of settings section to set the cookie blocking mode */
+"cookie blocking settings title" = "BLOQUEAR OS COOKIES";
+
+/* option to not block cookies of the block cookies setting */
+"block cookies setting none option" = "Nenhum";
+
+/* option to block third party cookies of the block cookies setting */
+"block cookies setting third party option" = "De terceiros";
+
+/* option to block all cookies of the block cookies setting */
+"block cookies setting all option" = "Todos";
+
+/* notice displayed on iOS 10 and lower devices to indicate that cookie blocking requires ios 11 or newer */
+"cookie blocking requires ios 11 notice" = "Requer iOS 11";
+
+/* string displayed to user to identify iphone safari user agent */
+"iphone safari user agent display name" = "Safari iPhone";
+
+/* string displayed to user to identify iphone chrome user agent */
+"iphone chrome user agent display name" = "Chrome iPhone";
+
+/* string displayed to user to identify iphone firefox user agent */
+"iphone firefox user agent display name" = "Firefox iPhone";
+
+/* string displayed to user to identify iphone opera user agent */
+"iphone opera user agent display name" = "Opera iPhone";
+
+/* string displayed to user to identify ipad safari user agent */
+"ipad safari user agent display name" = "Safari iPad";
+
+/* string displayed to user to identify ipad chrome user agent */
+"ipad chrome user agent display name" = "Chrome iPad";
+
+/* string displayed to user to identify ipad firefox user agent */
+"ipad firefox user agent display name" = "Firefox iPad";
+
+/* string displayed to user to identify ipad opera user agent */
+"ipad opera user agent display name" = "Opera iPad";
+
+/* string displayed to user to identify android default browser user agent */
+"android default browser user agent display name" = "Navegador padrão do Android";
+
+/* string displayed to user to identify android chrome user agent */
+"android chrome user agent display name" = "Chrome Android";
+
+/* string displayed to user to identify android firefox user agent */
+"android firefox user agent display name" = "Firefox Android";
+
+/* string displayed to user to identify android opera user agent */
+"android opera user agent display name" = "Opera Android";
+
+/* title of button to reset global settings to defaults */
+"reset global settings button title" = "Reiniciar as definições";
+
+/* title for cancel option of dialog to confirm resetting of global settings */
+"reset global settings confirm dialog cancel option title" = "Cancelar";
+
+/* title for confirm option of dialog to confirm resetting of global settings */
+"reset global settings confirm dialog confirm option title" = "Reinicializar";
+
+/* message for dialog to confirm resetting of global settings */
+"reset global settings confirm dialog message" = "Tem a certeza de querer reiniciar as definições?";
+
+/* title for dialog to confirm resetting of global settings */
+"reset global settings confirm dialog title" = "Confirmação da reinicialização";
+
+/* title of button to reset per page settings to defaults */
+"reset page settings button title" = "Reinicialização definições da página";
+
+/* title for cancel option of dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog cancel option title" = "Cancelar";
+
+/* title for confirm option of dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog confirm option title" = "Reinicializar";
+
+/* message for dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog message" = "Tem a certeza de querer apagar as definições para cada site?";
+
+/* title for dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog title" = "Confirmação da reinicialização";
+
+/* title of button to restart the tutorial */
+"restart tutorial settings button title" = "Reiniciar o tutorial";
+
+/* title of save history setting */
+"save history setting title" = "Guardar o histórico";
+
+/* title for require user action for media playback setting */
+"require user action for media playback setting title" = "Exigir uma ação";
+
+/* title for allow inline media playback setting */
+"allow inline media playback setting title" = "Autorizar a leitura em linha";
+
+/* name of bing search engine to be displayed to user */
+"bing search engine display name" = "Bing";
+
+/* name of google search engine to be displayed to user */
+"google search engine display name" = "Google";
+
+/* name of yahoo search engine to be displayed to user */
+"yahoo search engine display name" = "Yahoo";
+
+/* name of wikipedia search engine to be displayed to user */
+"wikipedia search engine display name" = "Wikipedia";
+
+/* name of wolframalpha search engine to be displayed to user */
+"wolframalpha search engine display name" = "WolframAlpha";
+
+/* name of ecosia search engine to be displayed to user */
+"ecosia search engine display name" = "Ecosia";
+
+/* name of startpage search engine to be displayed to user */
+"startpage search engine display name" = "Startpage";
+
+/* name of hulbee search engine to be displayed to user */
+"hulbee search engine display name" = "Hulbee";
+
+/* name of duckduckgo search engine to be displayed to user */
+"duckduckgo search engine display name" = "DuckDuckGo";
+
+/* name of none search engine to be displayed to user */
+"none search engine display name" = "Nenhum";
+
+/* name of snowhaze search engine to be displayed to user */
+"snowhaze search engine display name" = "SnowHaze";
+
+/* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
+"snowhaze search engine missing subscription accessibility label" = "SnowHaze – Necessita da subscrição do SnowHaze Premium";
+
+/* title of settings subsection to choose search engine */
+"search engine selection setting subsection title" = "MOTOR DE BUSCA";
+
+/* title of settings subsection to choose search engines for search suggestions */
+"search suggestion engines setting subsection title" = "SUGESTÕES DE PEQUISA";
+
+/* used to refer to the search engine selected by the user */
+"main search engine name" = "Principais motores de Busca";
+
+/* title of button to email support */
+"email support button title" = "Assistente do E-mail";
+
+/* title of button to share snowhaze */
+"share snowhaze button title" = "Partilhar o Snowhaze";
+
+/* title of button to rate snowhaze on the app store */
+"rate snowhaze button title" = "Avaliar SnowHaze";
+
+/* text use to prefill 'share' messagers */
+"snowhaze share text" = "Olá!\nO SnowHaze é um Browser genial que protege eficazmente todos os teus dados pessoais.\nVisite o site de internet: snowhaze.com.\nOu, simplesmente, faça o download da aplicação a partir da App Store; snowhaze.com/download.";
+
+/* format of message of email to be sent to support */
+"support email message format" = "Bom dia\nTenho tido alguns problemas com o SnowHaze:\n\n\n\nPor favor, responda através de\nEmail: \nTelefone: \n\nUtilizo o SnowHaze através de:\nAparhelho: %@\nVersão: %@\nLíngua: %@";
+
+/* title of email to be sent to support */
+"support email title" = "Assistência do SnowHaze";
+
+/* title of button to visit snowhaze website */
+"visit website button title" = "Visitar a nossa página";
+
+/* title for tracking protection settings */
+"tracking protection settings title" = "Proteção de rastreio";
+
+/* title of block referer setting */
+"block referer setting title" = "Bloquear os referentes HTTP";
+
+/* title for https settings */
+"https settings title" = "HTTPS";
+
+/* title of try https first setting */
+"try https first setting title" = "Tentar primeiro HTTPS";
+
+/* subtitle for autocomplete search suggestions from bing */
+"bing search suggestion subtitle" = "Pesquisa Bing";
+
+/* subtitle for autocomplete search suggestions from google */
+"google search suggestion subtitle" = "Pesquisa Google";
+
+/* subtitle for autocomplete search suggestions from yahoo */
+"yahoo search suggestion subtitle" = "Pesquisa Yahoo";
+
+/* subtitle for autocomplete search suggestions from wikipedia */
+"wikipedia search suggestion subtitle" = "Pesquisa na Wikipédia";
+
+/* subtitle for autocomplete search suggestions from wolframalpha */
+"wolframalpha search suggestion subtitle" = "Pesquisa WolframAlpha";
+
+/* subtitle for autocomplete search suggestions from ecosia */
+"ecosia search suggestion subtitle" = "Pesquisa Ecosia";
+
+/* subtitle for autocomplete search suggestions from startpage */
+"startpage search suggestion subtitle" = "Pesquisa Startpage";
+
+/* subtitle for autocomplete search suggestions from hulbee */
+"hulbee search suggestion subtitle" = "Pesquisa Hulbee";
+
+/* subtitle for autocomplete search suggestions from DuckDuckGo */
+"duckduckgo search suggestion subtitle" = "Pesquisa DuckDuckGo";
+
+/* subtitle for autocomplete search suggestions from snowhaze search */
+"snowhaze search search suggestion subtitle" = "Pesquisa SnowHaze";
+
+/* title of the activity to find some text on page */
+"find on page activity title" = "Pesquisar na página";
+
+/* title of button to dismiss text input bar */
+"text input bar dismiss button title" = "Concluído";
+
+/* title of button to cancel renaming of bookmark */
+"bookmark rename bar cancel button title" = "Cancelar";
+
+/* title of use https exclusively when possible setting */
+"use https exclusively when possible setting title" = "HTTPS se disponivel";
+
+/* title of mixed content blocking setting */
+"mixed content blocking setting title" = "Bloqueio de conteúdo misto";
+
+/* notice displayed on iOS 10 and lower devices to indicate that mixed content blocking requires ios 11 or newer */
+"mixed content blocking requires ios 11 notice" = "Requer iOS 11";
+
+/* title of block tracking scripts setting */
+"block tracking scripts setting title" = "Bloquear os scripts de rastreio";
+
+/* title of block ads setting */
+"block ads setting title" = "Bloquear anúncios";
+
+/* title for appearance settings */
+"appearance settings title" = "Aparência";
+
+/* title of night mode setting */
+"night mode setting title" = "Modo noite";
+
+/* title of minimum font size setting */
+"minimum font size setting title" = "Tamanho de letra";
+
+/* title of ignore scale limits setting */
+"ignore scale limits setting title" = "Ignorar limites de escala";
+
+/* notice displayed on iOS 9 devices to indicate that ignoring scale limits requires ios 10 or newer */
+"ignore scale limits requires ios 10 notice" = "Requer iOS 10";
+
+/* title of forget private sites setting */
+"forget private sites setting title" = "Esquecer os sites privados";
+
+/* title of block canvas data access setting */
+"block canvas data access setting title" = "Bloquear Canvas Fingerprinting";
+
+/* title of block fingerprinting setting */
+"block fingerprinting setting title" = "Bloquear Fingerprinting";
+
+/* title of block social media widgets setting */
+"block social media widgets setting title" = "Bluquear botões share";
+
+/* notice displayed on iOS 10 and lower devices to indicate that social media widget blocking requires ios 11 or newer */
+"social media widget blocking requires ios 11 notice" = "Requer iOS 11";
+
+/* title of apply hide only rules setting */
+"apply hide only rules setting title" = "Ocultar desbloqueado";
+
+/* notice displayed on iOS 10 and lower devices to indicate that applying hide only rules requires ios 11 or newer */
+"apply hide only rules requires ios 11 notice" = "Requer iOS 11";
+
+/* title for popover settings */
+"popover settings title" = "Pop-over";
+
+/* name of popover blocking policy which blocks all popovers */
+"allways block popover blocking policy name" = "Bloquear todos";
+
+/* name of popover blocking policy which only blocks js-triggered popovers */
+"block scripted popover blocking policy name" = "Permitir que o usuário dispare";
+
+/* name of popover blocking policy which allows all popovers */
+"allways allow popover blocking policy name" = "Autorizar todos";
+
+/* name of the never tab masking rule */
+"never tab masking rule name" = "Nunca";
+
+/* name of the when private tab masking rule */
+"when private tab masking rule name" = "Se Privado";
+
+/* name of the always tab masking rule */
+"always tab masking rule name" = "Sempre";
+
+/* title for warnings settings */
+"warnings settings title" = "Avisos";
+
+/* title of show dangerous sites warnings setting */
+"show dangerous sites warnings setting title" = "Sites perigosos";
+
+/* title of show tls certificate warnings setting */
+"show tls certificate warnings setting title" = "Certificados TLS";
+
+/* title of show tracking parameters warnings setting */
+"show tracking parameters warnings setting title" = "Parâmetros de rastreamento";
+
+/* title of prevent xss setting */
+"prevent xss setting title" = "Prevenir o XSS";
+
+/* title of settings to set passcode locking mode to off */
+"passcode locking mode off settings title" = "Desligado";
+
+/* title of settings to set passcode locking mode to passcode or biometric authentication */
+"passcode locking mode passcode or biometrics settings title" = "Palavra passe ou ID biométrica";
+
+/* title of settings to set passcode locking mode to passcode only */
+"passcode locking mode passcode only settings title" = "Somente palavra passe";
+
+/* subtitle of settings to set passcode locking mode to passcode or biometrics that indicates that biometric authentication is unavailable */
+"passcode locking mode passcode or biometrics settings biometrics not available subtitle" = "ID biométrica indisponível";
+
+/* title of settings to set after how long in the background the app locks */
+"passcode lock after settings title" = "Bloquear";
+
+/* title of settings to set passcode type to 6 digit PIN */
+"passcode type 6 digits settings title" = "6 dígitos";
+
+/* title of settings to set passcode type to arbitrary length PIN */
+"passcode type long numeric settings title" = "Numérico longo";
+
+/* title of settings to set passcode type to arbitrary length PIN */
+"passcode type alphanumeric settings title" = "Alfanumérico";
+
+/* title of button to change the applications passcode */
+"change passcode button title" = "Mudança de senha";
+
+/* title of button to manually engage ui lock */
+"lock snowhaze button title" = "Bloquear SnowHaze";
+
+/* title of settings section to set the apps locking mode */
+"passcode locking mode settings title" = "MODO";
+
+/* title of settings section to set the passcodes type */
+"passcode type settings title" = "FORMATO";
+
+/* string used to indicate that the app locks immediately on entering background */
+"passcode lock after 0 minutes time" = "Imediato";
+
+/* string used to indicate that the app locks 1 minute after entering background */
+"passcode lock after 1 minute time" = "1 min";
+
+/* string used to indicate that the app only requires unlocking at startup */
+"passcode lock after infinity minutes time" = "Start";
+
+/* string used to indicate how long after entering background the app locks */
+"passcode lock after many minutes time" = "%@ min";
+
+/* title for passcode settings */
+"passcode settings title" = "Senha";
+
+/* title for subscription settings */
+"subscription settings title" = "Assinaturas";
+
+/* title of settings to subscribe to snowhaze premium */
+"snowhaze premium settings title" = "SNOWHAZE PREMIUM";
+
+/* title of settings to auto-update the list of snowhaze premium subscription options */
+"update snowhaze premium subscription options settings title" = "Auto-update opções";
+
+/* title of settings to auto-update the premium authorization token */
+"update authorization token settings title" = "Auto-atualização token";
+
+/* title of the setting that displays the hash of the current premium authorization token */
+"current token hash settings title" = "Hash do token atual";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when nothing special happened recently */
+"load snowhaze premium options settings default title" = "Carregar opções de subscrição";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when a load recently failed */
+"load snowhaze premium options settings load failed title" = "Não foi possível carregar";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when a load recently succeeded */
+"load snowhaze premium options settings load succeeded title" = "Carregamento bem sucedido";
+
+/* title of settings to restore a snowhaze premium purchase when nothing special happened recently */
+"restore snowhaze premium purchase settings default title" = "Compra de restauro";
+
+/* title of settings to restore a snowhaze premium purchase when a restore recently failed */
+"restore snowhaze premium purchase settings restore failed title" = "Erro de restauro";
+
+/* title of settings to restore a snowhaze premium purchase when a restore recently succeeded */
+"restore snowhaze premium purchase settings restore succeeded title" = "Restauro bem sucedido";
+
+/* title of settings to show the users subscriptions management settings in itunes */
+"view all subscriptions settings title" = "Visualizar todas as subscrições";
+
+/* title of alert to inform users that a purchase has failed */
+"purchase failed error alert title" = "A compra falhou";
+
+/* title of the button to show the snowhaze premium subscription terms of service */
+"show subscription terms of service button title" = "Termos de uso";
+
+/* title of the button to show the snowhaze premium subscription privacy policy */
+"show subscription privacy policy button title" = "Política de Privacidade";
+
+/* displayed instead of the error message in the alert to inform users that a purchase has failed when the reason for the failure is unknown */
+"purchase failed error alert unknown error message" = "Erro desconhecido";
+
+/* title of the ok button of the alert to inform users that a purchase has failed */
+"purchase failed error alert ok button title" = "OK";
+
+/* text to indicate that the subscription will renew within the next 0 days */
+"subscription renews within 0 days notice" = "Renovação hoje";
+
+/* text to indicate that the subscription will renew within the next 1 days */
+"subscription renews within 1 days notice" = "Renovação hoje ou amanhã";
+
+/* text to indicate that the subscription will renew within the next n days for n > 1 */
+"subscription renews within n days notice format" = "Renovação daqui a %@ dias";
+
+/* text to indicate that the subscription will expire in 0 days */
+"subscription expire in 0 days notice" = "Expira hoje";
+
+/* text to indicate that the subscription will expire in 1 days */
+"subscription expire in 1 days notice" = "Expira amanhã";
+
+/* text to indicate that the subscription will expire in n days for n > 1 */
+"subscription expire in n days notice" = "Expira daqui a %@ dias";
+
+/* notice to warn users that snowhaze premium subscriptions auto-renew */
+"snowhaze premium subscription auto-renew notice" = "Subscrições são autorenovadas, condições na descrição";
+
+/* text to indicate that an authorization token can only be received by subscribing to snowhaze premium */
+"subscribe to receive authorization token notice" = "Subscreva para receber um nome de usuário";
+
+/* subtitle of the setting to load a new authorization token */
+"tab to load new authorization token settings subtitle" = "Clique para carregar um Token";
+
+/* title of the option to be billed monthly for snowhaze premium */
+"snowhaze premium billed monthly option description" = "Subscrição mensal";
+
+/* title of the option to be billed yearly for snowhaze premium */
+"snowhaze premium billed yearly option description" = "Subscrição annual";
+
+/* title for vpn settings */
+"vpn settings title" = "VPN";
+
+/* error message flashed when a vpn profile download the user explicitly requested fails */
+"vpn profile download failed error message" = "Falha no download";
+
+/* format of the notice used to indicate when the vpn profile will expire */
+"vpn profile expiration notice format" = "Expira %@";
+
+/* format of the notice used to indicate that a vpn profile has expired */
+"vpn profile expired notice" = "Expirado";
+
+/* format of the notice used to indicate that a vpn profile has not yet been installed */
+"vpn profile not installed notice" = "Não instalado";
+
+/* format used to combine the vpn profile status and ping stats */
+"vpn profile status und ping stats combined format" = "%@     %@ ms (%@ %%)";
+
+/* format used to display the vpn ping stats */
+"vpn ping stats format" = "%@ ms (%@ %%)";
+
+/* title of settings to auto-update the list of available vpn servers */
+"update vpn list settings title" = "Auto-update os localizações";
+
+/* title of button to open openvpn connect */
+"open openvpn connect button title" = "Abra OpenVPN Connect";
+
+/* title of setting to display the ping status of the vpn servers */
+"show vpn server ping status settings title" = "Mostrar Ping";
+
+/* title of button to switch from vpn settings to subscription settings */
+"show subscription status button title" = "Mostrar o estado das subscrições";
+
+/* title of button to show the vpn tutorial */
+"show vpn tutorial button title" = "Mostrar o tutorial VPN";
+
+/* title of settings section with the list of available vpn locations */
+"vpn location list settings title" = "LOCALIZAÇÕES";
+
+/* title of alert to point out that opening openvpn connect requires it being installed */
+"opening openvpn connect requires installing alert title" = "Instale OpenVPN Connect";
+
+/* message of alert to point out that opening openvpn connect requires it being installed */
+"opening openvpn connect requires installing alert message" = "Pode instalar a OpenVPN Connect através da App Store.";
+
+/* title of ok button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn connect app prompt ok button title" = "App Store";
+
+/* title of the show tutorial button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn show tutorial button title" = "Mostrar o tutorial";
+
+/* title of cancel button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn connect app prompt cancel button title" = "Cancelar";
+
+/* title of alert to point out that installing a ovpn configuration requires openvpn connect */
+"installing ovpn requires openvpn connect alert title" = "Necessaria a aplicação OpenVPN Connect";
+
+/* message of alert to point out that installing a ovpn configuration requires openvpn connect */
+"installing ovpn requires openvpn connect alert message" = "Para usar o VPN necessita da aplicação OpenVPN Connect. Pode instala-la através da App Store agora.";
+
+/* format of the accessibility label of the vpn profile cell when user is not subscribed to snowhaze premium */
+"vpn profile missing subscription accessibility label format" = "%@ - Requer assinatura SnowHaze Premium";
+
+/* format of the accessibility label of the vpn profile cell when the profile is being downloaded */
+"vpn profile downloading accessibility label format" = "%@ - Download";
+
+/* format of the accessibility label of the vpn profile cell when the profile credentials are not yet downloaded */
+"vpn profile download required accessibility label format" = "%@ - Requer download";
+
+/* indication that the ipsec vpn is connected */
+"connected ipsec vpn state title" = "Conectado";
+
+/* indication that the ipsec vpn is connecting */
+"connecting ipsec vpn state title" = "Conectando";
+
+/* indication that the ipsec vpn is disconnected */
+"disconnected ipsec vpn state title" = "Não Conectado";
+
+/* indication that the ipsec vpn is disconnecting */
+"disconnecting ipsec vpn state title" = "Desconectando";
+
+/* indication that the ipsec vpn profile is currently invalid */
+"invalid ipsec vpn state title" = "Carregando";
+
+/* indication that the ipsec vpn is reasserting */
+"reasserting ipsec vpn state title" = "Reconectando";
+
+/* prompt for user to select the ipsec vpn profile */
+"select ipsec vpn profile prompt" = "Selecionar Localização";
+
+/* accessibility label of prompt for user to select the ipsec vpn profile when user is not subscribed to snowhaze premium */
+"select ipsec vpn profile prompt missing subscription accessibility label" = "Selecionar Localização - Requer assinatura SnowHaze Premium";
+
+/* title of alert to warn users that a single installed VPN profile has expired */
+"vpn profile expiration warning single profile expired alert title" = "Perfil VPN expirado";
+
+/* message of alert to warn users that a single installed VPN profile has expired */
+"vpn profile expiration warning single profile expired alert message" = "Um dos seus perfis VPN instalados expirou. Você pode renová-lo nas configurações VPN.";
+
+/* title of alert to warn users that a single installed VPN profile is about to expire */
+"vpn profile expiration warning single profile expiring alert title" = "Perfil VPN expira";
+
+/* message of alert to warn users that a single installed VPN profile is about to expire */
+"vpn profile expiration warning single profile expiring alert message" = "Um dos seus perfis VPN instalados está prestes a expirar. Você pode renová-lo nas configurações VPN.";
+
+/* title of alert to warn users that multiple installed VPN profiles have expired */
+"vpn profile expiration warning multiple profiles expired alert title" = "Perfiles VPN expiraram";
+
+/* message of alert to warn users that multiple installed VPN profiles have expired */
+"vpn profile expiration warning multiple profiles expired alert message" = "Vários dos seus perfis VPN instalados expiraram. Você pode renová-los nas configurações VPN.";
+
+/* title of alert to warn users that multiple installed VPN profiles are about to expire */
+"vpn profile expiration warning multiple profiles expiring alert title" = "Perfiles VPN expiran";
+
+/* message of alert to warn users that multiple installed VPN profiles are about to expire */
+"vpn profile expiration warning multiple profiles expiring alert message" = "Vários de seus perfis VPN instalados estão prestes a expirar. Você pode renová-los nas configurações VPN.";
+
+/* title of vpn settings button of alert to warn users of VPN profile expiration */
+"vpn profile expiration warning alert vpn settings button title" = "Definições VPN";
+
+/* title of ignore button of alert to warn users of VPN profile expiration */
+"vpn profile expiration warning alert ignore button title" = "OK";
+
+/* name of app to provide IPSec VPN */
+"ipsec vpn app name" = "SnowHaze";
+
+/* name of app to provide OpenVPN VPN */
+"openvpn vpn app name" = "OpenVPN";
+
+/* title of button to delete website cache data records */
+"delete cache data button title" = "Eliminar cache";
+
+/* title of button to delete website cookies */
+"delete cookies button title" = "Apagar os cookies";
+
+/* title of button to delete website data stores records */
+"delete data stores button title" = "Apagar memória de dados";
+
+/* title for dialog to confirm deletion of all website cache records */
+"delete all caches confirm dialog title" = "Confirmação da eliminação";
+
+/* message format for dialog to confirm deletion of all website cache records */
+"delete all caches message format" = "Tem a certeza de querer apagar todos os %@ cache?";
+
+/* title for confirm option of dialog to confirm deletion of all website cache records */
+"delete all caches confirm option title" = "Excluir";
+
+/* title for confirm option of dialog to cancel deletion of all website cache records */
+"delete all caches cancel option title" = "Cancelar";
+
+/* title for dialog to confirm deletion of all cookies */
+"delete all cookies confirm dialog title" = "Confirmação da eliminação";
+
+/* message format for dialog to confirm deletion of all cookies */
+"delete all cookies message format" = "Tem a certeza de querer apagar os %@ cookies?";
+
+/* title for confirm option of dialog to confirm deletion of all cookies */
+"delete all cookies confirm option title" = "Excluir";
+
+/* title for confirm option of dialog to cancel deletion of all cookies */
+"delete all cookies cancel option title" = "Cancelar";
+
+/* title for dialog to confirm deletion of tracking cookies */
+"delete tracking cookies confirm dialog title" = "Confirmação da eliminação";
+
+/* message format for dialog to confirm deletion of tracking cookies */
+"delete tracking cookies message format" = "Tem a certeza de querer apagar os %@ cookies de rastreio?";
+
+/* title for confirm option of dialog to confirm deletion of tracking cookies */
+"delete tracking cookies confirm option title" = "Excluir";
+
+/* title for confirm option of dialog to cancel deletion of tracking cookies */
+"delete tracking cookies cancel option title" = "Cancelar";
+
+/* title for dialog to confirm deletion of all website data stores */
+"delete all data stores confirm dialog title" = "Confirmação da eliminação";
+
+/* message format for dialog to confirm deletion of all website data stores */
+"delete all data stores message format" = "Tem a certeza de querer apagar todos os %@ dados Web?";
+
+/* title for confirm option of dialog to confirm deletion of all website data stores */
+"delete all data stores confirm option title" = "Excluir";
+
+/* title for confirm option of dialog to cancel deletion of all website data stores */
+"delete all data stores cancel option title" = "Cancelar";
+
+/* title of button that deletes all history items */
+"clear history button title" = "Apagar histórico";
+
+/* title for dialog to confirm clearing of history */
+"clear history confirm dialog title" = "Confirmação da eliminação";
+
+/* message for dialog to confirm clearing of history */
+"clear history confirm dialog message" = "Tem a certeza de querer apagar o histórico?";
+
+/* title for confirm option of dialog to confirm clearing of history */
+"clear history confirm dialog confirm option title" = "Apagar";
+
+/* title for cancel option of dialog to confirm clearing of history */
+"clear history confirm dialog cancel option title" = "Cancelar";
+
+/* title for external bookmarks settings */
+"external bookmarks settings title" = "Marcadores externos";
+
+/* title of setting to index bookmarks in spotlight */
+"index bookmarks in spotlight setting title" = "Mostar separadores na barra de pesquisa";
+
+/* title of setting to add application shortcuts for bookmarks */
+"bookmark application shortcuts setting title" = "Atalhos no tela de inicio";
+
+/* title of setting to block image content from being loaded */
+"content blocker image content type" = "Imagem";
+
+/* title of setting to block style sheet content from being loaded */
+"content blocker style sheet content type" = "Style sheet";
+
+/* title of setting to block script content from being loaded */
+"content blocker script content type" = "Script";
+
+/* title of setting to block third party script content from being loaded */
+"content blocker third party script content type" = "Script de terceiros";
+
+/* title of setting to block font content from being loaded */
+"content blocker font content type" = "Fonte";
+
+/* title of setting to block raw content from being loaded */
+"content blocker raw content type" = "Raw";
+
+/* title of setting to block media content from being loaded */
+"content blocker media content type" = "Media";
+
+/* notice displayed on iOS 10 and lower devices to indicate that content type blockers require ios 11 or newer */
+"content type blockers require ios 11 notice" = "Requer iOS 11";
+
+/* format of the accessibility label for the close tab button of the tab switcher bar */
+"close tab from tab selection bar accessibility label format" = "Guia Fechado '%@'";
+
+/* accessibility label for more button (for tab settings) */
+"more button accessibility label" = "Mais";
+
+/* accessibility label for button to close a tab */
+"close tab button accessibility label" = "Fechar";
+
+/* privacy term to be appended to privacy assessment name */
+"privacy assessment privacy postfix" = " privacidade";
+
+/* accessibility label of button to load the previous page */
+"previous page button accessibility label" = "Voltar atrás";
+
+/* accessibility label of button to load the next page */
+"next page button accessibility label" = "Avançar";
+
+/* accessibility label of button to show share dialog */
+"share button accessibility label" = "Partilhar";
+
+/* accessibility label of button to show tab selection view */
+"show tab selection view button accessibility label" = "Separadores";
+
+/* accessibility label of button to show settings controller */
+"show settings controller button accessibility label" = "Definições";
+
+/* accessibility label of button to reload the current page */
+"reload page button accessibility label" = "Recarregar";
+
+/* accessibility label of button to create a new tab */
+"new tab button accessibility label" = "Novo separador";
+
+/* name of 'very good' privacy assessment */
+"very good privacy assessment name" = "Muito alta";
+
+/* name of 'good' privacy assessment */
+"good privacy assessment name" = "Alto";
+
+/* name of 'ok' privacy assessment */
+"ok privacy assessment name" = "OK";
+
+/* name of 'passable' privacy assessment */
+"passable privacy assessment name" = "Razoável";
+
+/* name of 'bad' privacy assessment */
+"bad privacy assessment name" = "Baixo";
+
+/* name of 'very bad' privacy assessment */
+"very bad privacy assessment name" = "Muito baixa";
+
+/* accessibility label of button to delete a day from history when in regular mode */
+"delete history day button accessibility label" = "Excluir";
+
+/* accessibility label of button to delete a day from history when in confirm mode */
+"delete history day button confirm accessibility label" = "Confirmação da eliminação";
+
+/* domain for wikipedia in the language used by the user */
+"localized wikipedia domain" = "pt.wikipedia.org";
+
+/* language for startpage in the language used by the user */
+"localized startpage language" = "portugues";
+
+/* name of the app store app used to confirm opening of url in other app */
+"open url in app app store app name" = "App Store";
+
+/* name of the itunes app used to confirm opening of url in other app */
+"open url in app itunes app name" = "iTunes";
+
+/* name of the mail app used to confirm opening of url in other app */
+"open url in app mail app name" = "Mail";
+
+/* name of the messages app used to confirm opening of url in other app */
+"open url in app messages app name" = "Mensagens";
+
+/* name of the maps app used to confirm opening of url in other app */
+"open url in app maps app name" = "Mapas";
+
+/* name of the whatsapp app used to confirm opening of url in other app */
+"open url in app whatsapp app name" = "WhatsApp";
+
+/* name of the workflow app used to confirm opening of url in other app */
+"open url in app workflow app name" = "Workflow";
+
+/* format string used to ask users if they want to open another app */
+"open url in app prompt format" = "Você realmente quer abrir o %@?";
+
+/* title of prompt to ask users if they want to open another app */
+"open url in app prompt title" = "Deixe SnowHaze";
+
+/* title of confirm button of prompt to ask users if they want to open another app */
+"open url in app prompt confirm button title" = "Sim";
+
+/* title of cancel button of prompt to ask users if they want to open another app */
+"open url in app prompt cancel button title" = "Não";
+
+/* title of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt title" = "Reenviar formulário";
+
+/* format string of message of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt format" = "Tem a certeza de deseja reenviar o formulário para '%@'?";
+
+/* message of prompt to ask users if they want to resubmit a form when the destination is unknown */
+"form resubmission confirmation prompt unknown url message" = "Tem a certeza de deseja reenviar o formulário?";
+
+/* title of confirm button of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt confirm button title" = "Continuar";
+
+/* title of cancel button of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt cancel button title" = "Cancelar";
+
+/* title of prompt to block xss */
+"block xss prompt title" = "Injeção de código bloqueada";
+
+/* format string of message of prompt to block xss on a known host */
+"block xss known host prompt format" = "Bloquear um URL potencialmente mal-intencionado em '%@' do carregamento";
+
+/* message of prompt to block xss on an unknown host */
+"block xss unknown host prompt message" = "Bloquear um URL potencialmente mal-intencionado do carregamento";
+
+/* title of block action of prompt to block xss on an unknown host */
+"block xss unknown host prompt block action title" = "Bloquear";
+
+/* title of load action of prompt to block xss on an unknown host */
+"block xss unknown host prompt load action title" = "Carga";
+
+/* title of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert title" = "Certificado inválido";
+
+/* format of message of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert message format" = "O certificado para o '%@' não é válido";
+
+/* title of continue button of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert continue button title" = "Continuar";
+
+/* title of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name */
+"certificate domain name mismatch alert title" = "Nome de domínio errado";
+
+/* format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is known */
+"certificate domain name mismatch known cert domain alert message format" = "O certificado para o '%@' foi emitido para '%@'";
+
+/* format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is not available */
+"certificate domain name mismatch unknown cert domain alert message format" = "O certificado para o '%@' foi emitido por outro domínio";
+
+/* title of continue button of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name */
+"certificate domain name mismatch alert continue button title" = "Continuar";
+
+/* title of cancel button of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert cancel button title" = "Cancelar";
+
+/* title of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert title" = "Parâmetro de rastreamento detectado";
+
+/* format of message of alert to warn users of a single url parameter on a known host identified as a tracking parameter */
+"tracking parameter found one parameter on known host alert format" = "O parâmetro '%@' em '%@' parece ser parâmetros de rastreamento. Deseja tirá-lo da pesquisa?";
+
+/* format of message of alert to warn users of a single url parameter on an unknown host identified as a tracking parameter */
+"tracking parameter found one parameter on unknown host alert format" = "O parâmetro '%@' parece ser parâmetros de rastreamento. Deseja tirá-lo da pesquisa?";
+
+/* separator used to separate multiple parameters in alert to warn users of url parameters identified as tracking parameters when three ore more where found */
+"tracking parameter found alert multiple parameters separator" = "', '";
+
+/* format of message of alert to warn users of multiple url parameters on a known host identified as tracking parameters */
+"tracking parameter found multiple parameters on known host alert format" = "Os parâmetros '%@' e '%@' em '%@' parecem ser parâmetros de rastreamento. Deseja tirá-los da pesquisa?";
+
+/* format of message of alert to warn users of multiple url parameters on an unknown host identified as tracking parameters */
+"tracking parameter found multiple parameters on unknown host alert format" = "Os parâmetros '%@' e '%@' parecem ser parâmetros de rastreamento. Deseja tirá-los da pesquisa?";
+
+/* title of ignore action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert ignore option title" = "Ignorar";
+
+/* title of cancel action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert cancel option title" = "Cancelar";
+
+/* title of strip action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert strip option title" = "Excluir a personalização";
+
+/* title of alert to warn users of dangerous sites */
+"dangerous site warning alert title" = "Atenção";
+
+/* explanation that the site might have malicious content */
+"malicious site warning reason" = "pode ser malicioso";
+
+/* explanation that the site might be a phishing site */
+"phishing site warning reason" = "esta registado como site de phishing";
+
+/* explanation that the site might contain malware */
+"malware site warning reason" = "pode conter malware";
+
+/* explanation that the site might contain harmful applications */
+"harmful application site warning reason" = "pode conter um aplicativo potencialmente prejudicial";
+
+/* explanation that the site might contain unwanted software */
+"unwanted software site warning reason" = "pode conter software indesejado";
+
+/* the separator used to separator most items in a (long) list of reasons a site might be dangerous. e.g. ', ' in 'a, b, c and d' */
+"dangerous site warning reason list main separator" = ", ";
+
+/* the separator used to separator the last 2 items in a list of reasons a site might be dangerous. e.g. ' and ' in 'a, b, c and d' */
+"dangerous site warning reason list final separator" = " e ";
+
+/* used instead of the domain name in the dangerous site warning if the domain is unknown */
+"dangerous site warning unknown domain name replacement" = "[Desconhecido]";
+
+/* format string for the message of the dangerous site warning alert */
+"dangerous site warning alert message format" = "Este site é %@. Por favor seja cuidadoso .\n\nDomínio suspeito: %@";
+
+/* format string for the message of the dangerous site warning alert when at least part of the warnings was generated by google safebrowsing data */
+"safebrowsing dangerous site warning alert message format" = "Este site é %@. Por favor seja cuidadoso .\n\nDomínio suspeito: %@\n\nEsta mensagem é uma proposta do Google. A mensagem foi gerada localmente. Não é necessária nenhuma conexão entre o seu aparelho e um servidor Google, ou qualquer outro servidor.";
+
+/* title of the continue button of the alert to warn users of dangerous sites */
+"dangerous site warning alert continue button title" = "Continuar";
+
+/* title of the cancel button of the alert to warn users of dangerous sites */
+"dangerous site warning alert cancel button title" = "Cancelar";
+
+/* title of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog title" = "Ligar";
+
+/* format for message of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog message format" = "Você quer ligar para '%@'?";
+
+/* title of confirm button of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog confirm button title" = "Sim";
+
+/* title of cancel button of dialog used to confirm the user wants to initiate a call */
+"cancel call dialog confirm button title" = "Não";
+
+/* title of tab settings popover */
+"tab settings title" = "Separador com definições";
+
+/* HTML of message shown when the memory game is won */
+"congratulation message html" = "Parabéns";
+
+/* title of button to create tab in tab settings popover */
+"tab settings create tab button title" = "Criar um separador";
+
+/* title of settings in tab settings to enable / disable search suggestions */
+"show search suggestions tab settings title" = "Sugestões de Pesquisa";
+
+/* displayed instead of domain name if the current page is an errorpage in page settings */
+"page settings errorpage description" = "Erro de página";
+
+/* displayed instead of domain name if the current page is a data URI in page settings */
+"page settings data uris description" = "Data URI scheme";
+
+/* displayed instead of domain name if url.host is nil in page settings */
+"page settings domain name placeholder" = "Esta página";
+
+/* title format of page settings popover (format specifier for domain name) */
+"page settings title format" = "Atividade %@";
+
+/* button of apply button of page settings */
+"page settings apply button title" = "Aplicar";
+
+/* title of button to temporarily set a page setting */
+"temporary page settings button title" = "Tentar";
+
+/* title of page setting to allow popovers */
+"allow popovers page setting title" = "Autorizar Pop-over";
+
+/* title of page setting to block cookies */
+"block cookies page setting title" = "Bloquear os cookies";
+
+/* is displayed when the user presses the page security icon without having loaded a page first */
+"local page settings unavailable notice" = "Nenhuma página carregada";
+
+/* title of prompt for http authentication */
+"http authentication prompt title" = "Credenciais de login";
+
+/* notice displayed in http authentication prompt when the specified credentials where incorrect */
+"http authentication prompt incorrect credentials notice" = "O servidor rejeitou as credenciais";
+
+/* prompt displayed in http authentication prompt when a realm is specified */
+"http authentication prompt existing realm prompt" = "Insira o seu '%@' de identificação de conexão para '%@'";
+
+/* prompt displayed in http authentication prompt when no realm is specified */
+"http authentication prompt missing realm prompt" = "Insira o sua identificação de conexão para '%@'";
+
+/* warning displayed when credentials entered in http authentication prompt will be transmitted insecurely */
+"http authentication prompt insecure transmission warning" = "ATENÇÃO: as suas credenciais serão transmitidas de maneira pouco segura";
+
+/* placeholder for username in prompt for http authentication */
+"http authentication prompt username placeholder" = "Nome do utilizador";
+
+/* placeholder for password in prompt for http authentication */
+"http authentication prompt password placeholder" = "Senha";
+
+/* title of continue button of http authentication prompt */
+"http authentication prompt continue button title" = "Continuar";
+
+/* title of cancel button of http authentication prompt */
+"http authentication prompt cancel button title" = "Cancelar";
+
+/* title of button of http authentication prompt to retrieve credentials from 1password */
+"http authentication 1password button title" = "1Password";
+
+/* default auth error title */
+"error page auth default title" = "Erro de autorização";
+
+/* default auth error message */
+"error page auth error default message" = "Você não possui um token de autorização válido. Você pode atualizá-lo nas configurações de assinatura.";
+
+/* default auth error information */
+"error page auth error default information" = "Pode acontecer que você não tenha recebido o token depois de se inscrever. Este site será recarregado assim que receber um token.";
+
+/* message shown when no error message is available but an url */
+"error page unexpected error message with url" = "Ocorreu um erro inesperado durante a abertura do %@";
+
+/* message shown when no error message is available */
+"error page unexpected error message" = "Ocorreu um erro inesperado";
+
+/* description of the error code on the errorpage */
+"error page error code description" = "Erro de código";
+
+/* default title of the errorpage */
+"error page default title" = "Ocorreu um erro";
+
+/* title of the details section on the errorpage */
+"error page details section title" = "Detalhes";
+
+/* description of the error domain on the errorpage */
+"error page error domain description" = "Erro de domínio";
+
+/* title of the button to get more information about the error */
+"error page more information button title" = "Mais informações";
+
+/* description of the error reason on the errorpage */
+"error page error reason description" = "Razão";
+
+/* title of the reload button on the errorpage */
+"error page reload button title" = "Recarregar";
+
+/* description of the url on the errorpage */
+"error page error url description" = "URL";
+
+/* description of the error file on the errorpage */
+"error page error file description" = "Ficheiro";
+
+/* description of the error mime type on the errorpage */
+"error page error mime type description" = "Tipo MIME";
+
+/* error page domain description where no host is available */
+"error page unknown domain" = "Domínio desconhecido";
+
+/* errormessage of the unknown file type errorpage */
+"unknown file type errorpage message" = "Este ficheiro não pode ser aberto porque o SnowHaze não reconhece este tipo de dados";
+
+/* errormessage format of the network error errorpage */
+"network error errormessage format" = "O SnowHaze não se pôde conectar a %@";
+
+/* errormessage format of the website error errorpage */
+"website error errormessage format" = "O SnowHaze não se pôde carregar %@";
+
+/* title of the unknown file type errorpage */
+"unknown file type errorpage title" = "Tipo de ficheiro desconhecido";
+
+/* title of the network error errorpage */
+"network error errorpage title" = "Erro de rede";
+
+/* title of the website error errorpage */
+"website error errorpage title" = "Erro de site web";
+
+/* html of the title of the error page displayed if a page preview could not be loaded */
+"failed to load page preview error page title html" = "<title>Erro de carragamento da página</title>";
+
+/* html of the content of the error page displayed if a page preview could not be loaded */
+"failed to load page preview error page content html" = "<span>Falha ao carregar a página</span>";
+
+/* title of button to move from first to second tutorial page */
+"tutorial start tutorial button title" = "Iniciar o tutorial";
+
+/* title of button to leave tutorial from first page */
+"tutorial skip tutorial button title" = "Saltar o tutorial";
+
+/* title of the tutorial button to visit the online tutorial */
+"visit online tutorial button title" = "Visitar a tutorial online";
+
+/* title of the tutorial button to subscribe to snowhaze premium */
+"subscribe now tutorial button title" = "Inscreva agora";
+
+/* html of first tutorial page content */
+"tutorial welcome html" = "<h3>Benvindo!</h3><p>SnowHaze – o navegador que protege os seus dados pessoais.</p>";
+
+/* content of 2. tutorial page */
+"tutorial 2. page content" = "SnowHaze funciona como qualquer outro navegador.";
+
+/* content of 3. tutorial page */
+"tutorial 3. page content" = "Graças às definições, pode adaptar o SnowHaze às suas preferências.";
+
+/* content of 4. tutorial page */
+"tutorial 4. page content" = "SnowHaze indica o nível de proteção de dados em função das suas definições.";
+
+/* content of 5. tutorial page */
+"tutorial 5. page content" = "Muda temporária ou permanentemente as definições para sites individuais ou abre separadores com definições diferentes.";
+
+/* content of 6. tutorial page */
+"tutorial 6. page content" = "Selecione atualizações automáticas para estar sempre atualizado.";
+
+/* title of button to leave tutorial from last page */
+"tutorial end tutorial button title" = "Iniciar o SnowHaze";
+
+/* title of button to switch to next tutorial page */
+"tutorial continue button title" = "Continuar";
+
+/* TODO: + add update tutorial textshtml of first update tutorial page content */
+"update tutorial welcome html" = "<h3>Bem-vindo à versão 2.5</h3> <p>Olá, temos uma nova versão do SnowHaze para você.</p>";
+
+/* content of 2. update tutorial page */
+"update tutorial 2. page content" = "SnowHaze VPN vem agora em duas versões. IPsec pode ser controlada dentro do aplicativo. O OpenVPN ainda funciona como antes.";
+
+/* content of 3. update tutorial page */
+"update tutorial 3. page content" = "A partir da versão 2.5, o SnowHaze indica sites não criptografados com um símbolo .";
+
+/* title of button to leave the update tutorial from last page */
+"update tutorial end tutorial button title" = "Iniciar o SnowHaze";
+
+/* title of button to leave update tutorial from first page */
+"update tutorial skip tutorial button title" = "Saltar";
+
+/* title of button to move from first to second update tutorial page */
+"update tutorial start tutorial button title" = "O que há de novo";
+
+/* header for the message from the developers in en, fr, de */
+"update tutorial message from developers header" = "no message";
+
+/* message from the developers in en, fr, de */
+"update tutorial message from developers content" = "no message";
+
+/* explanations of the application settings */
+"application settings explanation" = "<p>Aqui você encontra as configurações gerais do SnowHaze.</p><p><strong>Sugestões sites locais:</strong>Pode selecionar se deseja que os sites das listas locais sejam sugeridos aquando da utilização de motores de pesquisa.</p><p><strong>Sugerir sites privados:</strong> Quando essa opção estiver ativada o SnowHaze pode sugerir site privados ao se realizar uma busca. Quando essa opção estiver desativada continuarão sendo sugeridos sites que não são privados. Por razões de proteção à juventude, você pode querer desativar esta opção.</p><p><strong>Auto-update a lista de Sites / Somente Wi-Fi</strong>Pode também escolher se as diferentes listas de sites web ( sites de rastreio, sites de publicidade, sites de phishing ou de falsificação de identidade, sites de malware) devem ser atualizados automaticamente ou se devem ser atualizados somente quando existe uma ligação Wi-Fi. A atualização das listas faz-se automaticamente se subscrever o SnowHaze Premium, se não for o caso, a atualização faz-se a cada mudança de versão do SnowHaze. Se escolher desligar as atualizações automáticas, as listas serão apagadas.</p><p><strong>Restaurar um Separador:</strong> Escolher o intervalo de tempo durante o qual é possível restaurar um separador quando este e abanado. Especifique se todos os separadores podem ser recuperados, incluindo os separadores Privados.</p><strong>Mascarar os Separados:</strong> O conteúdo de um separador pode ser mascarado quando este não é atualizado. Escolha os separadores que podem ser mascarados.";
+
+/* explanations of the javascript settings */
+"javascript settings explanation" = "<p>Definições do JavaScript. O JavaScript é uma linguagem de programação utilizada por inúmeros sites de internet e é suportado pela maior parte dos navegadores. O JavaScript permite-nos tirar o melhor partido possível dos sites em termos de apresentação e de utilização das diferentes funcionalidades. O JavaScript é responsável pela maior parte dos conteúdos interativos e dinâmicos.</p><p><strong>Autorizar JavaScript:</strong> Ativar esta opção, permite o carregamento de conteúdos do JavaScript. É preferível desativar esta opção quando navegar em sites pouco seguros. <u>Nota:</u> é possível que algumas páginas web apresentem alguns erros se esta opção estiver desativada.</p><p><strong>Autorizar Scripts de aplicação:</strong> Os scripts de aplicação são elementos do JavaScript gerados pelo SnowHaze. São utilizados para ativar determinadas funcionalidades tais como a pesquisa e a proteção do registo dos sites visitados.</p><strong>Gerenciador de Senhas:</strong> Desligue a integração dos gerenciadores de senhas.";
+
+/* explanations of the website data settings */
+"website data settings explanation" = "<p>Definições de dados Web. Os dados Web incluem cookies, caches e outras formas de armazenamento de dados.</p><p>Cache é um conjunto de copias de sites visitados. Assim, ao visitar um site pela segunda vez, os dados são carregados a partir do cache, não sendo necessário um segundo download.</p><p>Cookie é um pequeno pacote de dados com informações sobre o site visitado. Quando um site utiliza cookies, estes dados são armazenados no computador do utilizador. Quando esse site é revisitado, esses dados são enviados a esse site. Os cookies podem então ser usados para reconhecer padrões de comportamento e de interesses do utilizador.</p><p><strong>Armazenar dados Web:</strong> Dados Web como cache, cookies e outros são armazenados.</p><p><strong>Bloquear os cookies:</strong> Escolha entre bloquear todos os cookies, nenhum cookie, ou somente os cookies de terceiros.</p><p><strong>Apagar todos os dados Web:</strong> Todos os dados Web são apagados.</p><p><strong>Eliminar cache:</strong> Os cache são apagados.</p><p><strong>Apagar os cookies:</strong> Todos os cookies são apagados.</p><p><strong>Apagar memória de dados:</strong> Todos os outros dados armazenados pelos sites são apagados.</p><strong>Apagar os tracking cookies:</strong> Apague os cookies de sites cujo objetivo principal  é fazer tracking.";
+
+/* explanations of the user agent settings */
+"user agent settings explanation" = "Escolha o seu agente de usuário de preferência. Um agente de usuário é uma linha de texto que identifica o aparelho e o browser utilizado. Essa linha de texto é enviada a cada site visitado. Os sites podem assim formatar o conteúdo da página Web de acordo com o seu agente de usuário. Os agentes de utilizador são uma das principais ferramentas utilizadas no rastreamento de informações visto que contêm muitas informações sobre o aparelho do utilizador. É recomendado, portanto, utilizar vários agentes de utilizador ou muda-los regularmente. <u>Nota:</u> Mudar de agente de utilizador pode provocar erros no carregamento da página.";
+
+/* explanations of the defaults settings */
+"defaults settings explanation" = "<p>Reinicializar as preferências do SnowHaze.</p><p><strong>Reiniciar as definições:</strong> Reinicia todas as definições transformando-as nas definições por defeito recomendadas pelo SnowHaze. Podem mudar-se as definições ao mudarem-se as opções nas diversas categorias. A mudança de cor indica se a opção aumentou ou diminuiu o nível de proteção dos dados.</p><p><strong>Reinicialização definições da página:</strong> Reinicializa as definições realizadas pelos sites.</p><strong>Reiniciar o tutorial:</strong> Reinicializa a breve introdução inicial do SnowHaze.";
+
+/* explanations of the contact settings */
+"contact settings explanation" = "Contacte-nos por e-mail ou visite o nosso website. Se tiver alguma duvida ou problema, não hesite em contactar-nos. Pode também visitar o nosso website ou partilhar o SnowHaze com os seus amigos e família e escrever SnowHaze na App Store.";
+
+/* explanations of the search engine settings */
+"search engine settings explanation" = "<p>Escolha o seu motor de busca preferido.</p><p><strong>Motor de busca:</strong> Um motor de busca é uma ferramenta utilizada para fazer pesquisas na internet, como por exemplo o Google, Yahoo e outros. As pesquisas realizadas através da barra de pesquisa são tratadas pelo motor de busca escolhido. Se 'nenhum' motor de busca for selecionado, só é possível aceder a uma página Web ao indicar o endereço exato da página ou através do histórico de pesquisa ou dos favoritos.</p><strong>Sugestões de Pesquisa:</strong> Além do motor de busca, também outros serviços podem sugerir temas que o podem interessar.";
+
+/* explanations of the history settings */
+"history settings explanation" = "<p>Gestão do histórico. O histórico é uma lista dos sites visitados bem como a hora e a data da visita. É possível aceder a uma página visitada anteriormente ao clicar no nome da mesma na lista do histórico.</p><p><strong>Guardar o histórico:</strong> Ao escolher esta função, o histórico é salvaguardado no aparelho do utilizador e só pode ser consultado pelo mesmo. O SnowHaze não guarda nenhum registo das páginas visitadas no histórico caso esta opção esteja desativada.</p><p><strong>Esquecer os sites privados:</strong> A visita de sites privados não será guardada no histórico, mesmo que a opção 'guardar histórico' esteja ativada.</p><strong>Apagar histórico:</strong> Todo o histórico é apagado.";
+
+/* explanations of the media playback settings */
+"media playback settings explanation" = "<p>Escolher de que maneira os médias, como vídeo e áudio, devem ser lidos.</p><p><strong>Exigir uma ação:</strong> O utilizador deve clicar para abrir a leitura dos médias. <u>Nota:</u> Desativar esta opção pode provocar um aumento do consumo dos dados móveis, visto que a leitura dos médias começará automaticamente.</p><strong>Autorizar a leitura em linha:</strong> Autoriza a leitura de vídeos sem os passar em modo de ecrã inteiro.";
+
+/* explanations of the tracking protection settings */
+"tracking protection settings explanation" = "<p>Impedir que os sites recolham e guardem informação do utilizador. Os sites Web recorrem a diferentes métodos para recolher informação sobre os utilizadores que os visitam. Trata-se de informações como por exemplo os interesses de cada visitante, o seu padrão de pesquisa ou ainda o tipo de sites que visitou. Alguns sites podem até rastrear o visitante mesmo depois deste sair e fechar a janela do seu site.</p><p><strong>Bloquear os referentes HTTP:</strong> Quando esta opção está ativada, o proprietário de cada site não receberá as informações dos sites que o utilizador visitou anteriormente.</p><p><strong>Bloquear os scripts de rastreio:</strong> Bloqueia os conteúdos JavaScript dedicados ao rastreio dos utilizadores.</p><p><strong>Bloquear anúncios:</strong> Essa configuração permite bloquear os anúncios em algumas páginas.</p><p><strong>Bloquear Canvas Fingerprinting:</strong> Canvas Fingerprinting é um método utilizado para identificar o utilizador sem recorrer ao uso de cookies. Bloquear esta opção impede a identificação e o rastreio de atividades.</p><p><strong>Bloquear Fingerprinting:</strong> Ativar esta funcionalidade protege contra vários méthodos de rastreamento usados na internet.</p><p><strong>Bloqueio share buttons:</strong> Esta opção retira dos sites web o conteúdo de redes sociais ( ex.: o ícone 'gostei' de Facebook e de outros widgets).</p><strong>Ocultar desbloqueado:</strong> Esse recurso oculta o conteúdo que deseja bloquear, mas não pode ser interrompido de carregar.";
+
+/* explanations of the https settings */
+"https settings explanation" = "<p>Escolher definições para uma conexão segura. Para se conectar a uma página Web é necessário um protocolo chamado HTTP. À versão segura do HTTP dá-se o nome de HTTPS. Na barra URL aparece o símbolo de um cadeado, o que assinala a conexão HTTPS.</p><p><strong>Tentar primeiro HTTPS:</strong> Tentar sempre estabelecer uma conexão HTTPS antes de passar à conexão HTTP. <u>Nota:</u> Ativar esta opção pode tornar o SnowHaze mais lento (enquanto a a conexão se estabelece).</p><p><strong>HTTPS se disponivel:</strong> Estabelecer conexões HTTPS somente em sites conhecidos por suportarem conexões seguras.</p><strong>Bloqueio de conteúdo misto:</strong> Alguns sites HTTPS podem ter conteúdo HTTP não seguro. Este conteúdo pode ser substituído por um invasor para roubar suas informações. O SnowHaze bloqueia este conteúdo misto em sites seguros se esta opção estiver ativada.";
+
+/* explanations of the appearance settings */
+"appearance settings explanation" = "<p>Escolher a apresentação dos sites no SnowHaze.</p><p><strong>Modo noite:</strong> O modo noite modifica as cores, de modo a tornar mais agradável a visualização num ambiente mais escuro.</p><p><strong>Tamanho de letra:</strong> Os textos apresentados em letras pequenas são automaticamente aumentados para o tamanho mínimo pré escolhido.</p><strong>Ignorar limites de escala:</strong> Ignore os limites definidos por um determinado site e redimensione o conteúdo conforme desejar.";
+
+/* explanations of the popover settings */
+"popover settings explanation" = "<p>Definições popover. Popovers são separadores abertos automaticamente por outros separadores.</p><p><strong>Bloquear todos:</strong> Bloqueia a abertura automática de separadores.</p><p><strong>Permitir que o usário dispare:</strong> Os popovers só se abrem uma vez abertos ativamente pelo utilizador (ao clicar no link).</p><strong>Autorizar todos:</strong> Não é aplicada nenhuma restrição à abertura de popovers.";
+
+/* explanations of the external bookmark settings */
+"external bookmark settings explanation" = "<p>Definições para a gestão de marcadores.</p><p><strong>Mostar separadores na barra de pesquisa:</strong> Esta opção permite a apresentação dos marcadores como sugestões na Spotlight.</p><strong>Atalhos no tela de inicio:</strong> Permite a existência de atalhos no ecrã inicial em aparelhos que suportam 3D Touch.";
+
+/* explanations of the content type blockers settings */
+"content type blockers settings explanation" = "SnowHaze pode bloquear diferentes conteúdos nas páginas da web. Escolha o tipo de conteúdo que deseja bloquear. <u>Nota:</u> é possível que algumas páginas web apresentem alguns erros.";
+
+/* explanations of the acknowledgements settings tab */
+"acknowledgements settings explanation" = "O desenvolvimento do SnowHaze foi grandemente facilitado pelo uso de códigos de terceiros e de projetos de open source. Agradecemos às pessoas que gerem os seguintes projetos: AgileBits Inc. por 1PasswordExtension, phishtank.com por o banco de dados de verificação de phishing, Zetetic LLC por SQLCipher, os autores de EasyList (easylist.github.io) fanboy, MonztA, Famlam e Khrin para as listas EasyList, EasyPrivacy e Fanboy's Social Blocking e o Polish TeX Users Group GUS por TeX gyre Adventor. SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. As licenças e direitos de autor dos projetos de open source utiizados. Design created by Basestudio.";
+
+/* explanations of the subscription settings tab */
+"subscription settings explanation" = "<p>Subscreva o SnowHaze Premium para ter acesso ao SnowHaze VPN, ao motor de pesquiza SnowHaze e a atualizações frequente de listas de sites. Os primeiros 7 dias são gratuitos para assinantes iniciantes. Existem subscrições de autorrenovação mensais ou anuais.</p><p><strong>Auto-update opções</strong> atualiza os planos de subscrição.</p><p><strong>Auto-Update token</strong> atualiza o autorização.</p><p><strong>Hash do token</strong> é um código utilizado para verificar a subscrição atual.</p>A inscrição anuais do SnowHaze Premium é válidas por um ano; a inscrição mensal SnowHaze Premium é válida por um mês. Durante este período, você tem acesso ao SnowHaze VPN, o motor de busca do SnowHaze e suas listas são atualizadas frequentemente. O pagamento é cobrado na sua conta iTunes ao confirmar a compra. Todas as inscrições são renovadas automaticamente, a menos que você desligue a renovação automática pelo menos 24 horas antes do final da assinatura. Sua conta será cobrada no prazo de 24 horas antes do final da assinatura. Você pode gerenciar sua assinatura nas configurações da conta tocando em 'Visualizar todas as minhas subscrições'. Qualquer parcela não utilizada de um período de teste gratuito será perdida quando você comprar a assinatura correspondente.";
+
+/* explanations of the vpn settings tab */
+"vpn settings explanation" = "<p>Um VPN (Virtual Private Network) é uma conexão encriptada a um servidor. Toda e qualquer ligação entre o seu dispositivo e a internet passa primeiro pelo servidor VPN. O receptor vê somente o endereço IP do servidor VPN e não o seu endereço IP real, o que é altamente importante para prevenir o rastreamento. Visite snowhaze.com/vpn para mais informação.</p><p>O VPN protege-o dos ataques de interceptadores ( ataque MITM), oculta o seu trafego de dados, sempre a encriptação do seu trafego para o servidor de VPN.</p><p>Oferecemos dois tipos diferentes de VPNs, que usam protocolos diferentes. Um é um protocolo chamado IPSec, o outro é o OpenVPN. A VPN que usa o IPSec pode ser facilmente controlada no aplicativo SnowHaze, enquanto o OpenVPN exige que você use o aplicativo OpenVPN Connect e atualize seus perfis mensalmente. No entanto, o OpenVPN é um pouco mais seguro que o IPSec. Este é um pequeno compromisso entre usabilidade (IPSec) e segurança (OpenVPN) que podemos deixar com segurança para você.</p><p>A SnowHaze VPN não registra absolutamente nada e é o único serviço de VPN que usa autorização de não identificação.</p><p>Subscreva o SnowHaze Premium para poder usar o VPN. SE ainda não configurou o VPN, por favor siga os passos do tutorial online.</p><p><strong>Auto-Update os localização:</strong> atualiza a localização do servidor VPN disponível.</p><strong>Mostrar Ping:</strong> informa quanto tempo é necessário para que os dados sejam transferidos do seu dispositivo até ao servidor e de volta ao seu dispositivo.";
+
+/* explanations of the passcode settings tab */
+"passcode settings explanation" = "<p>Pode proteger o SnowHaze através da utilização de uma palavra passe. Escolha, mude ou elimine a sua palavra passe abaixo.</p><p><strong>MODO:</strong> Selecione se deseja ter apenas um código ou palavra passe ou se prefere acrescentar o uso a ID biométrica (Touch ID ou Face ID). Pode também escolher o intervalo de tempo depois do qual o SnowHaze será bloqueado.</p><strong>FORMATO:</strong> Selecione o tipo de palavra passe, ou seja, se prefere um código de seis dígitos (ex. 378291) um código numérico longo (ex. 73820983772) ou um código alfanumérico (ex. $7&9jK-55[*d_4).";
+
+/* explanations of the warnings settings tab */
+"warnings settings explanation" = "<p>Selecione quais os avisos que deseja receber do SnowHaze.</p><p><strong>Sites perigosos:</strong> O SnowHaze avisa-o quando estiver prestes a aceder a um site de malware ou de pishing. Estes sites podem engana-lo e roubar as suas palavras passe, informação relativa a cartões de crédito, etc.</p><p><strong>Certificados TLS:</strong> O SnowHaze avisa-o se a certificação TSL não estiver correta. Estes certificados são utilizados para estabelecer ligações seguras.</p><p><strong>Parâmetros de rastreamento:</strong> Alguns URL contêm elementos personalizados que podem ser usados para rastreamento. SnowHaze pergunta se você deseja enviar a consulta sem essa personalização.</p><strong> Prevenir o XSS:</strong> O cross-site scripting (XSS) é um tipo de ataque, onde os invasores inserem o código nas páginas da Web. SnowHaze pergunta se você deseja bloquear essas inserções de código quando esta configuração estiver ativada.";
+
+/* title of prompt to explain http warning indicator */
+"http warnings explanation prompt title" = "Avisos HTTP";
+
+"site lists > 1 day old notice format" = "%@ dias de idade";
+
+"site lists 1 day old notice" = "1 dia de idade";
+
+"site lists 0 days old notice" = "atualizado";
+

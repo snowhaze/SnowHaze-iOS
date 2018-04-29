@@ -1,0 +1,1504 @@
+/* Localizable.strings
+	SnowHaze
+	Copyright © 2017 Illotros GmbH. All rights reserved. */
+
+/* code used to identify the current locale */
+"localization code" = "ja";
+
+/* title of prompt to warn user that their snowhaze version is old */
+"old snowhaze version prompt title" = "Snowhazeの旧バージョン";
+
+/* format string of message of prompt to warn user that their snowhaze version is old */
+"old snowhaze version prompt message format" = "使用から6月以上が経過し、お使いのSnowHaze(%@)のサーポート期間は終了しました。新しいバージョンのSnowHazeへの更新をお願いいたします。";
+
+/* title of button to lead users to the app store to update snowhaze */
+"old snowhaze version prompt update button title" = "App Store";
+
+/* title of button to ignore old snowhaze version warning */
+"old snowhaze version prompt ignore button title" = "無視する";
+
+/* title of home page displayed in url bar */
+"home screen page title" = "ホーム";
+
+/* displayed instead of title for masked tabs in app snapshots */
+"masked tab title" = "マスクされた";
+
+/* title for settings controller navigation item */
+"settings title" = "設定";
+
+/* title for general settings section */
+"general settings title" = "一般";
+
+/* title for premium settings section */
+"premium settings title" = "PREMIUM";
+
+/* title for privacy settings section */
+"privacy settings title" = "プライバシー";
+
+/* title for default settings section */
+"default settings title" = "規定/デフォルト";
+
+/* title for about settings section */
+"about settings title" = "情報";
+
+/* title for bookmark section */
+"bookmarks view title" = "ブックマーク";
+
+/* title for history section */
+"history view title" = "履歴";
+
+/* Used to confirm message */
+"js alert panel confirmation button title" = "OK";
+
+/* Used to accept message */
+"js confirm panel confirm button title" = "OK";
+
+/* Used to decline message */
+"js confirm panel cancel button title" = "キャンセル";
+
+/* Used to enter text */
+"js text prompt confirm button title" = "OK";
+
+/* Used to not enter text */
+"js text prompt cancel button title" = "キャンセル";
+
+/* title of button to ignore further alerts by this site */
+"ignore alerts from this site alert button title" = "アラートを無視する";
+
+/* title of the activity to create a new bookmark */
+"add bookmark activity title" = "ブックマークに追加";
+
+/* title of the activity to enter reader mode */
+"reader mode activity title" = "読書モード";
+
+/* preposition indication offset in set e.g. page 5 'of' 7 */
+"page offset indication preposition" = "の";
+
+/* name of document that has not been given a name */
+"untitled document name" = "無題";
+
+/* title of button to delete bookmark in bookmark view */
+"delete bookmark button title" = "削除";
+
+/* title of button to refresh bookmark in bookmark view */
+"refresh bookmark button title" = "再読み込み";
+
+/* title of button to rename bookmark in bookmark view */
+"rename bookmark button title" = "名前を付ける";
+
+/* title of button to delete all history section of a day */
+"delete history section button title" = "削除";
+
+/* title of cancel button of passcodecontroller */
+"passcodecontroller cancel button title" = "キャンセル";
+
+/* passcodecontrollers prompt to provide biometric authentication or enter passcode for verification */
+"passcodecontroller biometrics or passcode prompt" = "生体認証IDまたはパスコード";
+
+/* passcodecontrollers prompt to enter passcode for verification */
+"passcodecontroller passcode prompt" = "パスコードを入力して下さい。";
+
+/* passcodecontrollers prompt to provide new passcode */
+"passcodecontroller new passcode prompt" = "新しいパスコードを入力して下さい。";
+
+/* passcodecontrollers prompt to provide biometric authentication or enter old passcode for verification before passcode change */
+"passcodecontroller biometrics or old passcode prompt" = "生体認証IDまたは古いパスコード";
+
+/* passcodecontrollers prompt to enter old passcode for verification before passcode change */
+"passcodecontroller old passcode prompt" = "現在までのパスコードを入力して下さい。";
+
+/* passcodecontrollers prompt to confirm new passcode before setting it up or changing it */
+"passcodecontroller new passcode confirm prompt" = "新しいパスコードを確認して下さい";
+
+/* text to indicate that the passcode is currently being verified */
+"passcodecontroller verifying passcode notice" = "パスコードを確認中です…";
+
+/* text to indicate that the provided passcode is correct */
+"passcodecontroller passcode correct notice" = "パスコードが正しく入力されました";
+
+/* text to indicate that the provided passcode is incorrect */
+"passcodecontroller passcode incorrect notice" = "パスコードが間違っています";
+
+/* text to indicate that the provided passcodes did not match when setting up or changing passcode */
+"passcodecontroller passcodes do not match notice" = "パスコードが一致しません";
+
+/* text to indicate that passcode is being set up */
+"passcodecontroller setting up passcode notice" = "パスコードを設定中です…";
+
+/* text to indicate that passcode is being changed */
+"passcodecontroller changing up passcode notice" = "パスコードの変更中…";
+
+/* text to indicate that the passcode setup succeeded */
+"passcodecontroller passcode setup succeeded notice" = "パスコードの設定";
+
+/* text to indicate that the passcode change succeeded */
+"passcodecontroller passcode change succeeded notice" = "パスコードが変更されました";
+
+/* text to indicate that the passcode setup failed */
+"passcodecontroller passcode setup failed notice" = "パスコードの設定に失敗しました";
+
+/* text to indicate that the passcode change failed */
+"passcodecontroller passcode change failed notice" = "パスコードの変更は失敗しました";
+
+/* text to indicate why the user should authenticate with biometrics when updating the passcode stored in the keychain */
+"passcodecontroller update keychain passcode biometrics prompt" = "パスコードを更新して下さい";
+
+/* text to indicate why the user should authenticate to snowhaze using biometrics */
+"passcodecontroller authenticate with biometrics prompt" = "生体認証IDの使用を認証する";
+
+/* error message displayed when app launch fails due to keychain error */
+"app launch failed keychain error message" = "iCloudキーチェーンでエラーが発生したため、SnowHazeをアンロックできませんでした。";
+
+/* title of button to retry when app launch fails due to keychain error */
+"app launch failed keychain error retry button title" = "リトライ";
+
+/* accessibility label of the passcode controllers number pad enter button */
+"passcodecontroller enter button accessibility label" = "入力";
+
+/* accessibility label of the passcode controllers number pad backspace button */
+"passcodecontroller backspace button accessibility label" = "バックスペース";
+
+/* accessibility label of the passcode controllers biometrics button */
+"passcodecontroller biometrics button accessibility label" = "生体認証ID";
+
+/* accessibility label of the passcode controllers code display when it is empty */
+"passcodecontroller code display 0 characters accessibility label" = "安全テキスト - ０文字";
+
+/* accessibility label of the passcode controllers code display when it is has 1 character */
+"passcodecontroller code display 1 character accessibility label" = "安全テキスト - １文字";
+
+/* accessibility label of the passcode controllers code display when it is has more than 1 character */
+"passcodecontroller code display many characters accessibility label" = "安全テキスト - %@文字";
+
+/* title of the activity to scan a (QR) code */
+"scan code activity title" = "スキャンコード";
+
+/* title of button to cancel code scanning */
+"code scan view controller cancel button title" = "キャンセル";
+
+/* title of button to finish code scanning */
+"code scan view controller done button title" = "完了";
+
+/* title of button to preview scanned code */
+"code scan view controller preview button title" = "プレビュー";
+
+/* error message displayed when user tries to scan a code but has not (yet) granted camera access */
+"code scan no camera access error message" = "カメラを使用できません\n設定アプリでアクセスを許可することができます。";
+
+/* discoverability title of key command to make a new tab */
+"new tab key command title" = "新しいタブ";
+
+/* discoverability title of key command to cancel user input */
+"cancel key command title" = "キャンセル";
+
+/* discoverability title of key command to start search input */
+"search key command title" = "開く";
+
+/* discoverability title of key command to select next suggestion */
+"next suggestion key command title" = "次の提案";
+
+/* discoverability title of key command to select previous suggestion */
+"previous suggestion key command title" = "以前の提案";
+
+/* discoverability title of key command to open selected suggestion */
+"open key command title" = "開く";
+
+/* title of preview action to open a link in a new tab */
+"open in new tab preview action title" = "新規タブで開く";
+
+/* title of preview action to open the url of a history item */
+"open history item preview action title" = "開く";
+
+/* title of preview action to copy the url of a history item */
+"copy history item preview action title" = "コピー";
+
+/* title of preview action to share the url of a history item */
+"share history item preview action title" = "共有...";
+
+/* title of preview action to open the url of a bookmark */
+"open bookmark preview action title" = "開く";
+
+/* title of preview action to copy the url of a bookmark */
+"copy bookmark preview action title" = "コピー";
+
+/* title of preview action to share the url of a bookmark */
+"share bookmark preview action title" = "共有...";
+
+/* title for acknowledgements */
+"acknowledgements settings title" = "確認";
+
+/* title for website data settings */
+"website data settings title" = "ウェブデータ";
+
+/* title for content type blockers settings */
+"content type blockers settings title" = "コンテンツブロッカー";
+
+/* title for defaults settings */
+"defaults settings title" = "規定";
+
+/* title for application settings */
+"application settings title" = "SnowHaze";
+
+/* title for javascript settings */
+"javascript settings title" = "JavaScript";
+
+/* title for search engine settings */
+"search engine settings title" = "検索エンジン";
+
+/* title for contact section */
+"contact settings title" = "連絡/コンタクト";
+
+/* title for user agent settings */
+"user agent settings title" = "ユーザーエージェント";
+
+/* title for history settings */
+"history settings title" = "履歴";
+
+/* title for media playback settings */
+"media playback settings title" = "メディアの再生";
+
+/* title of mark as trusted setting */
+"mark as trusted setting title" = "信頼";
+
+/* title of show local site suggestions setting */
+"show local site suggestions setting title" = "ローカルサイトのサジェスト";
+
+/* title of suggest private sites setting */
+"suggest private sites setting title" = "サジェストプライベートサイト";
+
+/* title of update site lists setting */
+"update site lists setting title" = "サイトリストの自動更新";
+
+/* indication that the currently installed site lists are up to date */
+"site lists 0 weeks old notice" = "当世風";
+
+/* indication that the currently installed site lists are 1 week old */
+"site lists 1 week old notice" = "１週前";
+
+/* format string of indication that the currently installed site lists are > 1 week old */
+"site lists > 1 week old notice format" = "%@週前";
+
+/* title of setting to prevent site lists updates from using cellular data */
+"no cellular data for site lists update setting title" = "Wi-Fi接続時のみ";
+
+/* indication that subscribing to premium gives access to frequent site lists updates */
+"subscribe to premium for daily site lists update notice" = "Premiumは頻繁に更新できます";
+
+/* title of settings to manage site lists */
+"site lists settings title" = "サイトリスト";
+
+/* title of settings for undoing tab closing */
+"allow tab closing undo settings title" = "タブを復元";
+
+/* title of settings for tab masking */
+"tab masking settings title" = "タブを隠す";
+
+/* title of setting for the duration during which closing a tab can be undone */
+"allow tab closing undo duration settings title" = "許可：";
+
+/* title of setting to allow tab closing to be undone for all tabs */
+"allow tab closing undo for all tabs settings title" = "すべてのタブを許可する";
+
+/* string used to indicate that tab closing cannot be undone */
+"tab closing undo time limit 0 seconds time" = "０秒";
+
+/* string used to indicate that tab closing can be undone for 1 second */
+"tab closing undo time limit 1 second time" = "１秒";
+
+/* format string used to indicate how long tab closing can be undone */
+"tab closing undo time limit many seconds time format" = "%@秒";
+
+/* title of allow application controlled javascript setting */
+"allow application script setting title" = "アプリケーションスクリプト";
+
+/* title of allow password manager gather script setting */
+"allow password manager gather script setting title" = "パスワードマネージャー";
+
+/* title of allow javascript setting */
+"allow javascript setting title" = "JavaScriptを許可";
+
+/* title of button to delete all website data records */
+"delete all data button title" = "すべてのサイトのデータを削除する";
+
+/* title for confirm option of dialog to cancel deletion of all website data records */
+"delete all data cancel option title" = "キャンセル";
+
+/* title for dialog to confirm deletion of all website data records */
+"delete all data confirm dialog title" = "削除を確認";
+
+/* title for confirm option of dialog to confirm deletion of all website data records */
+"delete all data confirm option title" = "削除";
+
+/* message format for dialog to confirm deletion of all website data records */
+"delete all data message format" = "%@個すべてのキャッシュを削除してもよろしいですか？";
+
+/* title of button to delete tracking cookies */
+"delete tracking cookies button title" = "トラッキングクッキーの消去";
+
+/* title of save website data records setting */
+"save website data setting title" = "ウェブサイトのデータを保存する";
+
+/* title of settings section to set the cookie blocking mode */
+"cookie blocking settings title" = "クッキーをブロックする";
+
+/* option to not block cookies of the block cookies setting */
+"block cookies setting none option" = "なし";
+
+/* option to block third party cookies of the block cookies setting */
+"block cookies setting third party option" = "サードパーティー";
+
+/* option to block all cookies of the block cookies setting */
+"block cookies setting all option" = "すべて";
+
+/* notice displayed on iOS 10 and lower devices to indicate that cookie blocking requires ios 11 or newer */
+"cookie blocking requires ios 11 notice" = "iOS 11が必要です。";
+
+/* string displayed to user to identify iphone safari user agent */
+"iphone safari user agent display name" = "Safari iPhone";
+
+/* string displayed to user to identify iphone chrome user agent */
+"iphone chrome user agent display name" = "Chrome iPhone";
+
+/* string displayed to user to identify iphone firefox user agent */
+"iphone firefox user agent display name" = "Firefox iPhone";
+
+/* string displayed to user to identify iphone opera user agent */
+"iphone opera user agent display name" = "Opera iPhone";
+
+/* string displayed to user to identify ipad safari user agent */
+"ipad safari user agent display name" = "Safari iPad";
+
+/* string displayed to user to identify ipad chrome user agent */
+"ipad chrome user agent display name" = "Chrome iPad";
+
+/* string displayed to user to identify ipad firefox user agent */
+"ipad firefox user agent display name" = "Firefox iPad";
+
+/* string displayed to user to identify ipad opera user agent */
+"ipad opera user agent display name" = "Opera iPad";
+
+/* string displayed to user to identify android default browser user agent */
+"android default browser user agent display name" = "アンドロイドの規定のブラウザ";
+
+/* string displayed to user to identify android chrome user agent */
+"android chrome user agent display name" = "Chrome Android";
+
+/* string displayed to user to identify android firefox user agent */
+"android firefox user agent display name" = "Firefox Android";
+
+/* string displayed to user to identify android opera user agent */
+"android opera user agent display name" = "Opera Android";
+
+/* title of button to reset global settings to defaults */
+"reset global settings button title" = "既定の設定にリセットする";
+
+/* title for cancel option of dialog to confirm resetting of global settings */
+"reset global settings confirm dialog cancel option title" = "キャンセル";
+
+/* title for confirm option of dialog to confirm resetting of global settings */
+"reset global settings confirm dialog confirm option title" = "リセット";
+
+/* message for dialog to confirm resetting of global settings */
+"reset global settings confirm dialog message" = "すべての設定をリセットしてもよろしいですか？";
+
+/* title for dialog to confirm resetting of global settings */
+"reset global settings confirm dialog title" = "リセットを確認";
+
+/* title of button to reset per page settings to defaults */
+"reset page settings button title" = "ページの設定をリセットする";
+
+/* title for cancel option of dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog cancel option title" = "キャンセル";
+
+/* title for confirm option of dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog confirm option title" = "リセット";
+
+/* message for dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog message" = "ページの設定をリセットしてもよろしいですか？";
+
+/* title for dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog title" = "リセットを確認";
+
+/* title of button to restart the tutorial */
+"restart tutorial settings button title" = "チュートリアルを再起動する";
+
+/* title of save history setting */
+"save history setting title" = "履歴を保存する";
+
+/* title for require user action for media playback setting */
+"require user action for media playback setting title" = "応答が要求されています";
+
+/* title for allow inline media playback setting */
+"allow inline media playback setting title" = "埋め込みプレーヤーを許可";
+
+/* name of bing search engine to be displayed to user */
+"bing search engine display name" = "Bing";
+
+/* name of google search engine to be displayed to user */
+"google search engine display name" = "Google";
+
+/* name of yahoo search engine to be displayed to user */
+"yahoo search engine display name" = "Yahoo";
+
+/* name of wikipedia search engine to be displayed to user */
+"wikipedia search engine display name" = "Wikipedia";
+
+/* name of wolframalpha search engine to be displayed to user */
+"wolframalpha search engine display name" = "WolframAlpha";
+
+/* name of ecosia search engine to be displayed to user */
+"ecosia search engine display name" = "Ecosia";
+
+/* name of startpage search engine to be displayed to user */
+"startpage search engine display name" = "Startpage";
+
+/* name of hulbee search engine to be displayed to user */
+"hulbee search engine display name" = "Hulbee";
+
+/* name of duckduckgo search engine to be displayed to user */
+"duckduckgo search engine display name" = "DuckDuckGo";
+
+/* name of none search engine to be displayed to user */
+"none search engine display name" = "なし";
+
+/* name of snowhaze search engine to be displayed to user */
+"snowhaze search engine display name" = "SnowHaze";
+
+/* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
+"snowhaze search engine missing subscription accessibility label" = "SnowHaze - SnowHaze Premiumの購読が必要です。";
+
+/* title of settings subsection to choose search engine */
+"search engine selection setting subsection title" = "検索エンジン";
+
+/* title of settings subsection to choose search engines for search suggestions */
+"search suggestion engines setting subsection title" = "予測検索";
+
+/* used to refer to the search engine selected by the user */
+"main search engine name" = "既定の検索エンジン";
+
+/* title of button to email support */
+"email support button title" = "Emailサポート";
+
+/* title of button to share snowhaze */
+"share snowhaze button title" = "SnowHazeを共有する";
+
+/* title of button to rate snowhaze on the app store */
+"rate snowhaze button title" = "評価";
+
+/* text use to prefill 'share' messagers */
+"snowhaze share text" = "こんにちは。\nSnowHazeはあなたの個人情報を保護する素晴らしいブラウザです。\nぜひウェブサイトをご覧ください。: snowhaze.com.\nApp Storeではアプリをダウンロードすることができます; snowhaze.com/download。";
+
+/* format of message of email to be sent to support */
+"support email message format" = "こんにちは。\n私はSnowHazeに関する質問があります。:\n\n\n\n以下をお答えください。\nメール: \n電話: \n\n私はSnowHazeを以下で使用しています。:\nデバイス: %@\nバージョン: %@\n言語: %@";
+
+/* title of email to be sent to support */
+"support email title" = "SnowHazeサポート";
+
+/* title of button to visit snowhaze website */
+"visit website button title" = "ウェブサイトへ移動する";
+
+/* title for tracking protection settings */
+"tracking protection settings title" = "トラッキング保護";
+
+/* title of block referer setting */
+"block referer setting title" = "HTTPリファラをブロックする";
+
+/* title for https settings */
+"https settings title" = "HTTPS";
+
+/* title of try https first setting */
+"try https first setting title" = "はじめにHTTPSを使う";
+
+/* subtitle for autocomplete search suggestions from bing */
+"bing search suggestion subtitle" = "Bing検索";
+
+/* subtitle for autocomplete search suggestions from google */
+"google search suggestion subtitle" = "Google検索";
+
+/* subtitle for autocomplete search suggestions from yahoo */
+"yahoo search suggestion subtitle" = "Yahoo検索";
+
+/* subtitle for autocomplete search suggestions from wikipedia */
+"wikipedia search suggestion subtitle" = "Wikipedia検索";
+
+/* subtitle for autocomplete search suggestions from wolframalpha */
+"wolframalpha search suggestion subtitle" = "WolframAlpha検索";
+
+/* subtitle for autocomplete search suggestions from ecosia */
+"ecosia search suggestion subtitle" = "Ecosia検索";
+
+/* subtitle for autocomplete search suggestions from startpage */
+"startpage search suggestion subtitle" = "Startpage検索";
+
+/* subtitle for autocomplete search suggestions from hulbee */
+"hulbee search suggestion subtitle" = "Hulbee検索";
+
+/* subtitle for autocomplete search suggestions from DuckDuckGo */
+"duckduckgo search suggestion subtitle" = "DuckDuckGo検索";
+
+/* subtitle for autocomplete search suggestions from snowhaze search */
+"snowhaze search search suggestion subtitle" = "SnowHaze検索";
+
+/* title of the activity to find some text on page */
+"find on page activity title" = "ページ内を検索";
+
+/* title of button to dismiss text input bar */
+"text input bar dismiss button title" = "完了";
+
+/* title of button to cancel renaming of bookmark */
+"bookmark rename bar cancel button title" = "キャンセル";
+
+/* title of use https exclusively when possible setting */
+"use https exclusively when possible setting title" = "既知のサイトにHTTPSを使用";
+
+/* title of mixed content blocking setting */
+"mixed content blocking setting title" = "混合コンテンツブロッカー";
+
+/* notice displayed on iOS 10 and lower devices to indicate that mixed content blocking requires ios 11 or newer */
+"mixed content blocking requires ios 11 notice" = "iOS 11が必要です。";
+
+/* title of block tracking scripts setting */
+"block tracking scripts setting title" = "トラッキングコードをブロック";
+
+/* title of block ads setting */
+"block ads setting title" = "広告ブロック機能";
+
+/* title for appearance settings */
+"appearance settings title" = "画面表示";
+
+/* title of night mode setting */
+"night mode setting title" = "ナイトモード";
+
+/* title of minimum font size setting */
+"minimum font size setting title" = "最小フォントサイズ";
+
+/* title of ignore scale limits setting */
+"ignore scale limits setting title" = "スケール制限を無視する";
+
+/* notice displayed on iOS 9 devices to indicate that ignoring scale limits requires ios 10 or newer */
+"ignore scale limits requires ios 10 notice" = "iOS 10が必要です。";
+
+/* title of forget private sites setting */
+"forget private sites setting title" = "プライベートサイトを使用しない";
+
+/* title of block canvas data access setting */
+"block canvas data access setting title" = "キャンバスアクセスをブロックする";
+
+/* title of block fingerprinting setting */
+"block fingerprinting setting title" = "フィンガープリント対策";
+
+/* title of block social media widgets setting */
+"block social media widgets setting title" = "共有ボタンをブロックする";
+
+/* notice displayed on iOS 10 and lower devices to indicate that social media widget blocking requires ios 11 or newer */
+"social media widget blocking requires ios 11 notice" = "iOS 11が必要です。";
+
+/* title of apply hide only rules setting */
+"apply hide only rules setting title" = "隠すルール";
+
+/* notice displayed on iOS 10 and lower devices to indicate that applying hide only rules requires ios 11 or newer */
+"apply hide only rules requires ios 11 notice" = "iOS 11が必要です。";
+
+/* title for popover settings */
+"popover settings title" = "ポップアップ";
+
+/* name of popover blocking policy which blocks all popovers */
+"allways block popover blocking policy name" = "すべてをブロックする";
+
+/* name of popover blocking policy which only blocks js-triggered popovers */
+"block scripted popover blocking policy name" = "ユーザーによるトリガーを許可";
+
+/* name of popover blocking policy which allows all popovers */
+"allways allow popover blocking policy name" = "すべて許可";
+
+/* name of the never tab masking rule */
+"never tab masking rule name" = "決して";
+
+/* name of the when private tab masking rule */
+"when private tab masking rule name" = "プライベートの場合";
+
+/* name of the always tab masking rule */
+"always tab masking rule name" = "常に";
+
+/* title for warnings settings */
+"warnings settings title" = "警告";
+
+/* title of show dangerous sites warnings setting */
+"show dangerous sites warnings setting title" = "危険なサイト";
+
+/* title of show tls certificate warnings setting */
+"show tls certificate warnings setting title" = "TLS証明書";
+
+/* title of show tracking parameters warnings setting */
+"show tracking parameters warnings setting title" = "トラッキングパラメータ";
+
+/* title of prevent xss setting */
+"prevent xss setting title" = "XSSの防止";
+
+/* title of settings to set passcode locking mode to off */
+"passcode locking mode off settings title" = "切る";
+
+/* title of settings to set passcode locking mode to passcode or biometric authentication */
+"passcode locking mode passcode or biometrics settings title" = "パスコードもしくは生体認証ID";
+
+/* title of settings to set passcode locking mode to passcode only */
+"passcode locking mode passcode only settings title" = "パスコードのみ";
+
+/* subtitle of settings to set passcode locking mode to passcode or biometrics that indicates that biometric authentication is unavailable */
+"passcode locking mode passcode or biometrics settings biometrics not available subtitle" = "生体認証ID 利用不可能";
+
+/* title of settings to set after how long in the background the app locks */
+"passcode lock after settings title" = "ロックまで";
+
+/* title of settings to set passcode type to 6 digit PIN */
+"passcode type 6 digits settings title" = "６桁";
+
+/* title of settings to set passcode type to arbitrary length PIN */
+"passcode type long numeric settings title" = "長い数字";
+
+/* title of settings to set passcode type to arbitrary length PIN */
+"passcode type alphanumeric settings title" = "英数字";
+
+/* title of button to change the applications passcode */
+"change passcode button title" = " パスワードを 変更";
+
+/* title of button to manually engage ui lock */
+"lock snowhaze button title" = "SnowHazeをロック";
+
+/* title of settings section to set the apps locking mode */
+"passcode locking mode settings title" = "モード";
+
+/* title of settings section to set the passcodes type */
+"passcode type settings title" = "パスコードの種類：";
+
+/* string used to indicate that the app locks immediately on entering background */
+"passcode lock after 0 minutes time" = "即時";
+
+/* string used to indicate that the app locks 1 minute after entering background */
+"passcode lock after 1 minute time" = "１分";
+
+/* string used to indicate that the app only requires unlocking at startup */
+"passcode lock after infinity minutes time" = "着手";
+
+/* string used to indicate how long after entering background the app locks */
+"passcode lock after many minutes time" = "%@分";
+
+/* title for passcode settings */
+"passcode settings title" = "パスコード";
+
+/* title for subscription settings */
+"subscription settings title" = "定期購読";
+
+/* title of settings to subscribe to snowhaze premium */
+"snowhaze premium settings title" = "SNOWHAZE PREMIUM";
+
+/* title of settings to auto-update the list of snowhaze premium subscription options */
+"update snowhaze premium subscription options settings title" = "オプションの自動更新";
+
+/* title of settings to auto-update the premium authorization token */
+"update authorization token settings title" = "アクセストークンの自動更新";
+
+/* title of the setting that displays the hash of the current premium authorization token */
+"current token hash settings title" = "現在のToken Hash";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when nothing special happened recently */
+"load snowhaze premium options settings default title" = "購読オプションをロード";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when a load recently failed */
+"load snowhaze premium options settings load failed title" = "ロードに失敗しました";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when a load recently succeeded */
+"load snowhaze premium options settings load succeeded title" = "ロードは成功しました";
+
+/* title of settings to restore a snowhaze premium purchase when nothing special happened recently */
+"restore snowhaze premium purchase settings default title" = "以前の購入を復元";
+
+/* title of settings to restore a snowhaze premium purchase when a restore recently failed */
+"restore snowhaze premium purchase settings restore failed title" = "復元に失敗しました";
+
+/* title of settings to restore a snowhaze premium purchase when a restore recently succeeded */
+"restore snowhaze premium purchase settings restore succeeded title" = "復元に成功しました";
+
+/* title of settings to show the users subscriptions management settings in itunes */
+"view all subscriptions settings title" = "すべての購読を確認";
+
+/* title of alert to inform users that a purchase has failed */
+"purchase failed error alert title" = "購入に失敗しました";
+
+/* title of the button to show the snowhaze premium subscription terms of service */
+"show subscription terms of service button title" = "利用規約";
+
+/* title of the button to show the snowhaze premium subscription privacy policy */
+"show subscription privacy policy button title" = "個人情報保護方針";
+
+/* displayed instead of the error message in the alert to inform users that a purchase has failed when the reason for the failure is unknown */
+"purchase failed error alert unknown error message" = "不明なエラー";
+
+/* title of the ok button of the alert to inform users that a purchase has failed */
+"purchase failed error alert ok button title" = "OK";
+
+/* text to indicate that the subscription will renew within the next 0 days */
+"subscription renews within 0 days notice" = "今日を更新する";
+
+/* text to indicate that the subscription will renew within the next 1 days */
+"subscription renews within 1 days notice" = "今日または明日更新する";
+
+/* text to indicate that the subscription will renew within the next n days for n > 1 */
+"subscription renews within n days notice format" = "%@日以内に更新";
+
+/* text to indicate that the subscription will expire in 0 days */
+"subscription expire in 0 days notice" = "今日切れます";
+
+/* text to indicate that the subscription will expire in 1 days */
+"subscription expire in 1 days notice" = "明日切れます";
+
+/* text to indicate that the subscription will expire in n days for n > 1 */
+"subscription expire in n days notice" = "%@日後に切れます";
+
+/* notice to warn users that snowhaze premium subscriptions auto-renew */
+"snowhaze premium subscription auto-renew notice" = "説明の条件を読んでください。";
+
+/* text to indicate that an authorization token can only be received by subscribing to snowhaze premium */
+"subscribe to receive authorization token notice" = "Tokenを使うためには購読して下さい。";
+
+/* subtitle of the setting to load a new authorization token */
+"tab to load new authorization token settings subtitle" = "Tokenをロードするにはタップして下さい。";
+
+/* title of the option to be billed monthly for snowhaze premium */
+"snowhaze premium billed monthly option description" = "毎月のサブスクリプション";
+
+/* title of the option to be billed yearly for snowhaze premium */
+"snowhaze premium billed yearly option description" = "毎年のサブスクリプション";
+
+/* title for vpn settings */
+"vpn settings title" = "VPN";
+
+/* error message flashed when a vpn profile download the user explicitly requested fails */
+"vpn profile download failed error message" = "ダウンロードに失敗しました";
+
+/* format of the notice used to indicate when the vpn profile will expire */
+"vpn profile expiration notice format" = "%@に切れます";
+
+/* format of the notice used to indicate that a vpn profile has expired */
+"vpn profile expired notice" = "失効した";
+
+/* format of the notice used to indicate that a vpn profile has not yet been installed */
+"vpn profile not installed notice" = "インストールされていない";
+
+/* format used to combine the vpn profile status and ping stats */
+"vpn profile status und ping stats combined format" = "%@     %@ ms (%@ %%)";
+
+/* format used to display the vpn ping stats */
+"vpn ping stats format" = "%@ ms (%@ %%)";
+
+/* title of settings to auto-update the list of available vpn servers */
+"update vpn list settings title" = "位置リストの自動更新";
+
+/* title of button to open openvpn connect */
+"open openvpn connect button title" = "OpenVPN Connectを開く";
+
+/* title of setting to display the ping status of the vpn servers */
+"show vpn server ping status settings title" = "Pingの表示";
+
+/* title of button to switch from vpn settings to subscription settings */
+"show subscription status button title" = "購読状況を表示";
+
+/* title of button to show the vpn tutorial */
+"show vpn tutorial button title" = "VPNチュートリアルを見せる";
+
+/* title of settings section with the list of available vpn locations */
+"vpn location list settings title" = "地";
+
+/* title of alert to point out that opening openvpn connect requires it being installed */
+"opening openvpn connect requires installing alert title" = "OpenVPN Connectをインストールする";
+
+/* message of alert to point out that opening openvpn connect requires it being installed */
+"opening openvpn connect requires installing alert message" = "OpenVPN ConnectのインストールはApp Storeより可能です。";
+
+/* title of ok button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn connect app prompt ok button title" = "App Store";
+
+/* title of the show tutorial button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn show tutorial button title" = "チュートリアルを見せる";
+
+/* title of cancel button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn connect app prompt cancel button title" = "キャンセル";
+
+/* title of alert to point out that installing a ovpn configuration requires openvpn connect */
+"installing ovpn requires openvpn connect alert title" = "「OpenVPN Connect」が必要です";
+
+/* message of alert to point out that installing a ovpn configuration requires openvpn connect */
+"installing ovpn requires openvpn connect alert message" = "VPNの使用にはアプリケーション「OpenVPN Connect」が必要です。App Storeにてインストールを行って下さい。";
+
+/* format of the accessibility label of the vpn profile cell when user is not subscribed to snowhaze premium */
+"vpn profile missing subscription accessibility label format" = "%@ - SnowHazeプレミアムの購読が必要";
+
+/* format of the accessibility label of the vpn profile cell when the profile is being downloaded */
+"vpn profile downloading accessibility label format" = "ダウンロード";
+
+/* format of the accessibility label of the vpn profile cell when the profile credentials are not yet downloaded */
+"vpn profile download required accessibility label format" = "%@ - ダウンロードが必要";
+
+/* indication that the ipsec vpn is connected */
+"connected ipsec vpn state title" = "接続";
+
+/* indication that the ipsec vpn is connecting */
+"connecting ipsec vpn state title" = "接続中";
+
+/* indication that the ipsec vpn is disconnected */
+"disconnected ipsec vpn state title" = "未接続";
+
+/* indication that the ipsec vpn is disconnecting */
+"disconnecting ipsec vpn state title" = "切断されて";
+
+/* indication that the ipsec vpn profile is currently invalid */
+"invalid ipsec vpn state title" = "ロード中";
+
+/* indication that the ipsec vpn is reasserting */
+"reasserting ipsec vpn state title" = "再接続して";
+
+/* prompt for user to select the ipsec vpn profile */
+"select ipsec vpn profile prompt" = "場所の選択";
+
+/* accessibility label of prompt for user to select the ipsec vpn profile when user is not subscribed to snowhaze premium */
+"select ipsec vpn profile prompt missing subscription accessibility label" = "場所の選択 - SnowHazeプレミアムの購読が必要";
+
+/* title of alert to warn users that a single installed VPN profile has expired */
+"vpn profile expiration warning single profile expired alert title" = "VPNプロファイルの期限切れ";
+
+/* message of alert to warn users that a single installed VPN profile has expired */
+"vpn profile expiration warning single profile expired alert message" = "インストールされたVPNプロファイルの１つが期限切れになっています。 VPN設定で更新することができます。";
+
+/* title of alert to warn users that a single installed VPN profile is about to expire */
+"vpn profile expiration warning single profile expiring alert title" = "VPNプロファイルの期限切れ";
+
+/* message of alert to warn users that a single installed VPN profile is about to expire */
+"vpn profile expiration warning single profile expiring alert message" = "インストールされたVPNプロファイルの１つが期限切れになります。 VPN設定で更新することができます。";
+
+/* title of alert to warn users that multiple installed VPN profiles have expired */
+"vpn profile expiration warning multiple profiles expired alert title" = "VPNプロファイルの期限切れ";
+
+/* message of alert to warn users that multiple installed VPN profiles have expired */
+"vpn profile expiration warning multiple profiles expired alert message" = "インストールされたVPNプロファイルのいくつかが期限切れになっています。 VPN設定で更新することができます。";
+
+/* title of alert to warn users that multiple installed VPN profiles are about to expire */
+"vpn profile expiration warning multiple profiles expiring alert title" = "期限切れのVPNプロファイル";
+
+/* message of alert to warn users that multiple installed VPN profiles are about to expire */
+"vpn profile expiration warning multiple profiles expiring alert message" = "インストールされたいくつかのVPNプロファイルの有効期限が近づいています。 VPN設定で更新することができます。";
+
+/* title of vpn settings button of alert to warn users of VPN profile expiration */
+"vpn profile expiration warning alert vpn settings button title" = "VPNの設定";
+
+/* title of ignore button of alert to warn users of VPN profile expiration */
+"vpn profile expiration warning alert ignore button title" = "OK";
+
+/* name of app to provide IPSec VPN */
+"ipsec vpn app name" = "SnowHaze";
+
+/* name of app to provide OpenVPN VPN */
+"openvpn vpn app name" = "OpenVPN";
+
+/* title of button to delete website cache data records */
+"delete cache data button title" = "キャッシュを削除する";
+
+/* title of button to delete website cookies */
+"delete cookies button title" = "クッキーを削除する";
+
+/* title of button to delete website data stores records */
+"delete data stores button title" = "データ履歴を削除する";
+
+/* title for dialog to confirm deletion of all website cache records */
+"delete all caches confirm dialog title" = "削除を確認";
+
+/* message format for dialog to confirm deletion of all website cache records */
+"delete all caches message format" = "%@個すべてのキャッシュを削除してもよろしいですか？";
+
+/* title for confirm option of dialog to confirm deletion of all website cache records */
+"delete all caches confirm option title" = "削除";
+
+/* title for confirm option of dialog to cancel deletion of all website cache records */
+"delete all caches cancel option title" = "キャンセル";
+
+/* title for dialog to confirm deletion of all cookies */
+"delete all cookies confirm dialog title" = "削除を確認";
+
+/* message format for dialog to confirm deletion of all cookies */
+"delete all cookies message format" = "%@個すべてのクッキーを削除してもよろしいですか？";
+
+/* title for confirm option of dialog to confirm deletion of all cookies */
+"delete all cookies confirm option title" = "削除";
+
+/* title for confirm option of dialog to cancel deletion of all cookies */
+"delete all cookies cancel option title" = "キャンセル";
+
+/* title for dialog to confirm deletion of tracking cookies */
+"delete tracking cookies confirm dialog title" = "削除を確認";
+
+/* message format for dialog to confirm deletion of tracking cookies */
+"delete tracking cookies message format" = "%@個すべてのトラッキングクッキーを削除してもよろしいですか？";
+
+/* title for confirm option of dialog to confirm deletion of tracking cookies */
+"delete tracking cookies confirm option title" = "削除";
+
+/* title for confirm option of dialog to cancel deletion of tracking cookies */
+"delete tracking cookies cancel option title" = "キャンセル";
+
+/* title for dialog to confirm deletion of all website data stores */
+"delete all data stores confirm dialog title" = "削除を確認";
+
+/* message format for dialog to confirm deletion of all website data stores */
+"delete all data stores message format" = "%@個すべての保存したデータを削除してもよろしいですか？";
+
+/* title for confirm option of dialog to confirm deletion of all website data stores */
+"delete all data stores confirm option title" = "削除";
+
+/* title for confirm option of dialog to cancel deletion of all website data stores */
+"delete all data stores cancel option title" = "キャンセル";
+
+/* title of button that deletes all history items */
+"clear history button title" = "閲覧履歴の消去";
+
+/* title for dialog to confirm clearing of history */
+"clear history confirm dialog title" = "消去を確認";
+
+/* message for dialog to confirm clearing of history */
+"clear history confirm dialog message" = "履歴を消去してもよろしいですか？";
+
+/* title for confirm option of dialog to confirm clearing of history */
+"clear history confirm dialog confirm option title" = "消去";
+
+/* title for cancel option of dialog to confirm clearing of history */
+"clear history confirm dialog cancel option title" = "キャンセル";
+
+/* title for external bookmarks settings */
+"external bookmarks settings title" = "外部のブックマーク";
+
+/* title of setting to index bookmarks in spotlight */
+"index bookmarks in spotlight setting title" = "Spotlightインデックス";
+
+/* title of setting to add application shortcuts for bookmarks */
+"bookmark application shortcuts setting title" = "ホーム画面のショートカット";
+
+/* title of setting to block image content from being loaded */
+"content blocker image content type" = "イメージ";
+
+/* title of setting to block style sheet content from being loaded */
+"content blocker style sheet content type" = "スタイルシート";
+
+/* title of setting to block script content from being loaded */
+"content blocker script content type" = "スクリプト";
+
+/* title of setting to block third party script content from being loaded */
+"content blocker third party script content type" = "サードパーティースクリプト";
+
+/* title of setting to block font content from being loaded */
+"content blocker font content type" = "フォント";
+
+/* title of setting to block raw content from being loaded */
+"content blocker raw content type" = "Raw";
+
+/* title of setting to block media content from being loaded */
+"content blocker media content type" = "メディア";
+
+/* notice displayed on iOS 10 and lower devices to indicate that content type blockers require ios 11 or newer */
+"content type blockers require ios 11 notice" = "iOS 11が必要です。";
+
+/* format of the accessibility label for the close tab button of the tab switcher bar */
+"close tab from tab selection bar accessibility label format" = "'%@'タブを閉じる";
+
+/* accessibility label for more button (for tab settings) */
+"more button accessibility label" = "もっと";
+
+/* accessibility label for button to close a tab */
+"close tab button accessibility label" = "閉じる";
+
+/* privacy term to be appended to privacy assessment name */
+"privacy assessment privacy postfix" = "プライバシー";
+
+/* accessibility label of button to load the previous page */
+"previous page button accessibility label" = "戻る";
+
+/* accessibility label of button to load the next page */
+"next page button accessibility label" = "転送";
+
+/* accessibility label of button to show share dialog */
+"share button accessibility label" = "共有";
+
+/* accessibility label of button to show tab selection view */
+"show tab selection view button accessibility label" = "タブ";
+
+/* accessibility label of button to show settings controller */
+"show settings controller button accessibility label" = "設定";
+
+/* accessibility label of button to reload the current page */
+"reload page button accessibility label" = "再読み込み";
+
+/* accessibility label of button to create a new tab */
+"new tab button accessibility label" = "新しいタブ";
+
+/* name of 'very good' privacy assessment */
+"very good privacy assessment name" = "とても良い";
+
+/* name of 'good' privacy assessment */
+"good privacy assessment name" = "良い";
+
+/* name of 'ok' privacy assessment */
+"ok privacy assessment name" = "OK";
+
+/* name of 'passable' privacy assessment */
+"passable privacy assessment name" = "可";
+
+/* name of 'bad' privacy assessment */
+"bad privacy assessment name" = "悪い";
+
+/* name of 'very bad' privacy assessment */
+"very bad privacy assessment name" = "とても悪い";
+
+/* accessibility label of button to delete a day from history when in regular mode */
+"delete history day button accessibility label" = "削除";
+
+/* accessibility label of button to delete a day from history when in confirm mode */
+"delete history day button confirm accessibility label" = "削除を確認";
+
+/* domain for wikipedia in the language used by the user */
+"localized wikipedia domain" = "jp.wikipedia.org";
+
+/* language for startpage in the language used by the user */
+"localized startpage language" = "nihongo";
+
+/* name of the app store app used to confirm opening of url in other app */
+"open url in app app store app name" = "App Store";
+
+/* name of the itunes app used to confirm opening of url in other app */
+"open url in app itunes app name" = "iTunes";
+
+/* name of the mail app used to confirm opening of url in other app */
+"open url in app mail app name" = "メール";
+
+/* name of the messages app used to confirm opening of url in other app */
+"open url in app messages app name" = "メッセージ";
+
+/* name of the maps app used to confirm opening of url in other app */
+"open url in app maps app name" = "マップ";
+
+/* name of the whatsapp app used to confirm opening of url in other app */
+"open url in app whatsapp app name" = "WhatsApp";
+
+/* name of the workflow app used to confirm opening of url in other app */
+"open url in app workflow app name" = "Workflow";
+
+/* format string used to ask users if they want to open another app */
+"open url in app prompt format" = "本当に%@を開きたいですか？";
+
+/* title of prompt to ask users if they want to open another app */
+"open url in app prompt title" = "SnowHazeを離れる";
+
+/* title of confirm button of prompt to ask users if they want to open another app */
+"open url in app prompt confirm button title" = "はい";
+
+/* title of cancel button of prompt to ask users if they want to open another app */
+"open url in app prompt cancel button title" = "いいえ";
+
+/* title of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt title" = "フォームを再送信する";
+
+/* format string of message of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt format" = "フォームを'%@'に再送信してもよろしいですか？";
+
+/* message of prompt to ask users if they want to resubmit a form when the destination is unknown */
+"form resubmission confirmation prompt unknown url message" = "フォームを再送信してもよろしいですか？";
+
+/* title of confirm button of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt confirm button title" = "続行";
+
+/* title of cancel button of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt cancel button title" = "キャンセル";
+
+/* title of prompt to block xss */
+"block xss prompt title" = "インジェクション攻撃をブロックされた";
+
+/* format string of message of prompt to block xss on a known host */
+"block xss known host prompt format" = "'％@'の悪意のあるURLの読み込みをブロックする";
+
+/* message of prompt to block xss on an unknown host */
+"block xss unknown host prompt message" = "潜在的な悪意のあるURLの読み込みをブロックする";
+
+/* title of block action of prompt to block xss on an unknown host */
+"block xss unknown host prompt block action title" = "ブロック";
+
+/* title of load action of prompt to block xss on an unknown host */
+"block xss unknown host prompt load action title" = "ロード";
+
+/* title of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert title" = "不正な証明書";
+
+/* format of message of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert message format" = " '%@'への証明書は無効です。";
+
+/* title of continue button of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert continue button title" = "続行";
+
+/* title of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name */
+"certificate domain name mismatch alert title" = "ドメイン名が間違っています";
+
+/* format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is known */
+"certificate domain name mismatch known cert domain alert message format" = " '%@'への証明書は'%@'に発行されました。";
+
+/* format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is not available */
+"certificate domain name mismatch unknown cert domain alert message format" = " '%@'への証明書は別のドメインに発行されました。";
+
+/* title of continue button of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name */
+"certificate domain name mismatch alert continue button title" = "続行";
+
+/* title of cancel button of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert cancel button title" = "キャンセル";
+
+/* title of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert title" = "トラッキングパラメータが検出された";
+
+/* format of message of alert to warn users of a single url parameter on a known host identified as a tracking parameter */
+"tracking parameter found one parameter on known host alert format" = "'%2$@'の '％1$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
+
+/* format of message of alert to warn users of a single url parameter on an unknown host identified as a tracking parameter */
+"tracking parameter found one parameter on unknown host alert format" = "'％@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
+
+/* separator used to separate multiple parameters in alert to warn users of url parameters identified as tracking parameters when three ore more where found */
+"tracking parameter found alert multiple parameters separator" = "', '";
+
+/* format of message of alert to warn users of multiple url parameters on a known host identified as tracking parameters */
+"tracking parameter found multiple parameters on known host alert format" = "'%3$@'の '％1$@'と '％2$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
+
+/* format of message of alert to warn users of multiple url parameters on an unknown host identified as tracking parameters */
+"tracking parameter found multiple parameters on unknown host alert format" = "'％1$@'と '％2$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
+
+/* title of ignore action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert ignore option title" = "無視する";
+
+/* title of cancel action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert cancel option title" = "キャンセル";
+
+/* title of strip action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert strip option title" = "パーソナライゼーションを削除する";
+
+/* title of alert to warn users of dangerous sites */
+"dangerous site warning alert title" = "警告";
+
+/* explanation that the site might have malicious content */
+"malicious site warning reason" = "危険サイトの可能性があります.";
+
+/* explanation that the site might be a phishing site */
+"phishing site warning reason" = "フィッシングサイトとして分類されています。";
+
+/* explanation that the site might contain malware */
+"malware site warning reason" = "にマルウェアが含まれる可能性があります。";
+
+/* explanation that the site might contain harmful applications */
+"harmful application site warning reason" = "には潜在的に有害なアプリケーションが含まれる可能性があります。";
+
+/* explanation that the site might contain unwanted software */
+"unwanted software site warning reason" = "には不要なソフトウェアが含まれる可能性があります。";
+
+/* the separator used to separator most items in a (long) list of reasons a site might be dangerous. e.g. ', ' in 'a, b, c and d' */
+"dangerous site warning reason list main separator" = "、";
+
+/* the separator used to separator the last 2 items in a list of reasons a site might be dangerous. e.g. ' and ' in 'a, b, c and d' */
+"dangerous site warning reason list final separator" = "や";
+
+/* used instead of the domain name in the dangerous site warning if the domain is unknown */
+"dangerous site warning unknown domain name replacement" = "［不明］";
+
+/* format string for the message of the dangerous site warning alert */
+"dangerous site warning alert message format" = "このサイトは%@、気をつけて下さい。\n\nドメインへの嫌疑が報告されています: %@";
+
+/* format string for the message of the dangerous site warning alert when at least part of the warnings was generated by google safebrowsing data */
+"safebrowsing dangerous site warning alert message format" = "このサイトは%@、気をつけて下さい。\n\nドメインへの嫌疑が報告されています: %@\n\nこの勧告はGoogleが提供しています。ローカルで生成され、Googleのサーバーに接続する必要はありませんでした。";
+
+/* title of the continue button of the alert to warn users of dangerous sites */
+"dangerous site warning alert continue button title" = "続行";
+
+/* title of the cancel button of the alert to warn users of dangerous sites */
+"dangerous site warning alert cancel button title" = "キャンセル";
+
+/* title of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog title" = "発信";
+
+/* format for message of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog message format" = "発信確認：'%@' に発信しますか？";
+
+/* title of confirm button of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog confirm button title" = "はい";
+
+/* title of cancel button of dialog used to confirm the user wants to initiate a call */
+"cancel call dialog confirm button title" = "いいえ";
+
+/* title of tab settings popover */
+"tab settings title" = "設定で新しいタブを開く";
+
+/* HTML of message shown when the memory game is won */
+"congratulation message html" = "おめでとう";
+
+/* title of button to create tab in tab settings popover */
+"tab settings create tab button title" = "新しいタブを開く";
+
+/* title of settings in tab settings to enable / disable search suggestions */
+"show search suggestions tab settings title" = "予測検索";
+
+/* displayed instead of domain name if the current page is an errorpage in page settings */
+"page settings errorpage description" = "エラーページ";
+
+/* displayed instead of domain name if the current page is a data URI in page settings */
+"page settings data uris description" = "データURIスキーム";
+
+/* displayed instead of domain name if url.host is nil in page settings */
+"page settings domain name placeholder" = "このページ";
+
+/* title format of page settings popover (format specifier for domain name) */
+"page settings title format" = "%@ に";
+
+/* button of apply button of page settings */
+"page settings apply button title" = "適用";
+
+/* title of button to temporarily set a page setting */
+"temporary page settings button title" = "みる";
+
+/* title of page setting to allow popovers */
+"allow popovers page setting title" = "ポップオーバーを許可";
+
+/* title of page setting to block cookies */
+"block cookies page setting title" = "クッキーをブロックする";
+
+/* is displayed when the user presses the page security icon without having loaded a page first */
+"local page settings unavailable notice" = "ページが読み込めませんでした";
+
+/* title of prompt for http authentication */
+"http authentication prompt title" = "認証情報でログインしてください。";
+
+/* notice displayed in http authentication prompt when the specified credentials where incorrect */
+"http authentication prompt incorrect credentials notice" = "認証情報はサーバーによって拒否されました。";
+
+/* prompt displayed in http authentication prompt when a realm is specified */
+"http authentication prompt existing realm prompt" = "'%2$@'での'%1$@'本人認証情報を入力して下さい。";
+
+/* prompt displayed in http authentication prompt when no realm is specified */
+"http authentication prompt missing realm prompt" = "'%@'の認証情報を入力してください。";
+
+/* warning displayed when credentials entered in http authentication prompt will be transmitted insecurely */
+"http authentication prompt insecure transmission warning" = "警告: 認証情報は安全ではない接続で送信されます。";
+
+/* placeholder for username in prompt for http authentication */
+"http authentication prompt username placeholder" = "ユーザー名";
+
+/* placeholder for password in prompt for http authentication */
+"http authentication prompt password placeholder" = "パスワード";
+
+/* title of continue button of http authentication prompt */
+"http authentication prompt continue button title" = "続行";
+
+/* title of cancel button of http authentication prompt */
+"http authentication prompt cancel button title" = "キャンセル";
+
+/* title of button of http authentication prompt to retrieve credentials from 1password */
+"http authentication 1password button title" = "1Password";
+
+/* default auth error title */
+"error page auth default title" = "承認エラー";
+
+/* default auth error message */
+"error page auth error default message" = "あなたは有効な認証トークンを持っていません。 サブスクリプション設定で更新できます。";
+
+/* default auth error information */
+"error page auth error default information" = "あなたがトークンを受け取った後でトークンを受け取らなかったことが起こる可能性があります。このサイトは、トークンを受け取るとすぐにリロードされます。";
+
+/* message shown when no error message is available but an url */
+"error page unexpected error message with url" = "%@ を開いているときに予期しないエラーが発生しました";
+
+/* message shown when no error message is available */
+"error page unexpected error message" = "予期しないエラーが発生しました";
+
+/* description of the error code on the errorpage */
+"error page error code description" = "エラーコード";
+
+/* default title of the errorpage */
+"error page default title" = "エラーが発生しました";
+
+/* title of the details section on the errorpage */
+"error page details section title" = "詳細";
+
+/* description of the error domain on the errorpage */
+"error page error domain description" = "エラードメイン";
+
+/* title of the button to get more information about the error */
+"error page more information button title" = "もっと読む";
+
+/* description of the error reason on the errorpage */
+"error page error reason description" = "理由";
+
+/* title of the reload button on the errorpage */
+"error page reload button title" = "再読み込み";
+
+/* description of the url on the errorpage */
+"error page error url description" = "URL";
+
+/* description of the error file on the errorpage */
+"error page error file description" = "ファイル";
+
+/* description of the error mime type on the errorpage */
+"error page error mime type description" = "MIMEタイプ";
+
+/* error page domain description where no host is available */
+"error page unknown domain" = "ドメインは不明";
+
+/* errormessage of the unknown file type errorpage */
+"unknown file type errorpage message" = "このファイルは、SnowHazeによってサポートされたデータ形式でないため開けません。";
+
+/* errormessage format of the network error errorpage */
+"network error errormessage format" = "SnowHazeは%@に接続できませんでした";
+
+/* errormessage format of the website error errorpage */
+"website error errormessage format" = "SnowHazeは%@を読み込めませんでした。";
+
+/* title of the unknown file type errorpage */
+"unknown file type errorpage title" = "ファイルは不明";
+
+/* title of the network error errorpage */
+"network error errorpage title" = "ネットワークエラー";
+
+/* title of the website error errorpage */
+"website error errorpage title" = "ウェブサイトエラー";
+
+/* html of the title of the error page displayed if a page preview could not be loaded */
+"failed to load page preview error page title html" = "<title>ページ読み込みエラー</title>";
+
+/* html of the content of the error page displayed if a page preview could not be loaded */
+"failed to load page preview error page content html" = "<span>ページの読み込みに失敗しました。</span>";
+
+/* title of button to move from first to second tutorial page */
+"tutorial start tutorial button title" = "チュートリアルを始める";
+
+/* title of button to leave tutorial from first page */
+"tutorial skip tutorial button title" = "スキップ";
+
+/* title of the tutorial button to visit the online tutorial */
+"visit online tutorial button title" = "チュートリアルへ移動する";
+
+/* title of the tutorial button to subscribe to snowhaze premium */
+"subscribe now tutorial button title" = "購読する";
+
+/* html of first tutorial page content */
+"tutorial welcome html" = "<h3>ようこそ!</h3><p>SnowHaze はあなたの個人情報を十分に保護する初めてのブラウザです。 SnowHazeを見てみましょう!</p>";
+
+/* content of 2. tutorial page */
+"tutorial 2. page content" = "ほかのブラウザ同様、SnowHazeも簡単に使えます。";
+
+/* content of 3. tutorial page */
+"tutorial 3. page content" = "あなたに最適な設定を選択することで、ブラウジング方法をカスタマイズします。";
+
+/* content of 4. tutorial page */
+"tutorial 4. page content" = "色は常に、その時点での設定におけるプライバシーのレベルを表示します。";
+
+/* content of 5. tutorial page */
+"tutorial 5. page content" = "個人のページ設定を変更したり、設定を変更して新しいタブを開きます。";
+
+/* content of 6. tutorial page */
+"tutorial 6. page content" = "オンにすることで、VPNを含むアプリケーション機能の自動更新が有効となります。";
+
+/* title of button to leave tutorial from last page */
+"tutorial end tutorial button title" = "SnowHazeを始める";
+
+/* title of button to switch to next tutorial page */
+"tutorial continue button title" = "続行";
+
+/* TODO: + add update tutorial textshtml of first update tutorial page content */
+"update tutorial welcome html" = "<h3>バージョン2.5へようこそ。</h3> <p>こんにちは、SnowHazeの新しいバージョンがあります。</p>";
+
+/* content of 2. update tutorial page */
+"update tutorial 2. page content" = "SnowHaze VPNには2つのバージョンがあります。 IPsecはアプリ内で制御できます。 OpenVPNは以前と同じように動作します。";
+
+/* content of 3. update tutorial page */
+"update tutorial 3. page content" = "バージョン2.5から、SnowHazeは暗号化されていないWebサイトに記号があることを示します。";
+
+/* title of button to leave the update tutorial from last page */
+"update tutorial end tutorial button title" = "SnowHazeを始める";
+
+/* title of button to leave update tutorial from first page */
+"update tutorial skip tutorial button title" = "スキップ";
+
+/* title of button to move from first to second update tutorial page */
+"update tutorial start tutorial button title" = "新着情報";
+
+/* header for the message from the developers in en, fr, de */
+"update tutorial message from developers header" = "no message";
+
+/* message from the developers in en, fr, de */
+"update tutorial message from developers content" = "no message";
+
+/* explanations of the application settings */
+"application settings explanation" = "<p>SnowHazeの基本設定を管理できます。</p><p><strong>ローカルサイトのサジェスト</strong>検索バーを使った検索の際、ローカルリスト中のポピュラーサイトを予測候補に含めるかどうかを設定できます。</p><p><strong>検索サジェストプライベートサイト:</strong> 検索サジェスト機能とは、SnowHazeで検索した文字列に関連の深い語句を逐次予測して表示する機能です。SnowHazeでは、検索サジェスト機能により検索候補としてあげられるコンテンツの一部を制限することができます。オン（有効）の場合、成人向けコンテンツ（プライベートサイト）も検索サジェストの対象となります。オフ（無効）の場合、プライベートサイトは検索サジェストには含まれません。プライベートサイトの表示を望まない場合は、本設定を無効の上ご利用下さい。（例：未成年の方がご利用する場合、公共のパソコンで本ブラウザを利用する場合など）</p><p><strong>サイトリストの自動更新 / Wi-Fi接続時のみ</strong>各サイトリスト（トラッキング、広告、フィッシング、悪質サイトリスト）の自動更新設定が出来ます。自動更新が Wi-Fi接続時にのみ行われるように設定することも可能です。SnowHaze Premiumの購読登録をすることで、サイトリストの自動更新が頻繁に行われるようになります。（未購読時はSnowHaze ブラウザのアップデート時のみの更新となります。）自動アップデートを無効にすると、サイトリストは自動的に削除されます。</p><p><strong>閉じたタブの復元：</strong> シェイクすることで一度閉じたタブを復元する機能です。本機能を有効にする時間帯を設定できます。また、復元の対象となるタブの種類を選択できます。全てを選択した場合、プライベートタブを含む全てのタブが復元対象となります。</p><strong>タブのマスキング：</strong> 現在閲覧していないタブの見出しを非表示にする機能です。タブのマスキングを有効にする条件を設定できます。";
+
+/* explanations of the javascript settings */
+"javascript settings explanation" = "<p>まずはどのようにしてSnowHazeがJavaScriptの内容を把握しているかについてです。JavaScriptはプログラミング言語で、多くのウェブサイトに使用されており、ほとんどのブラウザでサポートされています。JavaScriptはほとんどのウェブサイトの画面表示や 機能を得るのに役立っています。そのため、多くの対話式コンテンツや動的なコンテンツに貢献しています。</p><p><strong>JavaScriptを許可する:</strong> この選択肢をオンにすることで、 JavaScriptのコンテンツを使用することができます。 プライバシー保護のため、オフにしておきたい方もいらっしゃると思いますが、一部のウェブサイトはJavaScriptが無効だとうまく表示されないことがあるということにご注意ください。 <u>ただし:</u>一部のサイトではJavaScript が無効になっていると、適切に表示されない場合があるのでご注意下さい。</p><p><strong>アプリケーションスクリプト:</strong> アプリケーションスクリプトはSnowHazeで動作するJavaScriptの要素で、検索やトラッキング保護などの役立つ機能を可能にします。</p><strong>パスワードマネージャ:</strong> パスワードマネージャの統合をオフにします。";
+
+/* explanations of the website data settings */
+"website data settings explanation" = "<p>ウェブサイトデータの管理　ウェブサイトデータは、キャッシュ、cookie、その他のデータを保持しています。</p><p>キャッシュは訪れたウェブサイトの一時的なコピーのセットです。同じページを訪れた際、再度ダウンロードされるのではなく、キャッシュからデータが取り出されます。</p><p>Cookieは訪れたウェブサイトからの情報の一部のデータです。Cookieを使ったウェブサイトを訪れた際、 ウェブサイトのデータはデバイスに保存されます。再度、そのサイトを訪れると、そのデータはウェブサイトに送り返されます。Cookieはあなたの興味やブラウジング行動から得られたパターンを認識するのに使われます。</p><p><strong>ウェブサイトのデータを保存する:</strong> キャッシュやcookieなどのウェブサイトのデータを保存します。</p><p><strong>Cookieをブロック：</strong>常に許可、サード パーティー（第三者）Cookieのみ許可 、常にブロックから選択してください。</p><p><strong>すべてのサイトのデータを削除する:</strong> すべてのウェブサイトのデータをを削除します。</p><p><strong>キャッシュを削除する:</strong> すべてのキャッシュのデータを削除します。</p><p><strong>Cookieを削除する:</strong> すべてのCookieのデータを削除します。</p><p><strong>すべてのデータを削除する:</strong> ウェブサイトでのすべてのデータを削除します。</p><strong>トラッキングCookieの削除：</strong>トラッキ ングを目的としたウェブサイトのCookieを削除します。";
+
+/* explanations of the user agent settings */
+"user agent settings explanation" = "お好みのユーザーエージェントを選ぶ。ユーザーエージェントとは、使用しているデバイスやブラウザを認識する文字列です。この文字列は、あなたが閲覧したウェブサイトすべてに送信されます。ウェブサイトは、ユーザーエージェントを認識し、使用しているデバイスによってページの内容をフォーマットします。ユーザーエージェントは多くの使用しているデバイス情報を含んでいるため、トラッキングに使用するメインのツールの一つであります。そのため、複数のユーザーエージェントを使用する、もしくは頻繁にユーザーエージェントを変更することが望ましいです。<u>ただし、</u>ユーザーエージェントを変更することで、ウェブサイトが正常に表示されない場合があります。";
+
+/* explanations of the defaults settings */
+"defaults settings explanation" = "<p>SnowHaze の設定をデフォルト（初期設定）にリセットする</p><p><strong>SnowHaze の設定をデフォルト（初期設定）にリセットする:</strong> すべてのグローバル設定をSnowHaze推奨の初期設定にリセットします。設定は、その他のカテゴリーにあるオプションにて、変更することができます。色の変化はオプションにて、プライバシーを強化したか、していないかを示します。</p><p><strong>ページ設定をリセットする:</strong> 特定のサイトにおけるすべての設定をリセットする。</p><strong>チュートリアルを再開する:</strong> 簡単なSnowHazeの紹介を再開します。";
+
+/* explanations of the contact settings */
+"contact settings explanation" = "メールもしくはウェブサイトにてお問い合わせください。何か問題やコメント等ございましたら、遠慮なくお問い合わせください。お待ちしております。SnowHazeのウェブサイトをご覧になる、もしくはSnowHazeをご友人、ご家族にシェアすることも可能です。Apple StoreでSnowHazeの評価を行う。";
+
+/* explanations of the search engine settings */
+"search engine settings explanation" = "<p>ウェブでの検索方法を選択する</p><p><strong>検索エンジン:</strong> 検索エンジンはGoogle, Yahoo等のインターネット上でコンテンツを探すのに使用するツールです。検索フィールドでの検索要求は、常に選択された検索エンジンで行われます。 'なし'が選択されていた場合、ウェブサイトへのアクセスは、直接アドレスを入力する、もしくは履歴やブックマーク上での検索結果のみになります。</p><strong>検索予測:</strong> メインの検索エンジンの設定に加え、検索したい単語を予測する機能もあります。";
+
+/* explanations of the history settings */
+"history settings explanation" = "<p>閲覧履歴の管理。閲覧履歴は、ウェブサイトを閲覧した日付や時間のリストだけでなく、そのウェブサイトのリストでもあります。以前アクセスしたページを閲覧履歴のリストからタップすることで、またアクセスすることができます。</p><p><strong>履歴の保存:</strong> デバイスでローカルに保存された履歴がある場合です。これは、使用している本人以外は閲覧することができません。SnowHazeでは、この設定がオフの場合、閲覧したページを保存することはありません。</p><p><strong>プライベートサイトを消去する:</strong> 履歴の保存の設定がオンになっている場合でも、プライベートサイトで閲覧した場合、履歴が保存されることはありません。</p><strong>履歴を削除する:</strong> すべての閲覧履歴を削除します。";
+
+/* explanations of the media playback settings */
+"media playback settings explanation" = "<p>動画、オーディオなどが再生されるメディアの選択方法。</p><p><strong>応答を要求する:</strong> メディアを再生するには、ユーザーによる応答（タッピング）が必要です。<u>ただし、</u>この設定を行わないと、メディアが自動再生されるため、多くのモバイルデータ通信を使用することになるのでご注意ください。</p><strong>インラインの再生を許可する:</strong> 全画面モードに変えることなく、ビデオ再生を許可します。";
+
+/* explanations of the tracking protection settings */
+"tracking protection settings explanation" = "<p>ウェブサイトでのトラッキング（追跡）を拒否する。 ウェブサイトは様々な方法で訪問者の情報を集めています。この情報は、例えば、興味、ブラウジング行動や 訪問したサイトを含みます。一部のウェブサイトは、そのウェブサイトをすでに見ていない場合でも、追跡することができます。</p><p><strong>HTTP リファラをブロックする:</strong> ウェブサイトの管理人は、この設定がオンの場合、そのウェブサイトを訪問する以前に訪問したサイトに関する情報を得ることはできません。</p><p><strong>トラッキングコードをブロックする:</strong> トラッキングコードをブロックすることは、JavaScriptのコンテンツを変更し、あなたをウェブサイト上で追跡することをブロックします。</p><p><strong>広告ブロック機能：</strong> ウェブサイト上の広告を非表示にします。ただし、一部のサイトでは広告が表示されることがあります。</p><p><strong>Canvas Fingerprintを拒否する:</strong> Canvas Fingerprinting は、cookieを使わずにユーザーを認識する方法です。ブロックすることで、認識やトラッキングを拒否することができます。</p><p><strong>フィンガープリント対策：</strong>この機能を有効にすることで、フィンガープリントを利用したユーザー追跡を防ぐ可能性を高めることができます。</p><p><strong>シェアボタンをブロック：</strong>このオプションは 、Facebookのボタンやその他のウィ ジェット等をソーシャルメディアコンテンツ のウェブページ上から削除します。</p><strong>隠すルール：</strong> この機能は、ブロックしたいコンテンツを非表示にしますが、読み込みを停止することはできません。";
+
+/* explanations of the https settings */
+"https settings explanation" = "<p>安全なウェブサイト接続の設定を選択する。ウェブサイトへの接続には、HTTPとよばれるプロトコルが必要になります。安全なバージョンのHTTPはHTTPSです。鍵のマークが検索バーに現れたときは、安全な接続が確立されていることになります。</p><p><strong>初めにHTTPS Sitesで試す:</strong> 毎回、HTTPに戻って接続する前に、安全な接続を確立するよう試行します。<u>ただし、</u>この機能を使用すると、しばらくの間安全な接続を確立しようとするため、SnowHazeの速度が遅くなることに注意してください。</p><p><strong>既知のサイトでHTTPS を使う:</strong> HTTPS接続ができるとわかっているウェブサイトでのみ、この接続が確立されます。</p><strong>混在コンテンツのブロック：</strong> 一部のHTTPSウェブサイトでは、安全でないHTTPコンテンツを使用することができます。 あなたの情報を盗むために、このコンテンツを攻撃者に置き換えることができます。 このオプションがオンの場合、SnowHazeはこの混在したコンテンツを安全なWebサイトでブロックします。";
+
+/* explanations of the appearance settings */
+"appearance settings explanation" = "<p>SnowHazeでウェブサイトをどのように見たいかを選択する</p><p><strong>ナイトモード:</strong> ナイトモードでは、暗い中でも、画面が見やすいように色を変更します。</p><p><strong>最小フォントサイズ:</strong> 表示される文字の大きさを選択します。</p><strong>スケール制限を無視する：</strong>一部のウェブサイトで定義されている制限を無視し、好きなようにコンテンツのサイズを変更します。";
+
+/* explanations of the popover settings */
+"popover settings explanation" = "<p>ポップオーバーの調整方法を選ぶ。ポップオーバーはほかのタブによって自動的に開かれるタブのことです。</p><p><strong>すべてブロック:</strong> この選択肢を選ぶことで自動的に開くタブをブロックします。</p><p><strong>ユーザーによるトリガーを許可:</strong> ポップオーバーはユーザーによるリンクのタッぷというトリガーによって開きます。</p><strong>すべてを許可:</strong> ポップオーバーに対する制限はありません。";
+
+/* explanations of the external bookmark settings */
+"external bookmark settings explanation" = "<p>外部のブックマークの管理</p><p><strong>Spotlightのインデックス:</strong> この選択肢がオンの場合、ブックマークはSpotlightにおいてインデックス化されるため、簡単に検索することができるようになります。</p><strong>ホームスクリーンショートカット:</strong> これにより、ブックマークがデバイス上のホームスクリーンからアクセス可能になり、3DTouchをサポートします。";
+
+/* explanations of the content type blockers settings */
+"content type blockers settings explanation" = "SnowHazeはウェブページのさまざまなコンテンツをブロックできます。 ブロックするコンテンツの種類を選択します。";
+
+/* explanations of the acknowledgements settings tab */
+"acknowledgements settings explanation" = "SnowHazeの開発は、第三者コードとオープンソースプロジェクトによって非常に簡易化されました。私たちは以下のプロジェクトの維持をしている方々がこれらを使用することを許可してくださったことに対し、感謝しています ; AgileBits Inc. for 1PasswordExtension, phishtank.com for their phish verification database, Zetetic LLC for SQLCipher, the EasyList authors (easylist.github.io) fanboy, MonztA, Famlam and Khrin for the EasyList, EasyPrivacy List and Fanboy's Social Blocking List and the Polish TeX Users Group GUST for the TeX Gyre Adventor font. 使用されたオープンソースのライセンスや著作権表示は以下に表記しています。SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Design created by Basestudio.";
+
+/* explanations of the subscription settings tab */
+"subscription settings explanation" = "<p>SnowHazeプレミアムの購読登録をすることで、SnowHaze VPN、 SnowHaze サーチエンジンをご利用出来ます。また、サイトリストの 自動更新が頻繁に行われます。最初の7日間は初めての加入者には無料です。購読期間は１ヶ月と１年間の２種類があります。購読解除がない限り、購読は自動更新されるので、ご注意ください。</p><p><strong>オプションの自動更新</strong>はサブスクリプションを更新します。</p><p><strong>アクセストークンの自動更新</strong>は認証トークンを更新します。</p><p><strong>Current Token Hash</strong>は現在の購読登録を確認するためのコードです。</p>毎年のSnowHazeプレミアムサブスクリプションは1年間有効です。毎月のSnowHazeプレミアム契約は1ヶ月間有効です。この間、SnowHaze VPN、SnowHaze検索エンジンにアクセスし、あなたのリストは頻繁に更新されます。購入を確認すると、お支払いはiTunesアカウントに請求されます。サブスクリプションの終了前に少なくとも24時間は自動更新をオフにしない限り、すべてのサブスクリプションは自動的に更新されます。あなたのアカウントには、購読期間の24時間前に請求されます。 [すべての購読を確認]をタップすると、アカウント設定で定期購入を管理できます。対応するサブスクリプションを購入すると、無料試用期間の未使用部分は失効します。";
+
+/* explanations of the vpn settings tab */
+"vpn settings explanation" = "<p>VPN (Virtual Private Network)は暗号化されたプライベートなネットワークです。ユーザーの使用する機器とインターネット間の全ての通信は、はじめに、VPNサーバーに送られます。VPNサーバーを介して情報を受けとった受信者には、ユーザー（送信者）のIPアドレスが通知されることはありません （VPNサーバーのIPアドレスが通知されます）。この機能はトラッキングの防止に役立ちます。</p><p>VPNの利用はインターネット活動をより安全で快適なものにします。例えば、VPNサーバーとの通信は暗号化されます。</p><p>異なるプロトコルを使用する2種類のVPNを提供しています。 1つはIPSecと呼ばれるプロトコルで、もう1つはOpenVPNです。 IPSecを使用したVPNはSnowHazeアプリ内で簡単に制御できますが、OpenVPNではOpenVPN Connectアプリを使用し、毎月プロファイルを更新する必要があります。 しかし、OpenVPNはIPSecよりも少し安全です。 これは、使いやすさ（IPSec）とセキュリティ（OpenVPN）の間の小さなトレードオフであり、私たちが安全にあなたに任せることができます。</p><p>SnowHaze VPNの利用にはSnowHaze Premiumの購読が必要です。VPNの設定についてはオンラインチュートリアルをご参考下さい。</p><p><strong>位置リストの自動更新：</strong>利用可能なVPNサーバーの位置情報を更新します。</p><strong>Pingの表示：</strong> 通信スピードを表示します。具体的には、 使用デバイス・サーバー間を往復するための所要時間が表示されます。";
+
+/* explanations of the passcode settings tab */
+"passcode settings explanation" = "<p>SnowHazeブラウザを開くためのパスコードを設定します。パスコードの設定、変更、削除は以下で行えます。</p><p><strong>モード：</strong>「パスコードのみ」、「パスコードと生体認証（Touch ID、Face ID）」、「パスコード設定無し」のいずれかを選択できます。また、 SnowHazeを自動ロックするまでの時間設定を行えます。</p><strong>パスコードの種類：</strong>6桁の数字（例：378291）;より長い数字（例：73820983772）;数字と記号を含む文字列（例：$7&9jK-55）";
+
+/* explanations of the warnings settings tab */
+"warnings settings explanation" = "<p>SnowHazeがセキュリティ警告文を表示する状況を設定できます。</p><p><strong>危険なサイト：</strong>アクセス先が危険なサイトである場合、アクセスを行う前に警告文を表示します。危険なサイトとは、マルウェア感染を誘発される恐れのある悪質サイトやフィッシングサイトを指します。これらのサイトは、ユーザーの個人情報（パスコード、クレジットカード情報など）を含むiOS機器上の情報を盗むことを目的としています。</p><p><strong>TLS証明書：</strong>TLS証明書が第三者による確かな審査を受けていない「自己署名型」のものと疑われる時、警告文を表示します。TLS（Transport Layer Security）証明書とは、情報を暗号化し安全なデータの送受信をするTLS機能と、ウェブサイトの運営元の身元を照会する機能を備えた電子証明書です。</p><p><strong>トラッキングパラメータ：</strong>URLには、トラッキングに使用できるパーソナライズされた要素が含まれています。 SnowHazeは、このパーソナライゼーションなしでクエリを送信するかどうかを尋ねます。</p><strong>XSSの防止：</strong>クロスサイトスクリプティング（XSS）は、攻撃者がWebページにコードを挿入する攻撃の一種です。 SnowHazeは、この設定がオンのときにそのようなコードの挿入をブロックするかどうかを尋ねます。";
+
+/* title of prompt to explain http warning indicator */
+"http warnings explanation prompt title" = "HTTPの警告";
+
+"site lists > 1 day old notice format" = "%@日前";
+
+"site lists 1 day old notice" = "１日前";
+
+"site lists 0 days old notice" = "当世風";
+

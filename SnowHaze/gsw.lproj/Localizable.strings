@@ -1,0 +1,1504 @@
+/* Localizable.strings
+	SnowHaze
+	Copyright © 2017 Illotros GmbH. All rights reserved. */
+
+/* code used to identify the current locale */
+"localization code" = "gsw";
+
+/* title of prompt to warn user that their snowhaze version is old */
+"old snowhaze version prompt title" = "Alti SnowHaze Version";
+
+/* format string of message of prompt to warn user that their snowhaze version is old */
+"old snowhaze version prompt message format" = "Bitte due SnowHaze aktualisiere. Dini Version (%@) isch eis Jahr alt und wird nümme understützt.";
+
+/* title of button to lead users to the app store to update snowhaze */
+"old snowhaze version prompt update button title" = "App Store";
+
+/* title of button to ignore old snowhaze version warning */
+"old snowhaze version prompt ignore button title" = "Ignoriere";
+
+/* title of home page displayed in url bar */
+"home screen page title" = "Startsite";
+
+/* displayed instead of title for masked tabs in app snapshots */
+"masked tab title" = "Maskiert";
+
+/* title for settings controller navigation item */
+"settings title" = "Iistellige";
+
+/* title for general settings section */
+"general settings title" = "ALLGEMEIN";
+
+/* title for premium settings section */
+"premium settings title" = "PREMIUM";
+
+/* title for privacy settings section */
+"privacy settings title" = "DATESCHUTZ";
+
+/* title for default settings section */
+"default settings title" = "STANDARD";
+
+/* title for about settings section */
+"about settings title" = "INFOS";
+
+/* title for bookmark section */
+"bookmarks view title" = "Läsezeiche";
+
+/* title for history section */
+"history view title" = "Verlouf";
+
+/* Used to confirm message */
+"js alert panel confirmation button title" = "OK";
+
+/* Used to accept message */
+"js confirm panel confirm button title" = "OK";
+
+/* Used to decline message */
+"js confirm panel cancel button title" = "Abbräche";
+
+/* Used to enter text */
+"js text prompt confirm button title" = "OK";
+
+/* Used to not enter text */
+"js text prompt cancel button title" = "Abbräche";
+
+/* title of button to ignore further alerts by this site */
+"ignore alerts from this site alert button title" = "Mäldige ignoriere";
+
+/* title of the activity to create a new bookmark */
+"add bookmark activity title" = "Läsezeiche hinzuefüege";
+
+/* title of the activity to enter reader mode */
+"reader mode activity title" = "Läsemodus";
+
+/* preposition indication offset in set e.g. page 5 'of' 7 */
+"page offset indication preposition" = "vo";
+
+/* name of document that has not been given a name */
+"untitled document name" = "ohni Titu";
+
+/* title of button to delete bookmark in bookmark view */
+"delete bookmark button title" = "Lösche";
+
+/* title of button to refresh bookmark in bookmark view */
+"refresh bookmark button title" = "Nöi lade";
+
+/* title of button to rename bookmark in bookmark view */
+"rename bookmark button title" = "Umbenenne";
+
+/* title of button to delete all history section of a day */
+"delete history section button title" = "Lösche";
+
+/* title of cancel button of passcodecontroller */
+"passcodecontroller cancel button title" = "Abbräche";
+
+/* passcodecontrollers prompt to provide biometric authentication or enter passcode for verification */
+"passcodecontroller biometrics or passcode prompt" = "Biometrischi ID oder Passwort";
+
+/* passcodecontrollers prompt to enter passcode for verification */
+"passcodecontroller passcode prompt" = "Passwort";
+
+/* passcodecontrollers prompt to provide new passcode */
+"passcodecontroller new passcode prompt" = "Nöis Passwort";
+
+/* passcodecontrollers prompt to provide biometric authentication or enter old passcode for verification before passcode change */
+"passcodecontroller biometrics or old passcode prompt" = "Biometrischi ID oder alts Passwort";
+
+/* passcodecontrollers prompt to enter old passcode for verification before passcode change */
+"passcodecontroller old passcode prompt" = "Alts Passwort";
+
+/* passcodecontrollers prompt to confirm new passcode before setting it up or changing it */
+"passcodecontroller new passcode confirm prompt" = "Due dis nöie Passwort bestätige";
+
+/* text to indicate that the passcode is currently being verified */
+"passcodecontroller verifying passcode notice" = "Passwort wird überprüeft";
+
+/* text to indicate that the provided passcode is correct */
+"passcodecontroller passcode correct notice" = "Passwort richtig";
+
+/* text to indicate that the provided passcode is incorrect */
+"passcodecontroller passcode incorrect notice" = "Passwort falsch";
+
+/* text to indicate that the provided passcodes did not match when setting up or changing passcode */
+"passcodecontroller passcodes do not match notice" = "Passwörter stimme nid überii";
+
+/* text to indicate that passcode is being set up */
+"passcodecontroller setting up passcode notice" = "Passwort wird gsetzt…";
+
+/* text to indicate that passcode is being changed */
+"passcodecontroller changing up passcode notice" = "Passwort wird gänderet…";
+
+/* text to indicate that the passcode setup succeeded */
+"passcodecontroller passcode setup succeeded notice" = "Passwort gsetzt";
+
+/* text to indicate that the passcode change succeeded */
+"passcodecontroller passcode change succeeded notice" = "Passwort gänderet";
+
+/* text to indicate that the passcode setup failed */
+"passcodecontroller passcode setup failed notice" = "Passwort setzt fählgschlage";
+
+/* text to indicate that the passcode change failed */
+"passcodecontroller passcode change failed notice" = "Passwortänderig fählgschlage";
+
+/* text to indicate why the user should authenticate with biometrics when updating the passcode stored in the keychain */
+"passcodecontroller update keychain passcode biometrics prompt" = "Due dis Passwort aktualisiere";
+
+/* text to indicate why the user should authenticate to snowhaze using biometrics */
+"passcodecontroller authenticate with biometrics prompt" = "Authentifizierig mit biometrischer ID";
+
+/* error message displayed when app launch fails due to keychain error */
+"app launch failed keychain error message" = "SnowHaze isch nid entsperrt worde, will e Fähler im iCloud Schlüssubund ufträtte isch.";
+
+/* title of button to retry when app launch fails due to keychain error */
+"app launch failed keychain error retry button title" = "Wider probiere";
+
+/* accessibility label of the passcode controllers number pad enter button */
+"passcodecontroller enter button accessibility label" = "Iigab";
+
+/* accessibility label of the passcode controllers number pad backspace button */
+"passcodecontroller backspace button accessibility label" = "Backspace";
+
+/* accessibility label of the passcode controllers biometrics button */
+"passcodecontroller biometrics button accessibility label" = "Biometrischi ID";
+
+/* accessibility label of the passcode controllers code display when it is empty */
+"passcodecontroller code display 0 characters accessibility label" = "Sichere Text - 0 Zeiche";
+
+/* accessibility label of the passcode controllers code display when it is has 1 character */
+"passcodecontroller code display 1 character accessibility label" = "Sichere Text - 1 Zeiche";
+
+/* accessibility label of the passcode controllers code display when it is has more than 1 character */
+"passcodecontroller code display many characters accessibility label" = "Sichere Text - %@ Zeiche";
+
+/* title of the activity to scan a (QR) code */
+"scan code activity title" = "Code scänne";
+
+/* title of button to cancel code scanning */
+"code scan view controller cancel button title" = "Abbräche";
+
+/* title of button to finish code scanning */
+"code scan view controller done button title" = "Fertig";
+
+/* title of button to preview scanned code */
+"code scan view controller preview button title" = "Vorschou";
+
+/* error message displayed when user tries to scan a code but has not (yet) granted camera access */
+"code scan no camera access error message" = "Kei Zuegriff ufd Kamera\nDu chasch ir App \"Einstellungen\" Zuegriff erlaube.";
+
+/* discoverability title of key command to make a new tab */
+"new tab key command title" = "Nöis Tab";
+
+/* discoverability title of key command to cancel user input */
+"cancel key command title" = "Abbräche";
+
+/* discoverability title of key command to start search input */
+"search key command title" = "Suechi";
+
+/* discoverability title of key command to select next suggestion */
+"next suggestion key command title" = "Nächsti Empfählig";
+
+/* discoverability title of key command to select previous suggestion */
+"previous suggestion key command title" = "Vorhärigi Empfälig";
+
+/* discoverability title of key command to open selected suggestion */
+"open key command title" = "Uftue";
+
+/* title of preview action to open a link in a new tab */
+"open in new tab preview action title" = "I nöiem Tab ufdue";
+
+/* title of preview action to open the url of a history item */
+"open history item preview action title" = "Ufdue";
+
+/* title of preview action to copy the url of a history item */
+"copy history item preview action title" = "Kopiere";
+
+/* title of preview action to share the url of a history item */
+"share history item preview action title" = "Teile...";
+
+/* title of preview action to open the url of a bookmark */
+"open bookmark preview action title" = "Ufdue";
+
+/* title of preview action to copy the url of a bookmark */
+"copy bookmark preview action title" = "Kopiere";
+
+/* title of preview action to share the url of a bookmark */
+"share bookmark preview action title" = "Teile...";
+
+/* title for acknowledgements */
+"acknowledgements settings title" = "Rächtliches";
+
+/* title for website data settings */
+"website data settings title" = "Webdate";
+
+/* title for content type blockers settings */
+"content type blockers settings title" = "Content Blocker";
+
+/* title for defaults settings */
+"defaults settings title" = "Standardiistellige";
+
+/* title for application settings */
+"application settings title" = "SnowHaze";
+
+/* title for javascript settings */
+"javascript settings title" = "JavaScript";
+
+/* title for search engine settings */
+"search engine settings title" = "Suechmaschine";
+
+/* title for contact section */
+"contact settings title" = "Kontakt";
+
+/* title for user agent settings */
+"user agent settings title" = "User Agent";
+
+/* title for history settings */
+"history settings title" = "Verlouf";
+
+/* title for media playback settings */
+"media playback settings title" = "Mediewidergab";
+
+/* title of mark as trusted setting */
+"mark as trusted setting title" = "Vertrauenswürdig";
+
+/* title of show local site suggestions setting */
+"show local site suggestions setting title" = "Lokali Suechvorschläg";
+
+/* title of suggest private sites setting */
+"suggest private sites setting title" = "Privati Site vorschlaa";
+
+/* title of update site lists setting */
+"update site lists setting title" = "Auto-Update Siteliste";
+
+/* indication that the currently installed site lists are up to date */
+"site lists 0 weeks old notice" = "aktuell";
+
+/* indication that the currently installed site lists are 1 week old */
+"site lists 1 week old notice" = "1 Wuche alt";
+
+/* format string of indication that the currently installed site lists are > 1 week old */
+"site lists > 1 week old notice format" = "%@ Wuche alt";
+
+/* title of setting to prevent site lists updates from using cellular data */
+"no cellular data for site lists update setting title" = "Nume Wi-Fi";
+
+/* indication that subscribing to premium gives access to frequent site lists updates */
+"subscribe to premium for daily site lists update notice" = "Premium aktualisiert hüfig";
+
+/* title of settings to manage site lists */
+"site lists settings title" = "SITELISTE";
+
+/* title of settings for undoing tab closing */
+"allow tab closing undo settings title" = "TAB WIDERHÄRSTELLE";
+
+/* title of settings for tab masking */
+"tab masking settings title" = "TABS MASKIERE";
+
+/* title of setting for the duration during which closing a tab can be undone */
+"allow tab closing undo duration settings title" = "Zuelaa für";
+
+/* title of setting to allow tab closing to be undone for all tabs */
+"allow tab closing undo for all tabs settings title" = "Zuelaa für alli Tabs";
+
+/* string used to indicate that tab closing cannot be undone */
+"tab closing undo time limit 0 seconds time" = "0 Sek";
+
+/* string used to indicate that tab closing can be undone for 1 second */
+"tab closing undo time limit 1 second time" = "1 Sek";
+
+/* format string used to indicate how long tab closing can be undone */
+"tab closing undo time limit many seconds time format" = "%@ Sek.";
+
+/* title of allow application controlled javascript setting */
+"allow application script setting title" = "Application Scripts zuelaa";
+
+/* title of allow password manager gather script setting */
+"allow password manager gather script setting title" = "Passwortmanager";
+
+/* title of allow javascript setting */
+"allow javascript setting title" = "JavaScript zuelaa";
+
+/* title of button to delete all website data records */
+"delete all data button title" = "Alli Websitedate lösche";
+
+/* title for confirm option of dialog to cancel deletion of all website data records */
+"delete all data cancel option title" = "Abbräche";
+
+/* title for dialog to confirm deletion of all website data records */
+"delete all data confirm dialog title" = "Lösche bestätige";
+
+/* title for confirm option of dialog to confirm deletion of all website data records */
+"delete all data confirm option title" = "Lösche";
+
+/* message format for dialog to confirm deletion of all website data records */
+"delete all data message format" = "Bisch dir sicher, dass du alli %@ Webdate wosch lösche?";
+
+/* title of button to delete tracking cookies */
+"delete tracking cookies button title" = "Tracking Cookies lösche";
+
+/* title of save website data records setting */
+"save website data setting title" = "Webdate spichere";
+
+/* title of settings section to set the cookie blocking mode */
+"cookie blocking settings title" = "COOKIES BLOCKIEREN";
+
+/* option to not block cookies of the block cookies setting */
+"block cookies setting none option" = "Keni";
+
+/* option to block third party cookies of the block cookies setting */
+"block cookies setting third party option" = "Vo Drittabieter";
+
+/* option to block all cookies of the block cookies setting */
+"block cookies setting all option" = "Alli";
+
+/* notice displayed on iOS 10 and lower devices to indicate that cookie blocking requires ios 11 or newer */
+"cookie blocking requires ios 11 notice" = "Das brucht iOS 11";
+
+/* string displayed to user to identify iphone safari user agent */
+"iphone safari user agent display name" = "Safari iPhone";
+
+/* string displayed to user to identify iphone chrome user agent */
+"iphone chrome user agent display name" = "Chrome iPhone";
+
+/* string displayed to user to identify iphone firefox user agent */
+"iphone firefox user agent display name" = "Firefox iPhone";
+
+/* string displayed to user to identify iphone opera user agent */
+"iphone opera user agent display name" = "Opera iPhone";
+
+/* string displayed to user to identify ipad safari user agent */
+"ipad safari user agent display name" = "Safari iPad";
+
+/* string displayed to user to identify ipad chrome user agent */
+"ipad chrome user agent display name" = "Chrome iPad";
+
+/* string displayed to user to identify ipad firefox user agent */
+"ipad firefox user agent display name" = "Firefox iPad";
+
+/* string displayed to user to identify ipad opera user agent */
+"ipad opera user agent display name" = "Opera iPad";
+
+/* string displayed to user to identify android default browser user agent */
+"android default browser user agent display name" = "Standard Android Browser";
+
+/* string displayed to user to identify android chrome user agent */
+"android chrome user agent display name" = "Chrome Android";
+
+/* string displayed to user to identify android firefox user agent */
+"android firefox user agent display name" = "Firefox Android";
+
+/* string displayed to user to identify android opera user agent */
+"android opera user agent display name" = "Opera Android";
+
+/* title of button to reset global settings to defaults */
+"reset global settings button title" = "Iistellige zruggsetze";
+
+/* title for cancel option of dialog to confirm resetting of global settings */
+"reset global settings confirm dialog cancel option title" = "Abbräche";
+
+/* title for confirm option of dialog to confirm resetting of global settings */
+"reset global settings confirm dialog confirm option title" = "Zruggsetze";
+
+/* message for dialog to confirm resetting of global settings */
+"reset global settings confirm dialog message" = "Bisch dir sicher, dass du dini Iistellige wosch zruggsetze?";
+
+/* title for dialog to confirm resetting of global settings */
+"reset global settings confirm dialog title" = "Zruggsetze bestätige";
+
+/* title of button to reset per page settings to defaults */
+"reset page settings button title" = "Siteiistellige zruggsetze";
+
+/* title for cancel option of dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog cancel option title" = "Abbräche";
+
+/* title for confirm option of dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog confirm option title" = "Zruggsetze";
+
+/* message for dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog message" = "Bisch dir sicher, dass du alli Siteiistellige wosch zruggsetze?";
+
+/* title for dialog to confirm resetting of per page settings */
+"reset page settings confirm dialog title" = "Zruggsetze bestätige";
+
+/* title of button to restart the tutorial */
+"restart tutorial settings button title" = "Tutorial nöi starte";
+
+/* title of save history setting */
+"save history setting title" = "Verlouf spichere";
+
+/* title for require user action for media playback setting */
+"require user action for media playback setting title" = "Benutzerhandlig erfordere";
+
+/* title for allow inline media playback setting */
+"allow inline media playback setting title" = "Inline Widergaab zuelaa";
+
+/* name of bing search engine to be displayed to user */
+"bing search engine display name" = "Bing";
+
+/* name of google search engine to be displayed to user */
+"google search engine display name" = "Google";
+
+/* name of yahoo search engine to be displayed to user */
+"yahoo search engine display name" = "Yahoo";
+
+/* name of wikipedia search engine to be displayed to user */
+"wikipedia search engine display name" = "Wikipedia";
+
+/* name of wolframalpha search engine to be displayed to user */
+"wolframalpha search engine display name" = "WolframAlpha";
+
+/* name of ecosia search engine to be displayed to user */
+"ecosia search engine display name" = "Ecosia";
+
+/* name of startpage search engine to be displayed to user */
+"startpage search engine display name" = "Startpage";
+
+/* name of hulbee search engine to be displayed to user */
+"hulbee search engine display name" = "Hulbee";
+
+/* name of duckduckgo search engine to be displayed to user */
+"duckduckgo search engine display name" = "DuckDuckGo";
+
+/* name of none search engine to be displayed to user */
+"none search engine display name" = "Keni";
+
+/* name of snowhaze search engine to be displayed to user */
+"snowhaze search engine display name" = "SnowHaze";
+
+/* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
+"snowhaze search engine missing subscription accessibility label" = "SnowHaze - Benötigt es SnowHaze Premium Abo";
+
+/* title of settings subsection to choose search engine */
+"search engine selection setting subsection title" = "SUECHMASCHINE";
+
+/* title of settings subsection to choose search engines for search suggestions */
+"search suggestion engines setting subsection title" = "SUECHVORSCHLÄG";
+
+/* used to refer to the search engine selected by the user */
+"main search engine name" = "Houptsuechmaschine";
+
+/* title of button to email support */
+"email support button title" = "Email Support";
+
+/* title of button to share snowhaze */
+"share snowhaze button title" = "SnowHaze teile";
+
+/* title of button to rate snowhaze on the app store */
+"rate snowhaze button title" = "SnowHaze bewärte";
+
+/* text use to prefill 'share' messagers */
+"snowhaze share text" = "Hoi!\nSnowHaze isch e super Browser wo Dini persönliche Date vollständig schützt.\nLug mau d'Website a: snowhaze.com\nOder lad d'App eifach usem App Store abe; snowhaze.com/download.";
+
+/* format of message of email to be sent to support */
+"support email message format" = "Hoi\nI ha es Problem mit däm SnowHaze:\n\n\n\nBitte antworte per:\nMail: \nTelefon: \n\nI bruche SnowHaze mit:\nGräät: %@\nVersion: %@\nSprach: %@";
+
+/* title of email to be sent to support */
+"support email title" = "SnowHaze Support";
+
+/* title of button to visit snowhaze website */
+"visit website button title" = "Website bsueche";
+
+/* title for tracking protection settings */
+"tracking protection settings title" = "Trackingschutz";
+
+/* title of block referer setting */
+"block referer setting title" = "HTTP Referer blockiere";
+
+/* title for https settings */
+"https settings title" = "HTTPS";
+
+/* title of try https first setting */
+"try https first setting title" = "Probier HTTPS Site zersch";
+
+/* subtitle for autocomplete search suggestions from bing */
+"bing search suggestion subtitle" = "Bing Suechi";
+
+/* subtitle for autocomplete search suggestions from google */
+"google search suggestion subtitle" = "Google Suechi";
+
+/* subtitle for autocomplete search suggestions from yahoo */
+"yahoo search suggestion subtitle" = "Yahoo Suechi";
+
+/* subtitle for autocomplete search suggestions from wikipedia */
+"wikipedia search suggestion subtitle" = "Wikipedia Suechi";
+
+/* subtitle for autocomplete search suggestions from wolframalpha */
+"wolframalpha search suggestion subtitle" = "WolframAlpha Suechi";
+
+/* subtitle for autocomplete search suggestions from ecosia */
+"ecosia search suggestion subtitle" = "Ecosia Suechi";
+
+/* subtitle for autocomplete search suggestions from startpage */
+"startpage search suggestion subtitle" = "Startpage Suechi";
+
+/* subtitle for autocomplete search suggestions from hulbee */
+"hulbee search suggestion subtitle" = "Hulbee Suechi";
+
+/* subtitle for autocomplete search suggestions from DuckDuckGo */
+"duckduckgo search suggestion subtitle" = "DuckDuckGo Suechi";
+
+/* subtitle for autocomplete search suggestions from snowhaze search */
+"snowhaze search search suggestion subtitle" = "SnowHaze Suechi";
+
+/* title of the activity to find some text on page */
+"find on page activity title" = "Site dürsueche";
+
+/* title of button to dismiss text input bar */
+"text input bar dismiss button title" = "Fertig";
+
+/* title of button to cancel renaming of bookmark */
+"bookmark rename bar cancel button title" = "Abbräche";
+
+/* title of use https exclusively when possible setting */
+"use https exclusively when possible setting title" = "HTTPS wenns geit";
+
+/* title of mixed content blocking setting */
+"mixed content blocking setting title" = "Mixed Content Blocker";
+
+/* notice displayed on iOS 10 and lower devices to indicate that mixed content blocking requires ios 11 or newer */
+"mixed content blocking requires ios 11 notice" = "Das brucht iOS 11";
+
+/* title of block tracking scripts setting */
+"block tracking scripts setting title" = "Tracking Scripts blockiere";
+
+/* title of block ads setting */
+"block ads setting title" = "Wärbig blockiere";
+
+/* title for appearance settings */
+"appearance settings title" = "Azeig";
+
+/* title of night mode setting */
+"night mode setting title" = "Nachtmodus";
+
+/* title of minimum font size setting */
+"minimum font size setting title" = "Mindestschriftgrössi";
+
+/* title of ignore scale limits setting */
+"ignore scale limits setting title" = "Skalierigsgränz ignoriere";
+
+/* notice displayed on iOS 9 devices to indicate that ignoring scale limits requires ios 10 or newer */
+"ignore scale limits requires ios 10 notice" = "Das brucht iOS 10";
+
+/* title of forget private sites setting */
+"forget private sites setting title" = "Privati Site vergässe";
+
+/* title of block canvas data access setting */
+"block canvas data access setting title" = "Canvas Fingerprinting blockiere";
+
+/* title of block fingerprinting setting */
+"block fingerprinting setting title" = "Fingerprinting blockiere";
+
+/* title of block social media widgets setting */
+"block social media widgets setting title" = "Teile Button blockiere";
+
+/* notice displayed on iOS 10 and lower devices to indicate that social media widget blocking requires ios 11 or newer */
+"social media widget blocking requires ios 11 notice" = "Das brucht iOS 11";
+
+/* title of apply hide only rules setting */
+"apply hide only rules setting title" = "Unblockierts verstecke";
+
+/* notice displayed on iOS 10 and lower devices to indicate that applying hide only rules requires ios 11 or newer */
+"apply hide only rules requires ios 11 notice" = "Das brucht iOS 11";
+
+/* title for popover settings */
+"popover settings title" = "Popover";
+
+/* name of popover blocking policy which blocks all popovers */
+"allways block popover blocking policy name" = "Alli blockiere";
+
+/* name of popover blocking policy which only blocks js-triggered popovers */
+"block scripted popover blocking policy name" = "Benutzerusglösti zuelaa";
+
+/* name of popover blocking policy which allows all popovers */
+"allways allow popover blocking policy name" = "Alli zuelaa";
+
+/* name of the never tab masking rule */
+"never tab masking rule name" = "Nie";
+
+/* name of the when private tab masking rule */
+"when private tab masking rule name" = "Wenn Privat";
+
+/* name of the always tab masking rule */
+"always tab masking rule name" = "Immer";
+
+/* title for warnings settings */
+"warnings settings title" = "Warnige";
+
+/* title of show dangerous sites warnings setting */
+"show dangerous sites warnings setting title" = "Gfährlechi Site";
+
+/* title of show tls certificate warnings setting */
+"show tls certificate warnings setting title" = "TLS Zertifikat";
+
+/* title of show tracking parameters warnings setting */
+"show tracking parameters warnings setting title" = "Tracking Parameter";
+
+/* title of prevent xss setting */
+"prevent xss setting title" = "XSS verhindere";
+
+/* title of settings to set passcode locking mode to off */
+"passcode locking mode off settings title" = "Us";
+
+/* title of settings to set passcode locking mode to passcode or biometric authentication */
+"passcode locking mode passcode or biometrics settings title" = "Passwort oder biometrischi ID";
+
+/* title of settings to set passcode locking mode to passcode only */
+"passcode locking mode passcode only settings title" = "Nume Passwort";
+
+/* subtitle of settings to set passcode locking mode to passcode or biometrics that indicates that biometric authentication is unavailable */
+"passcode locking mode passcode or biometrics settings biometrics not available subtitle" = "Biometrische ID nid verfüegbar";
+
+/* title of settings to set after how long in the background the app locks */
+"passcode lock after settings title" = "Sperre nach";
+
+/* title of settings to set passcode type to 6 digit PIN */
+"passcode type 6 digits settings title" = "6 Zahle";
+
+/* title of settings to set passcode type to arbitrary length PIN */
+"passcode type long numeric settings title" = "Länge Zahlecode";
+
+/* title of settings to set passcode type to arbitrary length PIN */
+"passcode type alphanumeric settings title" = "Alphanumerisch";
+
+/* title of button to change the applications passcode */
+"change passcode button title" = "Passwort ändere";
+
+/* title of button to manually engage ui lock */
+"lock snowhaze button title" = "SnowHaze sperre";
+
+/* title of settings section to set the apps locking mode */
+"passcode locking mode settings title" = "MODUS";
+
+/* title of settings section to set the passcodes type */
+"passcode type settings title" = "FORMAT";
+
+/* string used to indicate that the app locks immediately on entering background */
+"passcode lock after 0 minutes time" = "Sofort";
+
+/* string used to indicate that the app locks 1 minute after entering background */
+"passcode lock after 1 minute time" = "1 Min";
+
+/* string used to indicate that the app only requires unlocking at startup */
+"passcode lock after infinity minutes time" = "Start";
+
+/* string used to indicate how long after entering background the app locks */
+"passcode lock after many minutes time" = "%@ Min";
+
+/* title for passcode settings */
+"passcode settings title" = "Passcode";
+
+/* title for subscription settings */
+"subscription settings title" = "Abo";
+
+/* title of settings to subscribe to snowhaze premium */
+"snowhaze premium settings title" = "SNOWHAZE PREMIUM";
+
+/* title of settings to auto-update the list of snowhaze premium subscription options */
+"update snowhaze premium subscription options settings title" = "Auto-Update Optione";
+
+/* title of settings to auto-update the premium authorization token */
+"update authorization token settings title" = "Auto-Update Token";
+
+/* title of the setting that displays the hash of the current premium authorization token */
+"current token hash settings title" = "Hash vom aktuelle Token";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when nothing special happened recently */
+"load snowhaze premium options settings default title" = "Abonnementoptione lade";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when a load recently failed */
+"load snowhaze premium options settings load failed title" = "Lade fählgschlage";
+
+/* title of settings to manually load the list of snowhaze premium subscription options when a load recently succeeded */
+"load snowhaze premium options settings load succeeded title" = "Lade erfolgrich";
+
+/* title of settings to restore a snowhaze premium purchase when nothing special happened recently */
+"restore snowhaze premium purchase settings default title" = "Ichöif widerhärstelle";
+
+/* title of settings to restore a snowhaze premium purchase when a restore recently failed */
+"restore snowhaze premium purchase settings restore failed title" = "Widerhärstelle fählgschlage";
+
+/* title of settings to restore a snowhaze premium purchase when a restore recently succeeded */
+"restore snowhaze premium purchase settings restore succeeded title" = "Widerhärstelle erfolgrich";
+
+/* title of settings to show the users subscriptions management settings in itunes */
+"view all subscriptions settings title" = "Alli Abonnemänt azeige";
+
+/* title of alert to inform users that a purchase has failed */
+"purchase failed error alert title" = "Chauf fählgschlage";
+
+/* title of the button to show the snowhaze premium subscription terms of service */
+"show subscription terms of service button title" = "AGB";
+
+/* title of the button to show the snowhaze premium subscription privacy policy */
+"show subscription privacy policy button title" = "Dateschutzerklärig";
+
+/* displayed instead of the error message in the alert to inform users that a purchase has failed when the reason for the failure is unknown */
+"purchase failed error alert unknown error message" = "Unbekannte Fähler";
+
+/* title of the ok button of the alert to inform users that a purchase has failed */
+"purchase failed error alert ok button title" = "OK";
+
+/* text to indicate that the subscription will renew within the next 0 days */
+"subscription renews within 0 days notice" = "Ernöieret hüt";
+
+/* text to indicate that the subscription will renew within the next 1 days */
+"subscription renews within 1 days notice" = "Ernöieret morn";
+
+/* text to indicate that the subscription will renew within the next n days for n > 1 */
+"subscription renews within n days notice format" = "Ernöieret I %@ Täg";
+
+/* text to indicate that the subscription will expire in 0 days */
+"subscription expire in 0 days notice" = "Lauft hüt ab";
+
+/* text to indicate that the subscription will expire in 1 days */
+"subscription expire in 1 days notice" = "Lauft morn ab";
+
+/* text to indicate that the subscription will expire in n days for n > 1 */
+"subscription expire in n days notice" = "Lauft i %@ Täg ab";
+
+/* notice to warn users that snowhaze premium subscriptions auto-renew */
+"snowhaze premium subscription auto-renew notice" = "Ernöiere sich automatisch, d Bedingige si ir Beschribig";
+
+/* text to indicate that an authorization token can only be received by subscribing to snowhaze premium */
+"subscribe to receive authorization token notice" = "Due di aboniere zum e Token z'erhalte";
+
+/* subtitle of the setting to load a new authorization token */
+"tab to load new authorization token settings subtitle" = "Tippe zum de Token z'aktualisiere";
+
+/* title of the option to be billed monthly for snowhaze premium */
+"snowhaze premium billed monthly option description" = "Monatsabo";
+
+/* title of the option to be billed yearly for snowhaze premium */
+"snowhaze premium billed yearly option description" = "Jahresabo";
+
+/* title for vpn settings */
+"vpn settings title" = "VPN";
+
+/* error message flashed when a vpn profile download the user explicitly requested fails */
+"vpn profile download failed error message" = "Download fählgschlage";
+
+/* format of the notice used to indicate when the vpn profile will expire */
+"vpn profile expiration notice format" = "Lauft %@ ab";
+
+/* format of the notice used to indicate that a vpn profile has expired */
+"vpn profile expired notice" = "Abglaufe";
+
+/* format of the notice used to indicate that a vpn profile has not yet been installed */
+"vpn profile not installed notice" = "Nid installiert";
+
+/* format used to combine the vpn profile status and ping stats */
+"vpn profile status und ping stats combined format" = "%@     %@ ms (%@ %%)";
+
+/* format used to display the vpn ping stats */
+"vpn ping stats format" = "%@ ms (%@ %%)";
+
+/* title of settings to auto-update the list of available vpn servers */
+"update vpn list settings title" = "Auto-Update Standortliste";
+
+/* title of button to open openvpn connect */
+"open openvpn connect button title" = "OpenVPN Connect öffne";
+
+/* title of setting to display the ping status of the vpn servers */
+"show vpn server ping status settings title" = "Ping azeige";
+
+/* title of button to switch from vpn settings to subscription settings */
+"show subscription status button title" = "Abonnemäntstatus azeige";
+
+/* title of button to show the vpn tutorial */
+"show vpn tutorial button title" = "VPN Tutorial azeige";
+
+/* title of settings section with the list of available vpn locations */
+"vpn location list settings title" = "STANDORTE";
+
+/* title of alert to point out that opening openvpn connect requires it being installed */
+"opening openvpn connect requires installing alert title" = "OpenVPN Connect öffne";
+
+/* message of alert to point out that opening openvpn connect requires it being installed */
+"opening openvpn connect requires installing alert message" = "Du chasch OpenVPN Connect vom App Store lade.";
+
+/* title of ok button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn connect app prompt ok button title" = "App Store";
+
+/* title of the show tutorial button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn show tutorial button title" = "Tutorial azeige";
+
+/* title of cancel button of prompt to ask users if they want to install the openvpn connect app */
+"install openvpn connect app prompt cancel button title" = "Abbräche";
+
+/* title of alert to point out that installing a ovpn configuration requires openvpn connect */
+"installing ovpn requires openvpn connect alert title" = "OpenVPN Connect App notwändig";
+
+/* message of alert to point out that installing a ovpn configuration requires openvpn connect */
+"installing ovpn requires openvpn connect alert message" = "Füre VPN bruchts d App OpenVPN Connect. Lad si vom App Store abe.";
+
+/* format of the accessibility label of the vpn profile cell when user is not subscribed to snowhaze premium */
+"vpn profile missing subscription accessibility label format" = "%@ - Benötigt ein SnowHaze Premium Abonnement";
+
+/* format of the accessibility label of the vpn profile cell when the profile is being downloaded */
+"vpn profile downloading accessibility label format" = "%@ - Ladet";
+
+/* format of the accessibility label of the vpn profile cell when the profile credentials are not yet downloaded */
+"vpn profile download required accessibility label format" = "%@ - Muss geladen werden";
+
+/* indication that the ipsec vpn is connected */
+"connected ipsec vpn state title" = "Verbunde";
+
+/* indication that the ipsec vpn is connecting */
+"connecting ipsec vpn state title" = "Verbindet";
+
+/* indication that the ipsec vpn is disconnected */
+"disconnected ipsec vpn state title" = "Nid Verbunde";
+
+/* indication that the ipsec vpn is disconnecting */
+"disconnecting ipsec vpn state title" = "Verbindig wird trennt";
+
+/* indication that the ipsec vpn profile is currently invalid */
+"invalid ipsec vpn state title" = "Ladet";
+
+/* indication that the ipsec vpn is reasserting */
+"reasserting ipsec vpn state title" = "Verbindet neu";
+
+/* prompt for user to select the ipsec vpn profile */
+"select ipsec vpn profile prompt" = "Standort uswähle";
+
+/* accessibility label of prompt for user to select the ipsec vpn profile when user is not subscribed to snowhaze premium */
+"select ipsec vpn profile prompt missing subscription accessibility label" = "Standort auswählen - Benötigt ein SnowHaze Premium Abonnement";
+
+/* title of alert to warn users that a single installed VPN profile has expired */
+"vpn profile expiration warning single profile expired alert title" = "VPN Profil lauft ab";
+
+/* message of alert to warn users that a single installed VPN profile has expired */
+"vpn profile expiration warning single profile expired alert message" = "Eis vo dine VPN Profil isch abgloffe. Du chasches i de VPN Istellige ernöiere.";
+
+/* title of alert to warn users that a single installed VPN profile is about to expire */
+"vpn profile expiration warning single profile expiring alert title" = "VPN Profil abgloffe";
+
+/* message of alert to warn users that a single installed VPN profile is about to expire */
+"vpn profile expiration warning single profile expiring alert message" = "Eis vo dine VPN Profil lauft bald ab. Du chasches i de VPN Istellige ernöiere.";
+
+/* title of alert to warn users that multiple installed VPN profiles have expired */
+"vpn profile expiration warning multiple profiles expired alert title" = "VPN Profil laufe ab";
+
+/* message of alert to warn users that multiple installed VPN profiles have expired */
+"vpn profile expiration warning multiple profiles expired alert message" = "Einigi vo dine VPN Profil sind abgloffe. Du chaschse i de VPN Istellige ernöiere.";
+
+/* title of alert to warn users that multiple installed VPN profiles are about to expire */
+"vpn profile expiration warning multiple profiles expiring alert title" = "VPN Profil abgloffe";
+
+/* message of alert to warn users that multiple installed VPN profiles are about to expire */
+"vpn profile expiration warning multiple profiles expiring alert message" = "Einigi vo dine VPN Profil laufed bald ab. Du chaschse i de VPN Istellige ernöiere.";
+
+/* title of vpn settings button of alert to warn users of VPN profile expiration */
+"vpn profile expiration warning alert vpn settings button title" = "VPN Iistellige";
+
+/* title of ignore button of alert to warn users of VPN profile expiration */
+"vpn profile expiration warning alert ignore button title" = "OK";
+
+/* name of app to provide IPSec VPN */
+"ipsec vpn app name" = "SnowHaze";
+
+/* name of app to provide OpenVPN VPN */
+"openvpn vpn app name" = "OpenVPN";
+
+/* title of button to delete website cache data records */
+"delete cache data button title" = "Cache lääre";
+
+/* title of button to delete website cookies */
+"delete cookies button title" = "Cookies lösche";
+
+/* title of button to delete website data stores records */
+"delete data stores button title" = "Datespicher lösche";
+
+/* title for dialog to confirm deletion of all website cache records */
+"delete all caches confirm dialog title" = "Lösche bestätige";
+
+/* message format for dialog to confirm deletion of all website cache records */
+"delete all caches message format" = "Bisch dir sicher, dass du alli %@ Caches wosch lösche?";
+
+/* title for confirm option of dialog to confirm deletion of all website cache records */
+"delete all caches confirm option title" = "Lösche";
+
+/* title for confirm option of dialog to cancel deletion of all website cache records */
+"delete all caches cancel option title" = "Abbräche";
+
+/* title for dialog to confirm deletion of all cookies */
+"delete all cookies confirm dialog title" = "Lösche bestätige";
+
+/* message format for dialog to confirm deletion of all cookies */
+"delete all cookies message format" = "Bisch dir sicher, dass du alli %@ Cookies wosch lösche?";
+
+/* title for confirm option of dialog to confirm deletion of all cookies */
+"delete all cookies confirm option title" = "Lösche";
+
+/* title for confirm option of dialog to cancel deletion of all cookies */
+"delete all cookies cancel option title" = "Abbräche";
+
+/* title for dialog to confirm deletion of tracking cookies */
+"delete tracking cookies confirm dialog title" = "Lösche bestätige";
+
+/* message format for dialog to confirm deletion of tracking cookies */
+"delete tracking cookies message format" = "Bisch dir sicher, dass du alli %@ Tracking-Cookies wosch lösche?";
+
+/* title for confirm option of dialog to confirm deletion of tracking cookies */
+"delete tracking cookies confirm option title" = "Lösche";
+
+/* title for confirm option of dialog to cancel deletion of tracking cookies */
+"delete tracking cookies cancel option title" = "Abbräche";
+
+/* title for dialog to confirm deletion of all website data stores */
+"delete all data stores confirm dialog title" = "Lösche bestätige";
+
+/* message format for dialog to confirm deletion of all website data stores */
+"delete all data stores message format" = "Bisch dir sicher, dass du alli %@ Webspicher wosch lösche?";
+
+/* title for confirm option of dialog to confirm deletion of all website data stores */
+"delete all data stores confirm option title" = "Lösche";
+
+/* title for confirm option of dialog to cancel deletion of all website data stores */
+"delete all data stores cancel option title" = "Abbräche";
+
+/* title of button that deletes all history items */
+"clear history button title" = "Verlouf lösche";
+
+/* title for dialog to confirm clearing of history */
+"clear history confirm dialog title" = "Lösche bestätige";
+
+/* message for dialog to confirm clearing of history */
+"clear history confirm dialog message" = "Bisch dir sicher, dass du di Verlouf wosch lösche?";
+
+/* title for confirm option of dialog to confirm clearing of history */
+"clear history confirm dialog confirm option title" = "Lösche";
+
+/* title for cancel option of dialog to confirm clearing of history */
+"clear history confirm dialog cancel option title" = "Abbräche";
+
+/* title for external bookmarks settings */
+"external bookmarks settings title" = "Externi Läsezeiche";
+
+/* title of setting to index bookmarks in spotlight */
+"index bookmarks in spotlight setting title" = "In Spotlight Suechi aazeige";
+
+/* title of setting to add application shortcuts for bookmarks */
+"bookmark application shortcuts setting title" = "Startbildschirm Verchnüpfig";
+
+/* title of setting to block image content from being loaded */
+"content blocker image content type" = "Bild";
+
+/* title of setting to block style sheet content from being loaded */
+"content blocker style sheet content type" = "Stylesheet";
+
+/* title of setting to block script content from being loaded */
+"content blocker script content type" = "Script";
+
+/* title of setting to block third party script content from being loaded */
+"content blocker third party script content type" = "Script vo Dritte";
+
+/* title of setting to block font content from being loaded */
+"content blocker font content type" = "Schriftart";
+
+/* title of setting to block raw content from being loaded */
+"content blocker raw content type" = "Raw";
+
+/* title of setting to block media content from being loaded */
+"content blocker media content type" = "Medien";
+
+/* notice displayed on iOS 10 and lower devices to indicate that content type blockers require ios 11 or newer */
+"content type blockers require ios 11 notice" = "Das brucht iOS 11";
+
+/* format of the accessibility label for the close tab button of the tab switcher bar */
+"close tab from tab selection bar accessibility label format" = "Tab '%@' zuedue";
+
+/* accessibility label for more button (for tab settings) */
+"more button accessibility label" = "Meh";
+
+/* accessibility label for button to close a tab */
+"close tab button accessibility label" = "Zuetue";
+
+/* privacy term to be appended to privacy assessment name */
+"privacy assessment privacy postfix" = "Privatsphäre";
+
+/* accessibility label of button to load the previous page */
+"previous page button accessibility label" = "Zrugg";
+
+/* accessibility label of button to load the next page */
+"next page button accessibility label" = "Füre";
+
+/* accessibility label of button to show share dialog */
+"share button accessibility label" = "Teile";
+
+/* accessibility label of button to show tab selection view */
+"show tab selection view button accessibility label" = "Tabs";
+
+/* accessibility label of button to show settings controller */
+"show settings controller button accessibility label" = "Iistellige";
+
+/* accessibility label of button to reload the current page */
+"reload page button accessibility label" = "Nöi lade";
+
+/* accessibility label of button to create a new tab */
+"new tab button accessibility label" = "Nöis Tab";
+
+/* name of 'very good' privacy assessment */
+"very good privacy assessment name" = "Sehr guet";
+
+/* name of 'good' privacy assessment */
+"good privacy assessment name" = "Gueti";
+
+/* name of 'ok' privacy assessment */
+"ok privacy assessment name" = "OK";
+
+/* name of 'passable' privacy assessment */
+"passable privacy assessment name" = "Geit no grad";
+
+/* name of 'bad' privacy assessment */
+"bad privacy assessment name" = "Schlächti";
+
+/* name of 'very bad' privacy assessment */
+"very bad privacy assessment name" = "Sehr schlächt";
+
+/* accessibility label of button to delete a day from history when in regular mode */
+"delete history day button accessibility label" = "Lösche";
+
+/* accessibility label of button to delete a day from history when in confirm mode */
+"delete history day button confirm accessibility label" = "Lösche bestätige";
+
+/* domain for wikipedia in the language used by the user */
+"localized wikipedia domain" = "als.wikipedia.org";
+
+/* language for startpage in the language used by the user */
+"localized startpage language" = "deutsch";
+
+/* name of the app store app used to confirm opening of url in other app */
+"open url in app app store app name" = "App Store";
+
+/* name of the itunes app used to confirm opening of url in other app */
+"open url in app itunes app name" = "iTunes";
+
+/* name of the mail app used to confirm opening of url in other app */
+"open url in app mail app name" = "Mail";
+
+/* name of the messages app used to confirm opening of url in other app */
+"open url in app messages app name" = "Nachrichten";
+
+/* name of the maps app used to confirm opening of url in other app */
+"open url in app maps app name" = "Karten";
+
+/* name of the whatsapp app used to confirm opening of url in other app */
+"open url in app whatsapp app name" = "WhatsApp";
+
+/* name of the workflow app used to confirm opening of url in other app */
+"open url in app workflow app name" = "Workflow";
+
+/* format string used to ask users if they want to open another app */
+"open url in app prompt format" = "Wosch du %@ würklich ufdue?";
+
+/* title of prompt to ask users if they want to open another app */
+"open url in app prompt title" = "SnowHaze verla";
+
+/* title of confirm button of prompt to ask users if they want to open another app */
+"open url in app prompt confirm button title" = "Ja";
+
+/* title of cancel button of prompt to ask users if they want to open another app */
+"open url in app prompt cancel button title" = "Nei";
+
+/* title of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt title" = "Formular nomal schicke";
+
+/* format string of message of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt format" = "Bisch sicher dass ds Formular nomal a '%@' wosch schicke?";
+
+/* message of prompt to ask users if they want to resubmit a form when the destination is unknown */
+"form resubmission confirmation prompt unknown url message" = "Bisch sicher dass ds Formular nomal wosch schicke?";
+
+/* title of confirm button of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt confirm button title" = "Witer";
+
+/* title of cancel button of prompt to ask users if they want to resubmit a form */
+"form resubmission confirmation prompt cancel button title" = "Abbräche";
+
+/* title of prompt to block xss */
+"block xss prompt title" = "Code Injection blockiert";
+
+/* format string of message of prompt to block xss on a known host */
+"block xss known host prompt format" = "Blockier z'Lade vore potenziell bösartige URL uf '%@'";
+
+/* message of prompt to block xss on an unknown host */
+"block xss unknown host prompt message" = "Blockier z'Lade vore potenziell bösartige URL";
+
+/* title of block action of prompt to block xss on an unknown host */
+"block xss unknown host prompt block action title" = "Blockiere";
+
+/* title of load action of prompt to block xss on an unknown host */
+"block xss unknown host prompt load action title" = "Lade";
+
+/* title of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert title" = "Ungültigs Zertifikat";
+
+/* format of message of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert message format" = "Z'Zertifikat für '%@' isch nid gültig";
+
+/* title of continue button of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert continue button title" = "Witer";
+
+/* title of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name */
+"certificate domain name mismatch alert title" = "Falsche Domainname";
+
+/* format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is known */
+"certificate domain name mismatch known cert domain alert message format" = "Z'Zertifikat für '%@' isch für '%@' usgstellt worde";
+
+/* format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is not available */
+"certificate domain name mismatch unknown cert domain alert message format" = "Z'Zertifikat für '%@' isch fürne anderi Domain usgstellt worde";
+
+/* title of continue button of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name */
+"certificate domain name mismatch alert continue button title" = "Witer";
+
+/* title of cancel button of the alert that is displayed when trying to connect to a server with an invalid certificate */
+"invalid certificate alert cancel button title" = "Abbräche";
+
+/* title of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert title" = "Trackingparameter erkannt";
+
+/* format of message of alert to warn users of a single url parameter on a known host identified as a tracking parameter */
+"tracking parameter found one parameter on known host alert format" = "Dr Parameter '%@' uf '%@' schiint e Tracking Parameter z'sii. Wosch du dä usdr Suchafrag lösche?";
+
+/* format of message of alert to warn users of a single url parameter on an unknown host identified as a tracking parameter */
+"tracking parameter found one parameter on unknown host alert format" = "Dr Parameter '%@' schiint e Tracking Parameter z'sii. Wosch du dä usdr Suchafrag lösche?";
+
+/* separator used to separate multiple parameters in alert to warn users of url parameters identified as tracking parameters when three ore more where found */
+"tracking parameter found alert multiple parameters separator" = "', '";
+
+/* format of message of alert to warn users of multiple url parameters on a known host identified as tracking parameters */
+"tracking parameter found multiple parameters on known host alert format" = "D Parameter '%@' und '%@' uf '%@' schiine Tracking Parameter z'sii. Wosch du die usdr Suchafrag lösche?";
+
+/* format of message of alert to warn users of multiple url parameters on an unknown host identified as tracking parameters */
+"tracking parameter found multiple parameters on unknown host alert format" = "D Parameter '%@' und '%@' schiine Tracking Parameter z'sii. Wosch du die usdr Suchafrag lösche?";
+
+/* title of ignore action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert ignore option title" = "Ignoriere";
+
+/* title of cancel action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert cancel option title" = "Abbräche";
+
+/* title of strip action of alert to warn users of url parameters identified as tracking parameters */
+"tracking parameter found alert strip option title" = "Personalisierig lösche";
+
+/* title of alert to warn users of dangerous sites */
+"dangerous site warning alert title" = "Achtung";
+
+/* explanation that the site might have malicious content */
+"malicious site warning reason" = "chönnt schädlich si";
+
+/* explanation that the site might be a phishing site */
+"phishing site warning reason" = " isch als Phishingsite glistet";
+
+/* explanation that the site might contain malware */
+"malware site warning reason" = "chönnt Malware enthalte";
+
+/* explanation that the site might contain harmful applications */
+"harmful application site warning reason" = "chönnt e schädlechi Software enthalte";
+
+/* explanation that the site might contain unwanted software */
+"unwanted software site warning reason" = "chönnt e unerwünschti Software enthalte";
+
+/* the separator used to separator most items in a (long) list of reasons a site might be dangerous. e.g. ', ' in 'a, b, c and d' */
+"dangerous site warning reason list main separator" = ", ";
+
+/* the separator used to separator the last 2 items in a list of reasons a site might be dangerous. e.g. ' and ' in 'a, b, c and d' */
+"dangerous site warning reason list final separator" = " und ";
+
+/* used instead of the domain name in the dangerous site warning if the domain is unknown */
+"dangerous site warning unknown domain name replacement" = "[Unbekannt]";
+
+/* format string for the message of the dangerous site warning alert */
+"dangerous site warning alert message format" = "Diä Site %@. Bis vorsichtig.\n\nVerdächtigi Domain: %@";
+
+/* format string for the message of the dangerous site warning alert when at least part of the warnings was generated by google safebrowsing data */
+"safebrowsing dangerous site warning alert message format" = "Diä Site %@. Bis vorsichtig.\n\nVerdächtigi Domain: %@\n\nDä Hiwiis wird vo Google abote. Das wird lokal generiert. Das beinhaltet kei Verbindig zwüsche dim Grät und Google oder anderi Servers.";
+
+/* title of the continue button of the alert to warn users of dangerous sites */
+"dangerous site warning alert continue button title" = "Witer";
+
+/* title of the cancel button of the alert to warn users of dangerous sites */
+"dangerous site warning alert cancel button title" = "Abbräche";
+
+/* title of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog title" = "Alüüte";
+
+/* format for message of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog message format" = "Wosch du '%@' alüüte?";
+
+/* title of confirm button of dialog used to confirm the user wants to initiate a call */
+"confirm call dialog confirm button title" = "Ja";
+
+/* title of cancel button of dialog used to confirm the user wants to initiate a call */
+"cancel call dialog confirm button title" = "Nei";
+
+/* title of tab settings popover */
+"tab settings title" = "Tab mit Iistellige erstelle";
+
+/* HTML of message shown when the memory game is won */
+"congratulation message html" = "Gratuliere";
+
+/* title of button to create tab in tab settings popover */
+"tab settings create tab button title" = "Tab erstelle";
+
+/* title of settings in tab settings to enable / disable search suggestions */
+"show search suggestions tab settings title" = "Suechvorschläg";
+
+/* displayed instead of domain name if the current page is an errorpage in page settings */
+"page settings errorpage description" = "Fählersite";
+
+/* displayed instead of domain name if the current page is a data URI in page settings */
+"page settings data uris description" = "Data-URI";
+
+/* displayed instead of domain name if url.host is nil in page settings */
+"page settings domain name placeholder" = "Diä Site";
+
+/* title format of page settings popover (format specifier for domain name) */
+"page settings title format" = "Uf %@";
+
+/* button of apply button of page settings */
+"page settings apply button title" = "Awände";
+
+/* title of button to temporarily set a page setting */
+"temporary page settings button title" = "Probiere";
+
+/* title of page setting to allow popovers */
+"allow popovers page setting title" = "Popovers zuelaa";
+
+/* title of page setting to block cookies */
+"block cookies page setting title" = "Cookies blockieren";
+
+/* is displayed when the user presses the page security icon without having loaded a page first */
+"local page settings unavailable notice" = "Ke Site isch glade";
+
+/* title of prompt for http authentication */
+"http authentication prompt title" = "Amäldedate";
+
+/* notice displayed in http authentication prompt when the specified credentials where incorrect */
+"http authentication prompt incorrect credentials notice" = "D'Amäldedate si vom Server abglehnt worde";
+
+/* prompt displayed in http authentication prompt when a realm is specified */
+"http authentication prompt existing realm prompt" = "Gib dini '%@' Amäldedate für '%@' ii";
+
+/* prompt displayed in http authentication prompt when no realm is specified */
+"http authentication prompt missing realm prompt" = "Gib dini Amäldedate für '%@' ii";
+
+/* warning displayed when credentials entered in http authentication prompt will be transmitted insecurely */
+"http authentication prompt insecure transmission warning" = "ACHTUNG: Dini Logindate wärde nid sicher übermittlet";
+
+/* placeholder for username in prompt for http authentication */
+"http authentication prompt username placeholder" = "Benutzername";
+
+/* placeholder for password in prompt for http authentication */
+"http authentication prompt password placeholder" = "Passwort";
+
+/* title of continue button of http authentication prompt */
+"http authentication prompt continue button title" = "Witer";
+
+/* title of cancel button of http authentication prompt */
+"http authentication prompt cancel button title" = "Abbräche";
+
+/* title of button of http authentication prompt to retrieve credentials from 1password */
+"http authentication 1password button title" = "1Password";
+
+/* default auth error title */
+"error page auth default title" = "Berächtigigsfähler";
+
+/* default auth error message */
+"error page auth error default message" = "Du hesch ke gültige Authorisierigstoken. Du chasch dr Token ide Abonnemäntistellige aktualisiere.";
+
+/* default auth error information */
+"error page auth error default information" = "Es cha passiere, dass du nachem abonniere kei Token becho hesch. Sobald en Token bechunnsch ladet diä Site nöi.";
+
+/* message shown when no error message is available but an url */
+"error page unexpected error message with url" = "Bim ufdue vo %@ hez e unerwartete Fähler gä";
+
+/* message shown when no error message is available */
+"error page unexpected error message" = "Es het e unerwartete Fähler gä";
+
+/* description of the error code on the errorpage */
+"error page error code description" = "Fählercode";
+
+/* default title of the errorpage */
+"error page default title" = "Es het e Fähler gä";
+
+/* title of the details section on the errorpage */
+"error page details section title" = "Details";
+
+/* description of the error domain on the errorpage */
+"error page error domain description" = "Fählerdomain";
+
+/* title of the button to get more information about the error */
+"error page more information button title" = "Meh Informatione";
+
+/* description of the error reason on the errorpage */
+"error page error reason description" = "Grund";
+
+/* title of the reload button on the errorpage */
+"error page reload button title" = "Nöi lade";
+
+/* description of the url on the errorpage */
+"error page error url description" = "URL";
+
+/* description of the error file on the errorpage */
+"error page error file description" = "Datei";
+
+/* description of the error mime type on the errorpage */
+"error page error mime type description" = "MIME-Typ";
+
+/* error page domain description where no host is available */
+"error page unknown domain" = "Domain unbekannt";
+
+/* errormessage of the unknown file type errorpage */
+"unknown file type errorpage message" = "D'Datei geit nid uuf, will SnowHaze dä Datetyp nid kennt.";
+
+/* errormessage format of the network error errorpage */
+"network error errormessage format" = "SnowHaze het sich nid mit %@ chönne verbinde";
+
+/* errormessage format of the website error errorpage */
+"website error errormessage format" = "SnowHaze het folgendi Site nid chöne lade: %@";
+
+/* title of the unknown file type errorpage */
+"unknown file type errorpage title" = "Unbekannte Datetyp";
+
+/* title of the network error errorpage */
+"network error errorpage title" = "Netzwärchfähler";
+
+/* title of the website error errorpage */
+"website error errorpage title" = "Websitefähler";
+
+/* html of the title of the error page displayed if a page preview could not be loaded */
+"failed to load page preview error page title html" = "<title>Siteladefähler</title>";
+
+/* html of the content of the error page displayed if a page preview could not be loaded */
+"failed to load page preview error page content html" = "<span>D'Site het nid chönne glade werde</span>";
+
+/* title of button to move from first to second tutorial page */
+"tutorial start tutorial button title" = "Tutorial starte";
+
+/* title of button to leave tutorial from first page */
+"tutorial skip tutorial button title" = "Tutorial überspringe";
+
+/* title of the tutorial button to visit the online tutorial */
+"visit online tutorial button title" = "Online Tutorial bsueche";
+
+/* title of the tutorial button to subscribe to snowhaze premium */
+"subscribe now tutorial button title" = "Abonnier iz";
+
+/* html of first tutorial page content */
+"tutorial welcome html" = "<h3>Hoi!</h3><p>SnowHaue isch dr erst Browser wo dini persönleche Date vollständig schützt. Entdeck SnowHaze!</p>";
+
+/* content of 2. tutorial page */
+"tutorial 2. page content" = "SnowHaze funktioniert wi jede ander Browser.";
+
+/* content of 3. tutorial page */
+"tutorial 3. page content" = "Mit de Iistellige chasch du SnowHaze ganz nach dim Gschmack apasse.";
+
+/* content of 4. tutorial page */
+"tutorial 4. page content" = "Di aktuelli Dateschutzstuefe isch abhängig vo de Iistellige und wird farbig azeigt.";
+
+/* content of 5. tutorial page */
+"tutorial 5. page content" = "Du chasch d'Iistellige für einzelni Site temporär oder permanänt ändere oder mach es Tab uf mit andere Iistellige.";
+
+/* content of 6. tutorial page */
+"tutorial 6. page content" = "Stell automatische Updates a zum immer ufem nöiste Stand zsi. Das beinhaltet e Verbindig zu SnowHaze Server.";
+
+/* title of button to leave tutorial from last page */
+"tutorial end tutorial button title" = "Viu Spass mit SnowHaze";
+
+/* title of button to switch to next tutorial page */
+"tutorial continue button title" = "Witer";
+
+/* TODO: + add update tutorial textshtml of first update tutorial page content */
+"update tutorial welcome html" = "<h3>Willkomme bi SnowHaze 2.5</h3><p>Hallo, mir hei e nöii SnowHaze version für di.</p>";
+
+/* content of 2. update tutorial page */
+"update tutorial 2. page content" = "SnowHaze VPN chunt nöi in zwei Versione. IPsec cha direkt ir App gstüret wärde. OpenVPN funktioniert immerno wie bishär.";
+
+/* content of 3. update tutorial page */
+"update tutorial 3. page content" = "Ab Version 2.5, markiert SnowHaze unverschlüsselti Website mitem Zeiche .";
+
+/* title of button to leave the update tutorial from last page */
+"update tutorial end tutorial button title" = "SnowHaze starte";
+
+/* title of button to leave update tutorial from first page */
+"update tutorial skip tutorial button title" = "Überspringe";
+
+/* title of button to move from first to second update tutorial page */
+"update tutorial start tutorial button title" = "What's new";
+
+/* header for the message from the developers in en, fr, de */
+"update tutorial message from developers header" = "Nachricht vom SnowHaze Team";
+
+/* message from the developers in en, fr, de */
+"update tutorial message from developers content" = "Hallo,\n\nIn diesem Moment hältst du SnowHaze 2.5 in deinen Händen. Wir möchten diesen Moment nutzen, um uns bei dir zu bedanken und dich über unsere zukünftigen Projekte zu informieren.\n\nEs ist schon eine Weile her, seit die erste Version von SnowHaze im Juli 2016 veröffentlicht wurde. Dies ist bereits Version 2.5 und unglaublich viel hat sich geändert. Davon sind unsere ultra-private Suchmaschine und unser eigener no-log VPN nur zwei Beispiele.\n\nWir sind sehr dankbar, dass wir dich mit an Bord haben auf unserer Mission, das Internet zu einem sicheren und privaten Ort zu machen. Es ist nur dank unseren treuen Usern, dass wir die Dinge machen können, die wir lieben.\n\nWir möchten möglichst vielen Leuten helfen ihre persönlichen Daten zu schützen. Deshalb stehen wir jede Woche mit hunderten Usern in Kontakt, um fragen zu beantworten und unser Wissen zu teilen.\n\nDeshalb sind wir auch besessen davon weitere und bessere Produkte und Dienstleistungen zu kreieren.\n\nDeshalb ist SnowHaze jetzt vollständig open source.\n\nDeshalb ist dein Feedback so wichtig für uns.\n\nUnd deshalb werden wir in diesem Jahr SnowHaze auf ein neues Level heben. Das beginnt mit der Entwicklung von SnowHaze für Android, einem VPN Client für macOS und viel Weiterem! Weitere Informationen werden folgen.\n\nEs ist für uns äusserst wichtig in Kontakt mit unseren Usern zu bleiben. Ihr seid unsere Motivation und Inspiration, um SnowHaze voran zu treiben. Wenn du SnowHaze magst, dann erzähle deiner Familie  und deinen Freunden von SnowHaze. Je mehr Leute wir sind, desto lauter ist unsere Stimme nach mehr Privatsphäre und Sicherheit im Internet. Falls du irgendetwas nicht magst, dann sende uns eine Mail. Wir haben immer eine offene Inbox!\n\nDanke, dass du dabei bist!\n\nJan, Yvan, Dominique, Andris, Pascal\nDie SnowHaze Gründer\n\nP.S. Diese Nachricht ist hard-coded. Es war also keine Verbindung zu irgendeinem Server nötig, um dir diese Nachricht anzuzeigen. Wir sorgen uns wirklich um deine Privatsphäre :)\n\n";
+
+/* explanations of the application settings */
+"application settings explanation" = "<p>Hie chasch du allgemeini SnowHaze Iistllige mache</p><p><strong>Lokali Suechvorschläg:</strong>Du chasch uswähle, ob Site usere lokale Liste vorgschlage wärde während du e Suechi itippsch.</p><p><strong>Privati Site vorschlaa:</strong> Wenn diä Iistellig aktiv isch, schlaat SnowHaze o Privati Site vor, wenn e Suechi iitippt wird. Wenn die Iistellig us isch, schlaat SnowHaze witerhin Site wo nid Privat si. Es empfilt sich us Jugendschutzgründ die Iistellig uszschalte oder um zverhindere, dass me us Versehe ufne Privati Site chunnt.</p><p><strong>Auto-Update / Nume WiFi:</strong>Wähl us, ob verschideni Siteliste aktualisiert wärde chöi und ob das nume über WiFi sött passiere. Mit SnowHaze Premium wärde d’Siteliste hüfig aktualisiert, süsch mit jedere nöie Version vo SnowHaze. Auto-Update usschalte löscht alli Liste vom Grät.</p><p><strong>Tab wiederhärstelle</strong> Due d'Ziitspanni uswähle wos müglech isch geschlossni Tabs dur Schüttle vom Grät wieder ufzdue. Du chasch uswähle, dass alli Tabs wiederhärgstellt wärde, dass heisst o Privati Tabs.</p><strong>Tab maskiere</strong> Der Inhalt vomene Tab cha maskiert wärde, wenn du nid im Tab bisch. Wähl us für weli Tabs das sött gälte.";
+
+/* explanations of the javascript settings */
+"javascript settings explanation" = "<p>Due uswähle, wiä JavaScript Inhalte glade wärde sölle. JavaScript isch e Programmiersprach wo vo de meiste Website brucht wird und wo vo de meiste Browser understützt wird. JavaScript macht möglich dasme ufere Site villfältigi Darstellige und Funktione cha bruche. JavaScript isch für di dynamische Inhalte ufere Website verantwortlich.</p><p><strong>JavaScript zuelaa:</strong> Diä Iistellig macht möglich das JavaScript Inhalte chöi glade und dargestellt wärde. Es empfilt sich diä Iistellig uf Site wo nid vertouenswürdig si für di Dateschutz abzstelle. <u>Bemerkig:</u> Es cha si dass gwüssi Site ohni JavaScript nid richtig chöi glade wärde.</p><p><strong>Application Scripts zuelaa:</strong> Application Scripts di JavaScripts wo vo SnowHaze erzüügt wärde, um nützlichi Funktione wiä Trackingschutz z bruche.</p><strong>Passwortmanager:</strong> Iibindig vo Passwortmanager usschalte.";
+
+/* explanations of the website data settings */
+"website data settings explanation" = "<p>Websitedate enthalte Cache, Cookies und witeri Datespicher.</p><p>Es Cache isch e temporäri Kopie vore bsuechte Website. Wenn du nomal uf die Site geisch, wärde d'Inhalt usem Cache gholt statt diä nomal abezlade.</p><p>Cookies si Datestück wo Informatione über bsuechti Website enthalte. Wenn e Website bsuecht wird wo Cookies brucht wärde diä uf dis Gräät gspicheret und bi witere Bsüech wider a diä Website gschickt. Cookies wärde brucht um Muster z'erkenne wo uf dini Interässe und dis Suechverhalte lö la zruggfüere.</p><p><strong>Websitedate spichere:</strong> Websitedate wie Cache, Cookies usw. wärde gspicheret.</p><p><strong>Cookies blockiere:</strong> Blockier alli Cookies, keini oder nume Cookies von Drittabieter.</p><p><strong>Alli Websitedate lösche:</strong> Alli Websitedate wärde glöscht.</p><p><strong>Caches lääre:</strong> Alli Caches wärde gläärt.</p><p><strong>Cookies lösche:</strong> Alli Cookies wärde glöscht.</p><p><strong>Datespicher lösche:</strong> Alli witere Webdate wärde glöscht.</p><strong>Tracking Cookies lösche:</strong> Löscht alli Cookies von Website wo Tracking als Hauptziel hei.";
+
+/* explanations of the user agent settings */
+"user agent settings explanation" = "Suech dir di bevorzugt User Agent us. E User Agent isch e Textzile wo di Gräät- und Browsertyp wode bruchsch identifiziert und jedere Website wode bsuechsch gschickt wird. Indäm e Site di User Agent kennt, cha si dr Inhalt uf dis Gräät aapasse. User Agent si eini vo de verbreitiste Arte zum Tracken, will vili Informatione über dis Gräät teilt wärde. Es wird empfohle mehreri User Agent z'bruche oder die regelmässig z'wächsle. <u>Bemerkig:</u> User Agent ändere cha mache dass e Site falsch glade wird.";
+
+/* explanations of the defaults settings */
+"defaults settings explanation" = "<p>SnowHaze Iistellige uf d'Voriistellige zruggsetze.</p><p><strong>Iistellige zruggsetze:</strong> Alli globale Iistellige uf diä Iistellige zruggsetze, wo vo SnowHaze empfohle wärde. Du chasch d'Iistellige us de andere Kategorie ändere. D'Farbänderig zeigt a ob di Dateschutz iz höcher oder tiefer isch.</p><p><strong>Siteiistellige zruggsetze:</strong> Alli Iistellige wo du für bestimmti Site gmacht hesch wärde zrugggsetzt.</p><strong>Tutorial nöi starte:</strong> Di churzi Iileitig wird nomal azeigt.";
+
+/* explanations of the contact settings */
+"contact settings explanation" = "Schrib üs es Mail oder bsuech üsi Website. Falls du es Problem oder e Rückmäldig hesch, fröie mir üs dir z'hälfe. Du chasch o üsi Website bsueche oder SnowHaze mit Fründe u Bekannte teile u SnowHaze im App Store bewärte.";
+
+/* explanations of the search engine settings */
+"search engine settings explanation" = "<p>Wähl us, wi dini Suechafrage sölle düregfüert wärde.</p><p><strong>Suechmaschine:</strong> E Suechmaschine isch es Programm zum im Internet nach Sache z'sueche. Bispiil si Google, Yahoo und vili me. Suechafrage wo über z Suechfäld iigä wärde, wärde immer vor usgwählte Suechmaschine düregfüert. Falls 'Keni' usgwählt wird, chunnt me nume uf e Site mit dr gnaue Adrässe oder über Läsezeiche und Verloufsiträg.</p><strong>Suchvorschläge:</strong> Zuesätzlich zu de Vorschleg vor jewilige Suechmaschine, chöi o Vorschleg vo witere Site iibländet wärde.";
+
+/* explanations of the history settings */
+"history settings explanation" = "<p>Da chasch di Suechverlouf verwalte. Dr Suechverlouf isch e Liste vo bsuechte Website sowie Datum u Ziit vom bsuech. Du chasch ufe Verloufsiitrag tippe und chunnsch wider uf di Website.</p><p><strong>Verlouf spichere:</strong> Wenn die Iistellig igschaltet isch wird dr Verlouf lokal uf dim Gräät gspicheret. Dä gsesch nume du. Bsuechti Site wärde nid gspicheret wenn die Iistellig usgschalte isch.</p><p><strong>Privati Site vergässe:</strong> Obwohl 'Verlouf spichere' iigschaltet isch, wird dr Verlouf für private Site nid gspicheret.</p><strong>Verlouf lösche:</strong> Dr gsamt Suechverlouf wird glösche.";
+
+/* explanations of the media playback settings */
+"media playback settings explanation" = "<p>Wähl us, wie das Medie wiä Videos und Tondateie abgspilt wärde sölle.</p><p><strong>Benutzerhandlig erfordere:</strong> Um abgspilt z'wärde muess dr Benmutzer d'Widergab dür Tippe erzwinge. <u>Bemerkig:</u> Wenn diä Iistellig usgschaltet isch, cha das zu grösserem Verbruuch vo mobile Date füere, will Medie automatisch abgspilt wärde.</p><strong>Inline Widergab zuelaa:</strong> Da macht das Videos chöi abgspilt wärde ohni i Vollbildmodus z'wächsle.";
+
+/* explanations of the tracking protection settings */
+"tracking protection settings explanation" = "<p>Due Möglichkeite blokiere wo Site hei zum di z'verfolge. Website bruche verschideni Methode zum Informatione über ihri Bsuecher z'sammle. Diä Informatione si bispilswiis dini Interässe, dis Suechverhalte und di Suechverlouf. Es git Site wo di sogar no chöi verfolge wenn du nümme uf ihrer Site bisch.</p><p><strong>HTTP Referer blockiere:</strong> Dr Bsitzer vore Website bechunt ke Informatione über di Suechverlouf wenn diä Iistellig igschalte isch.</p><p><strong>Tracking Scripts blokiere:</strong> JavaScript wo speziell drfür gmacht si di im Internet z'verfolge wärde blockieret.</p><p><strong>Wärbig blockiere:</strong> Mit dere Iistellig chasch du Wärbig uf gwüsse site blockiere.</p><p><strong>Canvas Fingerprinting blockiere:</strong> Canvas Fingerprinting isch e Methode zum e Benutzer z'identifiziere ohni Cookies z'bruche. Die Funktion blockiere verhinderet Identifikation und Tracking.</p><p><strong>Fingerprinting blockiere:</strong> Die Iistellig blockiert verschideni Methode wo brucht wärde zum User im Internet z'verfolge.</p><p><strong>Teile Buttons blockiere:</strong> Diä Option entfärnt Social Media Inhalt uf Website wi bispilswis dr Facebook Like Button und anderi Widgets.</p><strong>Unblockierts verstecke:</strong> Diä Option bländet Inhalte us, wo du nid wosch gse, aber bim Lade nid blockiert worde si.";
+
+/* explanations of the https settings */
+"https settings explanation" = "<p>Iistellige für e sicheri Websiteverbindig. E Verbindig zure Website erfordert es Protokoll wo HTTP gnennt wird. Z'Protokoll für di sicheri Verbindig heisst HTTPS. Das wird brucht wenn persönlechi Date müesse gschützt wärde. HTTPS wird ir URL Bar mit em Schloss kennzeichnet.</p><p><strong>Probier HTTPS Site zersch:</strong> Es wird immer probiert e sicheri Verbindig zur Website härzstelle. Falls ke sicheri Verbindig möglich isch wird HTTP brucht. <u>Bemerkig:</u> Diä Option cha SnowHaze langsam mache, will während e gwüsse Ziit versuecht wird e sicheri Verbindig härzstelle.</p><p><strong>HTTPS wenns geit:</strong> Uf Website wo bekannt si e HTTPS-Verbindig z understütze, wird nume so eini härgstellt.</p><strong>Mixed Content Blocking:</strong> Es git HTTPS Website wo unsichere HTTP Inhalt hei. Dä Inhalt cha vo Agrifer ustuuscht wärde um dini Informatione z stähle. SnowHaze blockiert dä Mixed Content uf sichere Website wenn d'Option aktiv isch.";
+
+/* explanations of the appearance settings */
+"appearance settings explanation" = "<p>Due d'Darstellig vo Website apasse.</p><p><strong>Nachtmodus:</strong> Dr Nachtmodus änderet d'Farbe, so dass diä ire dunkle Umgäbig agnähm si zum aluege.</p><p><strong>Mindestschriftgrösse:</strong> Due d'Schriftgrössi uswähle wo chlini Texte sölle azeigt wärde.</p><strong>Skalierigsgränze ignoriere:</strong> Diä Funktion ignoriert d'Skalierigsgränze vor Website und erloubt d'Grössi vor Site frei z'ändere.";
+
+/* explanations of the popover settings */
+"popover settings explanation" = "<p>Wähl us was mit Popovers passiert. Popover si Tabs wo vore andere Site automatisch ufta wärde.</p><p><strong>Alli blockiere:</strong> Alli Popover wärde blockiert.</p><p><strong>Benutzerusglösti zuelaa:</strong> Popover wärde nume ufta wenn si aktiv vom Benutzer dür Tippe erzwunge wärde</p><strong>Alli zuelaa:</strong> Ke Iischränkige für Popover.";
+
+/* explanations of the external bookmark settings */
+"external bookmark settings explanation" = "<p>Due externi Läsezeiche verwalte.</p><p><strong>In Spotlight azeige:</strong> Diä Option erloubts Läsezeiche in Spotlight iizblände.</p><strong>Startbildschirm Verchnüpfig:</strong> Uf Gräät wo 3D Touch understütze chöi Läsezeiche vom Startbildschirm us ufta wärde.";
+
+/* explanations of the content type blockers settings */
+"content type blockers settings explanation" = "SnowHaze cha verschideni Inhalte uf Website blockiere. Wähl us weli Inhalte sölle blockiert wärde. Gwüssi Site lade nid richtig wenn Inhält blockiert wärde.";
+
+/* explanations of the acknowledgements settings tab */
+"acknowledgements settings explanation" = "D'Entwicklig vo SnowHaze isch dür Drittcode und Open Source Projekte starch erliechteret. Mir bedanke üs bi de Maintainer vo folgende Projekt fürd Benützig: AgileBits Inc. für 1PasswordExtension, phishtank.com fürd Phishing Datebank, Zetetic LLC für SQLCipher, d'EasyList Autore (easylist.github.io) fanboy, MonztA, Famlam u Khrin für d'EasyList, d'EasyPrivacy List und Fanboy's Social Blocking List und d'Polish TeX Users Group GUST für d'TeX Gyre Adventor Schrift. SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Lizenzä oder Urhäberrächtnotize vode verwändete Open Source Projekte si unde ufglistet. Design created by Basestudio.";
+
+/* explanations of the subscription settings tab */
+"subscription settings explanation" = "<p>Abonnier SnowHaze Premium um vom SnowHaze VPN, vor SnowHaze Suechmaschine und vo de hüfige Updates vode Siteliste z profitiere. Di erste 7 Täg si für Erstabonnänte gratis. Es git es monatlichs und jährlichs Abo wo sich sälber duet erneuere.</p><p><strong>Auto-Update Optione</strong> luegt automatisch ob d'Abooptione gänderet hei.</p><p><strong>Auto-Update Token</strong> aktualisiert dr Berächtigungstoken.</p><p><strong>Aktueller Token Hash:</strong> isch e Code womit me cha z aktuelle Abo überprüefe.</p>Da jähliche SnowHaze Premium Abo isch während eim Jahr gültig, ds monatliche während eim Monet. I dere Ziit hesch Zuegriff ufe SnowHaze VPN, ufd SnowHaze Suechmaschine und dini Liste wärde hüfig aktualisiert. Dr Betrag wird nach Zahligsbestätigung dim iTunes Konto abbuecht. Alli Abos erneuere sich automatisch ussert du schaltisch das bis 24 Stund im Vorus us. Dis Konto wird innerhalb vo 24 Stund vor Ablauf vom Abo nöi belastet. Du chasch dini Abos i de Kontoistellige verwalte indäm uf 'Alli Abonnemänt azeige' tippsch. Jede unbrucht Teil vore chostelose Probezit verfällt, sobald du z'ensprechende Abo chaufsch.";
+
+/* explanations of the vpn settings tab */
+"vpn settings explanation" = "<p>E VPN (Virtual Private Network) isch e verschlüsselti Verbindig zumne Server. Dr gsamt Vercher zwüsche dim Grät und em Internet wird zersch zum VPN Server gsändet. Dr Empfänger gseht nume d'IP Adrässe vom VPN Server, aber nid dini richtigi IP Adrässe, was extrem wichtig isch zum Tracking verhindere.</p><p>E VPN schützt vor Man-in-the-Middle Agriffe, versteckt di Internetvercher vorem Internetabieter und verschlüsselt immer d'Verbindig zum Server.</p><p>Mir biete zwöi verschideni VPN Arte a, wo verschideni Protokoll verwände. Eis isch z'IPsec Protokoll und z andere isch OpenVPN. Dr VPN mit IPSec cha eifach innerhalb vor SnowHaze app gstüret wärde, während OpenVPN verlangt das du d OpenVPN Connect App verwändisch und jede Monat dini Profil aktualisiersch. Allerdings isch OpenVPN chli sicherer als IPSec. Das isch e chli Kompromiss zwüsche Benutzerfründlichkeit (IPSec) und Sicherheit (OpenVPN), wo mir dir chöi überla.</p><p>SnowHaze VPN logt absolut nüt und isch dr einzig VPN Dienst ohni identifizierendi Autorisierig.</p><p>Abonnier SnowHaze Premium zum dr VPN z'bruche und verbind di mitem Server wode wosch. Falls du dr VPN no nid installiert hesch, folg de Schritte im online Tutorial.</p><p><strong>Auto-Update Standortliste:</strong> Aktualisiert d'Serverstandorte.</p><strong>Ping azeige:</strong> Zeigt ah wie lang es brucht bis Date zum Server si und wider zrügg.";
+
+/* explanations of the passcode settings tab */
+"passcode settings explanation" = "<p>Du chasch SnowHaze mitemne Passwort schütze. Setz, ändere oder lösch dis Passwort.</p><p><strong>MODUS:</strong> Wähl us, ob nur z'Passwort oder o biometrischi ID (Touch ID oder Face ID) cha SnowHaze entsperre. D'Zit bis SnowHaze gsperrt wird cha igstellt wärde.</p><strong>FORMAT:</strong> Du chasch e 6-stellige Zahlecode (Bsp. 378291), e lange Zahlecode (Bsp. 36729829835) oder es alphanumerischs Passwort (Bsp. $7&9jK-55[*d_4) setze.";
+
+/* explanations of the warnings settings tab */
+"warnings settings explanation" = "<p>Wähl us weli Warnig vo SnowHaze sölle azeigt wärde.</p><p><strong>Gfährlechi Site:</strong> SnowHaze warnt di bevor du ufne schädlechi oder Phishingsite chunnsch. Settigi Site chöi di ustrickse und Passwörter, Kreditchartedate usw. stähle.</p><p><strong>TLS Zertifikat:</strong> SnowHaze warnt di falls es TLS Zertifikat nid in Ornig isch. Die Zertifikat wärde brucht zum sicheri Verbindige ufzboue.</p><p><strong>Tracking Parameter:</strong> Es git URLs wo personalisierti Elemänt enthalte, wo zum Tracke verwändet wärde. SnowHaze fragt, ob dAfrag ohni Personalisierig söll abgschickt wärde.</p><strong>XSS verhindere:</strong> Cross-Site Scripting (XSS) isch e Agriffsart, wo dr Agrifer Code ine Website ifüegt. SnowHaze fragt, ob sone Code-Ifüegig söll blockiert wärde wenn diä Istellig aktiv isch.";
+
+/* title of prompt to explain http warning indicator */
+"http warnings explanation prompt title" = "HTTP Warnige";
+
+"site lists > 1 day old notice format" = "%@ Tag alt";
+
+"site lists 1 day old notice" = "1 Tag alt";
+
+"site lists 0 days old notice" = "aktuell";
+
