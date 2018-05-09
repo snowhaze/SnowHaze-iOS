@@ -13,16 +13,6 @@ class DataStore {
 	static let shared = DataStore()
 	static let tableName = "kvstore"
 
-	private func unescape(_ string: String) -> String {
-		let zeroUnesc = string.replacingOccurrences(of: "\\0", with: "\0")
-		return zeroUnesc.replacingOccurrences(of: "\\\\", with: "\\")
-	}
-
-	private func escape(_ key: String) -> String {
-		let backEsc = key.replacingOccurrences(of: "\\", with: "\\\\")
-		return backEsc.replacingOccurrences(of: "\0", with: "\\0")
-	}
-
 	private var store: [String: SQLite.Data] = {
 		let queryRes = try! db.execute("SELECT * FROM \(DataStore.tableName)")
 		var store: [String: SQLite.Data] = [:]

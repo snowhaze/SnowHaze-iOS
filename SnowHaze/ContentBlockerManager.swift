@@ -109,7 +109,7 @@ class ContentBlockerManager {
 
 	func load(completionHandler: (() -> Void)?) {
 		assert(Thread.isMainThread)
-		if compilationCnt == BlockerID.allIDs.count {
+		if canLoadPages {
 			completionHandler?()
 			return
 		}
@@ -163,7 +163,7 @@ class ContentBlockerManager {
 			assert(compilationCnt < BlockerID.allIDs.count)
 			blockers[id] = rules
 			compilationCnt += 1
-			if compilationCnt == BlockerID.allIDs.count {
+			if canLoadPages {
 				isLoading = false
 				blockerCallbacks.forEach { $0() }
 				blockerCallbacks = []
@@ -187,5 +187,9 @@ class ContentBlockerManager {
 
 	private func code(for id: String) -> (Int64, String) {
 		return DomainList.contentBlockerSource(for: id)
+	}
+
+	private var canLoadPages: Bool {
+		return compilationCnt == BlockerID.allIDs.count || (compilationCnt == BlockerID.allIDs.count - 1 && blockers[BlockerID.hstsPreloadUpgrader] == nil)
 	}
 }

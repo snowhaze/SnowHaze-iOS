@@ -63,9 +63,15 @@ class VPNSettingsManager: SettingsViewManager {
 				guard let me = self else {
 					return
 				}
+				me.updateHeaderColor(animated: true)
 				if me.isIPSec && me.showList {
-					let indexPath = IndexPath(row: 0, section: listSection)
-					me.controller.tableView.reloadRows(at: [indexPath], with: .none)
+					if case NEVPNManager.shared().connection.status = NEVPNStatus.invalid {
+						let section = IndexSet(integer: listSection)
+						me.controller.tableView.reloadSections(section, with: .none)
+					} else {
+						let indexPath = IndexPath(row: 0, section: listSection)
+						me.controller.tableView.reloadRows(at: [indexPath], with: .none)
+					}
 				}
 			}
 		}
@@ -373,7 +379,8 @@ class VPNSettingsManager: SettingsViewManager {
 						} else {
 							fatalError("A VPNProfile should be eigther a OVPNProfile or a IPSec profile")
 						}
-						if success && correctProfiles[index].hasProfile {
+						let profile = correctProfiles[index]
+						if success && profile.hasProfile {
 							if let profile = profile as? IPSecProfile, let me = self {
 								var reload = [indexPath]
 								if let oldSelectedIndex = me.selectedProfileIndex {
@@ -412,13 +419,23 @@ class VPNSettingsManager: SettingsViewManager {
 
 	@objc private func openOpenVPN(_ sender: UIButton) {
 		if UIApplication.shared.canOpenURL(URL(string: "openvpn://")!) {
-			UIApplication.shared.openURL(URL(string: "openvpn://")!)
+			if #available(iOS 10, *) {
+				UIApplication.shared.open(URL(string: "openvpn://")!)
+			} else {
+				UIApplication.shared.openURL(URL(string: "openvpn://")!)
+			}
 		} else {
 			let title = NSLocalizedString("opening openvpn connect requires installing alert title", comment: "title of alert to point out that opening openvpn connect requires it being installed")
 			let message = NSLocalizedString("opening openvpn connect requires installing alert message", comment: "message of alert to point out that opening openvpn connect requires it being installed")
 			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 			let okTitle = NSLocalizedString("install openvpn connect app prompt ok button title", comment: "title of ok button of prompt to ask users if they want to install the openvpn connect app")
-			let okAction = UIAlertAction(title: okTitle, style: .default) { _ in UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id590379981")!) }
+			let okAction = UIAlertAction(title: okTitle, style: .default) { _ in
+				if #available(iOS 10, *) {
+					UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id590379981")!)
+				} else {
+					UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id590379981")!)
+				}
+			}
 			alert.addAction(okAction)
 
 			let cancelTitle = NSLocalizedString("install openvpn connect app prompt cancel button title", comment: "title of cancel button of prompt to ask users if they want to install the openvpn connect app")
@@ -507,7 +524,13 @@ class VPNSettingsManager: SettingsViewManager {
 			let message = NSLocalizedString("installing ovpn requires openvpn connect alert message", comment: "message of alert to point out that installing a ovpn configuration requires openvpn connect")
 			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 			let okTitle = NSLocalizedString("install openvpn connect app prompt ok button title", comment: "title of ok button of prompt to ask users if they want to install the openvpn connect app")
-			let okAction = UIAlertAction(title: okTitle, style: .default) { _ in UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id590379981")!) }
+			let okAction = UIAlertAction(title: okTitle, style: .default) { _ in
+				if #available(iOS 10, *) {
+					UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id590379981")!)
+				} else {
+					UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id590379981")!)
+				}
+			}
 			alert.addAction(okAction)
 
 			let tutorialTitle = NSLocalizedString("install openvpn show tutorial button title", comment: "title of the show tutorial button of prompt to ask users if they want to install the openvpn connect app")
@@ -533,6 +556,7 @@ extension VPNSettingsManager: UIDocumentInteractionControllerDelegate {
 		let id = (controller.annotation as! [AnyHashable: Any])["id"] as! String
 		if let index = VPNManager.shared.ovpnProfiles.index(where: { $0.id == id }), application == "net.openvpn.connect.app" {
 			VPNManager.shared.didInstall(VPNManager.shared.ovpnProfiles[index])
+			updateHeaderColor(animated: true)
 			let indexPath = IndexPath(row: index, section: listSection)
 			self.controller?.tableView.reloadRows(at: [indexPath], with: .none)
 			VPNSettingsManager.sendingFile = true

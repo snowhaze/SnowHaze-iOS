@@ -216,7 +216,11 @@ class MainViewController: UIViewController {
 			let message = String(format: messageFormat, versionDescription)
 			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 			let okAction = UIAlertAction(title: updateTitle, style: .default) { _ in
-				UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id1121026941")!)
+				if #available(iOS 10, *) {
+					UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id1121026941")!)
+				} else {
+					UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id1121026941")!)
+				}
 				policy.updateEOLWarningVersion()
 			}
 			alert.addAction(okAction)

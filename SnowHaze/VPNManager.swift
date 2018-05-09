@@ -120,7 +120,7 @@ struct IPSecProfile: VPNProfile, Equatable {
 
 	var hasProfile: Bool {
 		assert((configs.isEmpty) == (expiration == nil))
-		return !configs.isEmpty
+		return !configs.isEmpty && expiration! > Date()
 	}
 
 	var data: [String: Any] {
@@ -206,7 +206,7 @@ struct OVPNProfile: VPNProfile, Equatable {
 
 	var hasProfile: Bool {
 		assert((profile != nil) == (expiration != nil))
-		return profile != nil
+		return profile != nil && expiration! > Date()
 	}
 
 	var isInstalled: Bool {
@@ -275,6 +275,10 @@ class VPNManager {
 				self.disconnect()
 			}
 		}
+	}
+
+	var currentOVPNInstalled: Bool {
+		return ovpnProfiles.contains { ($0.installedExpiration ?? Date.distantPast) > Date() }
 	}
 
 	var profileExpirationWarningConfig: (multiple: Bool, expired: Bool)? {
@@ -347,7 +351,7 @@ class VPNManager {
 	}
 
 	func didInstall(_ profile: OVPNProfile) {
-		assert(profile.hasProfile)
+		assert(profile.profile != nil) // cannot use hasProfile since the .ovpn may have expired since installation started
 		let index = ovpnProfiles.index(where: { $0 == profile })!
 		installedProfiles[profile.id] = profile.expiration!.timeIntervalSince1970
 		let updated = OVPNProfile(data: profile.data, installed: installedProfiles)!
@@ -507,6 +511,7 @@ extension VPNManager {
 					}
 				}
 			} else {
+				self.loadVPNManager(completion: nil)
 				success?()
 			}
 		}
@@ -549,9 +554,7 @@ extension VPNManager {
 					self.performWithLoadedVPNManager = nil
 				} else {
 					self.ipsecManagerLoaded = true
-					for block in self.performWithLoadedVPNManager! {
-						block()
-					}
+					self.performWithLoadedVPNManager!.forEach { $0() }
 					self.performWithLoadedVPNManager = nil
 				}
 			}
@@ -601,6 +604,7 @@ extension VPNManager {
 					}
 				} else {
 					self.lastIPSecCredSwap = Date()
+					self.selectedProfileID = nil
 				}
 			}
 		}
@@ -608,7 +612,7 @@ extension VPNManager {
 
 	func save(_ profile: IPSecProfile, enable: Bool = false, completion: (() -> Void)? = nil) {
 		selectedProfileID = profile.id
-		guard !profile.configs.isEmpty else {
+		guard profile.hasProfile else {
 			clearSavedProfile()
 			return
 		}

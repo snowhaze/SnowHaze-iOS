@@ -97,6 +97,8 @@ class SubscriptionSettingsManager: SettingsViewManager {
 			if !SubscriptionManager.shared.products.isEmpty {
 				return NSLocalizedString("snowhaze premium subscription auto-renew notice", comment: "notice to warn users that snowhaze premium subscriptions auto-renew")
 			}
+		} else if section == updateRestoreButtonProductsSection {
+			return NSLocalizedString("premium subscription conditions", comment: "conditions for the snowhaze premium autorenewing subscription")
 		}
 		return nil
 	}
@@ -112,6 +114,14 @@ class SubscriptionSettingsManager: SettingsViewManager {
 	override func heightForFooter(inSection section: Int) -> CGFloat {
 		if section == optionsSection && SubscriptionManager.shared.products.isEmpty {
 			return 0
+		} else if section == updateRestoreButtonProductsSection {
+			let size = CGSize(width: contentWidth, height: 0)
+			let text = titleForFooter(inSection: section)!
+			let label = UILabel()
+			label.text = text
+			UIFont.setSnowHazeFont(on: label)
+			label.numberOfLines = 0
+			return label.sizeThatFits(size).height + 25
 		}
 		return super.heightForFooter(inSection: section) + (section == optionsSection ? 20 : 0)
 	}
@@ -272,7 +282,7 @@ class SubscriptionSettingsManager: SettingsViewManager {
 					loadingProducts.insert(id)
 					tableView.reloadRows(at: [indexPath], with: .fade)
 					manager.load(product: id) { [weak self] product, error in
-						let section = updateRestoreButtonProductsSection
+						let section = optionsSection
 						guard let row = manager.products.index(where: { $0.id == id }), let me = self else {
 							return
 						}
@@ -340,11 +350,11 @@ class SubscriptionSettingsManager: SettingsViewManager {
 				}
 				switch me.updateStatus {
 					case .failed(let date):
-						if date.timeIntervalSinceNow > 0 {
+						if date > Date() {
 							return
 						}
 					case .succeded(let date):
-						if date.timeIntervalSinceNow > 0 {
+						if date > Date() {
 							return
 						}
 					default:
@@ -365,7 +375,11 @@ class SubscriptionSettingsManager: SettingsViewManager {
 	}
 
 	@objc private func showSupscriptionManagment(_ sender: UIButton) {
-		UIApplication.shared.openURL(URL(string: "itmss://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions")!)
+		if #available(iOS 10, *) {
+			UIApplication.shared.open(URL(string: "itmss://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions")!)
+		} else {
+			UIApplication.shared.openURL(URL(string: "itmss://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions")!)
+		}
 	}
 
 	@objc private func showTOS(_ sender: UIButton) {
@@ -426,11 +440,11 @@ extension SubscriptionSettingsManager: SubscriptionManagerDelegate {
 			}
 			switch me.restoreStatus {
 				case .failed(let date):
-					if date.timeIntervalSinceNow > 0 {
+					if date > Date() {
 						return
 					}
 				case .succeded(let date):
-					if date.timeIntervalSinceNow > 0 {
+					if date > Date() {
 						return
 					}
 				default:

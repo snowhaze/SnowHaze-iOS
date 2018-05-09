@@ -79,7 +79,7 @@ class PolicyAssessor {
 			case .warnings:				return 3
 			case .hidden:				return 1
 			case .subscription:			return 2
-			case .vpn:					return 3
+			case .vpn:					return 6
 			case .passcode:				return 1
 			case .contentTypeBlocker:	return 2
 		}
@@ -326,7 +326,11 @@ class PolicyAssessor {
 	}
 
 	private func assessVPN() -> Double {
-		return bool(for: updateVPNListKey) ? 1 : 0
+		let listUpdate = bool(for: updateVPNListKey) ? 0.3 : 0
+		let hasIPSec = VPNManager.shared.ipsecConnected
+		let hasOpenVPN = VPNManager.shared.currentOVPNInstalled
+		let hasVPN = hasIPSec || hasOpenVPN
+		return listUpdate + (hasVPN ? 0.7 : 0)
 	}
 
 	private func assessPasscode() -> Double {
@@ -349,16 +353,14 @@ class PolicyAssessor {
 		var result = 0.0
 		let rawTypes = integer(for: contentTypeBlockerBlockedTypesKey)
 		let types = ContentTypes(rawValue: rawTypes)
-		result += types.contains(.document) ? 0.3 : 0
-		result += types.contains(.image) ? 0.05 : 0
-		result += types.contains(.styleSheet) ? 0 : 0
-		result += types.contains(.script) ? 0.2 : 0
-		result += types.contains(.font) ? 0.1 : 0
-		result += types.contains(.raw) ? 0.15 : 0
-		result += types.contains(.svgDocument) ? 0 : 0
-		result += types.contains(.media) ? 0.1 : 0
-		result += types.contains(.popup) ? 0.1 : 0
-		result += !types.contains(.script) && types.contains(.thirdPartyScripts) ? 0.1 : 0
+		result += types.contains(.image) ? 0.1 : 0
+		result += types.contains(.styleSheet) ? 0.05 : 0
+		result += types.contains(.script) ? 0.3 : 0
+		result += types.contains(.font) ? 0.15 : 0
+		result += types.contains(.raw) ? 0.2 : 0
+		result += types.contains(.svgDocument) ? 0.05 : 0
+		result += types.contains(.media) ? 0.15 : 0
+		result += !types.contains(.script) && types.contains(.thirdPartyScripts) ? 0.15 : 0
 		return result
 	}
 

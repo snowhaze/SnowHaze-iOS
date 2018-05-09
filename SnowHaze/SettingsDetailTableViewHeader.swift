@@ -66,9 +66,7 @@ class SettingsDetailTableViewHeader: UITableViewHeaderFooterView {
 
 	private func setup() {
 		bounds = CGRect(x: 0, y: 0, width: defaultLength, height: SettingsDetailTableViewHeader.defaultHeight)
-		let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(showDetails))
-		gestureRecognizer.delegate = self
-		addGestureRecognizer(gestureRecognizer)
+		addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showDetails)))
 
 		descriptionLabel.textColor = .title
 		descriptionLabel.numberOfLines = 4
@@ -122,11 +120,5 @@ class SettingsDetailTableViewHeader: UITableViewHeaderFooterView {
 
 	@objc private func showDetails() {
 		delegate?.showDetails(for: self)
-	}
-}
-
-extension SettingsDetailTableViewHeader: UIGestureRecognizerDelegate {
-	func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-		return descriptionLabel.frame.contains(touch.location(in: self))
 	}
 }

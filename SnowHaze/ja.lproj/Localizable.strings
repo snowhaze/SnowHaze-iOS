@@ -756,7 +756,7 @@
 "subscription expire in n days notice" = "%@日後に切れます";
 
 /* notice to warn users that snowhaze premium subscriptions auto-renew */
-"snowhaze premium subscription auto-renew notice" = "説明の条件を読んでください。";
+"snowhaze premium subscription auto-renew notice" = "下記の条件を読んでください。";
 
 /* text to indicate that an authorization token can only be received by subscribing to snowhaze premium */
 "subscribe to receive authorization token notice" = "Tokenを使うためには購読して下さい。";
@@ -1479,10 +1479,10 @@
 "content type blockers settings explanation" = "SnowHazeはウェブページのさまざまなコンテンツをブロックできます。 ブロックするコンテンツの種類を選択します。";
 
 /* explanations of the acknowledgements settings tab */
-"acknowledgements settings explanation" = "SnowHazeの開発は、第三者コードとオープンソースプロジェクトによって非常に簡易化されました。私たちは以下のプロジェクトの維持をしている方々がこれらを使用することを許可してくださったことに対し、感謝しています ; AgileBits Inc. for 1PasswordExtension, phishtank.com for their phish verification database, Zetetic LLC for SQLCipher, the EasyList authors (easylist.github.io) fanboy, MonztA, Famlam and Khrin for the EasyList, EasyPrivacy List and Fanboy's Social Blocking List and the Polish TeX Users Group GUST for the TeX Gyre Adventor font. 使用されたオープンソースのライセンスや著作権表示は以下に表記しています。SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Design created by Basestudio.";
+"acknowledgements settings explanation" = "SnowHazeの開発は、第三者コードとオープンソースプロジェクトによって非常に簡易化されました。私たちは以下のプロジェクトの維持をしている方々がこれらを使用することを許可してくださったことに対し、感謝しています ; AgileBits Inc. for 1PasswordExtension, phishtank.com for their phish verification database, Zetetic LLC for SQLCipher, the EasyList authors (easylist.github.io) fanboy, MonztA, Famlam and Khrin for the EasyList, EasyPrivacy List and Fanboy's Social Blocking List and the Polish TeX Users Group GUST for the TeX Gyre Adventor font. 使用されたオープンソースのライセンスや著作権表示は以下に表記しています。SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Basestudioで作製されたデザイン。";
 
 /* explanations of the subscription settings tab */
-"subscription settings explanation" = "<p>SnowHazeプレミアムの購読登録をすることで、SnowHaze VPN、 SnowHaze サーチエンジンをご利用出来ます。また、サイトリストの 自動更新が頻繁に行われます。最初の7日間は初めての加入者には無料です。購読期間は１ヶ月と１年間の２種類があります。購読解除がない限り、購読は自動更新されるので、ご注意ください。</p><p><strong>オプションの自動更新</strong>はサブスクリプションを更新します。</p><p><strong>アクセストークンの自動更新</strong>は認証トークンを更新します。</p><p><strong>Current Token Hash</strong>は現在の購読登録を確認するためのコードです。</p>毎年のSnowHazeプレミアムサブスクリプションは1年間有効です。毎月のSnowHazeプレミアム契約は1ヶ月間有効です。この間、SnowHaze VPN、SnowHaze検索エンジンにアクセスし、あなたのリストは頻繁に更新されます。購入を確認すると、お支払いはiTunesアカウントに請求されます。サブスクリプションの終了前に少なくとも24時間は自動更新をオフにしない限り、すべてのサブスクリプションは自動的に更新されます。あなたのアカウントには、購読期間の24時間前に請求されます。 [すべての購読を確認]をタップすると、アカウント設定で定期購入を管理できます。対応するサブスクリプションを購入すると、無料試用期間の未使用部分は失効します。";
+"subscription settings explanation" = "<p>SnowHazeプレミアムの購読登録をすることで、SnowHaze VPN、 SnowHaze サーチエンジンをご利用出来ます。また、サイトリストの 自動更新が頻繁に行われます。最初の7日間は初めての加入者には無料です。購読期間は１ヶ月と１年間の２種類があります。購読解除がない限り、購読は自動更新されるので、ご注意ください。</p><p><strong>オプションの自動更新</strong>はサブスクリプションを更新します。</p><p><strong>アクセストークンの自動更新</strong>は認証トークンを更新します。</p><strong>Current Token Hash</strong>は現在の購読登録を確認するためのコードです。";
 
 /* explanations of the vpn settings tab */
 "vpn settings explanation" = "<p>VPN (Virtual Private Network)は暗号化されたプライベートなネットワークです。ユーザーの使用する機器とインターネット間の全ての通信は、はじめに、VPNサーバーに送られます。VPNサーバーを介して情報を受けとった受信者には、ユーザー（送信者）のIPアドレスが通知されることはありません （VPNサーバーのIPアドレスが通知されます）。この機能はトラッキングの防止に役立ちます。</p><p>VPNの利用はインターネット活動をより安全で快適なものにします。例えば、VPNサーバーとの通信は暗号化されます。</p><p>異なるプロトコルを使用する2種類のVPNを提供しています。 1つはIPSecと呼ばれるプロトコルで、もう1つはOpenVPNです。 IPSecを使用したVPNはSnowHazeアプリ内で簡単に制御できますが、OpenVPNではOpenVPN Connectアプリを使用し、毎月プロファイルを更新する必要があります。 しかし、OpenVPNはIPSecよりも少し安全です。 これは、使いやすさ（IPSec）とセキュリティ（OpenVPN）の間の小さなトレードオフであり、私たちが安全にあなたに任せることができます。</p><p>SnowHaze VPNの利用にはSnowHaze Premiumの購読が必要です。VPNの設定についてはオンラインチュートリアルをご参考下さい。</p><p><strong>位置リストの自動更新：</strong>利用可能なVPNサーバーの位置情報を更新します。</p><strong>Pingの表示：</strong> 通信スピードを表示します。具体的には、 使用デバイス・サーバー間を往復するための所要時間が表示されます。";
@@ -1496,9 +1496,6 @@
 /* title of prompt to explain http warning indicator */
 "http warnings explanation prompt title" = "HTTPの警告";
 
-"site lists > 1 day old notice format" = "%@日前";
-
-"site lists 1 day old notice" = "１日前";
-
-"site lists 0 days old notice" = "当世風";
+/* conditions for the snowhaze premium autorenewing subscription */
+"premium subscription conditions" = "毎年のSnowHazeプレミアムサブスクリプションは1年間有効です。毎月のSnowHazeプレミアム契約は1ヶ月間有効です。この間、SnowHaze VPN、SnowHaze検索エンジンにアクセスし、あなたのリストは頻繁に更新されます。購入を確認すると、お支払いはiTunesアカウントに請求されます。サブスクリプションの終了前に少なくとも24時間は自動更新をオフにしない限り、すべてのサブスクリプションは自動的に更新されます。あなたのアカウントには、購読期間の24時間前に請求されます。 [すべての購読を確認]をタップすると、アカウント設定で定期購入を管理できます。対応するサブスクリプションを購入すると、無料試用期間の未使用部分は失効します。";
 

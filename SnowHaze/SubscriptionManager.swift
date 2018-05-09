@@ -67,7 +67,7 @@ class SubscriptionManager: NSObject {
 	}
 
 	var hasValidToken: Bool {
-		return authorizationToken != nil && (authorizationTokenExpiration ?? .distantPast).timeIntervalSinceNow > 0 && hasSubscription
+		return authorizationToken != nil && (authorizationTokenExpiration ?? .distantPast) > Date() && hasSubscription
 	}
 
 	private(set) var activeSubscription: String? = DataStore.shared.getString(for: activeSubscriptionIdKey) {

@@ -833,7 +833,13 @@ private extension TabController {
 		let cancelTitle = NSLocalizedString("cancel call dialog confirm button title", comment: "title of cancel button of dialog used to confirm the user wants to initiate a call")
 		let message = String(format: format, recipient)
 		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in UIApplication.shared.openURL(call)}
+		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in
+			if #available(iOS 10, *) {
+				UIApplication.shared.open(call)
+			} else {
+				UIApplication.shared.openURL(call)
+			}
+		}
 		alert.addAction(confirm)
 
 		let decline = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
@@ -849,7 +855,13 @@ private extension TabController {
 		let confirmTitle = NSLocalizedString("open url in app prompt confirm button title", comment: "title of confirm button of prompt to ask users if they want to open another app")
 		let cancelTitle = NSLocalizedString("open url in app prompt cancel button title", comment: "title of cancel button of prompt to ask users if they want to open another app")
 		let alert = UIAlertController(title: title, message: prompt, preferredStyle: .alert)
-		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in UIApplication.shared.openURL(url)}
+		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in
+			if #available(iOS 10, *) {
+				UIApplication.shared.open(url)
+			} else {
+				UIApplication.shared.openURL(url)
+			}
+		}
 		alert.addAction(confirm)
 
 		let decline = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)

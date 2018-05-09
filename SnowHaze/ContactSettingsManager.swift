@@ -51,9 +51,15 @@ class ContactSettingsManager: SettingsViewManager, MFMailComposeViewControllerDe
 		let model = String(cString: uname_model(&u), encoding: String.defaultCStringEncoding) ?? "???"
 		let deviceDesc = "\(model); \(device.systemName) \(device.systemVersion)"
 
+		let dateFormatter = DateFormatter()
+		dateFormatter.locale = Locale(identifier: "en_US")
+		dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+		dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'UTC'"
+		let date = dateFormatter.string(from: compilationDate)
+
 		let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
 		let buildNr = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
-		let versionDesc = "\(version) (\(buildNr))"
+		let versionDesc = "\(version) (\(buildNr)@\(date))"
 		let messageFormat =  NSLocalizedString("support email message format", comment: "format of message of email to be sent to support")
 		let messageBody = String(format: messageFormat, deviceDesc, versionDesc, Locale.current.identifier)
 		let toRecipents = ["support@snowhaze.com"]
@@ -85,6 +91,10 @@ class ContactSettingsManager: SettingsViewManager, MFMailComposeViewControllerDe
 	}
 
 	@objc private func rateSnowHaze(_ sender: UIButton) {
-		UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id1121026941?action=write-review")!)
+		if #available(iOS 10, *) {
+			UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id1121026941?action=write-review")!)
+		} else {
+			UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id1121026941?action=write-review")!)
+		}
 	}
 }

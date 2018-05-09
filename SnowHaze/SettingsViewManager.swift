@@ -152,12 +152,17 @@ class SettingsViewManager: NSObject {
 		label.text = title
 		label.textColor = .title
 		let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
-		label.frame = view.bounds
-		label.frame.origin.x = controller?.tableView.separatorInset.left ?? 0
-		label.frame.size.width -= 2 * (controller?.tableView.separatorInset.left ?? 0)
 		label.numberOfLines = 0
 		view.addSubview(label)
-		label.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+		label.translatesAutoresizingMaskIntoConstraints = false
+		let inset = controller?.tableView.separatorInset.left ?? 0
+		let views = ["label": label]
+		let metrics = ["inset": inset]
+		var constraints = NSLayoutConstraint.constraints(withVisualFormat: "H:|-inset-[label]-inset-|", metrics: metrics, views:views)
+		constraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[label]-0-|", metrics: nil, views: views)
+		NSLayoutConstraint.activate(constraints)
+
 		return view
 	}
 
@@ -189,5 +194,14 @@ class SettingsViewManager: NSObject {
 		}
 		uiSwitch.setOn(!uiSwitch.isOn, animated: true)
 		uiSwitch.sendActions(for: UIControlEvents.valueChanged)
+	}
+
+	var contentWidth: CGFloat {
+		guard let tableView = controller?.tableView else {
+			return 0
+		}
+		let fullWidth = tableView.bounds.width
+		let insets = tableView.separatorInset.left
+		return fullWidth - 2 * insets
 	}
 }

@@ -116,7 +116,7 @@ private let defaults: [String: SQLite.Data] = [
 	blockAdsKey:							.false,
 	blockCanvasDataAccessKey:				.true,
 	blockFingerprintingKey:					.true,
-	blockSocialMediaWidgetsKey:				.false,
+	blockSocialMediaWidgetsKey:				.true,
 	applyHideOnlyBlockRulesKey:				.false,
 
 	// HTTPS
@@ -224,7 +224,7 @@ class PolicyManager {
 	}
 
 	var showEOLWarning: Bool {
-		return buildExpiration.timeIntervalSinceNow < 0 && settingsWrapper.value(for: lastEOLWarningVersionKey).integer! < currentVersion
+		return buildExpiration < Date() && settingsWrapper.value(for: lastEOLWarningVersionKey).integer! < currentVersion
 	}
 
 	var webViewConfiguration: WKWebViewConfiguration {
