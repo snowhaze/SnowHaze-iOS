@@ -1,3 +1,14 @@
-"add tab application shortcut item title"="Nuova scheda";
-"NSCameraUsageDescription"="La fotocamera è utilizzato esclusivamente per il barcode scanner.";
-"NSPhotoLibraryUsageDescription"="SnowHaze ha bisogno l'accesso alla libreria foto per salvare o caricare media.";
+/* InfoPlist.strings
+  SnowHaze
+  Copyright © 2017 Illotros GmbH. All rights reserved.
+
+  Language: en */
+
+"NSCameraUsageDescription" = "La fotocamera è utilizzato esclusivamente per il barcode scanner.";
+
+"NSPhotoLibraryUsageDescription" = "SnowHaze ha bisogno l'accesso alla libreria foto per salvare o caricare media.";
+
+"add tab application shortcut item title" = "Nuova scheda";
+
+"NSFaceIDUsageDescription" = "Sblocco SnowHaze con Face ID";
+

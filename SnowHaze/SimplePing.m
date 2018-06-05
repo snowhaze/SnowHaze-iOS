@@ -260,14 +260,12 @@ static uint16_t in_cksum(const void *buffer, size_t bufferLen) {
             packet = [self pingPacketWithType:ICMPv6TypeEchoRequest payload:payload requiresChecksum:NO];
         } break;
         default: {
-            assert(NO);
+			packet = NULL;
         } break;
     }
-    assert(packet != nil);
 
     // Send the packet.
-    
-    if (self.socket == NULL) {
+    if (!self.socket || !packet) {
         bytesSent = -1;
         err = EBADF;
     } else {

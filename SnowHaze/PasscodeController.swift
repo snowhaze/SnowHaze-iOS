@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import LocalAuthentication
 
 private let servicePrefix = "ch.illotros.ios.passcodecontroller.touchid.keychainservicename.external."
 

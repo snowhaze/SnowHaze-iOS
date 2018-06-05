@@ -1,3 +1,14 @@
-"add tab application shortcut item title"="nueva pesteña";
-"NSCameraUsageDescription"="La cámara se utiliza exclusivamente para el escáner de código de barras.";
-"NSPhotoLibraryUsageDescription"="SnowHaze necesita acceso de fototeca a guardar o subir media.";
+/* InfoPlist.strings
+  SnowHaze
+  Copyright © 2017 Illotros GmbH. All rights reserved.
+
+  Language: en */
+
+"NSCameraUsageDescription" = "La cámara se utiliza exclusivamente para el escáner de código de barras.";
+
+"NSPhotoLibraryUsageDescription" = "SnowHaze necesita acceso de fototeca a guardar o subir media.";
+
+"add tab application shortcut item title" = "nueva pesteña";
+
+"NSFaceIDUsageDescription" = "Desbloquear SnowHaze con Face ID";
+

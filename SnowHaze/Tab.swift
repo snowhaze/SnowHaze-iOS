@@ -118,6 +118,12 @@ class Tab: Equatable {
 
 	var snapshot: UIImage?  {
 		didSet {
+			snapshotData = snapshot?.pngData
+		}
+	}
+
+	fileprivate var snapshotData: Data? {
+		didSet {
 			save()
 		}
 	}
@@ -133,7 +139,9 @@ class Tab: Equatable {
 	}
 
 	func makeActive() {
-		TabStore.store.makeActive(self)
+		try! db.inTransaction {
+			TabStore.store.makeActive(self)
+		}
 	}
 
 	func save() {
@@ -153,6 +161,7 @@ class Tab: Equatable {
 		self.history = history
 		self.title = title
 		self.snapshot = snapshot
+		self.snapshotData = snapshot?.pngData
 		self.active = active
 	}
 
@@ -180,9 +189,11 @@ class Tab: Equatable {
 		}
 		active = row["active"]?.boolValue ?? false
 		if let imageData = row["snapshot"]?.blob {
-			snapshot = UIImage(data: imageData as Data)
+			snapshot = UIImage(data: imageData)
+			snapshotData = imageData
 		} else {
 			snapshot = nil
+			snapshotData = nil
 		}
 	}
 
@@ -215,7 +226,6 @@ class Tab: Equatable {
 	fileprivate var bindings: [String: SQLite.Data] {
 		let id: SQLite.Data = .integer(self.id)
 		let title = SQLite.Data(self.title)
-		let snapshotData = self.snapshot?.pngData
 		let snapshot = SQLite.Data(snapshotData)
 		let active: SQLite.Data = .integer(self.active ? 1 : 0)
 		let strings = history.map() { (url) -> String in
@@ -247,23 +257,28 @@ class TabStore {
 	private let tableName: String = TabStore.tableName
 	private var tabCache = [Int64: Tab]()
 
+	private var internalItems: [Tab]?
+
 	var items: [Tab] {
 		assert(Thread.isMainThread)
-		let query = "SELECT * FROM \(tableName) ORDER BY IFNULL(root_id, id) ASC, id ASC"
-		guard let rows = try? database.execute(query) else {
-			return []
-		}
-		let tabs = try? rows.map() { (row) -> Tab in
-			if let id = row["id"]?.integerValue, let cachedTab = tabCache[id] {
-				return cachedTab
+		if internalItems == nil {
+			let query = "SELECT * FROM \(tableName) ORDER BY IFNULL(root_id, id) ASC, id ASC"
+			guard let rows = try? database.execute(query) else {
+				return []
 			}
-			guard let item = Tab(row: row) else {
-				throw TabError.databaseError
+			let tabs = try? rows.map() { (row) -> Tab in
+				if let id = row["id"]?.integerValue, let cachedTab = tabCache[id] {
+					return cachedTab
+				}
+				guard let item = Tab(row: row) else {
+					throw TabError.databaseError
+				}
+				tabCache[item.id] = item
+				return item
 			}
-			tabCache[item.id] = item
-			return item
+			internalItems = tabs ?? []
 		}
-		return tabs ?? []
+		return internalItems!
 	}
 
 	func tab(with id: Int64) -> Tab? {
@@ -281,7 +296,7 @@ class TabStore {
 		return tab
 	}
 
-	func makeActive(_ tab: Tab) {
+	fileprivate func makeActive(_ tab: Tab) {
 		tab.active = true
 		for item in items {
 			let oldActive = item.active
@@ -378,6 +393,7 @@ class TabStore {
 			let bindings = [rootBinding, .text(json), snapshotBinding, .false, titleBinding]
 			let query = "INSERT INTO \(tableName) (root_id, history, snapshot, active, title) VALUES (?, ?, ?, ?, ?)"
 			try database.execute(query, with: bindings)
+			internalItems = nil
 			let callguard = Callguard()
 			return {
 				callguard.called = true
@@ -400,6 +416,7 @@ class TabStore {
 		} catch {
 			return false
 		}
+		internalItems = internalItems?.filter { $0.id != item.id }
 		tabCache[id] = nil
 		notifyDiff(from: oldItems)
 		if undoTime > 0.1 {
@@ -461,6 +478,7 @@ class TabStore {
 		let bindings = item.bindings
 		do {
 			try database.execute(query, with: bindings)
+			internalItems = nil
 			tabCache[item.id] = item
 			return true
 		} catch {

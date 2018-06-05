@@ -96,8 +96,10 @@ let db: SQLiteManager = {
 	SQLiteManager.freeSQLiteCachesOnMemoryWarning = true
 	let manager = SQLiteManager(setup: { _ in
 		let connection = SQLCipher(path: dbPath, key: keyingData)!
-		_ = try! connection.execute("PRAGMA secure_delete = on")
-		_ = try! connection.execute("PRAGMA foreign_keys = on")
+		try! connection.execute("PRAGMA secure_delete = on")
+		try! connection.execute("PRAGMA foreign_keys = on")
+		try! connection.busyTimeout(100)
+
 		try! connection.registerFTS5Tokenizer(named: "lemma") { _ in
 			return { flags, rawText in
 				var result: [(SQLite.FTS5TokenFlags, String, Range<String.Index>)] = []
@@ -136,7 +138,7 @@ let db: SQLiteManager = {
 	}
 
 	manager.migrator = Migrator()
-	_ = try! manager.migrate()
+	try! manager.migrate()
 
 	_ = try? manager.execute("DETACH \(settingsDB)")
 	_ = try? manager.execute("DETACH \(browsingDB)")

@@ -147,7 +147,7 @@
 "passcodecontroller authenticate with biometrics prompt" = "Authenticate Using Biometric ID";
 
 /* error message displayed when app launch fails due to keychain error */
-"app launch failed keychain error message" = "SnowHaze could not unlock because the iCloud Keychain has encountered an error.";
+"app launch failed keychain error message" = "SnowHaze could not unlock because the Keychain has encountered an error.";
 
 /* title of button to retry when app launch fails due to keychain error */
 "app launch failed keychain error retry button title" = "Retry";

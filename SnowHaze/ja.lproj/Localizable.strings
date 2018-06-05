@@ -147,7 +147,7 @@
 "passcodecontroller authenticate with biometrics prompt" = "生体認証IDの使用を認証する";
 
 /* error message displayed when app launch fails due to keychain error */
-"app launch failed keychain error message" = "iCloudキーチェーンでエラーが発生したため、SnowHazeをアンロックできませんでした。";
+"app launch failed keychain error message" = "キーチェーンでエラーが発生したため、SnowHazeをアンロックできませんでした。";
 
 /* title of button to retry when app launch fails due to keychain error */
 "app launch failed keychain error retry button title" = "リトライ";

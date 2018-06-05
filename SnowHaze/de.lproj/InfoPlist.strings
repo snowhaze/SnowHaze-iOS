@@ -1,3 +1,14 @@
-"add tab application shortcut item title"="Neuer Tab";
-"NSCameraUsageDescription"="Die Kamera wird ausschliesslich für den Strichcode-Scanner verwendet.";
-"NSPhotoLibraryUsageDescription"="SnowHaze braucht Zugriff auf die Fotomediathek um Medien zu speichern oder hochzuladen.";
+/* InfoPlist.strings
+  SnowHaze
+  Copyright © 2017 Illotros GmbH. All rights reserved.
+
+  Language: en */
+
+"NSCameraUsageDescription" = "Die Kamera wird ausschliesslich für den Strichcode-Scanner verwendet.";
+
+"NSPhotoLibraryUsageDescription" = "SnowHaze braucht Zugriff auf die Fotomediathek um Medien zu speichern oder hochzuladen.";
+
+"add tab application shortcut item title" = "Neuer Tab";
+
+"NSFaceIDUsageDescription" = "Entsperre SnowHaze mit Face ID";
+

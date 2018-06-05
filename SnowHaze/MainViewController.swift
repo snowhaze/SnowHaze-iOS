@@ -31,8 +31,6 @@ class MainViewController: UIViewController {
 		}
 	}
 
-	private var internalTabs: [Tab]?
-
 	private var textInputBar: TextInputBar?
 
 	private var tabVC: TabViewController!
@@ -154,7 +152,7 @@ class MainViewController: UIViewController {
 
 		navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.font: UIFont.snowHazeFont(size: 20)]
 
-		let tab = crashCount != 2 ? currentTab! : tabStore.addEmptyItem()!
+		let tab = crashCount != 2 ? currentTab : tabStore.addEmptyItem()!
 		let tabPolicy = PolicyManager.manager(for: tab)
 		dimmer.set(dimmed: tabPolicy.isInNightMode)
 		setupSuggestionVC()
@@ -254,20 +252,20 @@ class MainViewController: UIViewController {
 // MARK: Internals
 private extension MainViewController {
 	var tabs: [Tab] {
-		if internalTabs == nil {
-			internalTabs = tabStore.items
-		}
-		return internalTabs!
+		return tabStore.items
 	}
 
 	func close(_ tab: Tab) {
-		if tab == tabVC.tab {
-			tabVC.tab = nil
-		}
+		let currentDeleted = tabVC.tab == tab
 
 		let url = tab.controller?.url
 		let policy = PolicyManager.manager(for: url, in: tab)
 		tabStore.remove(tab, undoTime: policy.tabClosingUndoTimeLimit)
+
+		if currentDeleted {
+			tabVC.tab = nil
+			set(tab: currentTab, animated: !isShowingTabsView)
+		}
 	}
 
 	var isShowingTabsView: Bool {
@@ -286,21 +284,11 @@ private extension MainViewController {
 		}
 	}
 
-	var currentTab: Tab? {
-		let tabs = tabStore.items
-		var lastActive: Tab? = nil
-		for tab in tabs {
-			if tab.isActive {
-				lastActive = tab
-			}
+	var currentTab: Tab {
+		for tab in tabs.reversed() where tab.isActive {
+			return tab
 		}
-		if lastActive == nil {
-			lastActive = tabs.last
-		}
-		if lastActive == nil {
-			lastActive = tabStore.addEmptyItem()
-		}
-		return lastActive
+		return tabs.last ?? tabStore.addEmptyItem()!
 	}
 
 	@discardableResult func scroll(to tab: Tab, animated: Bool = true) -> IndexPath {
@@ -350,8 +338,7 @@ private extension MainViewController {
 			return
 		}
 		tabVC?.tab?.controller?.saveTabState()
-		let oldTabVC: TabViewController? = tabVC
-		oldTabVC?.tab = nil
+		let oldTabVC = tabVC
 		oldTabVC?.urlBar = nil
 		guard let storyboard = storyboard else {
 			return
@@ -376,11 +363,13 @@ private extension MainViewController {
 			UIView.animate(withDuration: animationDuration, animations: {
 				self.tabVC.view.frame = self.pageContentView.bounds
 			}, completion: { _ in
+				oldTabVC?.tab = nil
 				oldTabVC?.willMove(toParentViewController: nil)
 				oldTabVC?.view.removeFromSuperview()
 				oldTabVC?.removeFromParentViewController()
 			})
 		} else {
+			oldTabVC?.tab = nil
 			oldTabVC?.willMove(toParentViewController: nil)
 			oldTabVC?.view.removeFromSuperview()
 			oldTabVC?.removeFromParentViewController()
@@ -893,12 +882,7 @@ extension MainViewController: URLBarDelegate {
 	}
 
 	func urlbar(_ urlBar: URLBar, closedTab index: Int) {
-		let oldTab = tabs[index]
-		let currentDeleted = tabVC.tab == oldTab
-		close(oldTab)
-		if currentDeleted {
-			set(tab: currentTab!, animated: true)
-		}
+		close(tabs[index])
 	}
 
 	func urlbar(_ urlBar: URLBar, loadedURL url: URL, atIndex index: Int) {
@@ -931,6 +915,7 @@ extension MainViewController: TabViewControllerDelegate {
 	}
 
 	func stopShowingSuggestions() {
+		suggestionVC.cancelSuggestions()
 		UIView.animate(withDuration: 0.3, animations: {
 			self.suggestionContainer.alpha = 0
 		}, completion: { _ in
@@ -998,7 +983,6 @@ extension MainViewController {
 // MARK: Notifications
 extension MainViewController {
 	@objc private func tabListDidChange(_ notification: Notification) {
-		internalTabs = nil
 		let newIndexes = notification.userInfo?[NEW_TABS_INDEX_KEY] as? [Int] ?? []
 		let deletedIndexes = notification.userInfo?[DELETED_TABS_INDEX_KEY] as? [Int] ?? []
 		let fromIndexes = notification.userInfo?[MOVED_TABS_FROM_INDEX_KEY] as? [Int] ?? []

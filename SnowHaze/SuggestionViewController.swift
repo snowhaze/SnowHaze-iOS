@@ -18,6 +18,11 @@ protocol SuggestionViewControllerDelegate: class {
 
 protocol SuggestionSource {
 	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> Void)
+	func cancelSuggestions()
+}
+
+extension SuggestionSource {
+	func cancelSuggestions() { }
 }
 
 class SuggestionViewController: UITableViewController {
@@ -176,6 +181,12 @@ class SuggestionViewController: UITableViewController {
 	func open(_ suggestion: Suggestion) {
 		delegate?.suggestionController(self, didSelectURL: suggestion.url)
 		suggestion.selectionCallback?()
+	}
+
+	func cancelSuggestions() {
+		for source in sources {
+			source.cancelSuggestions()
+		}
 	}
 }
 

@@ -285,7 +285,7 @@ class InstallTutorialViewController : TutorialViewController {
 			let mainVC = MainViewController.controller!
 			mainVC.popToVisible(animated: true)
 			let lang = PolicyManager.globalManager().threeLanguageCode
-			mainVC.loadInFreshTab(input: "https://snowhaze.com/\(lang)/app.html#tut-slider", type: .url)
+			mainVC.loadInFreshTab(input: "https://snowhaze.com/\(lang)/support.html#tut-slider", type: .url)
 		}
 	}
 

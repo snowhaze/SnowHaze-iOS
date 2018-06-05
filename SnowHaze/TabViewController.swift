@@ -20,7 +20,7 @@ protocol TabViewControllerDelegate: class {
 }
 
 class TabViewController: UIViewController {
-	@IBOutlet weak var bookmarkHistoryView: BookmarkHistoryView!
+	@IBOutlet var bookmarkHistoryView: BookmarkHistoryView!
 	private let historyStore = HistoryStore.store
 	private let bookmarkStore = BookmarkStore.store
 	private var lastScrollPosition: CGFloat?
@@ -61,10 +61,12 @@ class TabViewController: UIViewController {
 				webView.isHidden = true
 				webView.alpha = 0
 				bookmarkHistoryView.isHidden = false
+				view.insertSubview(bookmarkHistoryView, at: 1)
 			} else {
 				webView.isHidden = false
 				webView.alpha = 1
 				bookmarkHistoryView.isHidden = true
+				self.bookmarkHistoryView.removeFromSuperview()
 				if webView.url == nil && !webView.isLoading {
 					controller.localReload()
 				}
@@ -383,6 +385,7 @@ extension TabViewController: TabControllerNavigationDelegate {
 				self.webView.alpha = 1
 			}, completion: { _ in
 				self.bookmarkHistoryView.isHidden = true
+				self.bookmarkHistoryView.removeFromSuperview()
 			})
 		}
 	}

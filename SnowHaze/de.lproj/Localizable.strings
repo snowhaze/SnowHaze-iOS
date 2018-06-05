@@ -147,7 +147,7 @@
 "passcodecontroller authenticate with biometrics prompt" = "Authentifizierung mit biometrischer ID";
 
 /* error message displayed when app launch fails due to keychain error */
-"app launch failed keychain error message" = "SnowHaze konnte nicht entsperrt werden, weil ein Fehler im iCloud Schlüsselbund aufgetreten ist.";
+"app launch failed keychain error message" = "SnowHaze konnte nicht entsperrt werden, weil ein Fehler im Schlüsselbund aufgetreten ist.";
 
 /* title of button to retry when app launch fails due to keychain error */
 "app launch failed keychain error retry button title" = "Erneut versuchen";

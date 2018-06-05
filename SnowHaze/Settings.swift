@@ -253,7 +253,7 @@ private class GlobalSettings: Settings {
 	override func set(_ value: SQLite.Data, for key: String) {
 		assert(Thread.isMainThread)
 		notifyListenersOfNewValue(value, for: key, alreadySet: false)
-		_ = try! db.execute("REPLACE INTO \(table) (key, value) VALUES (?, ?)", with: [sanitize(key), value])
+		try! db.execute("REPLACE INTO \(table) (key, value) VALUES (?, ?)", with: [sanitize(key), value])
 		internalCache?[key] = value
 		notifyListenersOfNewValue(value, for: key, alreadySet: true)
 	}
@@ -262,13 +262,13 @@ private class GlobalSettings: Settings {
 		assert(Thread.isMainThread)
 		notifyListenersOfNewValue(nil, for: key, alreadySet: false)
 		internalCache?[key] = nil
-		_ = try! db.execute("DELETE FROM \(table) WHERE key = ?", with: [sanitize(key)])
+		try! db.execute("DELETE FROM \(table) WHERE key = ?", with: [sanitize(key)])
 		notifyListenersOfNewValue(nil, for: key, alreadySet: true)
 	}
 
 	override func unsetAllValues() {
 		internalCache = [:]
-		_ = try! db.execute("DELETE FROM \(table)")
+		try! db.execute("DELETE FROM \(table)")
 		notifyAllListenersOfClear(finished: true)
 	}
 }
@@ -321,9 +321,9 @@ private class TabSettings: Settings, SettingsListener {
 
 	static func copyData(from: Tab, to: Tab) {
 		assert(Thread.isMainThread)
-		_ = try! db.execute("DELETE FROM \(table) WHERE tab_id = ?", with: [.integer(to.id)])
+		try! db.execute("DELETE FROM \(table) WHERE tab_id = ?", with: [.integer(to.id)])
 		let query = "INSERT INTO \(table) (tab_id, key, value) SELECT ?, key, value FROM \(table) WHERE tab_id = ?"
-		_ = try! db.execute(query, with: [.integer(to.id), .integer(from.id)])
+		try! db.execute(query, with: [.integer(to.id), .integer(from.id)])
 		TabSettings.instance(for: to).internalCache = nil
 	}
 
@@ -341,7 +341,7 @@ private class TabSettings: Settings, SettingsListener {
 	override func set(_ value: SQLite.Data, for key: String) {
 		assert(Thread.isMainThread)
 		notifyListenersOfNewValue(value, for: key, alreadySet: false)
-		_ = try! db.execute("REPLACE INTO \(table) (tab_id, key, value) VALUES (?, ?, ?)", with: [.integer(tabId), sanitize(key), value])
+		try! db.execute("REPLACE INTO \(table) (tab_id, key, value) VALUES (?, ?, ?)", with: [.integer(tabId), sanitize(key), value])
 		internalCache?[key] = value
 		notifyListenersOfNewValue(value, for: key, alreadySet: true)
 	}
@@ -351,7 +351,7 @@ private class TabSettings: Settings, SettingsListener {
 		let globalValue = globalSettings.value(for: key)
 		notifyListenersOfNewValue(globalValue, for: key, alreadySet: false)
 		internalCache?[key] = nil
-		_ = try! db.execute("DELETE FROM \(table) WHERE tab_id = ? AND key = ?", with: [.integer(tabId), sanitize(key)])
+		try! db.execute("DELETE FROM \(table) WHERE tab_id = ? AND key = ?", with: [.integer(tabId), sanitize(key)])
 		notifyListenersOfNewValue(globalValue, for: key, alreadySet: true)
 	}
 
@@ -359,7 +359,7 @@ private class TabSettings: Settings, SettingsListener {
 		assert(Thread.isMainThread)
 		notifyAllListenersOfClear(finished: false)
 		internalCache = [:]
-		_ = try! db.execute("DELETE FROM \(table) WHERE tab_id = ?", with: [.integer(tabId)])
+		try! db.execute("DELETE FROM \(table) WHERE tab_id = ?", with: [.integer(tabId)])
 		notifyAllListenersOfClear(finished: true)
 	}
 
@@ -455,7 +455,7 @@ private class GlobalPageSettings: Settings {
 
 	static func clearAllPageSettings() {
 		assert(Thread.isMainThread)
-		_ = try! db.execute("DELETE FROM \(table)")
+		try! db.execute("DELETE FROM \(table)")
 		for (_, settings) in cache {
 			settings.internalCache = [:]
 		}
@@ -472,7 +472,7 @@ private class GlobalPageSettings: Settings {
 	override func set(_ value: SQLite.Data, for key: String) {
 		assert(Thread.isMainThread)
 		notifyListenersOfNewValue(value, for: key, alreadySet: false)
-		_ = try! db.execute("REPLACE INTO \(table) (domain, key, value) VALUES (?, ?, ?)", with: [sanitize(domain), sanitize(key), value])
+		try! db.execute("REPLACE INTO \(table) (domain, key, value) VALUES (?, ?, ?)", with: [sanitize(domain), sanitize(key), value])
 		internalCache?[key] = value
 		notifyListenersOfNewValue(value, for: key, alreadySet: true)
 	}
@@ -481,7 +481,7 @@ private class GlobalPageSettings: Settings {
 		assert(Thread.isMainThread)
 		notifyListenersOfNewValue(nil, for: key, alreadySet: false)
 		internalCache?[key] = nil
-		_ = try! db.execute("DELETE FROM \(table) WHERE domain = ? AND key = ?", with: [sanitize(domain), sanitize(key)])
+		try! db.execute("DELETE FROM \(table) WHERE domain = ? AND key = ?", with: [sanitize(domain), sanitize(key)])
 		notifyListenersOfNewValue(nil, for: key, alreadySet: true)
 	}
 
@@ -489,7 +489,7 @@ private class GlobalPageSettings: Settings {
 		assert(Thread.isMainThread)
 		notifyAllListenersOfClear(finished: false)
 		internalCache = [:]
-		_ = try! db.execute("DELETE FROM \(table) WHERE domain = ?", with: [sanitize(domain)])
+		try! db.execute("DELETE FROM \(table) WHERE domain = ?", with: [sanitize(domain)])
 		notifyAllListenersOfClear(finished: true)
 	}
 

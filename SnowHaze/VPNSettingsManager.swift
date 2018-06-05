@@ -453,7 +453,7 @@ class VPNSettingsManager: SettingsViewManager {
 		let mainVC = MainViewController.controller
 		mainVC?.popToVisible(animated: true)
 		let language = PolicyManager.globalManager().threeLanguageCode
-		let site = "https://snowhaze.com/\(language)/vpn.html#tutorial"
+		let site = "https://snowhaze.com/\(language)/support.html#tutorial"
 		mainVC?.loadInFreshTab(input: site, type: .url)
 	}
 
@@ -580,10 +580,12 @@ extension VPNSettingsManager: UIDocumentInteractionControllerDelegate {
 extension VPNSettingsManager: VPNManagerDelegate {
 	func vpnManager(_ manager: VPNManager, didChangeOVPNProfileListFrom oldProfiles: [OVPNProfile], to newProfiles: [OVPNProfile]) {
 		updateProfiles(from: oldProfiles, to: newProfiles)
+		VPNManager.shared.ovpnProfiles.forEach { setupPinger(for: $0) }
 	}
 
 	func vpnManager(_ manager: VPNManager, didChangeIPSecProfileListFrom oldProfiles: [IPSecProfile], to newProfiles: [IPSecProfile]) {
 		updateProfiles(from: oldProfiles, to: newProfiles)
+		VPNManager.shared.ipsecProfiles.forEach { setupPinger(for: $0) }
 	}
 
 	private func updateProfiles(from oldProfiles: [VPNProfile], to newProfiles: [VPNProfile]) {

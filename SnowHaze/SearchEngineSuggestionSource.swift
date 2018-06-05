@@ -18,6 +18,8 @@ class SearchEngineSuggestionSource: SuggestionSource {
 	var engine: SearchEngine
 	var tab: Tab
 
+	private var snowhazeSearchID = 0
+
 	init(engine: SearchEngine, tab: Tab) {
 		self.engine = engine
 		self.tab = tab
@@ -379,25 +381,36 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		guard let url = URL(string: "https://search.snowhaze.com/suggestion.php?v=1&l=\(lang)&t=\(token)&q=\(queryString)") else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
-			guard let array = json as? [String] else {
+		let id = snowhazeSearchID + 1
+		snowhazeSearchID = id
+		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) { [weak self] in
+			guard let me = self, me.snowhazeSearchID == id else {
 				return
 			}
-			let phrases = array.prefix(maxCount)
-			var suggestions = [Suggestion]()
-			for (index, phrase) in phrases.enumerated() {
-				guard let url = self.engine.url(for: phrase) else {
+			JSONFetcher(tab: me.tab).fetchJSON(from: url) { (json) -> Void in
+				guard let me = self, let array = json as? [String] else {
 					return
 				}
-				let subtitle = NSLocalizedString("snowhaze search search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from snowhaze search")
-				let image = #imageLiteral(resourceName: "snowflake")
-				let priority = self.priority(for: index + 1)
-				let suggestion = Suggestion(title: phrase, subtitle: subtitle, url: url, image: image, priority: priority)
-				suggestions.append(suggestion)
-			}
-			if !suggestions.isEmpty {
-				callback(suggestions, "snowhaze")
+				let phrases = array.prefix(maxCount)
+				var suggestions = [Suggestion]()
+				for (index, phrase) in phrases.enumerated() {
+					guard let url = me.engine.url(for: phrase) else {
+						return
+					}
+					let subtitle = NSLocalizedString("snowhaze search search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from snowhaze search")
+					let image = #imageLiteral(resourceName: "snowflake")
+					let priority = me.priority(for: index + 1)
+					let suggestion = Suggestion(title: phrase, subtitle: subtitle, url: url, image: image, priority: priority)
+					suggestions.append(suggestion)
+				}
+				if !suggestions.isEmpty {
+					callback(suggestions, "snowhaze")
+				}
 			}
 		}
+	}
+
+	func cancelSuggestions() {
+		snowhazeSearchID += 1
 	}
 }

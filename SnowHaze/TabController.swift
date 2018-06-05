@@ -336,12 +336,7 @@ class TabController: NSObject, WebViewManager {
 // MARK: UI Delegate
 extension TabController: WKUIDelegate {
 	func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-		let policy = PolicyManager.manager(for: webView.url, in: tab)
-		let isBlank = PolicyManager.isAboutBlank(navigationAction.request.url)
-		guard policy.allowsPopover(for: navigationAction.navigationType) && !isBlank else {
-			return nil
-		}
-		post(event: .tabCreation(request: navigationAction.request))
+		createTab(for: navigationAction, originatingWebView: webView)
 		return nil
 	}
 
@@ -549,6 +544,17 @@ extension TabController: WKNavigationDelegate {
 				}
 			}
 		}
+		// 'activated' links can cause universal links to be opened in other apps. To prevent this massive privacy violation, we cancel them and load the request directly.
+		// In such cases the targetFrame also tends to be nil.
+		if case .linkActivated = navigationAction.navigationType, navigationAction.request.isHTTPGet && navigationAction.targetFrame?.isMainFrame ?? true {
+			decisionHandler(.cancel)
+			if let _ = navigationAction.targetFrame {
+				load(request: navigationAction.request)
+			} else {
+				createTab(for: navigationAction, originatingWebView: webView)
+			}
+			return
+		}
 		reloadedRequest = nil
 		let finalDecision: (Bool) -> Void = { decision in
 			if !decision {
@@ -726,7 +732,7 @@ private extension TabController {
 	}
 
 	func pushTabHistory(_ url: URL) {
-		if url != tab.history.last && WebViewURLSchemes.contains(url.scheme!.lowercased()) {
+		if url != tab.history.last && WebViewURLSchemes.contains(url.scheme?.lowercased() ?? ":arbitrary-non-webview-scheme:") {
 			tab.history.append(url)
 		}
 	}
@@ -774,6 +780,14 @@ private extension TabController {
 			return data.handler
 		} else {
 			return nil
+		}
+	}
+
+	func createTab(for navigationAction: WKNavigationAction, originatingWebView webView: WKWebView) {
+		let policy = PolicyManager.manager(for: webView.url, in: tab)
+		let isBlank = PolicyManager.isAboutBlank(navigationAction.request.url)
+		if policy.allowsPopover(for: navigationAction.navigationType) && !isBlank {
+			post(event: .tabCreation(request: navigationAction.request))
 		}
 	}
 }
