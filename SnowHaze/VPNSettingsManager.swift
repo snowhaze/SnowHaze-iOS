@@ -218,6 +218,12 @@ class VPNSettingsManager: SettingsViewManager {
 				button.setTitle(title, for: [])
 				button.addTarget(self, action: #selector(openOpenVPN(_:)), for: .touchUpInside)
 			}
+		} else if indexPath.section == listSection && isIPSec && indexPath.row == VPNManager.shared.ipsecProfiles.count + 1 {
+			cell.textLabel?.text = NSLocalizedString("autorotate ipsec credentials settings title", comment: "title of setting to autorotate ipsec credentials")
+			let uiSwitch = makeSwitch()
+			uiSwitch.isOn = bool(for: autorotateIPSecCredentialsKey)
+			uiSwitch.addTarget(self, action: #selector(toggleAutoRotateCredentials(_:)), for: .valueChanged)
+			cell.accessoryView = uiSwitch
 		} else if indexPath.section == listSection {
 			let index = indexPath.row - 1
 			let profile: VPNProfile
@@ -323,7 +329,7 @@ class VPNSettingsManager: SettingsViewManager {
 			return 4
 		} else {
 			assert(section == listSection)
-			return (isIPSec ? VPNManager.shared.ipsecProfiles.count : VPNManager.shared.ovpnProfiles.count) + 1
+			return isIPSec ? VPNManager.shared.ipsecProfiles.count + 2 : VPNManager.shared.ovpnProfiles.count + 1
 		}
 	}
 
@@ -331,6 +337,8 @@ class VPNSettingsManager: SettingsViewManager {
 		if showList && indexPath.section == listSection && indexPath.row == 0 && isIPSec {
 			toggleOnOff(tableView.cellForRow(at: indexPath))
 		} else if indexPath.section == controlSection || indexPath.row == 0 {
+			super.didSelectRow(atIndexPath: indexPath, tableView: tableView)
+		} else if showList && indexPath.section == listSection && indexPath.row == VPNManager.shared.ipsecProfiles.count + 1 && isIPSec {
 			super.didSelectRow(atIndexPath: indexPath, tableView: tableView)
 		} else {
 			assert(indexPath.section == listSection)
@@ -463,6 +471,11 @@ class VPNSettingsManager: SettingsViewManager {
 		if sender.isOn {
 			DownloadManager.shared.triggerVPNListUpdate()
 		}
+	}
+
+	@objc private func toggleAutoRotateCredentials(_ sender: UISwitch) {
+		set(sender.isOn, for: autorotateIPSecCredentialsKey)
+		updateHeaderColor(animated: true)
 	}
 
 	@objc private func toggleOnOff(_ sender: UIView?) {

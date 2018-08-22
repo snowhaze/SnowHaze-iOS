@@ -47,6 +47,18 @@
 /* title for history section */
 "history view title" = "Verlouf";
 
+/* name of the https upgrades usage stat */
+"https upgrades usage stats name" = "HTTPS\nUpgrades";
+
+/* name of the blocked trackers usage stat */
+"blocked trackers usage stats name" = "Tracker\nblockiert";
+
+/* name of the ephemeral cookies usage stat */
+"ephemeral cookies usage stats name" = "Cookies\nglöscht";
+
+/* name of the vpn protected loads usage stat */
+"vpn protected loads usage stats name" = "VPN\nSchutz";
+
 /* Used to confirm message */
 "js alert panel confirmation button title" = "OK";
 
@@ -293,11 +305,20 @@
 /* title of settings for tab masking */
 "tab masking settings title" = "TABS MASKIERE";
 
+/* title of settings for usage stats */
+"usage stats settings title" = "STATISTIKE";
+
 /* title of setting for the duration during which closing a tab can be undone */
 "allow tab closing undo duration settings title" = "Zuelaa für";
 
 /* title of setting to allow tab closing to be undone for all tabs */
 "allow tab closing undo for all tabs settings title" = "Zuelaa für alli Tabs";
+
+/* title of setting to keep usage stats */
+"keep usage stats settings title" = "Statistike bhalte";
+
+/* title of button to reset usage stats */
+"reset usage stats button title" = "Statistike lösche";
 
 /* string used to indicate that tab closing cannot be undone */
 "tab closing undo time limit 0 seconds time" = "0 Sek";
@@ -389,6 +410,15 @@
 /* string displayed to user to identify android opera user agent */
 "android opera user agent display name" = "Opera Android";
 
+/* string displayed to user to identify macos safari user agent */
+"safari macos user agent display name" = "Safari macOS";
+
+/* string displayed to user to identify windows chrome user agent */
+"chrome windows user agent display name" = "Chrome Windows";
+
+/* string displayed to user to identify linux firefox user agent */
+"firefox linux user agent display name" = "Firefox Linux";
+
 /* title of button to reset global settings to defaults */
 "reset global settings button title" = "Iistellige zruggsetze";
 
@@ -464,6 +494,9 @@
 /* name of snowhaze search engine to be displayed to user */
 "snowhaze search engine display name" = "SnowHaze";
 
+/* name of findx search engine to be displayed to user */
+"findx search engine display name" = "Findx";
+
 /* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
 "snowhaze search engine missing subscription accessibility label" = "SnowHaze - Benötigt es SnowHaze Premium Abo";
 
@@ -484,6 +517,9 @@
 
 /* title of button to rate snowhaze on the app store */
 "rate snowhaze button title" = "SnowHaze bewärte";
+
+/* title of button to show the snowhaze source */
+"show snowhaze source button title" = "Source Code";
 
 /* text use to prefill 'share' messagers */
 "snowhaze share text" = "Hoi!\nSnowHaze isch e super Browser wo Dini persönliche Date vollständig schützt.\nLug mau d'Website a: snowhaze.com\nOder lad d'App eifach usem App Store abe; snowhaze.com/download.";
@@ -538,6 +574,9 @@
 
 /* subtitle for autocomplete search suggestions from snowhaze search */
 "snowhaze search search suggestion subtitle" = "SnowHaze Suechi";
+
+/* subtitle for autocomplete search suggestions from findx */
+"findx search suggestion subtitle" = "Findx Suechi";
 
 /* title of the activity to find some text on page */
 "find on page activity title" = "Site dürsueche";
@@ -799,6 +838,9 @@
 
 /* title of setting to display the ping status of the vpn servers */
 "show vpn server ping status settings title" = "Ping azeige";
+
+/* title of setting to autorotate ipsec credentials */
+"autorotate ipsec credentials settings title" = "Sälbstrotierendi Logindate";
 
 /* title of button to switch from vpn settings to subscription settings */
 "show subscription status button title" = "Abonnemäntstatus azeige";
@@ -1244,6 +1286,9 @@
 /* title of settings in tab settings to enable / disable search suggestions */
 "show search suggestions tab settings title" = "Suechvorschläg";
 
+/* title of tab setting to use desktop user agents */
+"desktop user agent tab setting title" = "Desktop User Agent";
+
 /* displayed instead of domain name if the current page is an errorpage in page settings */
 "page settings errorpage description" = "Fählersite";
 
@@ -1305,7 +1350,7 @@
 "error page auth default title" = "Berächtigigsfähler";
 
 /* default auth error message */
-"error page auth error default message" = "Du hesch ke gültige Authorisierigstoken. Du chasch dr Token ide Abonnemäntistellige aktualisiere.";
+"error page auth error default message" = "Du hesch ke gültige Authorisierigstoken. Du chasch dr Token ide Abonnemäntistellige aktualisiere. Lös es nöis Abo i de SnowHaze Iistellige unter Abo.";
 
 /* default auth error information */
 "error page auth error default information" = "Es cha passiere, dass du nachem abonniere kei Token becho hesch. Sobald en Token bechunnsch ladet diä Site nöi.";
@@ -1434,7 +1479,7 @@
 "update tutorial message from developers content" = "Hallo,\n\nIn diesem Moment hältst du SnowHaze 2.5 in deinen Händen. Wir möchten diesen Moment nutzen, um uns bei dir zu bedanken und dich über unsere zukünftigen Projekte zu informieren.\n\nEs ist schon eine Weile her, seit die erste Version von SnowHaze im Juli 2016 veröffentlicht wurde. Dies ist bereits Version 2.5 und unglaublich viel hat sich geändert. Davon sind unsere ultra-private Suchmaschine und unser eigener no-log VPN nur zwei Beispiele.\n\nWir sind sehr dankbar, dass wir dich mit an Bord haben auf unserer Mission, das Internet zu einem sicheren und privaten Ort zu machen. Es ist nur dank unseren treuen Usern, dass wir die Dinge machen können, die wir lieben.\n\nWir möchten möglichst vielen Leuten helfen ihre persönlichen Daten zu schützen. Deshalb stehen wir jede Woche mit hunderten Usern in Kontakt, um fragen zu beantworten und unser Wissen zu teilen.\n\nDeshalb sind wir auch besessen davon weitere und bessere Produkte und Dienstleistungen zu kreieren.\n\nDeshalb ist SnowHaze jetzt vollständig open source.\n\nDeshalb ist dein Feedback so wichtig für uns.\n\nUnd deshalb werden wir in diesem Jahr SnowHaze auf ein neues Level heben. Das beginnt mit der Entwicklung von SnowHaze für Android, einem VPN Client für macOS und viel Weiterem! Weitere Informationen werden folgen.\n\nEs ist für uns äusserst wichtig in Kontakt mit unseren Usern zu bleiben. Ihr seid unsere Motivation und Inspiration, um SnowHaze voran zu treiben. Wenn du SnowHaze magst, dann erzähle deiner Familie  und deinen Freunden von SnowHaze. Je mehr Leute wir sind, desto lauter ist unsere Stimme nach mehr Privatsphäre und Sicherheit im Internet. Falls du irgendetwas nicht magst, dann sende uns eine Mail. Wir haben immer eine offene Inbox!\n\nDanke, dass du dabei bist!\n\nJan, Yvan, Dominique, Andris, Pascal\nDie SnowHaze Gründer\n\nP.S. Diese Nachricht ist hard-coded. Es war also keine Verbindung zu irgendeinem Server nötig, um dir diese Nachricht anzuzeigen. Wir sorgen uns wirklich um deine Privatsphäre :)\n\n";
 
 /* explanations of the application settings */
-"application settings explanation" = "<p>Hie chasch du allgemeini SnowHaze Iistllige mache</p><p><strong>Lokali Suechvorschläg:</strong>Du chasch uswähle, ob Site usere lokale Liste vorgschlage wärde während du e Suechi itippsch.</p><p><strong>Privati Site vorschlaa:</strong> Wenn diä Iistellig aktiv isch, schlaat SnowHaze o Privati Site vor, wenn e Suechi iitippt wird. Wenn die Iistellig us isch, schlaat SnowHaze witerhin Site wo nid Privat si. Es empfilt sich us Jugendschutzgründ die Iistellig uszschalte oder um zverhindere, dass me us Versehe ufne Privati Site chunnt.</p><p><strong>Auto-Update / Nume WiFi:</strong>Wähl us, ob verschideni Siteliste aktualisiert wärde chöi und ob das nume über WiFi sött passiere. Mit SnowHaze Premium wärde d’Siteliste hüfig aktualisiert, süsch mit jedere nöie Version vo SnowHaze. Auto-Update usschalte löscht alli Liste vom Grät.</p><p><strong>Tab wiederhärstelle</strong> Due d'Ziitspanni uswähle wos müglech isch geschlossni Tabs dur Schüttle vom Grät wieder ufzdue. Du chasch uswähle, dass alli Tabs wiederhärgstellt wärde, dass heisst o Privati Tabs.</p><strong>Tab maskiere</strong> Der Inhalt vomene Tab cha maskiert wärde, wenn du nid im Tab bisch. Wähl us für weli Tabs das sött gälte.";
+"application settings explanation" = "<p>Hie chasch du allgemeini SnowHaze Iistllige mache</p><p><strong>Lokali Suechvorschläg:</strong>Du chasch uswähle, ob Site usere lokale Liste vorgschlage wärde während du e Suechi itippsch.</p><p><strong>Privati Site vorschlaa:</strong> Wenn diä Iistellig aktiv isch, schlaat SnowHaze o Privati Site vor, wenn e Suechi iitippt wird. Wenn die Iistellig us isch, schlaat SnowHaze witerhin Site wo nid Privat si. Es empfilt sich us Jugendschutzgründ die Iistellig uszschalte oder um zverhindere, dass me us Versehe ufne Privati Site chunnt.</p><p><strong>Auto-Update / Nume WiFi:</strong>Wähl us, ob verschideni Siteliste aktualisiert wärde chöi und ob das nume über WiFi sött passiere. Mit SnowHaze Premium wärde d’Siteliste hüfig aktualisiert, süsch mit jedere nöie Version vo SnowHaze. Auto-Update usschalte löscht alli Liste vom Grät.</p><p><strong>Tab wiederhärstelle</strong> Due d'Ziitspanni uswähle wos müglech isch geschlossni Tabs dur Schüttle vom Grät wieder ufzdue. Du chasch uswähle, dass alli Tabs wiederhärgstellt wärde, dass heisst o Privati Tabs.</p><p><strong>Tab maskiere</strong> Der Inhalt vomene Tab cha maskiert wärde, wenn du nid im Tab bisch. Wähl us für weli Tabs das sött gälte.</p><p><strong>Statistike:</strong> Zeigt Statistike im Läsezeicheberich vor App a.</p><p>HTTPS Upgrade: Azahl Site, wo mit HTTPS anstell vo HTTP glade worde si, dank anere SnowHaze spezifische Funktion.</p><p>Tracker blockiert: Azahl blockierte Tracker</p><p>Glöschti Cookies: Azahl glöschti Cookies</p>VPN Schutz: Azahl gladeni Site währendr Verbindig mit SnowHaze VPN";
 
 /* explanations of the javascript settings */
 "javascript settings explanation" = "<p>Due uswähle, wiä JavaScript Inhalte glade wärde sölle. JavaScript isch e Programmiersprach wo vo de meiste Website brucht wird und wo vo de meiste Browser understützt wird. JavaScript macht möglich dasme ufere Site villfältigi Darstellige und Funktione cha bruche. JavaScript isch für di dynamische Inhalte ufere Website verantwortlich.</p><p><strong>JavaScript zuelaa:</strong> Diä Iistellig macht möglich das JavaScript Inhalte chöi glade und dargestellt wärde. Es empfilt sich diä Iistellig uf Site wo nid vertouenswürdig si für di Dateschutz abzstelle. <u>Bemerkig:</u> Es cha si dass gwüssi Site ohni JavaScript nid richtig chöi glade wärde.</p><p><strong>Application Scripts zuelaa:</strong> Application Scripts di JavaScripts wo vo SnowHaze erzüügt wärde, um nützlichi Funktione wiä Trackingschutz z bruche.</p><strong>Passwortmanager:</strong> Iibindig vo Passwortmanager usschalte.";
@@ -1478,14 +1523,14 @@
 /* explanations of the content type blockers settings */
 "content type blockers settings explanation" = "SnowHaze cha verschideni Inhalte uf Website blockiere. Wähl us weli Inhalte sölle blockiert wärde. Gwüssi Site lade nid richtig wenn Inhält blockiert wärde.";
 
-/* explanations of the acknowledgements settings tab */
-"acknowledgements settings explanation" = "D'Entwicklig vo SnowHaze isch dür Drittcode und Open Source Projekte starch erliechteret. Mir bedanke üs bi de Maintainer vo folgende Projekt fürd Benützig: AgileBits Inc. für 1PasswordExtension, phishtank.com fürd Phishing Datebank, Zetetic LLC für SQLCipher, d'EasyList Autore (easylist.github.io) fanboy, MonztA, Famlam u Khrin für d'EasyList, d'EasyPrivacy List und Fanboy's Social Blocking List und d'Polish TeX Users Group GUST für d'TeX Gyre Adventor Schrift. SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Lizenzä oder Urhäberrächtnotize vode verwändete Open Source Projekte si unde ufglistet. Design vo Basestudio.";
+/* format for explanations of the acknowledgements settings tab */
+"acknowledgements settings explanation format" = "<p>SnowHaze Version %@</p>D'Entwicklig vo SnowHaze isch dür Drittcode und Open Source Projekte starch erliechteret. Mir bedanke üs bi de Maintainer vo folgende Projekt fürd Benützig: AgileBits Inc. für 1PasswordExtension, phishtank.com fürd Phishing Datebank, Zetetic LLC für SQLCipher, d'EasyList Autore (easylist.github.io) fanboy, MonztA, Famlam u Khrin für d'EasyList, d'EasyPrivacy List und Fanboy's Social Blocking List und d'Polish TeX Users Group GUST für d'TeX Gyre Adventor Schrift. SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Lizenzä oder Urhäberrächtnotize vode verwändete Open Source Projekte si unde ufglistet. Design vo Basestudio.";
 
 /* explanations of the subscription settings tab */
 "subscription settings explanation" = "<p>Abonnier SnowHaze Premium um vom SnowHaze VPN, vor SnowHaze Suechmaschine und vo de hüfige Updates vode Siteliste z profitiere. Di erste 7 Täg si für Erstabonnänte gratis. Es git es monatlichs und jährlichs Abo wo sich sälber duet erneuere.</p><p><strong>Auto-Update Optione</strong> luegt automatisch ob d'Abooptione gänderet hei.</p><p><strong>Auto-Update Token</strong> aktualisiert dr Berächtigungstoken.</p>Dr <strong>aktuell Token Hash:</strong> isch e Code womit me cha z aktuelle Abo überprüefe.";
 
 /* explanations of the vpn settings tab */
-"vpn settings explanation" = "<p>E VPN (Virtual Private Network) isch e verschlüsselti Verbindig zumne Server. Dr gsamt Vercher zwüsche dim Grät und em Internet wird zersch zum VPN Server gsändet. Dr Empfänger gseht nume d'IP Adrässe vom VPN Server, aber nid dini richtigi IP Adrässe, was extrem wichtig isch zum Tracking verhindere.</p><p>E VPN schützt vor Man-in-the-Middle Agriffe, versteckt di Internetvercher vorem Internetabieter und verschlüsselt immer d'Verbindig zum Server.</p><p>Mir biete zwöi verschideni VPN Arte a, wo verschideni Protokoll verwände. Eis isch z'IPsec Protokoll und z andere isch OpenVPN. Dr VPN mit IPSec cha eifach innerhalb vor SnowHaze app gstüret wärde, während OpenVPN verlangt das du d OpenVPN Connect App verwändisch und jede Monat dini Profil aktualisiersch. Allerdings isch OpenVPN chli sicherer als IPSec. Das isch e chli Kompromiss zwüsche Benutzerfründlichkeit (IPSec) und Sicherheit (OpenVPN), wo mir dir chöi überla.</p><p>SnowHaze VPN logt absolut nüt und isch dr einzig VPN Dienst ohni identifizierendi Autorisierig.</p><p>Abonnier SnowHaze Premium zum dr VPN z'bruche und verbind di mitem Server wode wosch. Falls du dr VPN no nid installiert hesch, folg de Schritte im online Tutorial.</p><p><strong>Auto-Update Standortliste:</strong> Aktualisiert d'Serverstandorte.</p><strong>Ping azeige:</strong> Zeigt ah wie lang es brucht bis Date zum Server si und wider zrügg.";
+"vpn settings explanation" = "<p>Es VPN (Virtual Private Network) isch e verschlüsselti Verbindig zumne Server. Dr gsamt Vercher zwüsche dim Grät und em Internet wird zersch zum VPN Server gsändet. Dr Empfänger gseht nume d'IP Adrässe vom VPN Server, aber nid dini richtigi IP Adrässe, was extrem wichtig isch zum Tracking verhindere.</p><p>E VPN schützt vor Man-in-the-Middle Agriffe, versteckt di Internetvercher vorem Internetabieter und verschlüsselt immer d'Verbindig zum Server.</p><p>Mir biete zwöi verschideni VPN Arte a, wo verschideni Protokoll verwände. Eis isch z'IPsec Protokoll und z andere isch OpenVPN. Dr VPN mit IPSec cha eifach innerhalb vor SnowHaze app gstüret wärde, während OpenVPN verlangt das du d OpenVPN Connect App verwändisch und jede Monat dini Profil aktualisiersch. Allerdings isch OpenVPN chli sicherer als IPSec. Das isch e chli Kompromiss zwüsche Benutzerfründlichkeit (IPSec) und Sicherheit (OpenVPN), wo mir dir chöi überla.</p><p>SnowHaze VPN logt absolut nüt und isch dr einzig VPN Dienst ohni identifizierendi Autorisierig.</p><p>Abonnier SnowHaze Premium zum dr VPN z'bruche und verbind di mitem Server wode wosch. Falls du dr VPN no nid installiert hesch, folg de Schritte im online Tutorial.</p><p><strong>Sälbstrotierendi Logindate:</strong>Ändert d'Amäldeinformatione automatisch während du mitem Server verbunde bisch. Suscht ändere Logindate mit jedere Sitzig.</p><p><strong>Auto-Update Standortliste:</strong> Aktualisiert d'Serverstandorte.</p><strong>Ping azeige:</strong> Zeigt ah wie lang es brucht bis Date zum Server si und wider zrügg.";
 
 /* explanations of the passcode settings tab */
 "passcode settings explanation" = "<p>Du chasch SnowHaze mitemne Passwort schütze. Setz, ändere oder lösch dis Passwort.</p><p><strong>MODUS:</strong> Wähl us, ob nur z'Passwort oder o biometrischi ID (Touch ID oder Face ID) cha SnowHaze entsperre. D'Zit bis SnowHaze gsperrt wird cha igstellt wärde.</p><strong>FORMAT:</strong> Du chasch e 6-stellige Zahlecode (Bsp. 378291), e lange Zahlecode (Bsp. 36729829835) oder es alphanumerischs Passwort (Bsp. $7&9jK-55[*d_4) setze.";

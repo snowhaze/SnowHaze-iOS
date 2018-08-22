@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol BookmarkHistoryDelegate: class {
+protocol BookmarkHistoryDelegate: StatsViewDelegate {
 	var viewControllerForPreviewing: UIViewController { get }
 
 	func previewController(for url: URL) -> PagePreviewController?
@@ -42,14 +42,24 @@ class BookmarkHistoryView: UIView {
 	private var lefSwipeRecognize: UISwipeGestureRecognizer!
 	private var rightSwipeRecognize: UISwipeGestureRecognizer!
 
-	let dateFormatter = DateFormatter()
+	private let dateFormatter = DateFormatter()
 
 	private var showingHistoryInSingleMode = false
 
 	private var internalHistoryItems: [[HistoryItem]]?
 	private var internalBookmarks: [Bookmark]?
 
-	weak var delegate: BookmarkHistoryDelegate? // should be set before table-/collectionview cells are loaded and cannot be changed, as it is used for 3D touch previews
+	var hideStats = false {
+		didSet {
+			setStatsHidden()
+		}
+	}
+
+	weak var delegate: BookmarkHistoryDelegate? { // should be set before table-/collectionview cells are loaded and cannot be changed, as it is used for 3D touch previews
+		didSet {
+			reloadBookmarks()
+		}
+	}
 
 	var historyItems: [[HistoryItem]] {
 		if internalHistoryItems == nil {
@@ -65,13 +75,17 @@ class BookmarkHistoryView: UIView {
 		return internalBookmarks!
 	}
 
+	var constrainedHeight: Bool = false {
+		didSet {
+			setStatsHidden()
+		}
+	}
+
 	var constrainedWidth: Bool = false {
 		didSet {
 			if constrainedWidth {
 				bookmarkButton.setTitleColor(.darkTitle, for: [])
 				historyBytton.setTitleColor(.darkTitle, for: [])
-				UIFont.setSnowHazeFont(on: bookmarkButton)
-				UIFont.setSnowHazeFont(on: historyBytton)
 				let historyX: CGFloat
 				let bookmarkX: CGFloat
 				if showingHistoryInSingleMode {
@@ -232,6 +246,9 @@ private extension BookmarkHistoryView {
 		historyBytton.addTarget(self, action: #selector(showHistory(_:)), for: .touchUpInside)
 		historyBytton.setTitleColor(.white, for: .disabled)
 
+		UIFont.setSnowHazeFont(on: bookmarkButton)
+		UIFont.setSnowHazeFont(on: historyBytton)
+
 		let bgImage = #imageLiteral(resourceName: "Background")
 		let bookmarkBGView = UIImageView(image: bgImage)
 		let historyBGView = UIImageView(image: bgImage)
@@ -245,6 +262,8 @@ private extension BookmarkHistoryView {
 		layout.itemSize = CGSize(width: 100, height: 160)
 		layout.minimumLineSpacing = 30
 		layout.sectionInset = UIEdgeInsetsMake(20, 20, 20, 20)
+		layout.headerReferenceSize = CGSize(width: 100, height: 100)
+		bookmarkCollectionView.register(StatsView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "stats")
 
 		historyTableView.dataSource = self
 		historyTableView.delegate = self
@@ -277,6 +296,16 @@ private extension BookmarkHistoryView {
 		}
 
 		NotificationCenter.default.addObserver(self, selector: #selector(significantTimeChange(_:)), name: NSNotification.Name.UIApplicationSignificantTimeChange, object: nil)
+	}
+
+	private func setStatsHidden() {
+		if constrainedHeight || hideStats {
+			let layout = bookmarkCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
+			layout.headerReferenceSize = CGSize(width: 0, height: 0)
+		} else {
+			let layout = bookmarkCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
+			layout.headerReferenceSize = CGSize(width: 85, height: 85)
+		}
 	}
 }
 
@@ -339,6 +368,14 @@ extension BookmarkHistoryView: UITableViewDelegate {
 }
 
 extension BookmarkHistoryView: UICollectionViewDataSource {
+	func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+		let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "stats", for: indexPath)
+		if let stackView = view as? StatsView {
+			stackView.delegate = self.delegate
+		}
+		return view
+	}
+
 	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 		return bookmarks.count
 	}
@@ -416,11 +453,11 @@ extension BookmarkHistoryView {
 extension BookmarkHistoryView {
 	func reloadBookmarks() {
 		internalBookmarks = nil
+		_ = bookmarks
 		bookmarkCollectionView.reloadData()
 	}
 
 	func reloadBookmarks(new: [Int]?, deleted: [Int]?, movedFrom: [Int]?, movedTo: [Int]?) {
-		internalBookmarks = nil
 		let addIndexPaths = new?.map { IndexPath(item: $0, section: 0) } ?? []
 		let deleteIndexPaths = deleted?.map { IndexPath(item: $0, section: 0) } ?? []
 		let fromIndexPaths = movedFrom?.map { IndexPath(item: $0, section: 0) } ?? []
@@ -428,18 +465,25 @@ extension BookmarkHistoryView {
 		bookmarkCollectionView.performBatchUpdates({ () -> Void in
 			self.bookmarkCollectionView.insertItems(at: addIndexPaths)
 			self.bookmarkCollectionView.deleteItems(at: deleteIndexPaths)
-			for (index, fromPath) in fromIndexPaths.enumerated() {
-				let toPath = toIndexPaths[index]
+			for (fromPath, toPath) in zip(fromIndexPaths, toIndexPaths) {
 				self.bookmarkCollectionView.moveItem(at: fromPath, to: toPath)
 			}
+			internalBookmarks = nil
+			_ = bookmarks
 		}, completion: nil)
+	}
+}
+
+// MARK: Stats View
+extension BookmarkHistoryView {
+	func reloadStats() {
+		bookmarkCollectionView.reloadData()
 	}
 }
 
 extension BookmarkHistoryView: BookmarkCollectionViewCellDelegate {
 	func bookmarkCell(_ cell: BookmarkCollectionViewCell, didRequestDeleteBookmark bookmark: Bookmark) {
 		delegate?.remove(bookmark: bookmark)
-		internalBookmarks = nil
 	}
 
 	func bookmarkCell(_ cell: BookmarkCollectionViewCell, didRequestRefreshBookmark bookmark: Bookmark) {

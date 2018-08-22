@@ -8,6 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		6F681F99658C9DA34BDFBEB9 /* Pods_SnowHaze.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82D032C48D86357991AD5400 /* Pods_SnowHaze.framework */; };
+		842737ED212DC5E200B535BC /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 842737EC212DC5E200B535BC /* NotificationCenter.framework */; };
+		842737F0212DC5E200B535BC /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842737EF212DC5E200B535BC /* TodayViewController.swift */; };
+		842737F3212DC5E200B535BC /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 842737F1212DC5E200B535BC /* MainInterface.storyboard */; };
+		842737F7212DC5E200B535BC /* SnowHaze VPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 842737EB212DC5E200B535BC /* SnowHaze VPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		842737FE212DC68400B535BC /* Stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842737FC212DC68400B535BC /* Stats.swift */; };
+		842737FF212DC68400B535BC /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842737FD212DC68400B535BC /* StatsView.swift */; };
+		84273801212DC6D800B535BC /* IDNAMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84273800212DC6D800B535BC /* IDNAMapping.swift */; };
+		84273804212DEE6400B535BC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84273806212DEE6400B535BC /* Localizable.strings */; };
+		84273810212DF07600B535BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8427380F212DF07600B535BC /* Assets.xcassets */; };
 		84C7BE9620961AC6003C25B2 /* WorkerWebViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDC720961AB5003C25B2 /* WorkerWebViewManager.swift */; };
 		84C7BE9720961AC6003C25B2 /* InUseCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDC820961AB5003C25B2 /* InUseCounter.swift */; };
 		84C7BE9820961AC6003C25B2 /* HistorySuggestionSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDC920961AB5003C25B2 /* HistorySuggestionSource.swift */; };
@@ -177,9 +186,51 @@
 		84C7BF3D20961AC6003C25B2 /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE9520961AC6003C25B2 /* TabController.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		842737F5212DC5E200B535BC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84C7BDA520961A4D003C25B2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 842737EA212DC5E200B535BC;
+			remoteInfo = "SnowHaze VPN";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		842737FB212DC5E200B535BC /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				842737F7212DC5E200B535BC /* SnowHaze VPN.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		11CED1C90BB65D512E595090 /* Pods-SnowHaze.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SnowHaze.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SnowHaze/Pods-SnowHaze.debug.xcconfig"; sourceTree = "<group>"; };
 		82D032C48D86357991AD5400 /* Pods_SnowHaze.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SnowHaze.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		842737EB212DC5E200B535BC /* SnowHaze VPN.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "SnowHaze VPN.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		842737EC212DC5E200B535BC /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
+		842737EF212DC5E200B535BC /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
+		842737F2212DC5E200B535BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		842737F4212DC5E200B535BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		842737FC212DC68400B535BC /* Stats.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stats.swift; sourceTree = "<group>"; };
+		842737FD212DC68400B535BC /* StatsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		84273800212DC6D800B535BC /* IDNAMapping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IDNAMapping.swift; sourceTree = "<group>"; };
+		84273805212DEE6400B535BC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		84273807212DEE6A00B535BC /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
+		84273808212DEE6B00B535BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		84273809212DEE6C00B535BC /* gsw */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = gsw; path = gsw.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8427380A212DEE6D00B535BC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8427380B212DEE6E00B535BC /* en-GB */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-GB"; path = "en-GB.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		8427380C212DEE6F00B535BC /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8427380D212DEE7100B535BC /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8427380E212DEE7200B535BC /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8427380F212DF07600B535BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84C7BDAD20961A4D003C25B2 /* SnowHaze.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnowHaze.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84C7BDC620961AB5003C25B2 /* SnowHaze-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SnowHaze-Bridging-Header.h"; sourceTree = "<group>"; };
 		84C7BDC720961AB5003C25B2 /* WorkerWebViewManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkerWebViewManager.swift; sourceTree = "<group>"; };
@@ -358,6 +409,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		842737E8212DC5E200B535BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				842737ED212DC5E200B535BC /* NotificationCenter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		84C7BDAA20961A4D003C25B2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -373,14 +432,28 @@
 			isa = PBXGroup;
 			children = (
 				82D032C48D86357991AD5400 /* Pods_SnowHaze.framework */,
+				842737EC212DC5E200B535BC /* NotificationCenter.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		842737EE212DC5E200B535BC /* SnowHaze VPN */ = {
+			isa = PBXGroup;
+			children = (
+				842737EF212DC5E200B535BC /* TodayViewController.swift */,
+				8427380F212DF07600B535BC /* Assets.xcassets */,
+				84273806212DEE6400B535BC /* Localizable.strings */,
+				842737F1212DC5E200B535BC /* MainInterface.storyboard */,
+				842737F4212DC5E200B535BC /* Info.plist */,
+			);
+			path = "SnowHaze VPN";
 			sourceTree = "<group>";
 		};
 		84C7BDA420961A4D003C25B2 = {
 			isa = PBXGroup;
 			children = (
 				84C7BDAF20961A4D003C25B2 /* SnowHaze */,
+				842737EE212DC5E200B535BC /* SnowHaze VPN */,
 				84C7BDAE20961A4D003C25B2 /* Products */,
 				EF65EBC559173B0D8E4753E8 /* Pods */,
 				378B38FD533A7FEF6B3483F3 /* Frameworks */,
@@ -391,6 +464,7 @@
 			isa = PBXGroup;
 			children = (
 				84C7BDAD20961A4D003C25B2 /* SnowHaze.app */,
+				842737EB212DC5E200B535BC /* SnowHaze VPN.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -456,6 +530,7 @@
 				84C7BE2420961ABB003C25B2 /* HistoryTableViewSectionHeader.swift */,
 				84C7BE4C20961ABF003C25B2 /* HTMLParser.swift */,
 				84C7BE6120961AC1003C25B2 /* HTTPSSettingsManager.swift */,
+				84273800212DC6D800B535BC /* IDNAMapping.swift */,
 				84C7BE4B20961ABF003C25B2 /* Info.plist */,
 				84C7BE7A20961AC4003C25B2 /* InstallTutorialViewController.swift */,
 				84C7BDC820961AB5003C25B2 /* InUseCounter.swift */,
@@ -520,6 +595,8 @@
 				84C7BE1D20961ABB003C25B2 /* SnowHaze.entitlements */,
 				84C7BE4220961ABE003C25B2 /* SplitMergeController.swift */,
 				84C7BE1B20961ABA003C25B2 /* StartReaderActivity.swift */,
+				842737FC212DC68400B535BC /* Stats.swift */,
+				842737FD212DC68400B535BC /* StatsView.swift */,
 				84C7BE2C20961ABC003C25B2 /* StringURLHelpers.swift */,
 				84C7BDE620961AB6003C25B2 /* SublayerResizingView.swift */,
 				84C7BE3A20961ABD003C25B2 /* SubscriptionManager.swift */,
@@ -707,6 +784,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		842737EA212DC5E200B535BC /* SnowHaze VPN */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 842737FA212DC5E200B535BC /* Build configuration list for PBXNativeTarget "SnowHaze VPN" */;
+			buildPhases = (
+				842737E7212DC5E200B535BC /* Sources */,
+				842737E8212DC5E200B535BC /* Frameworks */,
+				842737E9212DC5E200B535BC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SnowHaze VPN";
+			productName = "SnowHaze VPN";
+			productReference = 842737EB212DC5E200B535BC /* SnowHaze VPN.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		84C7BDAC20961A4D003C25B2 /* SnowHaze */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84C7BDC320961A4E003C25B2 /* Build configuration list for PBXNativeTarget "SnowHaze" */;
@@ -716,10 +810,12 @@
 				84C7BDAA20961A4D003C25B2 /* Frameworks */,
 				84C7BDAB20961A4D003C25B2 /* Resources */,
 				F0CD141CDFABA6D96B5B30E9 /* [CP] Embed Pods Frameworks */,
+				842737FB212DC5E200B535BC /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				842737F6212DC5E200B535BC /* PBXTargetDependency */,
 			);
 			name = SnowHaze;
 			productName = SnowHaze;
@@ -732,9 +828,12 @@
 		84C7BDA520961A4D003C25B2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0930;
+				LastSwiftUpdateCheck = 0940;
 				LastUpgradeCheck = 0930;
 				TargetAttributes = {
+					842737EA212DC5E200B535BC = {
+						CreatedOnToolsVersion = 9.4.1;
+					};
 					84C7BDAC20961A4D003C25B2 = {
 						CreatedOnToolsVersion = 9.3;
 						LastSwiftMigration = 0930;
@@ -763,11 +862,22 @@
 			projectRoot = "";
 			targets = (
 				84C7BDAC20961A4D003C25B2 /* SnowHaze */,
+				842737EA212DC5E200B535BC /* SnowHaze VPN */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		842737E9212DC5E200B535BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				842737F3212DC5E200B535BC /* MainInterface.storyboard in Resources */,
+				84273810212DF07600B535BC /* Assets.xcassets in Resources */,
+				84273804212DEE6400B535BC /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		84C7BDAB20961A4D003C25B2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -858,6 +968,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		842737E7212DC5E200B535BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				842737F0212DC5E200B535BC /* TodayViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		84C7BDA920961A4D003C25B2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -892,6 +1010,7 @@
 				84C7BE9920961AC6003C25B2 /* TabViewController.swift in Sources */,
 				84C7BF2920961AC6003C25B2 /* Bookmark.swift in Sources */,
 				84C7BF2620961AC6003C25B2 /* TrackingSettingsManager.swift in Sources */,
+				84273801212DC6D800B535BC /* IDNAMapping.swift in Sources */,
 				84C7BEEC20961AC6003C25B2 /* PagePreviewController.swift in Sources */,
 				84C7BEA820961AC6003C25B2 /* ScanCodeActivity.swift in Sources */,
 				84C7BEB820961AC6003C25B2 /* HistorySettingsManager.swift in Sources */,
@@ -905,6 +1024,7 @@
 				84C7BE9620961AC6003C25B2 /* WorkerWebViewManager.swift in Sources */,
 				84C7BF3D20961AC6003C25B2 /* TabController.swift in Sources */,
 				84C7BECB20961AC6003C25B2 /* Regex.swift in Sources */,
+				842737FE212DC68400B535BC /* Stats.swift in Sources */,
 				84C7BEF620961AC6003C25B2 /* SearchEngineSettingsManager.swift in Sources */,
 				84C7BF3320961AC6003C25B2 /* SettingsDetailViewController.swift in Sources */,
 				84C7BF0C20961AC6003C25B2 /* BookmarkRenameBar.swift in Sources */,
@@ -987,6 +1107,7 @@
 				84C7BF2120961AC6003C25B2 /* CaptureSessionManager.swift in Sources */,
 				84C7BEBB20961AC6003C25B2 /* TextInputBar.swift in Sources */,
 				84C7BED820961AC6003C25B2 /* DefaultsSettingsManager.swift in Sources */,
+				842737FF212DC68400B535BC /* StatsView.swift in Sources */,
 				84C7BF0620961AC6003C25B2 /* FaviconFetcher.swift in Sources */,
 				84C7BF2220961AC6003C25B2 /* ContentBlockerManager.swift in Sources */,
 				84C7BEE020961AC6003C25B2 /* JSGenerator.swift in Sources */,
@@ -995,7 +1116,39 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		842737F6212DC5E200B535BC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 842737EA212DC5E200B535BC /* SnowHaze VPN */;
+			targetProxy = 842737F5212DC5E200B535BC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
+		842737F1212DC5E200B535BC /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				842737F2212DC5E200B535BC /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+		84273806212DEE6400B535BC /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				84273805212DEE6400B535BC /* en */,
+				84273807212DEE6A00B535BC /* pt */,
+				84273808212DEE6B00B535BC /* ja */,
+				84273809212DEE6C00B535BC /* gsw */,
+				8427380A212DEE6D00B535BC /* de */,
+				8427380B212DEE6E00B535BC /* en-GB */,
+				8427380C212DEE6F00B535BC /* fr */,
+				8427380D212DEE7100B535BC /* it */,
+				8427380E212DEE7200B535BC /* es */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		84C7BDD320961AB6003C25B2 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1159,6 +1312,44 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		842737F8212DC5E200B535BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		842737F9212DC5E200B535BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		84C7BDC120961A4E003C25B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1277,6 +1468,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 11CED1C90BB65D512E595090 /* Pods-SnowHaze.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1286,6 +1478,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1298,6 +1491,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A332F0A3DD107E44A936AAE6 /* Pods-SnowHaze.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1307,6 +1501,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
@@ -1317,6 +1512,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		842737FA212DC5E200B535BC /* Build configuration list for PBXNativeTarget "SnowHaze VPN" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				842737F8212DC5E200B535BC /* Debug */,
+				842737F9212DC5E200B535BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		84C7BDA820961A4D003C25B2 /* Build configuration list for PBXProject "SnowHaze" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

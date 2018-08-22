@@ -46,13 +46,13 @@ The following steps are needed to build SnowHaze:
   * Open the terminal and `cd` into the respective directory
   * Run  `pod install`
   * In Xcode, open the file SnowHaze.xcworkspace
-  * Set an arbitrary and *unique* ["Bundle Identifier"](https://cocoacasts.com/what-are-app-ids-and-bundle-identifiers/)
+  * For both SnowHaze App and the SnowHaze VPN Widget, set an arbitrary and *unique* ["Bundle Identifier"](https://cocoacasts.com/what-are-app-ids-and-bundle-identifiers/)
   * Build and run SnowHaze in the simulator
 
 In case you want to deploy SnowHaze to a real device:  
 
   * Use the same Apple ID on both devices (build machine and iOS device)
-  * Choose a [team](https://stackoverflow.com/questions/39524148/requires-a-development-team-select-a-development-team-in-the-project-editor-cod) (e.g. your Apple ID)
+  * For both SnowHaze App and the SnowHaze VPN Widget, choose a [team](https://stackoverflow.com/questions/39524148/requires-a-development-team-select-a-development-team-in-the-project-editor-cod) (e.g. your Apple ID)
   * Build and run SnowHaze on your device
 
 

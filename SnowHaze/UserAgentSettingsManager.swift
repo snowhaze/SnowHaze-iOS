@@ -19,7 +19,7 @@ class UserAgentSettingsManager: SettingsViewManager {
 
 	override func cellForRow(atIndexPath indexPath: IndexPath, tableView: UITableView) -> UITableViewCell {
 		let cell = getCell(for: tableView)
-		let agent = UserAgent(type: UserAgentType(rawValue: indexPath.row)!)
+		let agent = UserAgent(type: UserAgent.mobileAgents[indexPath.row])
 		let agents = UserAgent.decode(settings.value(for: userAgentsKey).text!)
 		cell.textLabel?.text = agent.displayName
 		let selected = agents.contains(agent.type)
@@ -28,13 +28,13 @@ class UserAgentSettingsManager: SettingsViewManager {
 	}
 
 	override func numberOfRows(inSection section: Int) -> Int {
-		return UserAgent.agentCount
+		return UserAgent.mobileAgents.count
 	}
 
 	override func didSelectRow(atIndexPath indexPath: IndexPath, tableView: UITableView) {
 		tableView.deselectRow(at: indexPath, animated: false)
 		var agents = UserAgent.decode(settings.value(for: userAgentsKey).text!)
-		let toggledAgent = UserAgentType(rawValue: indexPath.row)!
+		let toggledAgent = UserAgent.mobileAgents[indexPath.row]
 		let wasSelected = agents.contains(toggledAgent)
 		guard !(agents.count == 1 && wasSelected) else {
 			return

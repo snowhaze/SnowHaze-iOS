@@ -17,18 +17,18 @@ extension UIFont {
 		textField.font = snowHazeFont(size: size)
 	}
 
-	static func setSnowHazeFont(on textView: UITextView) {
+	static func setSnowHazeFont(on textView: UITextView, scale: CGFloat = 1) {
 		let size = textView.font?.pointSize ?? 12
-		textView.font = snowHazeFont(size: size)
+		textView.font = snowHazeFont(size: size * scale)
 	}
 
-	static func setSnowHazeFont(on label: UILabel) {
+	static func setSnowHazeFont(on label: UILabel, scale: CGFloat = 1) {
 		let size = label.font!.pointSize
-		label.font = snowHazeFont(size: size)
+		label.font = snowHazeFont(size: size * scale)
 	}
 
-	static func setSnowHazeFont(on button: UIButton) {
-		setSnowHazeFont(on: button.titleLabel!)
+	static func setSnowHazeFont(on button: UIButton, scale: CGFloat = 1) {
+		setSnowHazeFont(on: button.titleLabel!, scale: scale)
 	}
 
 	static func snowHazeFont(size: CGFloat) -> UIFont {

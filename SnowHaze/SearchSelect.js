@@ -15,7 +15,7 @@
 		var height = window.innerHeight;
 		var width = window.innerWidth;
 		var x = midX - width / 2 + window.scrollX;
-		var y = midY - height / 3 + window.scrollY;
+		var y = midY - (height - 200) / 3 + window.scrollY;
 		window.scroll(x, y);
 	}
 })();

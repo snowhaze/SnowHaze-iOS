@@ -48,6 +48,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				case .hulbee:		self.hulbeeSuggestion(for: base, callback: callback)
 				case .duckDuckGo:	self.duckDuckGoSuggestion(for: base, callback: callback)
 				case .snowhaze:		self.snowhazeSuggestion(for: base, callback: callback)
+				case .findx:		self.findxSuggestion(for: base, callback: callback)
 				case .none:			return
 			}
 		}
@@ -406,6 +407,43 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				if !suggestions.isEmpty {
 					callback(suggestions, "snowhaze")
 				}
+			}
+		}
+	}
+
+	func findxSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
+			return
+		}
+		guard let url = URL(string: "https://www.findx.com/api/web-search/suggestions/?q=" + queryString) else {
+			return
+		}
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+			guard let array = json as? [[String: Any]] else {
+				return
+			}
+			let phrases = array.prefix(maxCount)
+			var suggestions = [Suggestion]()
+			var maxScore = 0.0
+			for phrase in phrases {
+				guard let title = phrase["phrase"] as? String else {
+					return
+				}
+				guard let score = phrase["score"] as? Double else {
+					return
+				}
+				guard let url = self.engine.url(for: title) else {
+					return
+				}
+				maxScore = max(maxScore, score)
+				let subtitle = NSLocalizedString("findx search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from findx")
+				let image = #imageLiteral(resourceName: "findx")
+				let priority = 60 * score / maxScore
+				let suggestion = Suggestion(title: title, subtitle: subtitle, url: url, image: image, priority: priority)
+				suggestions.append(suggestion)
+			}
+			if !suggestions.isEmpty {
+				callback(suggestions, "findx")
 			}
 		}
 	}

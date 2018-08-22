@@ -26,7 +26,7 @@ enum DomainListType {
 			case .ads:						return "ad"
 			case .httpsSites:				return "https"
 			case .privateSites:				return "private"
-			case .nonPrivatePopularSites:	return "(SELECT * FROM popular WHERE domain NOT IN private AND 'www.' || domain NOT IN private)"
+			case .nonPrivatePopularSites:	return "(SELECT * FROM popular WHERE domain NOT IN private AND (substr(domain, 1, 4) != 'www.' OR substr(domain, 5) NOT IN private))"
 			case .popularSites:				return "popular"
 			case .blogspot:					return "blogspot"
 			case .danger:					return "danger"
@@ -42,8 +42,8 @@ class DomainList {
 	static let dbFileChangedNotification = Notification.Name(rawValue: "DomainListDBFileChangedNotification")
 
 	static let dbLocation: String = {
-		let appSupport = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)
-		return (appSupport.first! as NSString).appendingPathComponent("lists.db")
+		let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)
+		return (cachePath.first! as NSString).appendingPathComponent("lists.db")
 	}()
 
 	static let dbKey = Data(hex: "0000000000000000000000000000000000000000000000000000000000000000")!
@@ -54,8 +54,16 @@ class DomainList {
 			let updatedDB = SQLCipher(path: DomainList.dbLocation, key: DomainList.dbKey, flags: .readonly)
 			let query = "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name IN " +
 				"(VALUES ('tracking'), ('ad'), ('https'), ('private'), ('popular'), ('blogspot'), ('danger'), ('danger_hash'), ('content_blocker'), ('parameter_stripping'))"
-			let tblCnt = try? updatedDB?.execute(query)[0].integer
-			let ok = (tblCnt ?? 0) ?? 0 == 10
+			let tblCnt = try? updatedDB?.execute(query)[0].integer ?? 0
+			let clQuery = "SELECT EXISTS (SELECT * FROM content_blocker WHERE id = ?)"
+			let clOK = try? updatedDB?.execute(clQuery, with: [.text(BlockerID.adBlocker1)])[0].boolValue ?? false
+			let hasTrackerCount: Bool
+			if let _ = try? updatedDB?.execute("SELECT trackers FROM popular LIMIT 0") {
+				hasTrackerCount = true
+			} else {
+				hasTrackerCount = false
+			}
+			let ok = ((tblCnt ?? 0) == 10) && (clOK ?? false) && hasTrackerCount
 			let bundlePath = Bundle.main.path(forResource: "lists", ofType: "db")!
 			let db = ok ? updatedDB! : SQLCipher(path: bundlePath, key: DomainList.dbKey, flags: .readonly)!
 			try! db.execute("PRAGMA query_only=true")
@@ -93,6 +101,22 @@ class DomainList {
 		let query = "SELECT EXISTS (SELECT * FROM \(type.table) WHERE domain = ?)"
 		let result = try! db.execute(query, with: [.text(domain)])
 		return result.first![0]!.boolValue
+	}
+
+	func trackerCount(for domain: String) -> Int64 {
+		switch type {
+			case .nonPrivatePopularSites, .popularSites, .empty: break
+			default: fatalError("tracker count is only supported for popularSites, allPopularSites and empty domain list types")
+		}
+		let components = domain.components(separatedBy: ".")
+		var bindings = [SQLite.Data.text("")]
+		for i in 0 ..< components.count {
+			let suffix = components[i ..< components.count].joined(separator: ".")
+			bindings.append(.text(suffix))
+		}
+		let query = [String](repeating: "(?)", count: bindings.count).joined(separator: ",")
+		let result = try! db.execute("SELECT trackers FROM \(type.table) WHERE domain IN (VALUES \(query)) AND trackers IS NOT NULL ORDER BY length(domain) DESC LIMIT 1", with: bindings)
+		return result.first?.integerValue! ?? 20
 	}
 
 	func search(top: Int64, matching: String) -> [(Int64, String)] {

@@ -234,7 +234,7 @@ class Pinger: NSObject, SimplePingDelegate {
 		}
 	}
 
-	func simplePing(_ pinger: SimplePing, didFailToSendPacket packet: Data, sequenceNumber: UInt16, error: Error) {
+	func simplePing(_ pinger: SimplePing, didFailToSendPacket packet: Data?, sequenceNumber: UInt16, error: Error) {
 		queue.async { [weak self] in
 			if let me = self {
 				me.updateReport(seq: sequenceNumber)

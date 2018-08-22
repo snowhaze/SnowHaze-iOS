@@ -276,7 +276,7 @@ class InstallTutorialViewController : TutorialViewController {
 
 	@objc private func showSubscription() {
 		close {
-			MainViewController.controller.showSubscription()
+			MainViewController.controller.openSettings(.subscription)
 		}
 	}
 

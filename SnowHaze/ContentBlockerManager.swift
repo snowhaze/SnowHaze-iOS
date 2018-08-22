@@ -11,7 +11,10 @@ import Foundation
 private let compiledContentBlockerVersionKeyPrefix = "ch.illotros.snowhaze.contenblockermanager.contentblocker.compiled.version."
 
 class BlockerID {
-	static let adBlocker = "ad-blocker"
+	fileprivate static let deprecatedAdBlocker = "ad-blocker"
+
+	static let adBlocker1 = "ad-blocker-1-2"
+	static let adBlocker2 = "ad-blocker-2-2"
 	static let adHider = "ad-hider"
 	static let trackingScriptsBlocker = "tracking-scripts-blocker"
 	static let socialMediaWidgetsBlocker = "social-media-widgets-blocker"
@@ -35,7 +38,8 @@ class BlockerID {
 	static let thirdPartyScriptsContentTypeBlocker = "third-party-script-content-type-blocker"
 
 	static let allIDs = [
-		adBlocker,
+		adBlocker1,
+		adBlocker2,
 		adHider,
 		trackingScriptsBlocker,
 		socialMediaWidgetsBlocker,
@@ -121,6 +125,29 @@ class ContentBlockerManager {
 		}
 		isLoading = true
 		BlockerID.allIDs.forEach { load(rules: $0) }
+		clear(for: BlockerID.deprecatedAdBlocker)
+	}
+
+	private func clear(for id: String) {
+		if let _ = compiledVersion(for: id) {
+			WKContentRuleListStore.default().lookUpContentRuleList(forIdentifier: id) { rules, error in
+				print(error as Any)
+				if let _ = rules {
+					WKContentRuleListStore.default().removeContentRuleList(forIdentifier: id) { erron in
+						guard error == nil else {
+							return
+						}
+						DispatchQueue.main.async {
+							DataStore.shared.delete(compiledContentBlockerVersionKeyPrefix + id)
+						}
+					}
+				} else if let error = error as NSError?, error.code == 7, error.domain == "WKErrorDomain" {
+					DispatchQueue.main.async {
+						DataStore.shared.delete(compiledContentBlockerVersionKeyPrefix + id)
+					}
+				}
+			}
+		}
 	}
 
 	private func load(rules id: String) {

@@ -47,6 +47,18 @@
 /* title for history section */
 "history view title" = "Verlauf";
 
+/* name of the https upgrades usage stat */
+"https upgrades usage stats name" = "HTTPS\nUpgrades";
+
+/* name of the blocked trackers usage stat */
+"blocked trackers usage stats name" = "Tracker\nblockiert";
+
+/* name of the ephemeral cookies usage stat */
+"ephemeral cookies usage stats name" = "Gelöschte\nCookies";
+
+/* name of the vpn protected loads usage stat */
+"vpn protected loads usage stats name" = "VPN\nSchutz";
+
 /* Used to confirm message */
 "js alert panel confirmation button title" = "OK";
 
@@ -293,11 +305,20 @@
 /* title of settings for tab masking */
 "tab masking settings title" = "TABS MASKIEREN";
 
+/* title of settings for usage stats */
+"usage stats settings title" = "STATISTIK";
+
 /* title of setting for the duration during which closing a tab can be undone */
 "allow tab closing undo duration settings title" = "Zulassen";
 
 /* title of setting to allow tab closing to be undone for all tabs */
 "allow tab closing undo for all tabs settings title" = "Zulassen für alle Tabs";
+
+/* title of setting to keep usage stats */
+"keep usage stats settings title" = "Statistiken speichern";
+
+/* title of button to reset usage stats */
+"reset usage stats button title" = "Statistiken löschen";
 
 /* string used to indicate that tab closing cannot be undone */
 "tab closing undo time limit 0 seconds time" = "0 Sek";
@@ -389,6 +410,15 @@
 /* string displayed to user to identify android opera user agent */
 "android opera user agent display name" = "Opera Android";
 
+/* string displayed to user to identify macos safari user agent */
+"safari macos user agent display name" = "Safari macOS";
+
+/* string displayed to user to identify windows chrome user agent */
+"chrome windows user agent display name" = "Chrome Windows";
+
+/* string displayed to user to identify linux firefox user agent */
+"firefox linux user agent display name" = "Firefox Linux";
+
 /* title of button to reset global settings to defaults */
 "reset global settings button title" = "Einstellungen zurücksetzen";
 
@@ -464,6 +494,9 @@
 /* name of snowhaze search engine to be displayed to user */
 "snowhaze search engine display name" = "SnowHaze";
 
+/* name of findx search engine to be displayed to user */
+"findx search engine display name" = "Findx";
+
 /* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
 "snowhaze search engine missing subscription accessibility label" = "SnowHaze - Benötigt ein SnowHaze Premium Abonnement";
 
@@ -484,6 +517,9 @@
 
 /* title of button to rate snowhaze on the app store */
 "rate snowhaze button title" = "SnowHaze bewerten";
+
+/* title of button to show the snowhaze source */
+"show snowhaze source button title" = "Quellcode";
 
 /* text use to prefill 'share' messagers */
 "snowhaze share text" = "Hallo!\nSnowHaze ist ein genialer Browser, der Deine persönlichen Daten vollständig schützt.\nSchau Dir die Webseite an: snowhaze.com\nOder lade die App einfach aus dem App Store herunter; snowhaze.com/download.";
@@ -538,6 +574,9 @@
 
 /* subtitle for autocomplete search suggestions from snowhaze search */
 "snowhaze search search suggestion subtitle" = "SnowHaze Suche";
+
+/* subtitle for autocomplete search suggestions from findx */
+"findx search suggestion subtitle" = "Findx Suche";
 
 /* title of the activity to find some text on page */
 "find on page activity title" = "Seite durchsuchen";
@@ -799,6 +838,9 @@
 
 /* title of setting to display the ping status of the vpn servers */
 "show vpn server ping status settings title" = "Ping anzeigen";
+
+/* title of setting to autorotate ipsec credentials */
+"autorotate ipsec credentials settings title" = "Selbstrotierende Logindaten";
 
 /* title of button to switch from vpn settings to subscription settings */
 "show subscription status button title" = "Abonnementstatus anzeigen";
@@ -1244,6 +1286,9 @@
 /* title of settings in tab settings to enable / disable search suggestions */
 "show search suggestions tab settings title" = "Suchvorschläge";
 
+/* title of tab setting to use desktop user agents */
+"desktop user agent tab setting title" = "Desktop User Agent";
+
 /* displayed instead of domain name if the current page is an errorpage in page settings */
 "page settings errorpage description" = "Fehlerseite";
 
@@ -1305,7 +1350,7 @@
 "error page auth default title" = "Berechtigungsfehler";
 
 /* default auth error message */
-"error page auth error default message" = "Du hast keinen gültigen Authorizierungstoken. Du kannst diesen in den Abonnementeinstellungen aktualisieren.";
+"error page auth error default message" = "Du hast keinen gültigen Authorizierungstoken. Du kannst diesen in den Abonnementeinstellungen aktualisieren. Löse ein neues Abonnement in den SnowHaze Einstellungen unter Abonnemente.";
 
 /* default auth error information */
 "error page auth error default information" = "Es kann sein, dass du nach dem Abonnieren keinen Token gekriegt hast. Sobald du den Token kriegst wird die Seite neu laden.";
@@ -1434,7 +1479,7 @@
 "update tutorial message from developers content" = "Hallo,\n\nIn diesem Moment hältst du SnowHaze 2.5 in deinen Händen. Wir möchten diesen Moment nutzen, um uns bei dir zu bedanken und dich über unsere zukünftigen Projekte zu informieren.\n\nEs ist schon eine Weile her, seit die erste Version von SnowHaze im Juli 2016 veröffentlicht wurde. Dies ist bereits Version 2.5 und unglaublich viel hat sich geändert. Davon sind unsere ultra-private Suchmaschine und unser eigener no-log VPN nur zwei Beispiele.\n\nWir sind sehr dankbar, dass wir dich mit an Bord haben auf unserer Mission, das Internet zu einem sicheren und privaten Ort zu machen. Es ist nur dank unseren treuen Usern, dass wir die Dinge machen können, die wir lieben.\n\nWir möchten möglichst vielen Leuten helfen ihre persönlichen Daten zu schützen. Deshalb stehen wir jede Woche mit hunderten Usern in Kontakt, um fragen zu beantworten und unser Wissen zu teilen.\n\nDeshalb sind wir auch besessen davon weitere und bessere Produkte und Dienstleistungen zu kreieren.\n\nDeshalb ist SnowHaze jetzt vollständig open source.\n\nDeshalb ist dein Feedback so wichtig für uns.\n\nUnd deshalb werden wir in diesem Jahr SnowHaze auf ein neues Level heben. Das beginnt mit der Entwicklung von SnowHaze für Android, einem VPN Client für macOS und viel Weiterem! Weitere Informationen werden folgen.\n\nEs ist für uns äusserst wichtig in Kontakt mit unseren Usern zu bleiben. Ihr seid unsere Motivation und Inspiration, um SnowHaze voran zu treiben. Wenn du SnowHaze magst, dann erzähle deiner Familie  und deinen Freunden von SnowHaze. Je mehr Leute wir sind, desto lauter ist unsere Stimme nach mehr Privatsphäre und Sicherheit im Internet. Falls du irgendetwas nicht magst, dann sende uns eine Mail. Wir haben immer eine offene Inbox!\n\nDanke, dass du dabei bist!\n\nJan, Yvan, Dominique, Andris, Pascal\nDie SnowHaze Gründer\n\nP.S. Diese Nachricht ist hard-coded. Es war also keine Verbindung zu irgendeinem Server nötig, um dir diese Nachricht anzuzeigen. Wir sorgen uns wirklich um deine Privatsphäre :)\n\n";
 
 /* explanations of the application settings */
-"application settings explanation" = "<p>Hier findest du allgemeine SnowHaze Einstellungen.</p><p><strong>Lokale Suchvorschläge:</strong> Du kannst auswählen, ob Seiten aus einer lokalen Liste vorgeschlagen werden sollen während du eine Suche eingibst.</p><p><strong>Private Seiten vorschlagen:</strong> Wenn diese Einstellung eingeschaltet ist, schlägt SnowHaze auch Private Seiten vor, wenn eine Suche eingetippt wird. Wenn diese Einstellung ausgeschaltet ist, werden weiterhin Seiten vorgeschlagen, die nicht Private Seiten sind. Um ein versehentliches Aufrufen einer Privaten Seite zu verhindern und aus Jugendschutzgründen, empfiehlt es sich diese Funktion auszuschalten.</p><p><strong>Auto-Update Seitenlisten / Nur WiFi:</strong> Wähle aus, ob verschiedene Webseitenlisten (Trackingseiten, Werbeseiten, Phishingseiten, schädliche Seiten) automatisch aktualisiert werden können und ob dies nur über Wi-Fi geschehen soll. Mit SnowHaze Premium aktualisieren die Seitenlisten häufig, sonst mit jeder neuen SnowHaze Version. Auto-Update ausschalten löscht die Listen vom Gerät.</p><p><strong>Tab wiederherstellen:</strong> Wähle die Zeitspanne aus, in der es möglich ist, geschlossene Tabs durch Schütteln des Geräts wiederherzustellen. Zusätzlich kannst du auswählen, ob alle Tabs, das heisst auch Private Tabs, wiederhergestellt werden können.</p><strong>Tab Maskieren:</strong> Der Inhalt eines Tabs kann maskiert werden, wenn du nicht im Tab bist. Wähle aus für welche Tabs dies gelten soll.";
+"application settings explanation" = "<p>Hier findest du allgemeine SnowHaze Einstellungen.</p><p><strong>Lokale Suchvorschläge:</strong> Du kannst auswählen, ob Seiten aus einer lokalen Liste vorgeschlagen werden sollen während du eine Suche eingibst.</p><p><strong>Private Seiten vorschlagen:</strong> Wenn diese Einstellung eingeschaltet ist, schlägt SnowHaze auch Private Seiten vor, wenn eine Suche eingetippt wird. Wenn diese Einstellung ausgeschaltet ist, werden weiterhin Seiten vorgeschlagen, die nicht Private Seiten sind. Um ein versehentliches Aufrufen einer Privaten Seite zu verhindern und aus Jugendschutzgründen, empfiehlt es sich diese Funktion auszuschalten.</p><p><strong>Auto-Update Seitenlisten / Nur WiFi:</strong> Wähle aus, ob verschiedene Webseitenlisten (Trackingseiten, Werbeseiten, Phishingseiten, schädliche Seiten) automatisch aktualisiert werden können und ob dies nur über Wi-Fi geschehen soll. Mit SnowHaze Premium aktualisieren die Seitenlisten häufig, sonst mit jeder neuen SnowHaze Version. Auto-Update ausschalten löscht die Listen vom Gerät.</p><p><strong>Tab wiederherstellen:</strong> Wähle die Zeitspanne aus, in der es möglich ist, geschlossene Tabs durch Schütteln des Geräts wiederherzustellen. Zusätzlich kannst du auswählen, ob alle Tabs, das heisst auch Private Tabs, wiederhergestellt werden können.</p><p><strong>Tab Maskieren:</strong> Der Inhalt eines Tabs kann maskiert werden, wenn du nicht im Tab bist. Wähle aus für welche Tabs dies gelten soll.</p><p><strong>Statistiken:</strong> Zeigt Statistiken im Lesezeichenbereich der App an.</p><p>HTTPS Upgrade: Anzahl der Seiten, die mit HTTPS anstelle von HTTP geladen wurden, dank einer SnowHaze spezifischen Funktion.</p><p>Tracker blockiert: Anzahl der blockierten Tracker</p><p>Gelöschte Cookies: Anzahl der gelöschten Cookies</p>VPN Schutz: Anzahl der geladenen Seiten während der Verbindung mit SnowHaze VPN";
 
 /* explanations of the javascript settings */
 "javascript settings explanation" = "<p>Wähle aus, wie JavaScript Inhalte geladen werden sollen. JavaScript ist eine Programmiersprache, die von vielen Webseiten benutzt und von den meisten Browsern unterstützt wird. JavaScript ermöglicht auf einer Seite vielfältige Darstellungen und Funktionen zu nutzen. JavaScript ist für die dynamischen Inhalte einer Webseite verantwortlich.</p><p><strong>JavaScript zulassen:</strong> Diese Einstellung erlaubt JavaScript Inhalte zu laden und darzustellen. Es empfiehlt sich, diese Einstellung auf nicht vertrauenswürdigen Seiten für deinen Datenschutz auszuschalten. <u>Bemerkung:</u> Einige Seiten können ohne JavaScript nicht richtig geladen werden.</p><p><strong>Application Scripts zulassen:</strong> Application Scripts sind JavaScripts, die von SnowHaze erzeugt werden, um nützliche Funktionen wie Trackingschutz zu nutzen.</p><strong>Passwortmanager:</strong> Erlaubt die Einbindung von Passwortmanager.";
@@ -1478,14 +1523,14 @@
 /* explanations of the content type blockers settings */
 "content type blockers settings explanation" = "SnowHaze kann verschiedene Inhalte auf Webseiten blockieren. Wähle aus, welche Inhalte blockiert werden sollten. Wenn Inhalte blockiert werden, kann es sein, dass Seiten nicht richtig geladen werden.";
 
-/* explanations of the acknowledgements settings tab */
-"acknowledgements settings explanation" = "Die Entwicklung von SnowHaze wurde durch Drittcode und Open Source Projekten stark erleichtert. Wir bedanken uns bei den Maintainern der folgenden Projekten für die Benützung; AgileBits Inc. für 1PasswordExtension, phishtank.com für ihre Phishing Datenbank, Zetetic LLC für SQLCipher, die EasyList Autoren (easylist.github.io) fanboy, MonztA, Famlam und Khrin für die EasyList, die EasyPrivacy List und Fanboy's Social Blocking List und die Polish TeX Users Group GUST für die TeX Gyre Adventor Schrift. SnowHaze verwendet die Safebrowsing API von Google, um Meldungen zu generieren auf Seiten, die möglicherweise Phishingseiten sind oder Malware und unerwünschte Software enthalten. Die Datenbank ist lokal auf dem Gerät gespeichert und wird von einem SnowHaze Server aktualisiert. Dein Gerät wird dafür NIE direkt mit einem Google Server verbinden. Beim Aktualisieren der Datenbank werden KEINE Daten über dein Suchverhalten gesendet. Lizenzen oder Urheberechtnotizen der verwendeten Open Source Projekten sind unten aufgelistet. Design von Basestudio.";
+/* format for explanations of the acknowledgements settings tab */
+"acknowledgements settings explanation format" = "<p>SnowHaze Version %@</p>Die Entwicklung von SnowHaze wurde durch Drittcode und Open Source Projekten stark erleichtert. Wir bedanken uns bei den Maintainern der folgenden Projekten für die Benützung; AgileBits Inc. für 1PasswordExtension, phishtank.com für ihre Phishing Datenbank, Zetetic LLC für SQLCipher, die EasyList Autoren (easylist.github.io) fanboy, MonztA, Famlam und Khrin für die EasyList, die EasyPrivacy List und Fanboy's Social Blocking List und die Polish TeX Users Group GUST für die TeX Gyre Adventor Schrift. SnowHaze verwendet die Safebrowsing API von Google, um Meldungen zu generieren auf Seiten, die möglicherweise Phishingseiten sind oder Malware und unerwünschte Software enthalten. Die Datenbank ist lokal auf dem Gerät gespeichert und wird von einem SnowHaze Server aktualisiert. Dein Gerät wird dafür NIE direkt mit einem Google Server verbinden. Beim Aktualisieren der Datenbank werden KEINE Daten über dein Suchverhalten gesendet. Lizenzen oder Urheberechtnotizen der verwendeten Open Source Projekten sind unten aufgelistet. Design von Basestudio.";
 
 /* explanations of the subscription settings tab */
 "subscription settings explanation" = "<p>Abonniere SnowHaze Premium, um vom SnowHaze VPN, von der SnowHaze Suchmaschine und von häufigen Seitenlistenupdate zu profitieren. Die ersten 7 Tage sind für Erstabonnenten kostenlos. Es gibt ein monatliches und jährliches selbsterneuerndes Abonnement.</p><p><strong>Auto-Update Optionen</strong> aktualisiert die Abonnementoptionen.</p><p><strong>Auto-Update Token</strong> aktualisiert den Berechtigungstoken.</p><strong>Aktueller Token Hash</strong> ist ein Code, mit dem das aktuelle Abonnement überprüft werden kann.";
 
 /* explanations of the vpn settings tab */
-"vpn settings explanation" = "<p>Ein VPN (Virtual Private Network) ist eine verschlüsselte Verbindung zu einem Server. Der gesamte Verkehr zwischen deinem Gerät und dem Internet wird zuerst zum VPN Server gesendet. Der Empfänger sieht nur die IP Adresse des VPN Servers, aber nicht deine wahre IP Adresse, was extrem wichtig ist, um Tracking zu verhindern.</p><p>Ein VPN schützt dich vor Man-in-the-Middle-Angriffe, versteckt den Internetverkehr vom Internetanbieter und anderen Dritten und verschlüsselt alle Verbindungen zum VPN Server.</p><p>Wir bieten zwei verschiedene Arten von VPNs an, die unterschiedliche Protokolle verwenden. Eines ist ein Protokoll namens IPSec, das andere ist OpenVPN. Das VPN mit IPSec kann einfach innerhalb der SnowHaze App gesteuert werden, während OpenVPN verlangt, dass du die OpenVPN Connect App verwendest und deine Profile monatlich aktualisierst. Allerdings ist OpenVPN etwas sicherer als IPSec. Dies ist ein kleiner Kompromiss zwischen Benutzerfreundlichkeit (IPSec) und Sicherheit (OpenVPN), den wir dir überlassen können.</p><p>SnowHaze VPN logt absolut nichts und ist der einzige VPN Dienst ohne identifizierende Autorisation.</p><p>Abonniere SnowHaze Premium, um den VPN zu nutzen und verbinde dich mit einem unserer dedizierten Server am Standort deiner Wahl. Falls du den VPN noch nicht installiert hast, folge den Schritten im online VPN Tutorial.</p><p><strong>Auto-Update Standortliste:</strong> Aktualisiert die Serverstandorte.</p><strong>Ping anzeigen:</strong> Zeigt wie lange es dauert, bis Daten beim Server sind und wieder zurück.";
+"vpn settings explanation" = "<p>Ein VPN (Virtual Private Network) ist eine verschlüsselte Verbindung zu einem Server. Der gesamte Verkehr zwischen deinem Gerät und dem Internet wird zuerst zum VPN Server gesendet. Der Empfänger sieht nur die IP Adresse des VPN Servers, aber nicht deine wahre IP Adresse, was extrem wichtig ist, um Tracking zu verhindern.</p><p>Ein VPN schützt dich vor Man-in-the-Middle-Angriffe, versteckt den Internetverkehr vom Internetanbieter und anderen Dritten und verschlüsselt alle Verbindungen zum VPN Server.</p><p>Wir bieten zwei verschiedene Arten von VPNs an, die unterschiedliche Protokolle verwenden. Eines ist ein Protokoll namens IPSec, das andere ist OpenVPN. Das VPN mit IPSec kann einfach innerhalb der SnowHaze App gesteuert werden, während OpenVPN verlangt, dass du die OpenVPN Connect App verwendest und deine Profile monatlich aktualisierst. Allerdings ist OpenVPN etwas sicherer als IPSec. Dies ist ein kleiner Kompromiss zwischen Benutzerfreundlichkeit (IPSec) und Sicherheit (OpenVPN), den wir dir überlassen können.</p><p>SnowHaze VPN logt absolut nichts und ist der einzige VPN Dienst ohne identifizierende Autorisation.</p><p>Abonniere SnowHaze Premium, um den VPN zu nutzen und verbinde dich mit einem unserer dedizierten Server am Standort deiner Wahl. Falls du den VPN noch nicht installiert hast, folge den Schritten im online VPN Tutorial.</p><p><strong>Selbstrotierende Logindaten:</strong> Ändert automatisch die Anmeldeinformationen für den Server, während du mit dem VPN Server verbunden bist. Andernfalls ändern sich die Anmeldedaten für jede Sitzung.</p><p><strong>Auto-Update Standortliste:</strong> Aktualisiert die Serverstandorte.</p><strong>Ping anzeigen:</strong> Zeigt wie lange es dauert, bis Daten beim Server sind und wieder zurück.";
 
 /* explanations of the passcode settings tab */
 "passcode settings explanation" = "<p>Du kannst SnowHaze mit einem Passwort schützen. Setze, ändere oder lösche dein Passwort.</p><p><strong>MODUS:</strong> Wähle aus, ob nur das Passwort oder auch die biometrische ID (Touch ID oder Face ID) SnowHaze entsperren kann. Du kannst bestimmen nach welcher Zeit SnowHaze gesperrt werden soll.</p><strong>FORMAT:</strong> Du kannst einen 6-stelligen Zahlencode (Bsp. 378291), einen langen Zahlencode (Bsp. 73820983772) oder ein alphanumerisches Passwort (Bsp. $7&9jK-55[*d_4) setzen.";

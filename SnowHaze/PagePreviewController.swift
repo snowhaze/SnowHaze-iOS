@@ -82,6 +82,14 @@ class PagePreviewController: UIViewController, WorkerWebViewManagerDelegate {
 		loadBar.setNeedsDisplay()
 	}
 
+	func webViewManaget(_ manager: WorkerWebViewManager, didUpgradeLoadOf url: URL) {
+		Stats.shared.upgradedLoad(of: url, in: manager.tab)
+	}
+
+	func webViewManaget(_ manager: WorkerWebViewManager, isLoading url: URL?) {
+		Stats.shared.loading(url, in: manager.tab)
+	}
+
 	@available(iOS 11.0, *)
 	override func viewSafeAreaInsetsDidChange() {
 		super.viewSafeAreaInsetsDidChange()

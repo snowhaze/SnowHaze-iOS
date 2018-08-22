@@ -60,6 +60,8 @@ let stripTrackingURLParametersKey			= "ch.illotros.snowhaze.stripTrackingURLPara
 let preventXSSKey							= "ch.illotros.snowhaze.preventXSS"
 let skipRedirectsKey						= "ch.illotros.snowhaze.skipRedirects"
 let useFrontCameraForCodeScannerKey			= "ch.illotros.snowhaze.useFrontCameraForCodeScanner"
+let autorotateIPSecCredentialsKey			= "ch.illotros.snowhaze.autorotateIPSecCredentials"
+let updateUsageStatsKey						= "ch.illotros.snowhaze.updateUsageStatsKey"
 
 let lastOpenedVersionKey					= "ch.illotros.snowhaze.lastOpenedVersion"
 let lastTutorialVersionKey					= "ch.illotros.snowhaze.lastTutorialVersion"
@@ -81,10 +83,10 @@ private let defaults: [String: SQLite.Data] = [
 	lastEOLWarningVersionKey:				.integer(0),
 
 	// Warnings:
-	showDangerousSitesWarningsKey:			.true,
+	showDangerousSitesWarningsKey:			.false,
 	showTLSCertificateWarningsKey:			.true,
-	stripTrackingURLParametersKey:			.true,
-	preventXSSKey:							.true,
+	stripTrackingURLParametersKey:			.false,
+	preventXSSKey:							.false,
 
 	// Website Data
 	allowPermanentDataStorageKey:			.false,
@@ -107,22 +109,22 @@ private let defaults: [String: SQLite.Data] = [
 	searchSuggestionEnginesKey:				.text(SearchEngine.encode([SearchEngineType.startpage, SearchEngineType.wikipedia])),
 
 	// Media Playback
-	requiresUserActionForMediaPlaybackKey:	.true,
+	requiresUserActionForMediaPlaybackKey:	.false,
 	allowsInlineMediaPlaybackKey:			.true,
 
 	// Tracking Protection
 	blockHTTPReferrersKey:					.true,
 	blockTrackingScriptsKey:				.true,
-	blockAdsKey:							.false,
+	blockAdsKey:							.true,
 	blockCanvasDataAccessKey:				.true,
 	blockFingerprintingKey:					.true,
 	blockSocialMediaWidgetsKey:				.true,
 	applyHideOnlyBlockRulesKey:				.false,
 
 	// HTTPS
-	tryHTTPSfirstKey:						.false,
+	tryHTTPSfirstKey:						.true,
 	useHTTPSExclusivelyWhenPossibleKey:		.true,
-	blockMixedContentKey:					.false,
+	blockMixedContentKey:					.true,
 
 	// Appearence
 	nightModeKey:							.false,
@@ -141,6 +143,7 @@ private let defaults: [String: SQLite.Data] = [
 	suggestPrivateSitesKey:					.false,
 	updateSiteListsKey:						.false,
 	useCellularForSiteListsUpdateKey:		.false,
+	updateUsageStatsKey:					.true,
 
 	tabClosingUndoTimeLimitKey:				.float(10),
 	allowTabClosingUndoForAllTabsKey:		.false,
@@ -164,6 +167,7 @@ private let defaults: [String: SQLite.Data] = [
 	// VPN
 	updateVPNListKey:						.false,
 	showVPNServerPingStatsKey:				.true,
+	autorotateIPSecCredentialsKey:			.true,
 
 	// Content Type Blocer
 	contentTypeBlockerBlockedTypesKey:		.integer(ContentTypes.none.rawValue),
@@ -215,7 +219,7 @@ class PolicyManager {
 		settingsWrapper = wrapper
 	}
 
-	private var allowPermanentDataStorage: Bool {
+	var allowPermanentDataStorage: Bool {
 		return bool(for: allowPermanentDataStorageKey)
 	}
 
@@ -272,6 +276,10 @@ class PolicyManager {
 		return bool(for: updateVPNListKey)
 	}
 
+	var autorotateIPSecCredentials: Bool {
+		return bool(for: autorotateIPSecCredentialsKey)
+	}
+
 	var updateSiteLists: Bool {
 		let lastUpdate = (lastSiteListUpdate ?? .distantPast)
 		return !deleteSiteLists && ((lastUpdate < compilationDate) || (SubscriptionManager.shared.hasSubscription && lastUpdate.timeIntervalSinceNow < -7 * 24 * 60 * 60))
@@ -325,6 +333,10 @@ class PolicyManager {
 			let icon = UIApplicationShortcutIcon(templateImageName: "bookmark")
 			return UIApplicationShortcutItem(type: type, localizedTitle: title, localizedSubtitle: bookmark.URL.absoluteString, icon: icon, userInfo: userInfo)
 		}
+	}
+
+	var keepStats: Bool {
+		return bool(for: updateUsageStatsKey)
 	}
 
 	var isSuppressingHistory: Bool {
@@ -446,8 +458,9 @@ class PolicyManager {
 				} else if applyHideOnly {
 					print("ad hider not available")
 				}
-				if let blocker = allBlockers[BlockerID.adBlocker] {
-					blockers.append(blocker)
+				if let blocker1 = allBlockers[BlockerID.adBlocker1], let blocker2 = allBlockers[BlockerID.adBlocker2] {
+					blockers.append(blocker1)
+					blockers.append(blocker2)
 				} else {
 					let blacklist = DomainList(type: .ads).domains
 					let js = JSGenerator.named("BlockAds")!.generate(with: ["blacklist": blacklist as AnyObject])!
@@ -614,7 +627,7 @@ class PolicyManager {
 	}
 
 	func searchSuggestionSources(for tab: Tab) -> [SuggestionSource] {
-		let localSources: [SuggestionSource] = [HistorySuggestionSource(), BookmarkSuggestionSource(), PopularSitesSuggestionSource(includePrivate: bool(for: suggestPrivateSitesKey), upgrade: useHTTPSExclusivelyWhenPossible)]
+		let localSources: [SuggestionSource] = [HistorySuggestionSource(), BookmarkSuggestionSource(), PopularSitesSuggestionSource(includePrivate: bool(for: suggestPrivateSitesKey), upgrade: useHTTPSExclusivelyWhenPossible, tab: tab)]
 		let encoded = settingsWrapper.value(for: searchSuggestionEnginesKey).text!
 		let engines = SearchEngine.decode(encoded)
 		let engineSources: [SuggestionSource] = engines.map {
@@ -648,7 +661,7 @@ class PolicyManager {
 	}
 
 	enum Action {
-		case load(URL)
+		case load(URL, Bool)
 		case getTokenForSearch(String) // May only be at the end of the list
 	}
 	func actionList(for userInput: String) -> [Action] {
@@ -658,31 +671,36 @@ class PolicyManager {
 			if url.scheme!.lowercased() == "http" && httpsSites.contains(url.host!) {
 				var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
 				components.scheme = "https"
-				return [.load(components.url!)]
+				return [.load(components.url!, true)]
 			} else {
-				return [.load(url)]
+				return [.load(url, false)]
 			}
 		}
+
 		if let encoded = userInput.punycodeExtension {
+			let httpsFirst = bool(for: tryHTTPSfirstKey)
 			var https = [Action]()
+
 			if let url = encoded.extendToURL(https: true, www: false) {
-				https.append(.load(url))
+				let upgraded = httpsFirst || httpsSites.contains(url.host!)
+				https.append(.load(url, upgraded))
 			}
 			if let url = encoded.extendToURL(https: true, www: true), !encoded.hasWPrefix {
-				https.append(.load(url))
+				let upgraded = httpsFirst || httpsSites.contains(url.host!)
+				https.append(.load(url, https.isEmpty && upgraded))
 			}
 			var http = [Action]()
 			if let url = encoded.extendToURL(https: false, www: false) {
 				if !httpsSites.contains(url.host!) {
-					http.append(.load(url))
+					http.append(.load(url, false))
 				}
 			}
 			if let url = encoded.extendToURL(https: false, www: true), !encoded.hasWPrefix {
 				if !httpsSites.contains(url.host!) {
-					http.append(.load(url))
+					http.append(.load(url, false))
 				}
 			}
-			if bool(for: tryHTTPSfirstKey) {
+			if httpsFirst {
 				ret += https + http
 			} else {
 				ret += http + https
@@ -695,7 +713,7 @@ class PolicyManager {
 		if engine.needsTokenUpdate {
 			ret.append(.getTokenForSearch(userInput))
 		} else if let url = engine.url(for: userInput) {
-			ret.append(.load(url))
+			ret.append(.load(url, false))
 		}
 		return ret
 	}

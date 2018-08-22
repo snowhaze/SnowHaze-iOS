@@ -33,6 +33,11 @@ extension UIColor {
 	static let badPrivacy				= UIColor(red: 241 / 255.0, green: 119 / 255.0, blue:  60 / 255.0, alpha: 1   )
 	static let veryBadPrivacy			= UIColor(red: 232 / 255.0, green:  15 / 255.0, blue:  30 / 255.0, alpha: 1   )
 
+	static let httpsStats				= UIColor(red: 136 / 255.0, green: 176 / 255.0, blue:   0 / 255.0, alpha: 1   )
+	static let trackerStats				= UIColor(red: 200 / 255.0, green: 113 / 255.0, blue:  55 / 255.0, alpha: 1   )
+	static let cookieStats				= UIColor(red:  44 / 255.0, green: 137 / 255.0, blue: 160 / 255.0, alpha: 1   )
+	static let vpnStats					= UIColor(red: 160 / 255.0, green:  44 / 255.0, blue:  90 / 255.0, alpha: 1   )
+
 	static let title					= UIColor(white: 0.98 , alpha: 1)
 	static let darkTitle				= UIColor(white: 0.665, alpha: 1)
 	static let popover					= UIColor(white: 0.91 , alpha: 1)

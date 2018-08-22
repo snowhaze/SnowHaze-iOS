@@ -13,6 +13,7 @@ let bookmarkSearchDomainID = "ch.illotros.snowhaze.core-spotlight.domain.bookmar
 let bookmarkUTID = "ch.illotros.snowhaze.bookmark"
 let bookmarkApplicationShortcutType = "ch.illotros.snowhaze.application-shortcut.type.bookmark"
 let newTabApplicationShortcutType = "ch.illotros.snowhaze.application-shortcut.type.new-tab" // Is also used in info.plist
+let openVPNSettingsApplicationShortcutType = "ch.illotros.snowhaze.application-shortcut.type.open-vpn-settings" // Is also used in info.plist
 
 class ExternalBookmarkManager: NSObject {
 	init(store: BookmarkStore) {

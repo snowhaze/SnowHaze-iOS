@@ -57,10 +57,12 @@ class DataFetcher: NSObject, URLSessionDelegate {
 			completionHandler(.performDefaultHandling, nil)
 			return
 		}
-		guard tab.controller?.accept(space.serverTrust!, for: space.host) ?? false else {
+		guard let controller = tab.controller else {
 			completionHandler(.cancelAuthenticationChallenge, nil)
 			return
 		}
-		completionHandler(.performDefaultHandling, nil)
+		controller.accept(space.serverTrust!, for: space.host) { result in
+			completionHandler(result ? .performDefaultHandling : .cancelAuthenticationChallenge, nil)
+		}
 	}
 }

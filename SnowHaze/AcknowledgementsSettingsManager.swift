@@ -10,7 +10,8 @@ import Foundation
 
 class AcknowledgementsSettingsManager: SettingsViewManager {
 	override func html() -> String {
-		return NSLocalizedString("acknowledgements settings explanation", comment: "explanations of the acknowledgements settings tab")
+		let format = NSLocalizedString("acknowledgements settings explanation format", comment: "format for explanations of the acknowledgements settings tab")
+		return String(format: format, versionDescription)
 	}
 
 	var textViews = [Int: UITextView]()

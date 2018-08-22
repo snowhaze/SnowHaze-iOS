@@ -196,7 +196,7 @@ typedef NS_ENUM(NSInteger, SimplePingAddressStyle) {
  *  \param error Describes the failure.
  */
 
-- (void)simplePing:(SimplePing *)pinger didFailToSendPacket:(NSData *)packet sequenceNumber:(uint16_t)sequenceNumber error:(NSError *)error;
+- (void)simplePing:(SimplePing *)pinger didFailToSendPacket:(nullable NSData *)packet sequenceNumber:(uint16_t)sequenceNumber error:(NSError *)error;
 
 /*! A SimplePing delegate callback, called when the object receives a ping response.
  *  \details If the object receives an ping response that matches a ping request that it 

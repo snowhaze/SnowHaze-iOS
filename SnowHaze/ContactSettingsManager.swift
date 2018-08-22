@@ -31,16 +31,19 @@ class ContactSettingsManager: SettingsViewManager, MFMailComposeViewControllerDe
 		} else if indexPath.row == (MFMailComposeViewController.canSendMail() ? 2 : 1) {
 			title = NSLocalizedString("share snowhaze button title", comment: "title of button to share snowhaze")
 			button.addTarget(self, action: #selector(shareSnowHaze(_:)), for: .touchUpInside)
-		} else {
+		} else if indexPath.row == (MFMailComposeViewController.canSendMail() ? 3 : 2)  {
 			title = NSLocalizedString("rate snowhaze button title", comment: "title of button to rate snowhaze on the app store")
 			button.addTarget(self, action: #selector(rateSnowHaze(_:)), for: .touchUpInside)
+		} else {
+			title = NSLocalizedString("show snowhaze source button title", comment: "title of button to show the snowhaze source")
+			button.addTarget(self, action: #selector(showSource(_:)), for: .touchUpInside)
 		}
 		button.setTitle(title, for: [])
 		return cell
 	}
 
 	override func numberOfRows(inSection section: Int) -> Int {
-		return MFMailComposeViewController.canSendMail() ? 4 : 3
+		return MFMailComposeViewController.canSendMail() ? 5 : 4
 	}
 
 	@objc private func mailSupport(_ sender: UIButton) {
@@ -80,6 +83,13 @@ class ContactSettingsManager: SettingsViewManager, MFMailComposeViewControllerDe
 		let mainVC = MainViewController.controller
 		mainVC?.popToVisible(animated: true)
 		let site = "https://snowhaze.com/"
+		mainVC?.loadInFreshTab(input: site, type: .url)
+	}
+
+	@objc private func showSource(_ sender: UIButton) {
+		let mainVC = MainViewController.controller
+		mainVC?.popToVisible(animated: true)
+		let site = "https://snowhaze.com/opensource"
 		mainVC?.loadInFreshTab(input: site, type: .url)
 	}
 

@@ -48,34 +48,42 @@ class SecPolicyEvaluator {
 		return (result == uspecifiedResult || result == proceedResult)
 	}
 
-	@discardableResult func evaluate(_ policy: SecChallengeHandlerPolicy) -> Bool {
-		error = Int(errSecSuccess)
-		if policy != .allowInvalidCerts {
-			do {
-				guard try result(for: SecPolicyCreateSSL(true, nil)) else {
-					issue = .invalidCert
-					return false
-				}
-				if policy != .allowDomainMismatch {
-					guard try result(for: SecPolicyCreateSSL(true, domain as CFString)) else {
-						let res: String?
-						if let cert = SecTrustGetCertificateAtIndex(trust, 0) {
-							res = SecCertificateCopySubjectSummary(cert) as String?
-						} else {
-							res = nil
-						}
-						issue = .domainMismatch(certDomain: res)
-						return false
-					}
-				}
-			} catch let error {
-				issue = .unrecoverable
-				self.error = (error as NSError).code
-				return false
-			}
+	func evaluate(_ policy: SecChallengeHandlerPolicy, completionHandler: @escaping (Bool) -> Void) {
+		let callback: (Bool) -> Void = { result in
+			DispatchQueue.main.sync { completionHandler(result) }
 		}
-		issue = .none
-		return true
+		DispatchQueue.global(qos: .userInitiated).async {
+			self.error = Int(errSecSuccess)
+			if policy != .allowInvalidCerts {
+				do {
+					guard try self.result(for: SecPolicyCreateSSL(true, nil)) else {
+						self.issue = .invalidCert
+						callback(false)
+						return
+					}
+					if policy != .allowDomainMismatch {
+						guard try self.result(for: SecPolicyCreateSSL(true, self.domain as CFString)) else {
+							let res: String?
+							if let cert = SecTrustGetCertificateAtIndex(self.trust, 0) {
+								res = SecCertificateCopySubjectSummary(cert) as String?
+							} else {
+								res = nil
+							}
+							self.issue = .domainMismatch(certDomain: res)
+							callback(false)
+							return
+						}
+					}
+				} catch let error {
+					self.issue = .unrecoverable
+					self.error = (error as NSError).code
+					callback(false)
+					return
+				}
+			}
+			self.issue = .none
+			callback(true)
+		}
 	}
 
 	func pin(with mode: PinningMode) -> Bool {

@@ -16,6 +16,7 @@ protocol SubscriptionManagerDelegate: AnyObject {
 	func purchaseFailed(besause description: String?)
 }
 
+let subscriptionPurchasedNotificationName = Notification.Name(rawValue: "SubscriptionPurchasedNotification")
 
 private let monthlyId = "ch.illotros.ios.snowhaze.premium.monthly"
 private let yearlyId = "ch.illotros.ios.snowhaze.premium.yearly"
@@ -79,6 +80,14 @@ class SubscriptionManager: NSObject {
 		didSet {
 			if hasSubscription && !hasValidToken && PolicyManager.globalManager().autoUpdateAuthToken {
 				updateAuthToken(completionHandler: nil)
+			}
+			if oldValue == nil && activeSubscription != nil {
+				DispatchQueue.main.async {
+					// Wait until subscriptionRenews & expirationDate are set, so hasSubscription is properly computed.
+					if self.hasSubscription {
+						NotificationCenter.default.post(name: subscriptionPurchasedNotificationName, object: self)
+					}
+				}
 			}
 		}
 	}

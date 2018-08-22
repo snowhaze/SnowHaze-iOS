@@ -27,6 +27,8 @@ class Search {
 	}
 	private(set) var matchCount: UInt = 0
 
+	private var searchInitiated = false
+
 	var searchPattern: String {
 		didSet {
 			countMatches()
@@ -45,13 +47,27 @@ class Search {
 			return
 		}
 		matchCount = 0
-		tab.controller?.evaluate(script) { (result, error) -> Void in
-			guard let count = result as? NSNumber, search == self.searchPattern else {
+		searchInitiated = false
+		let throttle: TimeInterval
+		switch search.count {
+			case 1:		throttle = 1
+			case 2:		throttle = 0.5
+			case 3:		throttle = 0.5
+			default:	throttle = 0
+		}
+		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + throttle) { [weak self] in
+			guard let me = self, me.searchPattern == search, !me.searchInitiated else {
 				return
 			}
-			DispatchQueue.main.async {
-				self.matchCount = count.uintValue
-				self.matchIndex = search.isEmpty ? 0 : 1
+			me.searchInitiated = true
+			me.tab.controller?.evaluate(script) { (result, error) -> Void in
+				DispatchQueue.main.async {
+					guard let me = self, let count = result as? NSNumber, search == me.searchPattern else {
+						return
+					}
+					me.matchCount = count.uintValue
+					me.matchIndex = search.isEmpty ? 0 : 1
+				}
 			}
 		}
 	}

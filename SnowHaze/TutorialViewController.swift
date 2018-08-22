@@ -8,6 +8,10 @@
 
 import Foundation
 
+private let overlapConst: CGFloat = 100
+private let overlapRel: CGFloat = 0.125
+private let animationDuration = 0.4
+
 class TutorialViewController: UIViewController {
 	private lazy var pageControl: UIPageControl = {
 		let ret = UIPageControl()
@@ -18,10 +22,6 @@ class TutorialViewController: UIViewController {
 	private var overlap: CGFloat {
 		return overlapRel + overlapConst / view.bounds.height
 	}
-
-	private let overlapConst: CGFloat = 100
-	private let overlapRel: CGFloat = 0.125
-	private let animationDuration = 0.4
 
 	private var index = 0
 
@@ -121,7 +121,7 @@ class TutorialViewController: UIViewController {
 		}, completion: { _ in
 			oldSecView.removeFromSuperview()
 			self.view.insertSubview(newSecView, belowSubview: self.pageControl)
-			UIView.animate(withDuration: self.animationDuration / 2, animations: {
+			UIView.animate(withDuration: animationDuration / 2, animations: {
 				newSecView.frame.origin.y -= newSecView.frame.size.height
 			})
 		})
@@ -171,7 +171,7 @@ class TutorialViewController: UIViewController {
 		}, completion: { _ in
 			oldSecView.removeFromSuperview()
 			self.view.insertSubview(newSecView, belowSubview: self.pageControl)
-			UIView.animate(withDuration: self.animationDuration / 2, animations: {
+			UIView.animate(withDuration: animationDuration / 2, animations: {
 				newSecView.frame.origin.y -= newSecView.frame.size.height
 			})
 		})

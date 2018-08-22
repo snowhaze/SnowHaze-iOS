@@ -8,6 +8,8 @@
 
 "NSPhotoLibraryUsageDescription" = "メディアの保存やアップロードの機能を有効にするためには、SnowHazeにフォトライブラリ（写真）へのアクセスを許可する必要があります。";
 
+"open vpn settings application shortcut item title" = "VPNの設定";
+
 "add tab application shortcut item title" = "新しいタブ";
 
 "NSFaceIDUsageDescription" = "Face IDを使用してSnowHazeのロックを解除してください。";

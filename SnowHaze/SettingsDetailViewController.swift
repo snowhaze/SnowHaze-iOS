@@ -29,6 +29,10 @@ class SettingsDetailViewController: UIViewController {
 		manager.setup()
 	}
 
+	func expand() {
+		manager.header.expand()
+	}
+
 	func switchToSubscriptionSettings() {
 		delegate?.settingsDetailViewControllerShowSubscriptionSettings(self)
 	}

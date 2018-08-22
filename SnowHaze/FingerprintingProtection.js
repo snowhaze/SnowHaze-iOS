@@ -36,4 +36,6 @@
 	});
 	observer.observe(document.documentElement, {attributes: true, childList: true, subtree: true, attributeFilter: ["ping"]});
 	window.RTCPeerConnection = undefined;
+
+	Navigator.prototype.sendBeacon = function () { return false; };
 })();

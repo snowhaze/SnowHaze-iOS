@@ -29,10 +29,12 @@ class PinningSessionDelegate: NSObject, URLSessionDelegate {
 		}
 		let policy = SecPolicyEvaluator(domain: space.host, trust: space.serverTrust!)
 		let certs = PinningSessionDelegate.pinnedCerts
-		guard policy.evaluate(.strict) && policy.pin(with: .certs(certs)) else {
-			completionHandler(.cancelAuthenticationChallenge, nil)
-			return
+		policy.evaluate(.strict) { result in
+			if result && policy.pin(with: .certs(certs)) {
+				completionHandler(.performDefaultHandling, nil)
+			} else {
+				completionHandler(.cancelAuthenticationChallenge, nil)
+			}
 		}
-		completionHandler(.performDefaultHandling, nil)
 	}
 }

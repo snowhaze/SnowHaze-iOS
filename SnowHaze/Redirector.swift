@@ -8,6 +8,7 @@
 
 import Foundation
 
+// NOTE: This is currently not yet reliable enough. It can therefore not be enabled from the UI.
 struct Redirector {
 	static let shared = Redirector()
 

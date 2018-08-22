@@ -46,6 +46,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			MainViewController.addEmptyTab(self) {
 				completionHandler(true)
 			}
+		} else if shortcutItem.type == openVPNSettingsApplicationShortcutType {
+			MainViewController.openSettings(type: .vpn) {
+				completionHandler(true)
+			}
 		} else {
 			completionHandler(false)
 		}
@@ -79,6 +83,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				return false
 			}
 			queries.forEach { MainViewController.loadInFreshTab(input: $0, type: .plainInput) }
+			let openSettings = queryItems.filter { $0.name.lowercased() == "open-setting" }
+			let settings = openSettings.compactMap { (item: URLQueryItem) -> SettingsViewController.SettingsType? in
+				switch item.value?.lowercased() {
+					case "vpn":				return .vpn
+					case "subscription":	return .subscription
+					default:				return nil
+				}
+			}
+			let unfold = queryItems.contains { $0.name.lowercased() == "unfold-explanation" }
+			if let type = settings.last {
+				MainViewController.openSettings(type: type, unfold: unfold)
+			}
+			if queryItems.contains(where: { $0.name.lowercased() == "rotate-ipsec-credentials" }) {
+				MainViewController.rotateIPSecCreds()
+			}
 		} else {
 			let query = components.url?.absoluteString ?? ""
 			MainViewController.loadInFreshTab(input: query, type: .url)

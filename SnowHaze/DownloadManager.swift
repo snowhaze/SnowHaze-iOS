@@ -183,8 +183,8 @@ extension DownloadManager: URLSessionDownloadDelegate {
 					return
 				}
 			}
-			guard let _ = try? db.execute("SELECT rank FROM popular LIMIT 0") else {
-				print("table popular does not have a rank column")
+			guard let _ = try? db.execute("SELECT rank, trackers FROM popular LIMIT 0") else {
+				print("table popular does not have a rank or trackers column")
 				return
 			}
 			guard let _ = try? db.execute("SELECT type FROM danger LIMIT 0") else {
@@ -253,6 +253,10 @@ private extension DownloadManager {
 		try! fm.replaceItem(at: URL(fileURLWithPath: DomainList.dbLocation), withItemAt: location, backupItemName: nil, options: [], resultingItemURL: nil)
 		try? fm.setAttributes([.creationDate: modified], ofItemAtPath: DomainList.dbLocation)
 		NotificationCenter.default.post(name: DomainList.dbFileChangedNotification, object: nil)
+		if let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first {
+			let downloadCaches = cachePath + "/com.apple.nsurlsessiond"
+			try? fm.removeItem(atPath: downloadCaches)
+		}
 	}
 
 	func appropriateListUpdateBackgroundSession(for policy: PolicyManager) -> URLSession {

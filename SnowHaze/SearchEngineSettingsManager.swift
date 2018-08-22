@@ -40,6 +40,7 @@ class SearchEngineSettingsManager: SettingsViewManager {
 								cell.accessibilityLabel = NSLocalizedString("snowhaze search engine missing subscription accessibility label", comment: "accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium")
 								cell.accessoryView = image
 							}
+				case 11:	title = NSLocalizedString("findx search engine display name", comment: "name of findx search engine to be displayed to user")
 				default:	fatalError("invalid index path")
 			}
 			cell.textLabel?.text = title
@@ -69,7 +70,7 @@ class SearchEngineSettingsManager: SettingsViewManager {
 	override func numberOfRows(inSection section: Int) -> Int {
 		switch section {
 			case 0:		return 0
-			case 1:		return 11
+			case 1:		return 12
 			case 2:		return 3
 			default:	fatalError("invalid section")
 		}

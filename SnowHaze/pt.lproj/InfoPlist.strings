@@ -8,6 +8,8 @@
 
 "NSPhotoLibraryUsageDescription" = "O SnowHaze precisa ter acesso ao Photos para poder fazer download dos médias.";
 
+"open vpn settings application shortcut item title" = "Definições VPN";
+
 "add tab application shortcut item title" = "Novo separador";
 
 "NSFaceIDUsageDescription" = "Desbloqueie SnowHaze usando o Face ID";

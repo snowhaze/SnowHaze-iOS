@@ -1,0 +1,61 @@
+/* Localizable.strings
+  SnowHaze
+  Copyright © 2018 Illotros GmbH. All rights reserved. */
+
+/* indication that no vpn location is selected */
+"none ipsec location name" = "Keni";
+
+/* indication that australia is selected as ipsec vpn location */
+"australia ipsec location name" = "Australie";
+
+/* indication that canada is selected as ipsec vpn location */
+"canada ipsec location name" = "Kanada";
+
+/* indication that switzerland is selected as ipsec vpn location */
+"switzerland ipsec location name" = "Schwiiz";
+
+/* indication that germany is selected as ipsec vpn location */
+"germany ipsec location name" = "Dütschland";
+
+/* indication that france is selected as ipsec vpn location */
+"france ipsec location name" = "Frankriich";
+
+/* indication that poland is selected as ipsec vpn location */
+"poland ipsec location name" = "Pole";
+
+/* indication that singapore is selected as ipsec vpn location */
+"singapore ipsec location name" = "Singapur";
+
+/* indication that uk is selected as ipsec vpn location */
+"uk ipsec location name" = "Vereinigts Königrich";
+
+/* indication that us is selected as ipsec vpn location */
+"us ipsec location name" = "USA";
+
+/* indication that the selected ipsec vpn location is unknown */
+"unknown ipsec location name" = "Unbekannt";
+
+/* label for the error ipsec status */
+"error ipsec status" = "Fähler";
+
+/* format for the label for the connected ipsec status */
+"connected ipsec status format" = "Verbunde - %@";
+
+/* label for the connecting ipsec status */
+"connecting ipsec status" = "Verbindet";
+
+/* label for the disconnected ipsec status */
+"disconnected ipsec status" = "Nid Verbunde";
+
+/* label for the disconnecting ipsec status */
+"disconnecting ipsec status" = "Verbindig wird trennt";
+
+/* label for the invalid ipsec status */
+"invalid ipsec status" = "Ladet";
+
+/* label for the reasserting ipsec status */
+"reasserting ipsec status" = "Verbindet neu";
+
+/* format of the accessibbility label for the ipsec location flag */
+"flag accessibbility label format" = "Standort: %@";
+

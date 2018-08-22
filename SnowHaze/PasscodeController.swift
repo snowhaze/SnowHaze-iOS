@@ -191,7 +191,13 @@ public class PasscodeController: UIViewController {
 			let updates = [kSecValueData: data] as NSDictionary
 			let updateErr = SecItemUpdate(query, updates)
 			if updateErr == errSecItemNotFound {
-				guard let accessControll = SecAccessControlCreateWithFlags(nil, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, .touchIDCurrentSet, nil) else {
+				let acFlag: SecAccessControlCreateFlags
+				if #available(iOS 11.3, *) {
+					acFlag = .biometryCurrentSet
+				} else {
+					acFlag = .touchIDCurrentSet
+				}
+				guard let accessControll = SecAccessControlCreateWithFlags(nil, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, acFlag, nil) else {
 					completed(false)
 					return
 				}

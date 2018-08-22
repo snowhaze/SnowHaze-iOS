@@ -13,8 +13,21 @@ private let vpnRow = 1
 private let premiumSection = 0
 
 class SettingsViewController: UIViewController, SettingsDetailViewControllerDelegate {
+	enum SettingsType {
+		case subscription
+		case vpn
+
+		fileprivate var indexPath: IndexPath {
+			switch self {
+				case .subscription:	return IndexPath(row: subscriptionRow, section: premiumSection)
+				case .vpn:			return IndexPath(row: vpnRow, section: premiumSection)
+			}
+		}
+	}
 
 	@IBOutlet weak var tableView: UITableView!
+
+	static var requestedType: (type: SettingsType?, unfold: Bool)?
 
 	private let repCounter = RepeatCounter()
 
@@ -26,6 +39,9 @@ class SettingsViewController: UIViewController, SettingsDetailViewControllerDele
 		tableView.alwaysBounceVertical = false
 		splitMergeController?.backgroundImage = #imageLiteral(resourceName: "Background")
 		splitMergeController?.backgroundColor = .background
+		let requestedType = SettingsViewController.requestedType
+		self.showSettings(requestedType?.type, unfold: requestedType?.unfold ?? false)
+		SettingsViewController.requestedType = nil
 	}
 
 	override func viewDidAppear(_ animated: Bool) {
@@ -50,8 +66,7 @@ class SettingsViewController: UIViewController, SettingsDetailViewControllerDele
 			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 			let renewTitle = NSLocalizedString("vpn profile expiration warning alert vpn settings button title", comment: "title of vpn settings button of alert to warn users of VPN profile expiration")
 			let renewAction = UIAlertAction(title: renewTitle, style: .default) { [weak self] _ in
-				let vpnIndexPath = IndexPath(row: vpnRow, section: premiumSection)
-				self?.animateToManager(at: vpnIndexPath)
+				self?.showSettings(.vpn, unfold: false)
 			}
 			let okTitle = NSLocalizedString("vpn profile expiration warning alert ignore button title", comment: "title of ignore button of alert to warn users of VPN profile expiration")
 			let okAction = UIAlertAction(title: okTitle, style: .cancel, handler: nil)
@@ -62,7 +77,7 @@ class SettingsViewController: UIViewController, SettingsDetailViewControllerDele
 			}
 		}
 
-		VPNManager.shared.swapLongRunningIPSecCreds()
+		VPNManager.shared.swapIPSecCreds(runningLongerThan: 60 * 60, force: false)
 
 		if !LockController.isDisengagingUILock {
 			for indexPath in tableView.indexPathsForSelectedRows ?? [] {
@@ -72,21 +87,26 @@ class SettingsViewController: UIViewController, SettingsDetailViewControllerDele
 	}
 
 	func settingsDetailViewControllerShowSubscriptionSettings(_ settingsDetailVC: SettingsDetailViewController) {
-		showSubscriptionSettings()
+		showSettings(.subscription, unfold: false)
 	}
 
-	func showSubscriptionSettings() {
-		let subscriptionIndexPath = IndexPath(row: subscriptionRow, section: premiumSection)
-		animateToManager(at: subscriptionIndexPath)
+	func showSettings(_ type: SettingsType?, unfold: Bool) {
+		SettingsViewController.requestedType = nil
+		if let indexPath = type?.indexPath {
+			animateToManager(at: indexPath, unfold: unfold)
+		} else {
+			splitMergeController?.detailViewController = nil
+		}
 	}
 
-	private func animateToManager(at indexPath: IndexPath) {
-		showManager(for: indexPath)
+	private func animateToManager(at indexPath: IndexPath, unfold: Bool) {
+		SettingsViewController.requestedType = nil
+		showManager(for: indexPath, unfold: unfold)
 		tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
 		tableView.scrollToRow(at: indexPath, at: .none, animated: true)
 	}
 
-	private func showManager(for indexPath: IndexPath) {
+	private func showManager(for indexPath: IndexPath, unfold: Bool) {
 		let detailVC = storyboard?.instantiateViewController(withIdentifier: "settingsDetailViewController") as? SettingsDetailViewController
 		detailVC?.delegate = self
 		detailVC?.manager = settingsViewManager(for: indexPath)
@@ -96,6 +116,11 @@ class SettingsViewController: UIViewController, SettingsDetailViewControllerDele
 		detailVC?.manager.header.icon = image
 		detailVC?.navigationItem.title = title(for: indexPath)
 		splitMergeController?.detailViewController = detailVC
+		if unfold {
+			UIView.animate(withDuration: 0.2) { [weak detailVC] in
+				detailVC?.expand()
+			}
+		}
 	}
 
 	@available (iOS 11, *)
@@ -185,7 +210,7 @@ extension SettingsViewController: UITableViewDataSource {
 
 extension SettingsViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		showManager(for: indexPath)
+		showManager(for: indexPath, unfold: false)
 	}
 
 	func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {

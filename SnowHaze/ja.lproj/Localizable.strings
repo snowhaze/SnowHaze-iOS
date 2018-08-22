@@ -47,6 +47,18 @@
 /* title for history section */
 "history view title" = "履歴";
 
+/* name of the https upgrades usage stat */
+"https upgrades usage stats name" = "HTTPSの\nアップグレード";
+
+/* name of the blocked trackers usage stat */
+"blocked trackers usage stats name" = "トラッカー";
+
+/* name of the ephemeral cookies usage stat */
+"ephemeral cookies usage stats name" = "ブロックされた\nCookie";
+
+/* name of the vpn protected loads usage stat */
+"vpn protected loads usage stats name" = "VPN\n保護";
+
 /* Used to confirm message */
 "js alert panel confirmation button title" = "OK";
 
@@ -293,11 +305,20 @@
 /* title of settings for tab masking */
 "tab masking settings title" = "タブを隠す";
 
+/* title of settings for usage stats */
+"usage stats settings title" = "統計";
+
 /* title of setting for the duration during which closing a tab can be undone */
 "allow tab closing undo duration settings title" = "許可：";
 
 /* title of setting to allow tab closing to be undone for all tabs */
 "allow tab closing undo for all tabs settings title" = "すべてのタブを許可する";
+
+/* title of setting to keep usage stats */
+"keep usage stats settings title" = "統計を保存する";
+
+/* title of button to reset usage stats */
+"reset usage stats button title" = "統計情報を削除する";
 
 /* string used to indicate that tab closing cannot be undone */
 "tab closing undo time limit 0 seconds time" = "０秒";
@@ -389,6 +410,15 @@
 /* string displayed to user to identify android opera user agent */
 "android opera user agent display name" = "Opera Android";
 
+/* string displayed to user to identify macos safari user agent */
+"safari macos user agent display name" = "Safari macOS";
+
+/* string displayed to user to identify windows chrome user agent */
+"chrome windows user agent display name" = "Chrome Windows";
+
+/* string displayed to user to identify linux firefox user agent */
+"firefox linux user agent display name" = "Firefox Linux";
+
 /* title of button to reset global settings to defaults */
 "reset global settings button title" = "既定の設定にリセットする";
 
@@ -464,6 +494,9 @@
 /* name of snowhaze search engine to be displayed to user */
 "snowhaze search engine display name" = "SnowHaze";
 
+/* name of findx search engine to be displayed to user */
+"findx search engine display name" = "Findx";
+
 /* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
 "snowhaze search engine missing subscription accessibility label" = "SnowHaze - SnowHaze Premiumの購読が必要です。";
 
@@ -484,6 +517,9 @@
 
 /* title of button to rate snowhaze on the app store */
 "rate snowhaze button title" = "評価";
+
+/* title of button to show the snowhaze source */
+"show snowhaze source button title" = "ソースコード";
 
 /* text use to prefill 'share' messagers */
 "snowhaze share text" = "こんにちは。\nSnowHazeはあなたの個人情報を保護する素晴らしいブラウザです。\nぜひウェブサイトをご覧ください。: snowhaze.com.\nApp Storeではアプリをダウンロードすることができます; snowhaze.com/download。";
@@ -538,6 +574,9 @@
 
 /* subtitle for autocomplete search suggestions from snowhaze search */
 "snowhaze search search suggestion subtitle" = "SnowHaze検索";
+
+/* subtitle for autocomplete search suggestions from findx */
+"findx search suggestion subtitle" = "Findx検索";
 
 /* title of the activity to find some text on page */
 "find on page activity title" = "ページ内を検索";
@@ -800,6 +839,9 @@
 /* title of setting to display the ping status of the vpn servers */
 "show vpn server ping status settings title" = "Pingの表示";
 
+/* title of setting to autorotate ipsec credentials */
+"autorotate ipsec credentials settings title" = "資格情報を自動的にローテーションする";
+
 /* title of button to switch from vpn settings to subscription settings */
 "show subscription status button title" = "購読状況を表示";
 
@@ -834,7 +876,7 @@
 "vpn profile missing subscription accessibility label format" = "%@ - SnowHazeプレミアムの購読が必要";
 
 /* format of the accessibility label of the vpn profile cell when the profile is being downloaded */
-"vpn profile downloading accessibility label format" = "ダウンロード";
+"vpn profile downloading accessibility label format" = "%@ - ダウンロード";
 
 /* format of the accessibility label of the vpn profile cell when the profile credentials are not yet downloaded */
 "vpn profile download required accessibility label format" = "%@ - ダウンロードが必要";
@@ -1119,7 +1161,7 @@
 "block xss prompt title" = "インジェクション攻撃をブロックされた";
 
 /* format string of message of prompt to block xss on a known host */
-"block xss known host prompt format" = "'％@'の悪意のあるURLの読み込みをブロックする";
+"block xss known host prompt format" = "'%@'の悪意のあるURLの読み込みをブロックする";
 
 /* message of prompt to block xss on an unknown host */
 "block xss unknown host prompt message" = "潜在的な悪意のあるURLの読み込みをブロックする";
@@ -1158,19 +1200,19 @@
 "tracking parameter found alert title" = "トラッキングパラメータが検出された";
 
 /* format of message of alert to warn users of a single url parameter on a known host identified as a tracking parameter */
-"tracking parameter found one parameter on known host alert format" = "'%2$@'の '％1$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
+"tracking parameter found one parameter on known host alert format" = "'%2$@'の '%1$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
 
 /* format of message of alert to warn users of a single url parameter on an unknown host identified as a tracking parameter */
-"tracking parameter found one parameter on unknown host alert format" = "'％@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
+"tracking parameter found one parameter on unknown host alert format" = "'%@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
 
 /* separator used to separate multiple parameters in alert to warn users of url parameters identified as tracking parameters when three ore more where found */
 "tracking parameter found alert multiple parameters separator" = "', '";
 
 /* format of message of alert to warn users of multiple url parameters on a known host identified as tracking parameters */
-"tracking parameter found multiple parameters on known host alert format" = "'%3$@'の '％1$@'と '％2$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
+"tracking parameter found multiple parameters on known host alert format" = "'%3$@'の '%1$@'と '%2$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
 
 /* format of message of alert to warn users of multiple url parameters on an unknown host identified as tracking parameters */
-"tracking parameter found multiple parameters on unknown host alert format" = "'％1$@'と '％2$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
+"tracking parameter found multiple parameters on unknown host alert format" = "'%1$@'と '%2$@'はパラメータをトラッキングしているようです。 あなたはそれらを検索から取り除きたいですか？";
 
 /* title of ignore action of alert to warn users of url parameters identified as tracking parameters */
 "tracking parameter found alert ignore option title" = "無視する";
@@ -1243,6 +1285,9 @@
 
 /* title of settings in tab settings to enable / disable search suggestions */
 "show search suggestions tab settings title" = "予測検索";
+
+/* title of tab setting to use desktop user agents */
+"desktop user agent tab setting title" = "デスクトップユーザエージェント";
 
 /* displayed instead of domain name if the current page is an errorpage in page settings */
 "page settings errorpage description" = "エラーページ";
@@ -1478,14 +1523,14 @@
 /* explanations of the content type blockers settings */
 "content type blockers settings explanation" = "SnowHazeはウェブページのさまざまなコンテンツをブロックできます。 ブロックするコンテンツの種類を選択します。";
 
-/* explanations of the acknowledgements settings tab */
-"acknowledgements settings explanation" = "SnowHazeの開発は、第三者コードとオープンソースプロジェクトによって非常に簡易化されました。私たちは以下のプロジェクトの維持をしている方々がこれらを使用することを許可してくださったことに対し、感謝しています ; AgileBits Inc. for 1PasswordExtension, phishtank.com for their phish verification database, Zetetic LLC for SQLCipher, the EasyList authors (easylist.github.io) fanboy, MonztA, Famlam and Khrin for the EasyList, EasyPrivacy List and Fanboy's Social Blocking List and the Polish TeX Users Group GUST for the TeX Gyre Adventor font. 使用されたオープンソースのライセンスや著作権表示は以下に表記しています。SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Basestudioで作製されたデザイン。";
+/* format for explanations of the acknowledgements settings tab */
+"acknowledgements settings explanation format" = "<p>SnowHazeバージョン %@</p>SnowHazeの開発は、第三者コードとオープンソースプロジェクトによって非常に簡易化されました。私たちは以下のプロジェクトの維持をしている方々がこれらを使用することを許可してくださったことに対し、感謝しています ; AgileBits Inc. for 1PasswordExtension, phishtank.com for their phish verification database, Zetetic LLC for SQLCipher, the EasyList authors (easylist.github.io) fanboy, MonztA, Famlam and Khrin for the EasyList, EasyPrivacy List and Fanboy's Social Blocking List and the Polish TeX Users Group GUST for the TeX Gyre Adventor font. 使用されたオープンソースのライセンスや著作権表示は以下に表記しています。SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Basestudioで作製されたデザイン。";
 
 /* explanations of the subscription settings tab */
 "subscription settings explanation" = "<p>SnowHazeプレミアムの購読登録をすることで、SnowHaze VPN、 SnowHaze サーチエンジンをご利用出来ます。また、サイトリストの 自動更新が頻繁に行われます。最初の7日間は初めての加入者には無料です。購読期間は１ヶ月と１年間の２種類があります。購読解除がない限り、購読は自動更新されるので、ご注意ください。</p><p><strong>オプションの自動更新</strong>はサブスクリプションを更新します。</p><p><strong>アクセストークンの自動更新</strong>は認証トークンを更新します。</p><strong>Current Token Hash</strong>は現在の購読登録を確認するためのコードです。";
 
 /* explanations of the vpn settings tab */
-"vpn settings explanation" = "<p>VPN (Virtual Private Network)は暗号化されたプライベートなネットワークです。ユーザーの使用する機器とインターネット間の全ての通信は、はじめに、VPNサーバーに送られます。VPNサーバーを介して情報を受けとった受信者には、ユーザー（送信者）のIPアドレスが通知されることはありません （VPNサーバーのIPアドレスが通知されます）。この機能はトラッキングの防止に役立ちます。</p><p>VPNの利用はインターネット活動をより安全で快適なものにします。例えば、VPNサーバーとの通信は暗号化されます。</p><p>異なるプロトコルを使用する2種類のVPNを提供しています。 1つはIPSecと呼ばれるプロトコルで、もう1つはOpenVPNです。 IPSecを使用したVPNはSnowHazeアプリ内で簡単に制御できますが、OpenVPNではOpenVPN Connectアプリを使用し、毎月プロファイルを更新する必要があります。 しかし、OpenVPNはIPSecよりも少し安全です。 これは、使いやすさ（IPSec）とセキュリティ（OpenVPN）の間の小さなトレードオフであり、私たちが安全にあなたに任せることができます。</p><p>SnowHaze VPNの利用にはSnowHaze Premiumの購読が必要です。VPNの設定についてはオンラインチュートリアルをご参考下さい。</p><p><strong>位置リストの自動更新：</strong>利用可能なVPNサーバーの位置情報を更新します。</p><strong>Pingの表示：</strong> 通信スピードを表示します。具体的には、 使用デバイス・サーバー間を往復するための所要時間が表示されます。";
+"vpn settings explanation" = "<p>VPN (Virtual Private Network)は暗号化されたプライベートなネットワークです。ユーザーの使用する機器とインターネット間の全ての通信は、はじめに、VPNサーバーに送られます。VPNサーバーを介して情報を受けとった受信者には、ユーザー（送信者）のIPアドレスが通知されることはありません （VPNサーバーのIPアドレスが通知されます）。この機能はトラッキングの防止に役立ちます。</p><p>VPNの利用はインターネット活動をより安全で快適なものにします。例えば、VPNサーバーとの通信は暗号化されます。</p><p>異なるプロトコルを使用する2種類のVPNを提供しています。 1つはIPSecと呼ばれるプロトコルで、もう1つはOpenVPNです。 IPSecを使用したVPNはSnowHazeアプリ内で簡単に制御できますが、OpenVPNではOpenVPN Connectアプリを使用し、毎月プロファイルを更新する必要があります。 しかし、OpenVPNはIPSecよりも少し安全です。 これは、使いやすさ（IPSec）とセキュリティ（OpenVPN）の間の小さなトレードオフであり、私たちが安全にあなたに任せることができます。</p><p>SnowHaze VPNの利用にはSnowHaze Premiumの購読が必要です。VPNの設定についてはオンラインチュートリアルをご参考下さい。</p><p><strong>資格情報を自動的にローテーションする:</strong>VPNサーバーに接続している間、サーバーのログイン資格情報を自動的に変更します。 それ以外の場合は、各セッションの資格情報が変更されます。</p><p><strong>位置リストの自動更新：</strong>利用可能なVPNサーバーの位置情報を更新します。</p><strong>Pingの表示：</strong> 通信スピードを表示します。具体的には、 使用デバイス・サーバー間を往復するための所要時間が表示されます。";
 
 /* explanations of the passcode settings tab */
 "passcode settings explanation" = "<p>SnowHazeブラウザを開くためのパスコードを設定します。パスコードの設定、変更、削除は以下で行えます。</p><p><strong>モード：</strong>「パスコードのみ」、「パスコードと生体認証（Touch ID、Face ID）」、「パスコード設定無し」のいずれかを選択できます。また、 SnowHazeを自動ロックするまでの時間設定を行えます。</p><strong>パスコードの種類：</strong>6桁の数字（例：378291）;より長い数字（例：73820983772）;数字と記号を含む文字列（例：$7&9jK-55）";

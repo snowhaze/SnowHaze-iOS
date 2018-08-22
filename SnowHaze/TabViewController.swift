@@ -26,8 +26,6 @@ class TabViewController: UIViewController {
 	private var lastScrollPosition: CGFloat?
 	private var lastScrollUp: Bool?
 
-	private var alertData: (() -> Void, UIViewControllerTransitioningDelegate?)?
-
 	weak var delegate: TabViewControllerDelegate?
 
 	@IBOutlet weak var maskContent: UIView!
@@ -164,8 +162,13 @@ class TabViewController: UIViewController {
 		NotificationCenter.default.addObserver(self, selector: #selector(addedHistoryItem(_:)), name: INSERT_HISTORY_NOTIFICATION, object: historyStore)
 		NotificationCenter.default.addObserver(self, selector: #selector(deletedHistoryItem(_:)), name: DELETE_HISTORY_NOTIFICATION, object: historyStore)
 
+		NotificationCenter.default.addObserver(self, selector: #selector(reloadStatsView(_:)), name: statsResetNotificationName, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(reloadStatsView(_:)), name: subscriptionPurchasedNotificationName, object: nil)
+
 		bookmarkHistoryView.delegate = self
 		bookmarkHistoryView.constrainedWidth = traitCollection.horizontalSizeClass == .compact
+		bookmarkHistoryView.constrainedHeight = traitCollection.verticalSizeClass == .compact
+		bookmarkHistoryView.hideStats = !PolicyManager.globalManager().keepStats
 	}
 
 	override func viewDidLayoutSubviews() {
@@ -176,14 +179,18 @@ class TabViewController: UIViewController {
 	deinit {
 		NotificationCenter.default.removeObserver(self)
 		tab?.controller?.UIDelegate = nil
-		alertData?.0()
 	}
 }
 
 // MARK: Internals
 private extension TabViewController {
 	func display(_ alert: UIAlertController, domain: String?, fallbackHandler: @escaping () -> Void) -> Bool {
-		guard alertData == nil else {
+		guard !TabAlertTransitioningDelegate.shared.isBusy else {
+			if let controller = tab?.controller {
+				TabAlertTransitioningDelegate.shared.notify(controller: controller)
+			} else {
+				fallbackHandler()
+			}
 			return false
 		}
 		if let domain = domain, !domain.isEmpty, tab?.controller?.shouldAllowIgnoreForIncedAlertCount(for: domain) ?? false {
@@ -194,8 +201,8 @@ private extension TabViewController {
 			}
 			alert.addAction(ignoreAction)
 		}
-		alertData = (fallbackHandler, alert.transitioningDelegate)
-		alert.transitioningDelegate = self
+		TabAlertTransitioningDelegate.shared.setup(delegate: alert.transitioningDelegate)
+		alert.transitioningDelegate = TabAlertTransitioningDelegate.shared
 		present(alert, animated: true, completion: nil)
 		return true
 	}
@@ -253,21 +260,6 @@ private extension TabViewController {
 		bookmarkHistoryView?.frame = view.bounds
 		bookmarkHistoryView?.frame.size.height -= insets.top + insets.bottom
 		bookmarkHistoryView?.frame.origin.y += insets.top
-	}
-}
-
-// MARK: Transitioning Delegate
-extension TabViewController: UIViewControllerTransitioningDelegate {
-	func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-		return alertData?.1?.animationController?(forPresented: presented, presenting: presenting, source: source)
-	}
-
-	func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-		DispatchQueue.main.async {
-			self.alertData = nil
-			self.tab?.controller?.notifyNextUIEvent()
-		}
-		return alertData?.1?.animationController?(forDismissed: dismissed)
 	}
 }
 
@@ -363,8 +355,13 @@ extension TabViewController: TabControllerNavigationDelegate {
 		urlBar?.attributedTitle = tab?.formatedDisplayTitle
 	}
 
-	func tabController(_ controller: TabController, didLoadURL url: URL?) {
+	func tabController(_ controller: TabController, isLoading url: URL?) {
 		urlBar?.url = controller.tab.displayURL
+		Stats.shared.loading(url, in: controller.tab)
+	}
+
+	func tabController(_ controller: TabController, didUpgradeLoadOf url: URL) {
+		Stats.shared.upgradedLoad(of: url, in: controller.tab)
 	}
 
 	func tabController(_ controller: TabController, estimatedProgress: Double) {
@@ -471,6 +468,53 @@ extension TabViewController: BookmarkHistoryDelegate {
 			bookmarkStore.addItem(for: url, loadWith: tab)
 		}
 	}
+
+	func numerOfStats(in statsView: StatsView) -> Int {
+		return 4
+	}
+
+	func titleOfStat(_ index: Int, in statsView: StatsView) -> String {
+		switch index {
+			case 0:		return NSLocalizedString("https upgrades usage stats name", comment: "name of the https upgrades usage stat")
+			case 1:		return NSLocalizedString("blocked trackers usage stats name", comment: "name of the blocked trackers usage stat")
+			case 2:		return NSLocalizedString("ephemeral cookies usage stats name", comment: "name of the ephemeral cookies usage stat")
+			case 3:		return NSLocalizedString("vpn protected loads usage stats name", comment: "name of the vpn protected loads usage stat")
+			default:	fatalError("unexpected index")
+		}
+	}
+
+	func countForStat(_ index: Int, in statsView: StatsView) -> Int {
+		let stats = Stats.shared
+		let count: UInt
+		switch index {
+			case 0:		count = stats.upgradedLoads
+			case 1:		count = stats.blockedTrackers
+			case 2:		count = stats.killedCookies
+			case 3:		count = stats.protectedSiteLoads
+			default:	fatalError("unexpected index")
+		}
+		return Int(count)
+	}
+
+	func colorForStat(_ index: Int, in statsView: StatsView) -> UIColor {
+		switch index {
+			case 0:		return .httpsStats
+			case 1:		return .trackerStats
+			case 2:		return .cookieStats
+			case 3:		return .vpnStats
+			default:	fatalError("unexpected index")
+		}
+	}
+
+	func dimmStat(_ index: Int, in statsView: StatsView) -> Bool {
+		return index == 3 && !SubscriptionManager.shared.hasSubscription
+	}
+
+	func statTapped(at index: Int, in statsView: StatsView) {
+		if index == 3 && !SubscriptionManager.shared.hasSubscription {
+			MainViewController.openSettings(type: .subscription)
+		}
+	}
 }
 
 // MARK: Notifications
@@ -504,6 +548,11 @@ extension TabViewController {
 		let index = info[HISTORY_ITEM_INDEX] as? Int
 		bookmarkHistoryView.deleteHistoryItems(section: section, index: index)
 	}
+
+	@objc private func reloadStatsView(_ notification: Notification) {
+		bookmarkHistoryView.hideStats = !PolicyManager.globalManager().keepStats
+		bookmarkHistoryView.reloadStats()
+	}
 }
 
 // MARK: UIContentContainer methods
@@ -511,6 +560,7 @@ extension TabViewController {
 	override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
 		super.willTransition(to: newCollection, with: coordinator)
 		bookmarkHistoryView.constrainedWidth = newCollection.horizontalSizeClass == .compact
+		bookmarkHistoryView.constrainedHeight = newCollection.verticalSizeClass == .compact
 	}
 }
 
@@ -543,5 +593,42 @@ extension TabViewController: UIScrollViewDelegate {
 			scale = finalScale
 		}
 		lastScrollPosition = newScrollPosition
+	}
+}
+
+private class TabAlertTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
+	static let shared = TabAlertTransitioningDelegate()
+
+	private(set) var proxiedDelegate: UIViewControllerTransitioningDelegate?
+	private(set) var waitingControllers = [TabController]()
+
+	func notify(controller: TabController) {
+		precondition(isBusy)
+		precondition(Thread.isMainThread)
+		waitingControllers.append(controller)
+	}
+
+	func setup(delegate: UIViewControllerTransitioningDelegate?) {
+		precondition(Thread.isMainThread)
+		proxiedDelegate = delegate
+		isBusy = true
+	}
+
+	private(set) var isBusy = false
+
+	func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+		return proxiedDelegate?.animationController?(forPresented: presented, presenting: presenting, source: source)
+	}
+
+	func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+		DispatchQueue.main.async {
+			let oldWaiting = self.waitingControllers
+			self.waitingControllers = []
+			self.isBusy = false
+			for controller in oldWaiting {
+				controller.notifyNextUIEvent()
+			}
+		}
+		return proxiedDelegate?.animationController?(forDismissed: dismissed)
 	}
 }

@@ -27,9 +27,9 @@ private class OverrideSettingsDefaultWrapper: SettingsDefaultWrapper {
 class TabSettingsController: LocalSettingsController {
 	override var numberOfSettings: Int {
 		if #available(iOS 10, *) {
-			return 6
+			return 7
 		} else {
-			return 5
+			return 6
 		}
 	}
 
@@ -48,7 +48,8 @@ class TabSettingsController: LocalSettingsController {
 			case 2:		return NSLocalizedString("night mode setting title", comment: "title of night mode setting")
 			case 3:		return NSLocalizedString("show search suggestions tab settings title", comment: "title of settings in tab settings to enable / disable search suggestions")
 			case 4:		return NSLocalizedString("allow javascript setting title", comment: "title of allow javascript setting")
-			case 5:		return NSLocalizedString("ignore scale limits setting title", comment: "title of ignore scale limits setting")
+			case 5:		return NSLocalizedString("desktop user agent tab setting title", comment: "title of tab setting to use desktop user agents")
+			case 6:		return NSLocalizedString("ignore scale limits setting title", comment: "title of ignore scale limits setting")
 			default:	fatalError("Invalid Index")
 		}
 	}
@@ -60,7 +61,8 @@ class TabSettingsController: LocalSettingsController {
 			case 2:		return nightModeKey
 			case 3:		return searchSuggestionEnginesKey
 			case 4:		return allowJavaScriptKey
-			case 5:		return ignoresViewportScaleLimitsKey
+			case 5:		return userAgentsKey
+			case 6:		return ignoresViewportScaleLimitsKey
 			default:	fatalError("Invalid Index")
 		}
 	}
@@ -84,6 +86,12 @@ class TabSettingsController: LocalSettingsController {
 				engines = []
 			}
 			return .text(SearchEngine.encode(engines))
+		} else if key == userAgentsKey {
+			if bool {
+				return .text(UserAgent.encode(UserAgent.desktopAgents))
+			} else {
+				return .text(UserAgent.encode(UserAgent.defaultUserAgentTypes))
+			}
 		} else {
 			return super.mapToData(bool, for: key)
 		}
@@ -93,6 +101,8 @@ class TabSettingsController: LocalSettingsController {
 		if key == searchSuggestionEnginesKey {
 			let encoded = wrapper.value(for: searchSuggestionEnginesKey).text!
 			return !SearchEngine.decode(encoded).isEmpty
+		} else if key == userAgentsKey {
+			return UserAgent.decode(data.text!).contains { $0.isDesktop }
 		} else {
 			return super.mapToBool(data, for: key)
 		}

@@ -118,12 +118,27 @@ class AppSettingsManager: SettingsViewManager {
 				uiSwitch.addTarget(self, action: #selector(toggleAllowTabClosingUndoForAllTabs(_:)), for: .valueChanged)
 				cell.accessoryView = uiSwitch
 			}
-		} else {
+		} else if indexPath.section == tabMaskingSection {
+			assert(tabMaskingSection == 3)
 			cell.accessoryView = nil
 			let selected = settings.value(for: tabMaskingRuleKey).integer!
 			let index = Int64(indexPath.row)
 			cell.accessoryType = selected == index ? .checkmark : .none
 			cell.textLabel?.text = TabMaskingRule(rawValue: index)?.name
+		} else {
+			if indexPath.row == 0 {
+				let uiSwitch = makeSwitch()
+				cell.textLabel?.text = NSLocalizedString("keep usage stats settings title", comment: "title of setting to keep usage stats")
+				uiSwitch.isOn = bool(for: updateUsageStatsKey)
+				uiSwitch.addTarget(self, action: #selector(toggleKeepUsageStats(_:)), for: .valueChanged)
+				cell.accessoryView = uiSwitch
+			} else {
+				let button = makeButton(for: cell)
+				let title = NSLocalizedString("reset usage stats button title", comment: "title of button to reset usage stats")
+				button.setTitle(title, for: [])
+				button.isEnabled = !Stats.shared.isCleared
+				button.addTarget(self, action: #selector(clearUsageStats(_:)), for: .touchUpInside)
+			}
 		}
 		return cell
 	}
@@ -153,6 +168,7 @@ class AppSettingsManager: SettingsViewManager {
 			case 1:		return NSLocalizedString("site lists settings title", comment: "title of settings to manage site lists")
 			case 2:		return NSLocalizedString("allow tab closing undo settings title", comment: "title of settings for undoing tab closing")
 			case 3:		return NSLocalizedString("tab masking settings title", comment: "title of settings for tab masking")
+			case 4:		return NSLocalizedString("usage stats settings title", comment: "title of settings for usage stats")
 			default:	fatalError("invalid section")
 		}
 	}
@@ -166,7 +182,7 @@ class AppSettingsManager: SettingsViewManager {
 	}
 
 	override var numberOfSections: Int {
-		return 4
+		return 5
 	}
 
 	override func numberOfRows(inSection section: Int) -> Int {
@@ -177,6 +193,7 @@ class AppSettingsManager: SettingsViewManager {
 			case 1:		return 2
 			case 2:		return 2
 			case 3:		return 3
+			case 4:		return 2
 			default:	fatalError("invalid section")
 		}
 	}
@@ -216,6 +233,17 @@ class AppSettingsManager: SettingsViewManager {
 	@objc private func toggleAllowTabClosingUndoForAllTabs(_ sender: UISwitch) {
 		set(sender.isOn, for: allowTabClosingUndoForAllTabsKey)
 		updateHeaderColor(animated: true)
+	}
+
+	@objc private func toggleKeepUsageStats(_ sender: UISwitch) {
+		set(sender.isOn, for: updateUsageStatsKey)
+		Stats.shared.reset()
+		updateHeaderColor(animated: true)
+	}
+
+	@objc private func clearUsageStats(_ sender: UIControl) {
+		Stats.shared.reset()
+		sender.isEnabled = !Stats.shared.isCleared
 	}
 
 	private func timeFor(stepperValue: Double) -> Double {

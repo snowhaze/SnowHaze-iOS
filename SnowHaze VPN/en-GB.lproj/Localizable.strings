@@ -1,0 +1,61 @@
+/* Localizable.strings
+  SnowHaze
+  Copyright © 2018 Illotros GmbH. All rights reserved. */
+
+/* indication that no vpn location is selected */
+"none ipsec location name" = "None";
+
+/* indication that australia is selected as ipsec vpn location */
+"australia ipsec location name" = "Australia";
+
+/* indication that canada is selected as ipsec vpn location */
+"canada ipsec location name" = "Canada";
+
+/* indication that switzerland is selected as ipsec vpn location */
+"switzerland ipsec location name" = "Switzerland";
+
+/* indication that germany is selected as ipsec vpn location */
+"germany ipsec location name" = "Germany";
+
+/* indication that france is selected as ipsec vpn location */
+"france ipsec location name" = "France";
+
+/* indication that poland is selected as ipsec vpn location */
+"poland ipsec location name" = "Poland";
+
+/* indication that singapore is selected as ipsec vpn location */
+"singapore ipsec location name" = "Singapore";
+
+/* indication that uk is selected as ipsec vpn location */
+"uk ipsec location name" = "United Kingdom";
+
+/* indication that us is selected as ipsec vpn location */
+"us ipsec location name" = "USA";
+
+/* indication that the selected ipsec vpn location is unknown */
+"unknown ipsec location name" = "Unknown";
+
+/* label for the error ipsec status */
+"error ipsec status" = "Error";
+
+/* format for the label for the connected ipsec status */
+"connected ipsec status format" = "Connected - %@";
+
+/* label for the connecting ipsec status */
+"connecting ipsec status" = "Connecting";
+
+/* label for the disconnected ipsec status */
+"disconnected ipsec status" = "Not Connected";
+
+/* label for the disconnecting ipsec status */
+"disconnecting ipsec status" = "Disconnecting";
+
+/* label for the invalid ipsec status */
+"invalid ipsec status" = "Loading";
+
+/* label for the reasserting ipsec status */
+"reasserting ipsec status" = "Reconnecting";
+
+/* format of the accessibbility label for the ipsec location flag */
+"flag accessibbility label format" = "Location: %@";
+

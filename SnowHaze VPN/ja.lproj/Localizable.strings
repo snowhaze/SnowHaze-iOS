@@ -1,0 +1,61 @@
+/* Localizable.strings
+  SnowHaze
+  Copyright © 2018 Illotros GmbH. All rights reserved. */
+
+/* indication that no vpn location is selected */
+"none ipsec location name" = "なし";
+
+/* indication that australia is selected as ipsec vpn location */
+"australia ipsec location name" = "オストラリア";
+
+/* indication that canada is selected as ipsec vpn location */
+"canada ipsec location name" = "カナダ";
+
+/* indication that switzerland is selected as ipsec vpn location */
+"switzerland ipsec location name" = "スイス";
+
+/* indication that germany is selected as ipsec vpn location */
+"germany ipsec location name" = "ドイツ";
+
+/* indication that france is selected as ipsec vpn location */
+"france ipsec location name" = "フランス";
+
+/* indication that poland is selected as ipsec vpn location */
+"poland ipsec location name" = "ポーランド";
+
+/* indication that singapore is selected as ipsec vpn location */
+"singapore ipsec location name" = "シンガポール";
+
+/* indication that uk is selected as ipsec vpn location */
+"uk ipsec location name" = "イギリス";
+
+/* indication that us is selected as ipsec vpn location */
+"us ipsec location name" = "大米";
+
+/* indication that the selected ipsec vpn location is unknown */
+"unknown ipsec location name" = "不明";
+
+/* label for the error ipsec status */
+"error ipsec status" = "エラー";
+
+/* format for the label for the connected ipsec status */
+"connected ipsec status format" = "接続 - %@";
+
+/* label for the connecting ipsec status */
+"connecting ipsec status" = "接続中";
+
+/* label for the disconnected ipsec status */
+"disconnected ipsec status" = "未接続";
+
+/* label for the disconnecting ipsec status */
+"disconnecting ipsec status" = "切断されて";
+
+/* label for the invalid ipsec status */
+"invalid ipsec status" = "ロード中";
+
+/* label for the reasserting ipsec status */
+"reasserting ipsec status" = "再接続して";
+
+/* format of the accessibbility label for the ipsec location flag */
+"flag accessibbility label format" = "場所: %@";
+

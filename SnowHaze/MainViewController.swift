@@ -17,6 +17,9 @@ enum InputType {
 
 private let crashCountKey = "ch.illotros.snowhaze.crashCount"
 
+private let animationDuration = 0.3
+private let tabControllerEdgeOffset: CGFloat = 5
+
 class MainViewController: UIViewController {
 	private(set) static var controller: MainViewController!
 
@@ -37,8 +40,6 @@ class MainViewController: UIViewController {
 	private var suggestionVC: SuggestionViewController!
 	private var suggestionContainer = UIView()
 
-	private let animationDuration = 0.3
-	private let tabControllerEdgeOffset: CGFloat = 5
 	private let pageTapRecognizer = UITapGestureRecognizer()
 
 	private let tabStore = TabStore.store
@@ -54,33 +55,45 @@ class MainViewController: UIViewController {
 		return pageTapRecognizer.isEnabled
 	}
 
-	private enum OpenTask {
+	private enum LaunchTask {
 		case openTab(AnyObject)
+		case openSettings(SettingsViewController.SettingsType, Bool)
 		case loadInFreshTab(String, InputType)
+		case rotateIPSecCreds
 	}
 
-	private static var openTasks = [(OpenTask, (() -> Void)?)]()
+	private static var openTasks = [(LaunchTask, (() -> Void)?)]()
 
-	class func addEmptyTab(_ sender: AnyObject, completionHandler: (() -> Void)? = nil) {
+	private class func perform(_ action: LaunchTask, completionHandler: (() -> Void)?) {
 		DispatchQueue.main.async {
 			if let controller = controller {
-				controller.addEmptyTab(sender)
+				switch action {
+					case .openTab(let sender):					controller.addEmptyTab(sender)
+					case .openSettings(let type, let unfold):	controller.openSettings(type, unfold: unfold)
+					case .loadInFreshTab(let input, let type):	controller.loadInFreshTab(input: input, type: type)
+					case .rotateIPSecCreds:						VPNManager.shared.swapIPSecCreds(runningLongerThan: 60, force: true)
+				}
 				completionHandler?()
 			} else {
-				openTasks.append((.openTab(sender), completionHandler))
+				openTasks.append((action, completionHandler))
 			}
 		}
+	}
+
+	class func addEmptyTab(_ sender: AnyObject, completionHandler: (() -> Void)? = nil) {
+		MainViewController.perform(.openTab(sender), completionHandler: completionHandler)
+	}
+
+	class func openSettings(type: SettingsViewController.SettingsType, unfold: Bool = false, completionHandler: (() -> Void)? = nil) {
+		MainViewController.perform(.openSettings(type, unfold), completionHandler: completionHandler)
+	}
+
+	class func rotateIPSecCreds(completionHandler: (() -> Void)? = nil) {
+		MainViewController.perform(.rotateIPSecCreds, completionHandler: completionHandler)
 	}
 
 	class func loadInFreshTab(input: String, type: InputType, completionHandler: (() -> Void)? = nil) {
-		DispatchQueue.main.async {
-			if let controller = controller {
-				controller.loadInFreshTab(input: input, type: type)
-				completionHandler?()
-			} else {
-				openTasks.append((.loadInFreshTab(input, type), completionHandler))
-			}
-		}
+		MainViewController.perform(.loadInFreshTab(input, type), completionHandler: completionHandler)
 	}
 
 	override var keyCommands: [UIKeyCommand]? {
@@ -134,15 +147,11 @@ class MainViewController: UIViewController {
 		let policy = PolicyManager.globalManager()
 		policy.updateOpenedVersion()
 		MainViewController.controller = self
-		for wrapped in MainViewController.openTasks {
+		let tasks = MainViewController.openTasks
+		MainViewController.openTasks = []
+		for wrapped in tasks {
 			let (task, completion) = wrapped
-			DispatchQueue.main.async {
-				switch task {
-					case .openTab(let sender):					self.addEmptyTab(sender)
-					case .loadInFreshTab(let input, let type):	self.loadInFreshTab(input: input, type: type)
-				}
-				completion?()
-			}
+			MainViewController.perform(task, completionHandler: completion)
 		}
 		tabCollectionView.register(TabCollectionViewCell.self, forCellWithReuseIdentifier: "TabCell")
 
@@ -258,13 +267,17 @@ private extension MainViewController {
 	func close(_ tab: Tab) {
 		let currentDeleted = tabVC.tab == tab
 
+		Stats.shared.updateCookieCount(for: tab)
+
 		let url = tab.controller?.url
 		let policy = PolicyManager.manager(for: url, in: tab)
 		tabStore.remove(tab, undoTime: policy.tabClosingUndoTimeLimit)
 
 		if currentDeleted {
 			tabVC.tab = nil
-			set(tab: currentTab, animated: !isShowingTabsView)
+			if !isShowingTabsView {
+				set(tab: currentTab, animated: true)
+			}
 		}
 	}
 
@@ -340,11 +353,14 @@ private extension MainViewController {
 		tabVC?.tab?.controller?.saveTabState()
 		let oldTabVC = tabVC
 		oldTabVC?.urlBar = nil
+		if let tab = oldTabVC?.tab {
+			Stats.shared.updateCookieCount(for: tab)
+		}
 		guard let storyboard = storyboard else {
 			return
 		}
 		tab.makeActive()
-		tabVC = storyboard.instantiateViewController(withIdentifier: "TabViewController") as! TabViewController
+		tabVC = (storyboard.instantiateViewController(withIdentifier: "TabViewController") as! TabViewController)
 		tabVC.delegate = self
 		addChildViewController(tabVC)
 		pageContentView.addSubview(tabVC.view)
@@ -517,27 +533,21 @@ extension MainViewController {
 		_ = navigationController?.popToViewController(self, animated: animated)
 	}
 
-	func showSubscription() {
+	func openSettings(_ type: SettingsViewController.SettingsType? = nil, unfold: Bool = false) {
 		let vcs = navigationController!.viewControllers
 		let index = vcs.index(of: self)!
 		let show: () -> Void = {
+			SettingsViewController.requestedType = (type, unfold)
 			self.showSettings()
-			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3) {
-				let top = self.navigationController?.topViewController
-				if let splitMerge = top as? SplitMergeController, let settings = splitMerge.masterViewController as? SettingsViewController {
-					settings.showSubscriptionSettings()
-					return
-				}
-			}
 		}
 		if index + 1 < vcs.count {
 			let next = vcs[index + 1]
 			if let splitMerge = next as? SplitMergeController, let settings = splitMerge.masterViewController as? SettingsViewController {
-				settings.showSubscriptionSettings()
+				settings.showSettings(type, unfold: unfold)
 				return
 			}
 			popToVisible(animated: true)
-			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3, execute: show)
+			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + animationDuration + 0.1, execute: show)
 			return
 		}
 		show()
@@ -588,8 +598,8 @@ extension MainViewController {
 					var frame = attributes.frame
 					frame.size.height -= TabCollectionViewCell.barHeight
 					frame.origin.y += TabCollectionViewCell.barHeight
-					frame.size.width -= self.tabControllerEdgeOffset * 2
-					frame.origin.x += self.tabControllerEdgeOffset
+					frame.size.width -= tabControllerEdgeOffset * 2
+					frame.origin.x += tabControllerEdgeOffset
 					let convertedFrame = self.pageContentView.convert(frame, from: self.tabCollectionView)
 					tabVC?.view.frame = convertedFrame
 					tabVC?.view.layer.transform = attributes.transform3D
@@ -1055,6 +1065,9 @@ extension MainViewController {
 			let tabCell = cell as! TabCollectionViewCell
 			tabCell.isMasked = shouldMask(tab: tabCell.tab)
 		}
+		for tab in tabs {
+			Stats.shared.updateCookieCount(for: tab)
+		}
 	}
 
 	@objc private func willEnterForeground(_ notification: Notification) {
@@ -1092,7 +1105,7 @@ extension MainViewController: SearchBarDelegate, SearchListener {
 		bar.frame.origin.y = self.view.bounds.maxY + 10
 		bar.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
 		self.view.addSubview(bar)
-		UIView.animate(withDuration: self.animationDuration, animations: {
+		UIView.animate(withDuration: animationDuration, animations: {
 			if #available(iOS 11, *) {
 				bar.frame.origin.y = self.view.bounds.maxY - bar.frame.height - self.view.safeAreaInsets.bottom
 			} else {

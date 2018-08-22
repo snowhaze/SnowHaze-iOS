@@ -491,24 +491,24 @@ extension VPNManager {
 	private func saveManager(with reload: @escaping () -> Void, success: (() -> Void)? = nil) {
 		NEVPNManager.shared().saveToPreferences { err in
 			if let error = err {
-				if #available(iOS 11, *) {
-					let code = (error as NSError).code
-					if (error as NSError).domain == "NEVPNErrorDomain" {
-						switch code {
-							case NEDNSProxyManagerError.configurationCannotBeRemoved.rawValue:
-								fatalError("was not trying to remove config")
-							case NEDNSProxyManagerError.configurationDisabled.rawValue:
-								print("config disabled")
-							case NEDNSProxyManagerError.configurationInvalid.rawValue:
-								reload()
-							case NEDNSProxyManagerError.configurationStale.rawValue:
-								reload()
-							default:
-								print("unexpected error code \(code)")
-						}
-					} else {
-						print("unexpected error domain \((error as NSError).domain), code \(code)")
+				let code = (error as NSError).code
+				if (error as NSError).domain == "NEVPNErrorDomain", let vpnError = NEVPNError.Code(rawValue: code) {
+					switch vpnError {
+						case .configurationInvalid:
+							fatalError("config invalid")
+						case .configurationDisabled:
+							fatalError("was not trying to connect")
+						case .connectionFailed:
+							fatalError("was not trying to connect")
+						case .configurationStale:
+							fatalError("was trying to load config already")
+						case .configurationReadWriteFailed:
+							fatalError("failed to save config")
+						case .configurationUnknown:
+							fatalError("unexpected error")
 					}
+				} else {
+					fatalError("unexpected error domain \((error as NSError).domain), code \(code)")
 				}
 			} else {
 				self.loadVPNManager(completion: nil)
@@ -532,24 +532,24 @@ extension VPNManager {
 		NEVPNManager.shared().loadFromPreferences { error in
 			DispatchQueue.main.async {
 				if let error = error {
-					if #available(iOS 11, *) {
-						let code = (error as NSError).code
-						if (error as NSError).domain == "NEVPNErrorDomain" {
-							switch code {
-								case NEDNSProxyManagerError.configurationCannotBeRemoved.rawValue:
-									fatalError("was not trying to remove config")
-								case NEDNSProxyManagerError.configurationDisabled.rawValue:
-									print("config disabled")
-								case NEDNSProxyManagerError.configurationInvalid.rawValue:
-									print("config invalid")
-								case NEDNSProxyManagerError.configurationStale.rawValue:
-									fatalError("I was already trying to load config")
-								default:
-									print("unexpected error code \(code)")
-							}
-						} else {
-							print("unexpected error domain \((error as NSError).domain), code \(code)")
+					let code = (error as NSError).code
+					if (error as NSError).domain == "NEVPNErrorDomain", let vpnError = NEVPNError.Code(rawValue: code) {
+						switch vpnError {
+							case .configurationInvalid:
+								fatalError("config invalid")
+							case .configurationDisabled:
+								fatalError("was not trying to connect")
+							case .connectionFailed:
+								fatalError("was not trying to connect")
+							case .configurationStale:
+								fatalError("was trying to load config already")
+							case .configurationReadWriteFailed:
+								print("failed to load config")
+							case .configurationUnknown:
+								fatalError("unexpected error")
 						}
+					} else {
+						fatalError("unexpected error domain \((error as NSError).domain), code \(code)")
 					}
 					self.performWithLoadedVPNManager = nil
 				} else {
@@ -564,7 +564,7 @@ extension VPNManager {
 
 
 	func disconnect() {
-		VPNManager.shared.withLoadedManager { reload in
+		withLoadedManager { reload in
 			let manager = NEVPNManager.shared()
 
 			// don't create a profile just to disconnect
@@ -573,7 +573,7 @@ extension VPNManager {
 			}
 
 			manager.isOnDemandEnabled = false
-			VPNManager.shared.saveManager(with: reload) {
+			self.saveManager(with: reload) {
 				NEVPNManager.shared().connection.stopVPNTunnel()
 			}
 		}
@@ -583,24 +583,24 @@ extension VPNManager {
 		withLoadedManager { reload in
 			NEVPNManager.shared().removeFromPreferences { err in
 				if let error = err {
-					if #available(iOS 11, *) {
-						let code = (error as NSError).code
-						if (error as NSError).domain == "NEVPNErrorDomain" {
-							switch code {
-								case NEDNSProxyManagerError.configurationCannotBeRemoved.rawValue:
-									reload()
-								case NEDNSProxyManagerError.configurationDisabled.rawValue:
-									print("config disabled")
-								case NEDNSProxyManagerError.configurationInvalid.rawValue:
-									break
-								case NEDNSProxyManagerError.configurationStale.rawValue:
-									reload()
-								default:
-									print("unexpected error code \(code)")
-							}
-						} else {
-							print("unexpected error domain \((error as NSError).domain), code \(code)")
+					let code = (error as NSError).code
+					if (error as NSError).domain == "NEVPNErrorDomain", let vpnError = NEVPNError.Code(rawValue: code) {
+						switch vpnError {
+							case .configurationInvalid:
+								print("config invalid")
+							case .configurationDisabled:
+								fatalError("was not trying to connect")
+							case .connectionFailed:
+								fatalError("was not trying to connect")
+							case .configurationStale:
+								reload()
+							case .configurationReadWriteFailed:
+								fatalError("failed to delete config")
+							case .configurationUnknown:
+								fatalError("unexpected error")
 						}
+					} else {
+						fatalError("unexpected error domain \((error as NSError).domain), code \(code)")
 					}
 				} else {
 					self.lastIPSecCredSwap = Date()
@@ -622,7 +622,7 @@ extension VPNManager {
 		let loc = NSLocalizedString("localization code", comment: "code used to identify the current locale")
 		let name = profile.names[loc] ?? profile.names["en"] ?? profile.hosts.first ?? "?"
 
-		VPNManager.shared.withLoadedManager { reload in
+		withLoadedManager { reload in
 			let vpnManager = NEVPNManager.shared()
 
 			let psk = KeyManager(name: "snowhaze.vpn.ipsec.psk.current")
@@ -660,7 +660,7 @@ extension VPNManager {
 			vpnManager.isEnabled = true
 			vpnManager.isOnDemandEnabled = enable
 			vpnManager.localizedDescription = name
-			VPNManager.shared.saveManager(with: reload) {
+			self.saveManager(with: reload) {
 				completion?()
 			}
 		}
@@ -672,20 +672,24 @@ extension VPNManager {
 		}
 	}
 
-	func swapLongRunningIPSecCreds() {
-		let profile = VPNManager.shared.ipsecProfiles.first { $0.id == selectedProfileID }
-		if ipsecConnected && lastIPSecCredSwap.timeIntervalSinceNow < -60 * 60 {
-			if let profile = profile, SubscriptionManager.shared.hasSubscription {
-				connect(with: profile)
-			} else if SubscriptionManager.shared.hasSubscription {
-				disconnect()
-			} else {
-				clearSavedProfile()
+	func swapIPSecCreds(runningLongerThan credsTimeout: TimeInterval, force: Bool) {
+		withLoadedManager { _ in
+			let profile = self.ipsecProfiles.first { $0.id == self.selectedProfileID }
+			if self.ipsecConnected && self.lastIPSecCredSwap.timeIntervalSinceNow < -credsTimeout {
+				if let profile = profile, SubscriptionManager.shared.hasSubscription {
+					if PolicyManager.globalManager().autorotateIPSecCredentials || force {
+						self.connect(with: profile)
+					}
+				} else if SubscriptionManager.shared.hasSubscription {
+					self.disconnect()
+				} else {
+					self.clearSavedProfile()
+				}
+			} else if !SubscriptionManager.shared.hasSubscription {
+				self.clearSavedProfile()
+			} else if let profile = profile, !profile.hasProfile {
+				self.clearSavedProfile()
 			}
-		} else if !SubscriptionManager.shared.hasSubscription {
-			clearSavedProfile()
-		} else if let profile = profile, !profile.hasProfile {
-			clearSavedProfile()
 		}
 	}
 }

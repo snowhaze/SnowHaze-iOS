@@ -13,13 +13,15 @@ private let maxCount = 3
 class PopularSitesSuggestionSource: SuggestionSource {
 	let includesPrivate: Bool
 	let upgradeHTTP: Bool
+	private(set) weak var tab: Tab?
 	private var popularSites: DomainList {
 		return DomainList(type: includesPrivate ? .popularSites : .nonPrivatePopularSites)
 	}
 
-	init(includePrivate: Bool, upgrade: Bool) {
+	init(includePrivate: Bool, upgrade: Bool, tab: Tab) {
 		includesPrivate = includePrivate
 		upgradeHTTP = upgrade
+		self.tab = tab
 	}
 
 	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> Void) {
@@ -38,7 +40,14 @@ class PopularSitesSuggestionSource: SuggestionSource {
 				let url = URL(string:  urlString)!
 				let image = #imageLiteral(resourceName: "popular_sites")
 				let priority = 5000 / (Double(index) + 100) * Double(1 + base.count) * Double(1 + base.count)
-				return Suggestion(title: title, subtitle: urlString, url: url, image: image, priority: priority)
+				let suggestion =  Suggestion(title: title, subtitle: urlString, url: url, image: image, priority: priority)
+				let tab = self.tab
+				suggestion.selectionCallback = { [weak tab] in
+					if upgrage, let tab = tab {
+						Stats.shared.upgradedLoad(of: url, in: tab)
+					}
+				}
+				return suggestion
 			}
 			DispatchQueue.main.sync {
 				callback(suggestions, "popular_sites")

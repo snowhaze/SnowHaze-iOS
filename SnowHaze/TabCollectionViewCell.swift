@@ -12,9 +12,10 @@ protocol TabCollectionViewCellDelegate: class {
 	func closeTab(for tab: TabCollectionViewCell)
 }
 
+private let animationDuration = 0.3
+
 class TabCollectionViewCell: UICollectionViewCell {
 	static let barHeight: CGFloat = 35
-	private let animationDuration = 0.3
 	private let barHeight: CGFloat = TabCollectionViewCell.barHeight
 	private var closeButton: UIButton!
 	private var imageView: UIImageView!

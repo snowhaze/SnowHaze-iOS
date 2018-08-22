@@ -47,6 +47,18 @@
 /* title for history section */
 "history view title" = "Histórico";
 
+/* name of the https upgrades usage stat */
+"https upgrades usage stats name" = "Upgrade\nHTTPS";
+
+/* name of the blocked trackers usage stat */
+"blocked trackers usage stats name" = "Trackers";
+
+/* name of the ephemeral cookies usage stat */
+"ephemeral cookies usage stats name" = "Cookies\nexcluídos";
+
+/* name of the vpn protected loads usage stat */
+"vpn protected loads usage stats name" = "Proteções\nVPN";
+
 /* Used to confirm message */
 "js alert panel confirmation button title" = "OK";
 
@@ -293,11 +305,20 @@
 /* title of settings for tab masking */
 "tab masking settings title" = "MASCARAR OS SEPARADOS";
 
+/* title of settings for usage stats */
+"usage stats settings title" = "ESTATISTICA";
+
 /* title of setting for the duration during which closing a tab can be undone */
 "allow tab closing undo duration settings title" = "Permitir";
 
 /* title of setting to allow tab closing to be undone for all tabs */
 "allow tab closing undo for all tabs settings title" = "Permitir todas";
+
+/* title of setting to keep usage stats */
+"keep usage stats settings title" = "Salvar estatísticas";
+
+/* title of button to reset usage stats */
+"reset usage stats button title" = "Excluir estatísticas";
 
 /* string used to indicate that tab closing cannot be undone */
 "tab closing undo time limit 0 seconds time" = "0 seg";
@@ -389,6 +410,15 @@
 /* string displayed to user to identify android opera user agent */
 "android opera user agent display name" = "Opera Android";
 
+/* string displayed to user to identify macos safari user agent */
+"safari macos user agent display name" = "Safari macOS";
+
+/* string displayed to user to identify windows chrome user agent */
+"chrome windows user agent display name" = "Chrome Windows";
+
+/* string displayed to user to identify linux firefox user agent */
+"firefox linux user agent display name" = "Firefox Linux";
+
 /* title of button to reset global settings to defaults */
 "reset global settings button title" = "Reiniciar as definições";
 
@@ -464,6 +494,9 @@
 /* name of snowhaze search engine to be displayed to user */
 "snowhaze search engine display name" = "SnowHaze";
 
+/* name of findx search engine to be displayed to user */
+"findx search engine display name" = "Findx";
+
 /* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
 "snowhaze search engine missing subscription accessibility label" = "SnowHaze – Necessita da subscrição do SnowHaze Premium";
 
@@ -484,6 +517,9 @@
 
 /* title of button to rate snowhaze on the app store */
 "rate snowhaze button title" = "Avaliar SnowHaze";
+
+/* title of button to show the snowhaze source */
+"show snowhaze source button title" = "Código-fonte";
 
 /* text use to prefill 'share' messagers */
 "snowhaze share text" = "Olá!\nO SnowHaze é um Browser genial que protege eficazmente todos os teus dados pessoais.\nVisite o site de internet: snowhaze.com.\nOu, simplesmente, faça o download da aplicação a partir da App Store; snowhaze.com/download.";
@@ -538,6 +574,9 @@
 
 /* subtitle for autocomplete search suggestions from snowhaze search */
 "snowhaze search search suggestion subtitle" = "Pesquisa SnowHaze";
+
+/* subtitle for autocomplete search suggestions from findx */
+"findx search suggestion subtitle" = "Pesquisa Findx";
 
 /* title of the activity to find some text on page */
 "find on page activity title" = "Pesquisar na página";
@@ -799,6 +838,9 @@
 
 /* title of setting to display the ping status of the vpn servers */
 "show vpn server ping status settings title" = "Mostrar Ping";
+
+/* title of setting to autorotate ipsec credentials */
+"autorotate ipsec credentials settings title" = "Credenciais de rotação automática";
 
 /* title of button to switch from vpn settings to subscription settings */
 "show subscription status button title" = "Mostrar o estado das subscrições";
@@ -1244,6 +1286,9 @@
 /* title of settings in tab settings to enable / disable search suggestions */
 "show search suggestions tab settings title" = "Sugestões de Pesquisa";
 
+/* title of tab setting to use desktop user agents */
+"desktop user agent tab setting title" = "Agente do utilizador desktop";
+
 /* displayed instead of domain name if the current page is an errorpage in page settings */
 "page settings errorpage description" = "Erro de página";
 
@@ -1434,7 +1479,7 @@
 "update tutorial message from developers content" = "no message";
 
 /* explanations of the application settings */
-"application settings explanation" = "<p>Aqui você encontra as configurações gerais do SnowHaze.</p><p><strong>Sugestões sites locais:</strong>Pode selecionar se deseja que os sites das listas locais sejam sugeridos aquando da utilização de motores de pesquisa.</p><p><strong>Sugerir sites privados:</strong> Quando essa opção estiver ativada o SnowHaze pode sugerir site privados ao se realizar uma busca. Quando essa opção estiver desativada continuarão sendo sugeridos sites que não são privados. Por razões de proteção à juventude, você pode querer desativar esta opção.</p><p><strong>Auto-update a lista de Sites / Somente Wi-Fi</strong>Pode também escolher se as diferentes listas de sites web ( sites de rastreio, sites de publicidade, sites de phishing ou de falsificação de identidade, sites de malware) devem ser atualizados automaticamente ou se devem ser atualizados somente quando existe uma ligação Wi-Fi. A atualização das listas faz-se automaticamente se subscrever o SnowHaze Premium, se não for o caso, a atualização faz-se a cada mudança de versão do SnowHaze. Se escolher desligar as atualizações automáticas, as listas serão apagadas.</p><p><strong>Restaurar um Separador:</strong> Escolher o intervalo de tempo durante o qual é possível restaurar um separador quando este e abanado. Especifique se todos os separadores podem ser recuperados, incluindo os separadores Privados.</p><strong>Mascarar os Separados:</strong> O conteúdo de um separador pode ser mascarado quando este não é atualizado. Escolha os separadores que podem ser mascarados.";
+"application settings explanation" = "<p>Aqui você encontra as configurações gerais do SnowHaze.</p><p><strong>Sugestões sites locais:</strong>Pode selecionar se deseja que os sites das listas locais sejam sugeridos aquando da utilização de motores de pesquisa.</p><p><strong>Sugerir sites privados:</strong> Quando essa opção estiver ativada o SnowHaze pode sugerir site privados ao se realizar uma busca. Quando essa opção estiver desativada continuarão sendo sugeridos sites que não são privados. Por razões de proteção à juventude, você pode querer desativar esta opção.</p><p><strong>Auto-update a lista de Sites / Somente Wi-Fi</strong>Pode também escolher se as diferentes listas de sites web ( sites de rastreio, sites de publicidade, sites de phishing ou de falsificação de identidade, sites de malware) devem ser atualizados automaticamente ou se devem ser atualizados somente quando existe uma ligação Wi-Fi. A atualização das listas faz-se automaticamente se subscrever o SnowHaze Premium, se não for o caso, a atualização faz-se a cada mudança de versão do SnowHaze. Se escolher desligar as atualizações automáticas, as listas serão apagadas.</p><p><strong>Restaurar um Separador:</strong> Escolher o intervalo de tempo durante o qual é possível restaurar um separador quando este e abanado. Especifique se todos os separadores podem ser recuperados, incluindo os separadores Privados.</p><p><strong>Mascarar os Separados:</strong> O conteúdo de um separador pode ser mascarado quando este não é atualizado. Escolha os separadores que podem ser mascarados.</p><strong>Estatísticas:</strong> Mostra estatísticas na seção de marcadores do aplicativo.</p><p>Upgrade HTTPS: número de sites carregados com HTTPS em vez de HTTP graças a um recurso específico do SnowHaze</p><p>Trackers bloqueados: número de rastreadores bloqueados</p><p>Cookies Excluídos: Número de cookies excluídos</p>Proteções VPN: número de sites carregados conectados ao SnowHaze VPN";
 
 /* explanations of the javascript settings */
 "javascript settings explanation" = "<p>Definições do JavaScript. O JavaScript é uma linguagem de programação utilizada por inúmeros sites de internet e é suportado pela maior parte dos navegadores. O JavaScript permite-nos tirar o melhor partido possível dos sites em termos de apresentação e de utilização das diferentes funcionalidades. O JavaScript é responsável pela maior parte dos conteúdos interativos e dinâmicos.</p><p><strong>Autorizar JavaScript:</strong> Ativar esta opção, permite o carregamento de conteúdos do JavaScript. É preferível desativar esta opção quando navegar em sites pouco seguros. <u>Nota:</u> é possível que algumas páginas web apresentem alguns erros se esta opção estiver desativada.</p><p><strong>Autorizar Scripts de aplicação:</strong> Os scripts de aplicação são elementos do JavaScript gerados pelo SnowHaze. São utilizados para ativar determinadas funcionalidades tais como a pesquisa e a proteção do registo dos sites visitados.</p><strong>Gerenciador de Senhas:</strong> Desligue a integração dos gerenciadores de senhas.";
@@ -1478,14 +1523,14 @@
 /* explanations of the content type blockers settings */
 "content type blockers settings explanation" = "SnowHaze pode bloquear diferentes conteúdos nas páginas da web. Escolha o tipo de conteúdo que deseja bloquear. <u>Nota:</u> é possível que algumas páginas web apresentem alguns erros.";
 
-/* explanations of the acknowledgements settings tab */
-"acknowledgements settings explanation" = "O desenvolvimento do SnowHaze foi grandemente facilitado pelo uso de códigos de terceiros e de projetos de open source. Agradecemos às pessoas que gerem os seguintes projetos: AgileBits Inc. por 1PasswordExtension, phishtank.com por o banco de dados de verificação de phishing, Zetetic LLC por SQLCipher, os autores de EasyList (easylist.github.io) fanboy, MonztA, Famlam e Khrin para as listas EasyList, EasyPrivacy e Fanboy's Social Blocking e o Polish TeX Users Group GUS por TeX gyre Adventor. SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. As licenças e direitos de autor dos projetos de open source utiizados. Design por Basestudio.";
+/* format for explanations of the acknowledgements settings tab */
+"acknowledgements settings explanation format" = "<p>SnowHaze versão %@</p>O desenvolvimento do SnowHaze foi grandemente facilitado pelo uso de códigos de terceiros e de projetos de open source. Agradecemos às pessoas que gerem os seguintes projetos: AgileBits Inc. por 1PasswordExtension, phishtank.com por o banco de dados de verificação de phishing, Zetetic LLC por SQLCipher, os autores de EasyList (easylist.github.io) fanboy, MonztA, Famlam e Khrin para as listas EasyList, EasyPrivacy e Fanboy's Social Blocking e o Polish TeX Users Group GUS por TeX gyre Adventor. SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. As licenças e direitos de autor dos projetos de open source utiizados. Design por Basestudio.";
 
 /* explanations of the subscription settings tab */
 "subscription settings explanation" = "<p>Subscreva o SnowHaze Premium para ter acesso ao SnowHaze VPN, ao motor de pesquiza SnowHaze e a atualizações frequente de listas de sites. Os primeiros 7 dias são gratuitos para assinantes iniciantes. Existem subscrições de autorrenovação mensais ou anuais.</p><p><strong>Auto-update opções</strong> atualiza os planos de subscrição.</p><p><strong>Auto-Update token</strong> atualiza o autorização.</p><strong>Hash do token</strong> é um código utilizado para verificar a subscrição atual.";
 
 /* explanations of the vpn settings tab */
-"vpn settings explanation" = "<p>Um VPN (Virtual Private Network) é uma conexão encriptada a um servidor. Toda e qualquer ligação entre o seu dispositivo e a internet passa primeiro pelo servidor VPN. O receptor vê somente o endereço IP do servidor VPN e não o seu endereço IP real, o que é altamente importante para prevenir o rastreamento.</p><p>O VPN protege-o dos ataques de interceptadores ( ataque MITM), oculta o seu trafego de dados, sempre a encriptação do seu trafego para o servidor de VPN.</p><p>Oferecemos dois tipos diferentes de VPNs, que usam protocolos diferentes. Um é um protocolo chamado IPSec, o outro é o OpenVPN. A VPN que usa o IPSec pode ser facilmente controlada no aplicativo SnowHaze, enquanto o OpenVPN exige que você use o aplicativo OpenVPN Connect e atualize seus perfis mensalmente. No entanto, o OpenVPN é um pouco mais seguro que o IPSec. Este é um pequeno compromisso entre usabilidade (IPSec) e segurança (OpenVPN) que podemos deixar com segurança para você.</p><p>A SnowHaze VPN não registra absolutamente nada e é o único serviço de VPN que usa autorização de não identificação.</p><p>Subscreva o SnowHaze Premium para poder usar o VPN. SE ainda não configurou o VPN, por favor siga os passos do tutorial online.</p><p><strong>Auto-Update os localização:</strong> atualiza a localização do servidor VPN disponível.</p><strong>Mostrar Ping:</strong> informa quanto tempo é necessário para que os dados sejam transferidos do seu dispositivo até ao servidor e de volta ao seu dispositivo.";
+"vpn settings explanation" = "<p>Um VPN (Virtual Private Network) é uma conexão encriptada a um servidor. Toda e qualquer ligação entre o seu dispositivo e a internet passa primeiro pelo servidor VPN. O receptor vê somente o endereço IP do servidor VPN e não o seu endereço IP real, o que é altamente importante para prevenir o rastreamento.</p><p>O VPN protege-o dos ataques de interceptadores ( ataque MITM), oculta o seu trafego de dados, sempre a encriptação do seu trafego para o servidor de VPN.</p><p>Oferecemos dois tipos diferentes de VPNs, que usam protocolos diferentes. Um é um protocolo chamado IPSec, o outro é o OpenVPN. A VPN que usa o IPSec pode ser facilmente controlada no aplicativo SnowHaze, enquanto o OpenVPN exige que você use o aplicativo OpenVPN Connect e atualize seus perfis mensalmente. No entanto, o OpenVPN é um pouco mais seguro que o IPSec. Este é um pequeno compromisso entre usabilidade (IPSec) e segurança (OpenVPN) que podemos deixar com segurança para você.</p><p>A SnowHaze VPN não registra absolutamente nada e é o único serviço de VPN que usa autorização de não identificação.</p><p>Subscreva o SnowHaze Premium para poder usar o VPN. SE ainda não configurou o VPN, por favor siga os passos do tutorial online.</p><p><strong>Credenciais de rotação automática:</strong> Altera automaticamente as credenciais de login do servidor enquanto estiver conectado ao servidor VPN. Caso contrário, as credenciais mudam para cada sessão.</p><p><strong>Auto-Update os localização:</strong> atualiza a localização do servidor VPN disponível.</p><strong>Mostrar Ping:</strong> informa quanto tempo é necessário para que os dados sejam transferidos do seu dispositivo até ao servidor e de volta ao seu dispositivo.";
 
 /* explanations of the passcode settings tab */
 "passcode settings explanation" = "<p>Pode proteger o SnowHaze através da utilização de uma palavra passe. Escolha, mude ou elimine a sua palavra passe abaixo.</p><p><strong>MODO:</strong> Selecione se deseja ter apenas um código ou palavra passe ou se prefere acrescentar o uso a ID biométrica (Touch ID ou Face ID). Pode também escolher o intervalo de tempo depois do qual o SnowHaze será bloqueado.</p><strong>FORMATO:</strong> Selecione o tipo de palavra passe, ou seja, se prefere um código de seis dígitos (ex. 378291) um código numérico longo (ex. 73820983772) ou um código alfanumérico (ex. $7&9jK-55[*d_4).";

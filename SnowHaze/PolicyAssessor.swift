@@ -111,7 +111,8 @@ class PolicyAssessor {
 			case .whenPrivate: maskRating = 0.1
 			case .never: maskRating = 0
 		}
-		res += bool(for: updateSiteListsKey) ? 0.5 : 0
+		res += bool(for: updateSiteListsKey) ? 0.4 : 0
+		res += bool(for: updateUsageStatsKey) ? 0 : 0.1
 		return res - undoPenalty + maskRating
 	}
 
@@ -141,6 +142,7 @@ class PolicyAssessor {
 			case .hulbee:		return 0.7
 			case .duckDuckGo:	return 0.75
 			case .snowhaze:		return 0.95
+			case .findx:		return 0.9
 			case .none:			return 1
 		}
 	}
@@ -189,6 +191,10 @@ class PolicyAssessor {
 				case .chromeAndroid:	result *= 0.9
 				case .firefoxAndroid:	result *= 0.9
 				case .operaAndroid:		result *= 0.95
+
+				case .safariMac:		result *= 0.6
+				case .chromeWindows:	result *= 0.8
+				case .firefoxLinux:		result *= 0.8
 			}
 		}
 		return 1 - result
@@ -330,7 +336,9 @@ class PolicyAssessor {
 		let hasIPSec = VPNManager.shared.ipsecConnected
 		let hasOpenVPN = VPNManager.shared.currentOVPNInstalled
 		let hasVPN = hasIPSec || hasOpenVPN
-		return listUpdate + (hasVPN ? 0.7 : 0)
+		let vpnResult = hasVPN ? 0.5 : 0
+		let credsResult = bool(for: autorotateIPSecCredentialsKey) ? 0.2 : 0
+		return listUpdate + vpnResult + credsResult
 	}
 
 	private func assessPasscode() -> Double {

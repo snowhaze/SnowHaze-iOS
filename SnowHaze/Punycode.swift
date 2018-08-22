@@ -132,8 +132,12 @@ public class Punycode {
 		return out
 	}
 
-	public static func encode(_ inputStr: String) -> String? {
-		let input = inputStr.unicodeScalars.map { $0.value }
+	public static func encode(_ input: String) -> String? {
+		return encode(input.unicodeScalars.map { $0 })
+	}
+
+	public static func encode(_ inputScalars: [Unicode.Scalar]) -> String? {
+		let input = inputScalars.map { $0.value }
 		var output = input.filter { $0 < initial_n }
 		var n = initial_n
 		var delta: UInt64 = 0
@@ -141,7 +145,7 @@ public class Punycode {
 		var h = output.count
 		let b = h
 		if b == input.count && !input.contains(0x2D) {
-			return inputStr
+			return String(inputScalars.map { Character($0)})
 		} else if b > 0 {
 			output.append( 0x2D )
 		}
@@ -204,7 +208,7 @@ public class Punycode {
 	}
 
 	private static func encode(domainComponent input: String) -> String {
-		guard let enc = encode(input) else {
+		guard let mapped = idnaMap(input), let enc = encode(mapped) else {
 			return input
 		}
 		return enc == input || enc == input + "-" ? input : "xn--" + enc

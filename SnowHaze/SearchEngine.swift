@@ -20,6 +20,7 @@ enum SearchEngineType: Int64 {
 	case hulbee
 	case duckDuckGo
 	case snowhaze
+	case findx
 }
 
 class SearchEngine {
@@ -98,6 +99,7 @@ class SearchEngine {
 				let originalLanguage = NSLocalizedString("localization code", comment: "code used to identify the current locale")
 				let language = originalLanguage.addingPercentEncoding(withAllowedCharacters: allowedChars)!
 				return URL(string: "https://search.snowhaze.com/?q=\(escapedSearch)&l=\(language)&t=\(token)&v=1")
+			case .findx:		return URL(string: "https://www.findx.com/web?q=" + escapedSearch)
 			case .none:			return nil
 		}
 	}

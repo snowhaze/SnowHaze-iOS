@@ -35,7 +35,7 @@ protocol TabControllerUIDelegate: class {
 
 protocol TabControllerNavigationDelegate: class {
 	func tabController(_ controller: TabController, didLoadTitle title: String?)
-	func tabController(_ controller: TabController, didLoadURL url: URL?)
+	func tabController(_ controller: TabController, isLoading url: URL?)
 	func tabController(_ controller: TabController, estimatedProgress: Double)
 	func tabControllerWillStartLoading(_ controller: TabController)
 	func tabController(_ controller: TabController, securityAssessmentDidUpdate assessment: PolicyAssessmentResult)
@@ -43,6 +43,8 @@ protocol TabControllerNavigationDelegate: class {
 	func tabController(_ controller: TabController, serverTrustDidChange trust: SecTrust?)
 
 	func tabControllerCanGoForwardBackwardUpdate(_ controller: TabController)
+
+	func tabController(_ controller: TabController, didUpgradeLoadOf url: URL)
 }
 
 private extension WKWebView {
@@ -149,7 +151,7 @@ class TabController: NSObject, WebViewManager {
 		didSet {
 			if let navigationDelegate = navigationDelegate {
 				navigationDelegate.tabController(self, didLoadTitle: webView.title)
-				navigationDelegate.tabController(self, didLoadURL: webView.url)
+				navigationDelegate.tabController(self, isLoading: webView.url)
 				navigationDelegate.tabController(self, estimatedProgress: progress)
 				navigationDelegate.tabController(self, securityAssessmentDidUpdate: securityAssessment)
 				navigationDelegate.tabControllerCanGoForwardBackwardUpdate(self)
@@ -191,7 +193,7 @@ class TabController: NSObject, WebViewManager {
 		DispatchQueue.main.async {
 			self.observations.insert(ret.observe(\.URL, options: .initial, changeHandler: { [weak self] webView, _ in
 				if let me = self {
-					me.navigationDelegate?.tabController(me, didLoadURL: webView.url)
+					me.navigationDelegate?.tabController(me, isLoading: webView.url)
 				}
 				if let url = webView.url {
 					self?.pushTabHistory(url)
@@ -378,6 +380,10 @@ extension TabController {
 		return webViewIfLoaded?.isLoading
 	}
 
+	var webbsiteDataStore: WKWebsiteDataStore? {
+		return webViewIfLoaded?.configuration.websiteDataStore
+	}
+
 	var evOrganization: String? {
 		if #available(iOS 10, *) {
 			guard let trust = webViewIfLoaded?.serverTrust else {
@@ -546,7 +552,7 @@ extension TabController: WKNavigationDelegate {
 		}
 		// 'activated' links can cause universal links to be opened in other apps. To prevent this massive privacy violation, we cancel them and load the request directly.
 		// In such cases the targetFrame also tends to be nil.
-		if case .linkActivated = navigationAction.navigationType, navigationAction.request.isHTTPGet && navigationAction.targetFrame?.isMainFrame ?? true {
+		if [.linkActivated, .formSubmitted].contains(navigationAction.navigationType), navigationAction.request.isHTTPGet && navigationAction.targetFrame?.isMainFrame ?? true {
 			decisionHandler(.cancel)
 			if let _ = navigationAction.targetFrame {
 				load(request: navigationAction.request)
@@ -571,6 +577,7 @@ extension TabController: WKNavigationDelegate {
 		let requestingDomain = navigationAction.sourceFrame.securityOrigin.host
 
 		if actionURL != lastUpgrade.url, let url = upgradeURL(for: actionURL, navigationAction: navigationAction) {
+			navigationDelegate?.tabController(self, didUpgradeLoadOf: url)
 			finalDecision(false)
 			load(request: navigationAction.request.with(url: url))
 			if let actionURL = actionURL {
@@ -695,10 +702,10 @@ private extension TabController {
 	func waitForToken(with search: String) {
 		if observer == nil {
 			observer = NotificationCenter.default.addObserver(forName: SubscriptionManager.tokenUpdatedNotificationName, object: nil, queue: nil) { [weak self] _ in
-				if let search = self?.waitingSnowHazeSearch {
-					if PolicyManager.isAboutBlank(self?.webView.url) {
+				if let me = self, let search = me.waitingSnowHazeSearch {
+					if PolicyManager.isAboutBlank(me.webView.url) {
 						let url = SearchEngine(type: .snowhaze).url(for: search)
-						self?.load(url: url)
+						me.load(url: url)
 					}
 				}
 			}
@@ -752,8 +759,11 @@ private extension TabController {
 		}
 		let nextAction = actionTryList.removeFirst()
 		switch nextAction {
-			case .load(let nextURL):
+			case .load(let nextURL, let upgraded):
 				let request = URLRequest(url: nextURL, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeout)
+				if upgraded {
+					navigationDelegate?.tabController(self, didUpgradeLoadOf: nextURL)
+				}
 				load(request: request)
 			case .getTokenForSearch(let search):
 				assert(actionTryList.isEmpty)
@@ -824,7 +834,7 @@ private extension TabController {
 					let callguard = Callguard()
 					return {
 						callguard.called = true
-						self.load([.load(fallback)])
+						self.load([.load(fallback, false)])
 					}
 				}
 				return { }
@@ -1039,12 +1049,10 @@ private extension TabController {
 		let confirmTitle = NSLocalizedString("dangerous site warning alert continue button title", comment: "title of the continue button of the alert to warn users of dangerous sites")
 		let cancelTitle = NSLocalizedString("dangerous site warning alert cancel button title", comment: "title of the cancel button of the alert to warn users of dangerous sites")
 		let alert = UIAlertController(title: title, message: prompt, preferredStyle: .alert)
-		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in
-			decisionHandler(true)
-		}
+		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in decisionHandler(true) }
 		alert.addAction(confirm)
 
-		let decline = UIAlertAction(title: cancelTitle, style: .cancel, handler: { _ in decisionHandler(false) })
+		let decline = UIAlertAction(title: cancelTitle, style: .cancel) { _ in decisionHandler(false) }
 		alert.addAction(decline)
 
 		post(event: .alert(alert: alert, domain: nil, fallbackHandler: { decisionHandler(false) }))
@@ -1097,7 +1105,7 @@ extension TabController {
 
 	func load(url: URL?) {
 		if let url = url {
-			loadFromInput { _ in return [.load(url)] }
+			loadFromInput { _ in return [.load(url, false)] }
 		}
 	}
 
@@ -1139,8 +1147,11 @@ extension TabController {
 		}
 		let action = actionTryList.removeFirst()
 		switch action {
-			case .load(let url):
+			case .load(let url, let upgraded):
 				let request = actionTryList.isEmpty ? URLRequest(url: url) : URLRequest(url: url, cachePolicy: .useProtocolCachePolicy, timeoutInterval: timeout)
+				if upgraded {
+					navigationDelegate?.tabController(self, didUpgradeLoadOf: url)
+				}
 				load(request: request)
 			case .getTokenForSearch(let search):
 				assert(actionTryList.isEmpty)
@@ -1153,66 +1164,80 @@ extension TabController {
 extension TabController {
 	private func handleSSLChallenge(with trust: SecTrust, for domain: String, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 		let policyEvaluator = SecPolicyEvaluator(domain: domain, trust: trust)
-		policyEvaluator.evaluate(sslValidationExeptions[domain] ?? .strict)
-		var optDialog: UIAlertController? = nil
-		let retest = { (exeption: SecChallengeHandlerPolicy) in
-			self.sslValidationExeptions[domain] = exeption
-			if self.accept(trust, for: domain) {
-				completionHandler(.useCredential, URLCredential(trust: trust))
-			} else {
+		let url = self.url
+		weak var tab = self.tab
+		policyEvaluator.evaluate(sslValidationExeptions[domain] ?? .strict) { [weak self] _ in
+			guard let me = self else {
 				completionHandler(.cancelAuthenticationChallenge, nil)
+				return
 			}
-		}
-		switch policyEvaluator.issue {
-			case .none:
-				if accept(trust, for: domain) {
-					completionHandler(.useCredential, URLCredential(trust: trust))
+			var optDialog: UIAlertController? = nil
+			let retest = {(exeption: SecChallengeHandlerPolicy) in
+				guard let me = self else {
+					completionHandler(.cancelAuthenticationChallenge, nil)
+					return
+				}
+				me.sslValidationExeptions[domain] = exeption
+				me.accept(trust, for: domain) { result in
+					if result {
+						completionHandler(.useCredential, URLCredential(trust: trust))
+					} else {
+						completionHandler(.cancelAuthenticationChallenge, nil)
+					}
+				}
+			}
+			switch policyEvaluator.issue {
+				case .none:
+					me.accept(trust, for: domain) { result in
+						if result {
+							completionHandler(.useCredential, URLCredential(trust: trust))
+						} else {
+							completionHandler(.cancelAuthenticationChallenge, nil)
+						}
+					}
+				case .invalidCert:
+					let invalidCertTitle = NSLocalizedString("invalid certificate alert title", comment: "title of the alert that is displayed when trying to connect to a server with an invalid certificate")
+					let invalidCertFormat = NSLocalizedString("invalid certificate alert message format", comment: "format of message of the alert that is displayed when trying to connect to a server with an invalid certificate")
+					let invalidCertMessage = String(format: invalidCertFormat, domain)
+					optDialog = UIAlertController(title: invalidCertTitle, message: invalidCertMessage, preferredStyle: .alert)
+					let continueTitle = NSLocalizedString("invalid certificate alert continue button title", comment: "title of continue button of the alert that is displayed when trying to connect to a server with an invalid certificate")
+					let continueAction = UIAlertAction(title: continueTitle, style: .default) { _ in retest(.allowInvalidCerts) }
+					optDialog!.addAction(continueAction)
+				case .domainMismatch(let certDomain):
+					let domainMismatchTitle = NSLocalizedString("certificate domain name mismatch alert title", comment: "title of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name")
+					let domainMismatchMessage: String
+					if let certDomain = certDomain {
+						let displayOriginalDomain: String
+						if certDomain.hasPrefix("*.") {
+							displayOriginalDomain = String(certDomain[certDomain.index(certDomain.startIndex, offsetBy: 2)...])
+						} else {
+							displayOriginalDomain = certDomain
+						}
+						let domainMismatchFormat = NSLocalizedString("certificate domain name mismatch known cert domain alert message format", comment: "format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is known")
+						domainMismatchMessage = String(format: domainMismatchFormat, domain, displayOriginalDomain)
+					} else {
+						let domainMismatchFormat = NSLocalizedString("certificate domain name mismatch unknown cert domain alert message format", comment: "format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is not available")
+						domainMismatchMessage = String(format: domainMismatchFormat, domain)
+					}
+					optDialog = UIAlertController(title: domainMismatchTitle, message: domainMismatchMessage, preferredStyle: .alert)
+					let continueTitle = NSLocalizedString("certificate domain name mismatch alert continue button title", comment: "title of continue button of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name")
+					let continueAction = UIAlertAction(title: continueTitle, style: .default) { _ in retest(.allowDomainMismatch) }
+					optDialog!.addAction(continueAction)
+				case .unrecoverable:
+					completionHandler(.cancelAuthenticationChallenge, nil)
+				case .notEvaluated:
+					fatalError("This should not happen")
+			}
+			if let dialog = optDialog {
+				if let tab = tab, PolicyManager.manager(for: url, in: tab).showTLSCertWarnings {
+					let cancelTitle = NSLocalizedString("invalid certificate alert cancel button title", comment: "title of cancel button of the alert that is displayed when trying to connect to a server with an invalid certificate")
+					let fallbackHandler = { completionHandler(.cancelAuthenticationChallenge, nil) }
+					let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel) { _ in fallbackHandler() }
+					dialog.addAction(cancelAction)
+					self?.post(event: .alert(alert: dialog, domain: domain, fallbackHandler: fallbackHandler))
 				} else {
 					completionHandler(.cancelAuthenticationChallenge, nil)
 				}
-			case .invalidCert:
-				let invalidCertTitle = NSLocalizedString("invalid certificate alert title", comment: "title of the alert that is displayed when trying to connect to a server with an invalid certificate")
-				let invalidCertFormat = NSLocalizedString("invalid certificate alert message format", comment: "format of message of the alert that is displayed when trying to connect to a server with an invalid certificate")
-				let invalidCertMessage = String(format: invalidCertFormat, domain)
-				optDialog = UIAlertController(title: invalidCertTitle, message: invalidCertMessage, preferredStyle: .alert)
-				let continueTitle = NSLocalizedString("invalid certificate alert continue button title", comment: "title of continue button of the alert that is displayed when trying to connect to a server with an invalid certificate")
-				let continueAction = UIAlertAction(title: continueTitle, style: .default) { _ in retest(.allowInvalidCerts) }
-				optDialog!.addAction(continueAction)
-			case .domainMismatch(let certDomain):
-				let domainMismatchTitle = NSLocalizedString("certificate domain name mismatch alert title", comment: "title of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name")
-				let domainMismatchMessage: String
-				if let certDomain = certDomain {
-					let displayOriginalDomain: String
-					if certDomain.hasPrefix("*.") {
-						displayOriginalDomain = String(certDomain[certDomain.index(certDomain.startIndex, offsetBy: 2)...])
-					} else {
-						displayOriginalDomain = certDomain
-					}
-					let domainMismatchFormat = NSLocalizedString("certificate domain name mismatch known cert domain alert message format", comment: "format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is known")
-					domainMismatchMessage = String(format: domainMismatchFormat, domain, displayOriginalDomain)
-				} else {
-					let domainMismatchFormat = NSLocalizedString("certificate domain name mismatch unknown cert domain alert message format", comment: "format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is not available")
-					domainMismatchMessage = String(format: domainMismatchFormat, domain)
-
-				}
-				optDialog = UIAlertController(title: domainMismatchTitle, message: domainMismatchMessage, preferredStyle: .alert)
-				let continueTitle = NSLocalizedString("certificate domain name mismatch alert continue button title", comment: "title of continue button of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name")
-				let continueAction = UIAlertAction(title: continueTitle, style: .default) { _ in retest(.allowDomainMismatch) }
-				optDialog!.addAction(continueAction)
-			case .unrecoverable:
-				completionHandler(.cancelAuthenticationChallenge, nil)
-			case .notEvaluated:
-				fatalError("This should not happen")
-		}
-		if let dialog = optDialog {
-			if PolicyManager.manager(for: url, in: tab).showTLSCertWarnings {
-				let cancelTitle = NSLocalizedString("invalid certificate alert cancel button title", comment: "title of cancel button of the alert that is displayed when trying to connect to a server with an invalid certificate")
-				let fallbackHandler = { completionHandler(.cancelAuthenticationChallenge, nil) }
-				let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel) { _ in fallbackHandler() }
-				dialog.addAction(cancelAction)
-				post(event: .alert(alert: dialog, domain: domain, fallbackHandler: fallbackHandler))
-			} else {
-				completionHandler(.cancelAuthenticationChallenge, nil)
 			}
 		}
 	}
@@ -1298,10 +1323,10 @@ extension TabController {
 		post(event: .alert(alert: dialog, domain: domain, fallbackHandler: fallbackHandler))
 	}
 
-	func accept(_ trust: SecTrust, for host: String) -> Bool {
+	func accept(_ trust: SecTrust, for host: String, completionHandler: @escaping (Bool) -> Void) {
 		let policyEvaluator = SecPolicyEvaluator(domain: host, trust: trust)
-		return 	policyEvaluator.evaluate(sslValidationExeptions[host] ?? .strict) &&
-				(!PinningSessionDelegate.pinnedHosts.contains(host) ||
-				policyEvaluator.pin(with: .certs(PinningSessionDelegate.pinnedCerts)))
+		policyEvaluator.evaluate(sslValidationExeptions[host] ?? .strict) { result in
+			completionHandler(result && (!PinningSessionDelegate.pinnedHosts.contains(host) || policyEvaluator.pin(with: .certs(PinningSessionDelegate.pinnedCerts))))
+		}
 	}
 }

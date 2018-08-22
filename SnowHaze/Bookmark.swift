@@ -174,6 +174,14 @@ class Bookmark: Equatable, WorkerWebViewManagerDelegate {
 		webViewManager?.load(url: URL)
 	}
 
+	func webViewManaget(_ manager: WorkerWebViewManager, didUpgradeLoadOf url: URL) {
+		Stats.shared.upgradedLoad(of: url, in: manager.tab)
+	}
+
+	func webViewManaget(_ manager: WorkerWebViewManager, isLoading url: URL?) {
+		Stats.shared.loading(url, in: manager.tab)
+	}
+
 	func webViewManagerDidFailLoad(_ manager: WorkerWebViewManager) {
 		webViewManager = nil
 	}

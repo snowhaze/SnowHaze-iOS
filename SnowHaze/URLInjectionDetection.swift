@@ -46,8 +46,8 @@ internal extension URL {
 				"|\\).*" + pref + "\\W*\(name)\\W*\\("
 		}
 		let modRxs = problematicJSModify.map { name -> String in
-			return	"\\w+\\W*.\\W*\(name)\\W*(\\.\\W*\\w+\\W*\\(.*\\)|\\W*=\\W*[\\w\"'+\\-{])|"
-				+ "\\).*\\w+\\W*.\\W*\(name)\\W*\\.\\W*\\w+\\W*\\("
+			return	"\\w+\\W*\\.\\W*\(name)\\W*(\\.\\W*\\w+\\W*\\(.*\\)|\\W*=\\W*[\\w\"'+\\-{])|"
+				+ "\\).*\\w+\\W*\\.\\W*\(name)\\W*\\.\\W*\\w+\\W*\\("
 		}
 		let readRxs = problematicJSReads.map { name -> String in
 			return "\\w+\\W*=\\W*\\w+\\W*\\.\\W*\(name)"

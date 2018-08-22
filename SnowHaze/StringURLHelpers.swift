@@ -8,7 +8,7 @@
 
 import Foundation
 
-private let domainRx = Regex(pattern: "^https?://(?:[^@/]+@)?([^:/\\s?]+)(?::|/|$|?|$)")
+private let domainRx = Regex(pattern: "^https?://(?:[^@/?#]+@)?([^:/\\s?#]+)(?::|/|#|\\?|$)")
 
 internal extension String {
 	var punycodeExtension: String? {

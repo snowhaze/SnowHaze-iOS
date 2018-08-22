@@ -1,0 +1,61 @@
+/* Localizable.strings
+  SnowHaze
+  Copyright © 2018 Illotros GmbH. All rights reserved. */
+
+/* indication that no vpn location is selected */
+"none ipsec location name" = "Nenhum";
+
+/* indication that australia is selected as ipsec vpn location */
+"australia ipsec location name" = "Austrália";
+
+/* indication that canada is selected as ipsec vpn location */
+"canada ipsec location name" = "Canadá";
+
+/* indication that switzerland is selected as ipsec vpn location */
+"switzerland ipsec location name" = "Suíça";
+
+/* indication that germany is selected as ipsec vpn location */
+"germany ipsec location name" = "Alemanha";
+
+/* indication that france is selected as ipsec vpn location */
+"france ipsec location name" = "França";
+
+/* indication that poland is selected as ipsec vpn location */
+"poland ipsec location name" = "Polônia";
+
+/* indication that singapore is selected as ipsec vpn location */
+"singapore ipsec location name" = "Cingapura";
+
+/* indication that uk is selected as ipsec vpn location */
+"uk ipsec location name" = "Reino Unido";
+
+/* indication that us is selected as ipsec vpn location */
+"us ipsec location name" = "USA";
+
+/* indication that the selected ipsec vpn location is unknown */
+"unknown ipsec location name" = "Desconhecido";
+
+/* label for the error ipsec status */
+"error ipsec status" = "Erro";
+
+/* format for the label for the connected ipsec status */
+"connected ipsec status format" = "Conectado - %@";
+
+/* label for the connecting ipsec status */
+"connecting ipsec status" = "Conectando";
+
+/* label for the disconnected ipsec status */
+"disconnected ipsec status" = "Não Conectado";
+
+/* label for the disconnecting ipsec status */
+"disconnecting ipsec status" = "Desconectando";
+
+/* label for the invalid ipsec status */
+"invalid ipsec status" = "Carregando";
+
+/* label for the reasserting ipsec status */
+"reasserting ipsec status" = "Reconectando";
+
+/* format of the accessibbility label for the ipsec location flag */
+"flag accessibbility label format" = "Localização: %@";
+

@@ -23,6 +23,21 @@ enum UserAgentType: Int {
 	case chromeAndroid
 	case firefoxAndroid
 	case operaAndroid
+
+	case safariMac
+	case chromeWindows
+	case firefoxLinux
+
+	var isDesktop: Bool {
+		switch self {
+			case .safariiPhone, .chromeiPhone, .firefoxiPhone, .operaiPhone,
+				 .safariiPad, .chromeiPad, .firefoxiPad, .operaiPad,
+				 .defaultAndroid, .chromeAndroid, .firefoxAndroid, .operaAndroid:
+				return false
+			case .safariMac, .chromeWindows, .firefoxLinux:
+				return true
+		}
+	}
 }
 
 class UserAgent {
@@ -32,9 +47,13 @@ class UserAgent {
 		self.type = type
 	}
 
-	static var agentCount: Int {
-		return 12
-	}
+	static let mobileAgents = [
+		UserAgentType.safariiPhone, .chromeiPhone, .firefoxiPhone, .operaiPhone,
+		.safariiPad, .chromeiPad, .firefoxiPad, .operaiPad,
+		.defaultAndroid, .chromeAndroid, .firefoxAndroid, .operaAndroid
+	]
+
+	static let desktopAgents = [UserAgentType.safariMac, .chromeWindows, .firefoxLinux]
 
 	static var defaultUserAgentTypes: [UserAgentType] {
 		if UI_USER_INTERFACE_IDIOM() == .pad {
@@ -76,23 +95,26 @@ class UserAgent {
 
 	var string: String {
 		switch type {
-			case .safariiPhone:		return "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Mobile/15E148 Safari/604.1"
-			case .chromeiPhone:		return "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) CriOS/67.0.3396.59 Mobile/15F79 Safari/604.1"
-			case .firefoxiPhone:	return "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/12.0b10862 Mobile/15F79 Safari/605.1.15"
-			case .operaiPhone:		return "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) OPiOS/16.0.10.121137 Mobile/15F79 Safari/9537.53"
+			case .safariiPhone:		return "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Mobile/15E148 Safari/604.1"
+			case .chromeiPhone:		return "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4_1 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) CriOS/68.0.3440.83 Mobile/15G5077a Safari/604.1"
+			case .firefoxiPhone:	return "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/12.2b11231 Mobile/15G5077a Safari/605.1.15"
+			case .operaiPhone:		return "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) OPiOS/16.0.12.122038 Mobile/15G5077a Safari/9537.53"
 
-			case .safariiPad:		return "Mozilla/5.0 (iPad; CPU OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Mobile/15E148 Safari/604.1"
-			case .chromeiPad:		return "Mozilla/5.0 (iPad; CPU OS 11_4 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) CriOS/67.0.3396.59 Mobile/15F79 Safari/604.1"
-			case .firefoxiPad:		return "Mozilla/5.0 (iPad; CPU OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/12.0b10862 Mobile/15F79 Safari/605.1.15"
-			case .operaiPad:		return "Mozilla/5.0 (iPad; CPU OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) OPiOS/16.0.10.121137 Mobile/15F79 Safari/9537.53"
+			case .safariiPad:		return "Mozilla/5.0 (iPad; CPU OS 11_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Mobile/15E148 Safari/604.1"
+			case .chromeiPad:		return "Mozilla/5.0 (iPad; CPU OS 11_4_1 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) CriOS/68.0.3440.83 Mobile/15G77 Safari/604.1"
+			case .firefoxiPad:		return "Mozilla/5.0 (iPad; CPU OS 11_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/12.2b11231 Mobile/15G77 Safari/605.1.15"
+			case .operaiPad:		return "Mozilla/5.0 (iPad; CPU OS 11_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) OPiOS/16.0.12.122038 Mobile/15G77 Safari/9537.53"
 
-			case .defaultAndroid:	return "Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-G935F/G935FXXS2DRC3 Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/6.4 Chrome/56.0.2924.87 Mobile Safari/537.36"
-			case .chromeAndroid:	return "Mozilla/5.0 (Linux; Android 7.0; SM-G935F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36"
-			case .firefoxAndroid:	return "Mozilla/5.0 (Android 7.0; Mobile; rv:60.0) Gecko/60.0 Firefox/60.0"
-			case .operaAndroid:		return "Mozilla/5.0 (Linux; Android 7.0; SM-G935F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36 OPR/46.3.2246.127744"
+			case .defaultAndroid:	return "Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-G935F/G935FXXS2DRC3 Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/7.2 Chrome/59.0.3071.125 Mobile Safari/537.36"
+			case .chromeAndroid:	return "Mozilla/5.0 (Linux; Android 7.0; SM-G935F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.91 Mobile Safari/537.36"
+			case .firefoxAndroid:	return "Mozilla/5.0 (Android 7.0; Mobile; rv:61.0) Gecko/61.0 Firefox/61.0"
+			case .operaAndroid:		return "Mozilla/5.0 (Linux; Android 7.0; SM-G935F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36 OPR/47.1.2249.129326"
+
+			case .safariMac:		return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.2 Safari/605.1.15"
+			case .chromeWindows:	return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36"
+			case .firefoxLinux:		return "Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0"
 		}
 	}
-
 
 	var displayName: String {
 		switch type {
@@ -110,6 +132,10 @@ class UserAgent {
 			case .chromeAndroid:	return NSLocalizedString("android chrome user agent display name", comment: "string displayed to user to identify android chrome user agent")
 			case .firefoxAndroid:	return NSLocalizedString("android firefox user agent display name", comment: "string displayed to user to identify android firefox user agent")
 			case .operaAndroid:		return NSLocalizedString("android opera user agent display name", comment: "string displayed to user to identify android opera user agent")
+
+			case .safariMac:		return NSLocalizedString("safari macos user agent display name", comment: "string displayed to user to identify macos safari user agent")
+			case .chromeWindows:	return NSLocalizedString("chrome windows user agent display name", comment: "string displayed to user to identify windows chrome user agent")
+			case .firefoxLinux:		return NSLocalizedString("firefox linux user agent display name", comment: "string displayed to user to identify linux firefox user agent")
 		}
 	}
 }

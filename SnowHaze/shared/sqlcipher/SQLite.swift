@@ -24,11 +24,8 @@ public extension String {
 	}
 
 	fileprivate init?(cUTF8: UnsafeRawPointer, length: Int32) {
-		let encoding = String.Encoding.utf8.rawValue
-		guard let str = NSString(bytes: cUTF8, length: Int(length), encoding: encoding) else {
-			return nil
-		}
-		self.init(describing: str)
+		let data = Data(bytes: cUTF8, count: Int(length))
+		self.init(data: data, encoding: .utf8)
 	}
 
 	fileprivate func withCUTF8<ResultType>(_ body: (UnsafePointer<Int8>, UInt64) throws -> ResultType) rethrows -> ResultType {
