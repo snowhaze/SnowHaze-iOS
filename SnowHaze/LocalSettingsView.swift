@@ -76,11 +76,11 @@ class TabSettingsController: LocalSettingsController {
 				engines = currentEngines
 			} else if bool {
 				let defaultEngineID = wrapper.value(for: searchEngineKey).integer!
-				let defaultEngine = SearchEngineType(rawValue: defaultEngineID)!
-				if defaultEngine == .none {
+				let mainEngine = SearchEngineType(rawValue: defaultEngineID) ?? .none
+				if mainEngine == .none {
 					engines = [.wikipedia, .wolframAlpha, .startpage]
 				} else {
-					engines = [defaultEngine]
+					engines = [mainEngine]
 				}
 			} else {
 				engines = []

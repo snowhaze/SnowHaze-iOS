@@ -89,7 +89,7 @@ private class TabView: UIView {
 		separator.frame = CGRect(x: bounds.maxX, y: bounds.minY + 5, width: 1, height: bounds.height - 10)
 		closeButton.frame = CGRect(x: bounds.minX, y: bounds.minY, width: bounds.height, height: bounds.height)
 		let insets = (bounds.height - 15) / 2
-		closeButton.imageEdgeInsets = UIEdgeInsetsMake(insets, insets, insets, insets)
+		closeButton.imageEdgeInsets = UIEdgeInsets.init(top: insets, left: insets, bottom: insets, right: insets)
 		titleButton.frame = CGRect(x: bounds.minX + bounds.height - 10, y: bounds.minY, width: bounds.width - bounds.height, height: bounds.height)
 	}
 

@@ -24,7 +24,7 @@ private enum TabError: Error {
 
 private extension UIImage {
 	var pngData: Data {
-		return UIImagePNGRepresentation(self)!
+		return self.pngData()!
 	}
 }
 
@@ -203,22 +203,22 @@ class Tab: Equatable {
 
 		if isEV {
 			let range = NSRange(title.startIndex ..< title.endIndex, in: title)
-			formated.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.safetyIndicator, range: range)
+			formated.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.safetyIndicator, range: range)
 		}
 
 		let barRange = (title as NSString).range(of: String(Tab.barCharacter))
 		if barRange.location != NSNotFound {
-			formated.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.mixedContentBar, range: barRange)
+			formated.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.mixedContentBar, range: barRange)
 		}
 
 		let checkRange = (title as NSString).range(of: String(Tab.trustedCharacter))
 		if checkRange.location != NSNotFound {
-			formated.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.safetyIndicator, range: checkRange)
+			formated.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.safetyIndicator, range: checkRange)
 		}
 
 		let warningRange = (title as NSString).range(of: String(Tab.unsafeCharacter))
 		if warningRange.location != NSNotFound {
-			formated.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.httpWarning, range: warningRange)
+			formated.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.httpWarning, range: warningRange)
 		}
 		return formated
 	}

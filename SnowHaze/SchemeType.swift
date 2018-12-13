@@ -50,7 +50,7 @@ enum SchemeType {
 				} else {
 					self = .call(nil)
 				}
-			case "itms-appss", "itms-apps":
+			case "itms-appss", "itms-apps", "macappstores":
 				self = .store
 			case "itmss":
 				self = .itunes

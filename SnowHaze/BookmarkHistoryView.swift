@@ -261,9 +261,9 @@ private extension BookmarkHistoryView {
 		let layout = bookmarkCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
 		layout.itemSize = CGSize(width: 100, height: 160)
 		layout.minimumLineSpacing = 30
-		layout.sectionInset = UIEdgeInsetsMake(20, 20, 20, 20)
+		layout.sectionInset = UIEdgeInsets.init(top: 20, left: 20, bottom: 20, right: 20)
 		layout.headerReferenceSize = CGSize(width: 100, height: 100)
-		bookmarkCollectionView.register(StatsView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "stats")
+		bookmarkCollectionView.register(StatsView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "stats")
 
 		historyTableView.dataSource = self
 		historyTableView.delegate = self
@@ -295,7 +295,7 @@ private extension BookmarkHistoryView {
 			bookmarkCollectionView.addInteraction(dropInteraction)
 		}
 
-		NotificationCenter.default.addObserver(self, selector: #selector(significantTimeChange(_:)), name: NSNotification.Name.UIApplicationSignificantTimeChange, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(significantTimeChange(_:)), name: UIApplication.significantTimeChangeNotification, object: nil)
 	}
 
 	private func setStatsHidden() {
@@ -355,7 +355,7 @@ extension BookmarkHistoryView: UITableViewDataSource {
 		return cell
 	}
 
-	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		removeHistoryItem(at: indexPath)
 	}
 }

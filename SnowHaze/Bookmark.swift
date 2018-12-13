@@ -91,7 +91,7 @@ class Bookmark: Equatable, WorkerWebViewManagerDelegate {
 		}
 		let character = String(name[..<name.index(after: name.startIndex)])
 		let font = UIFont.systemFont(ofSize: 100)
-		let attributes = [NSAttributedStringKey.foregroundColor: UIColor.title, NSAttributedStringKey.font: font]
+		let attributes = [NSAttributedString.Key.foregroundColor: UIColor.title, NSAttributedString.Key.font: font]
 		character.draw(in: CGRect(origin: CGPoint(x: 5, y: 0), size: size), withAttributes: attributes)
 		let image = UIGraphicsGetImageFromCurrentImageContext()
 		UIGraphicsEndImageContext()
@@ -111,7 +111,7 @@ class Bookmark: Equatable, WorkerWebViewManagerDelegate {
 		}
 		get {
 			if let favicon = favicon {
-				return UIImagePNGRepresentation(favicon)
+				return favicon.pngData()
 			} else {
 				return nil
 			}

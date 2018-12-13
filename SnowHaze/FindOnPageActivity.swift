@@ -17,8 +17,8 @@ class FindOnPageActivity: UIActivity {
 		self.callback = callback
 	}
 
-	override var activityType : UIActivityType? {
-		return UIActivityType("Find on Page Activity")
+	override var activityType : UIActivity.ActivityType? {
+		return UIActivity.ActivityType("Find on Page Activity")
 	}
 
 	override var activityTitle : String? {
@@ -43,7 +43,7 @@ class FindOnPageActivity: UIActivity {
 		return false
 	}
 
-	override class var activityCategory : UIActivityCategory {
+	override class var activityCategory : UIActivity.Category {
 		return .action
 	}
 

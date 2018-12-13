@@ -47,7 +47,7 @@ class ExternalBookmarksSettingsManager: SettingsViewManager {
 			attributes.title = bookmark.title
 			attributes.path = bookmark.URL.absoluteString
 			let icon = bookmark.displayIcon
-			attributes.thumbnailData = UIImagePNGRepresentation(icon)
+			attributes.thumbnailData = icon.pngData()
 			let id = "bookmark-\(bookmark.id)-\(bookmark.URL.absoluteString)"
 			return CSSearchableItem(uniqueIdentifier: id, domainIdentifier: bookmarkSearchDomainID, attributeSet: attributes)
 		}

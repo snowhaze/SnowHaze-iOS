@@ -107,9 +107,9 @@ class MainViewController: UIViewController {
 			let nextTitle = NSLocalizedString("next suggestion key command title", comment: "discoverability title of key command to select next suggestion")
 			let previousTitle = NSLocalizedString("previous suggestion key command title", comment: "discoverability title of key command to select previous suggestion")
 			let selectTitle = NSLocalizedString("open key command title", comment: "discoverability title of key command to open selected suggestion")
-			let endInput = UIKeyCommand(input: UIKeyInputEscape, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(endURLEntry(_:)), discoverabilityTitle: cancelTitle)
-			let next = UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: .command, action: #selector(selectNextSuggestion(_:)), discoverabilityTitle: nextTitle)
-			let previous = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: .command, action: #selector(selectPreviousSuggestion(_:)), discoverabilityTitle: previousTitle)
+			let endInput = UIKeyCommand(input: UIKeyCommand.inputEscape, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(endURLEntry(_:)), discoverabilityTitle: cancelTitle)
+			let next = UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .command, action: #selector(selectNextSuggestion(_:)), discoverabilityTitle: nextTitle)
+			let previous = UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .command, action: #selector(selectPreviousSuggestion(_:)), discoverabilityTitle: previousTitle)
 			let select = UIKeyCommand(input: "O", modifierFlags: .command, action: #selector(selectSuggestion(_:)), discoverabilityTitle: selectTitle)
 			var commands = [endInput]
 			if suggestionVC.canSelectNext {
@@ -159,7 +159,7 @@ class MainViewController: UIViewController {
 			tabCollectionView.contentInset = view.safeAreaInsets
 		}
 
-		navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.font: UIFont.snowHazeFont(size: 20)]
+		navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.snowHazeFont(size: 20)]
 
 		let tab = crashCount != 2 ? currentTab : tabStore.addEmptyItem()!
 		let tabPolicy = PolicyManager.manager(for: tab)
@@ -171,9 +171,9 @@ class MainViewController: UIViewController {
 
 		NotificationCenter.default.addObserver(self, selector: #selector(tabListDidChange(_:)), name: TAB_LIST_CHANGED_NOTIFICATION, object: tabStore)
 		NotificationCenter.default.addObserver(self, selector: #selector(tabDidChange(_:)), name: TAB_CHANGED_NOTIFICATION, object: tabStore)
-		NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameDidChange(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
-		NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: Notification.Name.UIApplicationDidEnterBackground, object: nil)
-		NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(_:)), name: Notification.Name.UIApplicationWillEnterForeground, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameDidChange(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
 
 		urlBar.delegate = self
 
@@ -273,6 +273,8 @@ private extension MainViewController {
 		let policy = PolicyManager.manager(for: url, in: tab)
 		tabStore.remove(tab, undoTime: policy.tabClosingUndoTimeLimit)
 
+		ReviewPrompt.tabClosed()
+
 		if currentDeleted {
 			tabVC.tab = nil
 			if !isShowingTabsView {
@@ -313,15 +315,15 @@ private extension MainViewController {
 	func setupSuggestionVC() {
 		view.addSubview(suggestionContainer)
 		suggestionVC = SuggestionViewController()
-		addChildViewController(suggestionVC)
+		addChild(suggestionVC)
 		suggestionContainer.addSubview(suggestionVC.view)
-		suggestionVC.didMove(toParentViewController: self)
+		suggestionVC.didMove(toParent: self)
 		let width = min(view.bounds.width, 600)
 		let y: CGFloat = urlBar.suggestionViewOrigin(in: view)
 		suggestionContainer.frame = CGRect(x: (view.bounds.width - width) / 2, y: y, width: width, height: view.bounds.height - urlBar.bounds.maxY)
 		suggestionVC.view.frame = suggestionContainer.bounds
 		suggestionContainer.isHidden = true
-		let flexibleSize: UIViewAutoresizing = [.flexibleWidth, .flexibleHeight]
+		let flexibleSize: UIView.AutoresizingMask = [.flexibleWidth, .flexibleHeight]
 		suggestionContainer.autoresizingMask = flexibleSize
 		suggestionVC.view.autoresizingMask = flexibleSize
 		suggestionVC.delegate = self
@@ -362,9 +364,9 @@ private extension MainViewController {
 		tab.makeActive()
 		tabVC = (storyboard.instantiateViewController(withIdentifier: "TabViewController") as! TabViewController)
 		tabVC.delegate = self
-		addChildViewController(tabVC)
+		addChild(tabVC)
 		pageContentView.addSubview(tabVC.view)
-		tabVC.didMove(toParentViewController: self)
+		tabVC.didMove(toParent: self)
 		tabVC.urlBar = urlBar
 		tabVC.tab = tab
 		tabVC.view.frame = pageContentView.bounds
@@ -380,15 +382,15 @@ private extension MainViewController {
 				self.tabVC.view.frame = self.pageContentView.bounds
 			}, completion: { _ in
 				oldTabVC?.tab = nil
-				oldTabVC?.willMove(toParentViewController: nil)
+				oldTabVC?.willMove(toParent: nil)
 				oldTabVC?.view.removeFromSuperview()
-				oldTabVC?.removeFromParentViewController()
+				oldTabVC?.removeFromParent()
 			})
 		} else {
 			oldTabVC?.tab = nil
-			oldTabVC?.willMove(toParentViewController: nil)
+			oldTabVC?.willMove(toParent: nil)
 			oldTabVC?.view.removeFromSuperview()
-			oldTabVC?.removeFromParentViewController()
+			oldTabVC?.removeFromParent()
 		}
 	}
 
@@ -410,7 +412,7 @@ private extension MainViewController {
 		}
 		if let webView = webView {
 			if let title = webView.title {
-				items.append(title as AnyObject)
+				items.append((title + " ") as AnyObject)
 			}
 			if let url = webView.url {
 				items.append(url as AnyObject)
@@ -459,12 +461,12 @@ private extension MainViewController {
 			activities.append(scanActivity)
 		}
 		let controller = UIActivityViewController(activityItems: items, applicationActivities: activities)
-		controller.excludedActivityTypes = [UIActivityType.addToReadingList]
+		controller.excludedActivityTypes = [UIActivity.ActivityType.addToReadingList]
 		// TODO: set an upper limit once bug is patched
 		if #available(iOS 11, *) {
 			// work arround a bug where iOS 11 tries to generate a file name from the title and fails if it is empty
 			if let wv = webView, (wv.title ?? "").isEmpty {
-				controller.excludedActivityTypes = (controller.excludedActivityTypes ?? []) + [UIActivityType.markupAsPDF]
+				controller.excludedActivityTypes = (controller.excludedActivityTypes ?? []) + [UIActivity.ActivityType.markupAsPDF]
 			}
 		}
 		controller.completionWithItemsHandler = { [weak self] activityType, completed, returnedItems, error in
@@ -647,6 +649,9 @@ extension MainViewController {
 			lastTab = tabStore.addEmptyItem()
 		}
 		set(tab: lastTab!, animated: false)
+
+		ReviewPrompt.tabCloseReset()
+
 		let indexPath = IndexPath(item: tabs.index(of: lastTab!)!, section: 0)
 		if let attributes = tabCollectionView.layoutAttributesForItem(at: indexPath) {
 			let tabVC = self.tabVC
@@ -752,7 +757,7 @@ extension MainViewController: TabCollectionViewCellDelegate {
 		close(tabCell.tab!)
 	}
 
-	override func motionBegan(_ motion: UIEventSubtype, with event: UIEvent?) {
+	override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
 		if motion == .motionShake && isShowingTabsView {
 			if let tab = tabStore.undoDeletion() {
 				scroll(to: tab)
@@ -1024,10 +1029,10 @@ extension MainViewController {
 		guard let info = notification.userInfo else {
 			return
 		}
-		let duration = info[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber ?? NSNumber(value: 0.3 as Double)
-		let curveValue = info[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber ?? NSNumber(value: 0 as Int32)
-		let curve = UIViewAnimationOptions(rawValue: curveValue.uintValue)
-		let endValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue
+		let duration = info[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber ?? NSNumber(value: 0.3 as Double)
+		let curveValue = info[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber ?? NSNumber(value: 0 as Int32)
+		let curve = UIView.AnimationOptions(rawValue: curveValue.uintValue)
+		let endValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue
 		let endRect = endValue?.cgRectValue ?? CGRect.zero
 		let viewRect = view.convert(endRect, from: view.window)
 		windowMargin = viewRect.size.height
@@ -1123,7 +1128,7 @@ extension MainViewController: SearchBarDelegate, SearchListener {
 		if let textInputBar = self.textInputBar {
 			textInputBar.textField.resignFirstResponder()
 			self.textInputBar = nil
-			UIView.animate(withDuration: 0.12, delay: 0, options: UIViewAnimationOptions(rawValue: UInt(UIViewAnimationCurve.easeOut.rawValue)), animations: {
+			UIView.animate(withDuration: 0.12, delay: 0, options: UIView.AnimationOptions(rawValue: UInt(UIView.AnimationCurve.easeOut.rawValue)), animations: {
 				textInputBar.frame.origin.y = self.view.bounds.maxY + 10
 			}, completion: { (_) -> Void in
 				textInputBar.removeFromSuperview()

@@ -313,7 +313,7 @@ class PolicyManager {
 
 	var searchEngine: SearchEngine {
 		let value = settingsWrapper.value(for: searchEngineKey).integer
-		let type = SearchEngineType(rawValue: value!)!
+		let type = SearchEngineType(rawValue: value!) ?? .none
 		return SearchEngine(type: type)
 	}
 
@@ -329,7 +329,7 @@ class PolicyManager {
 		return bookmarks.map { bookmark -> UIApplicationShortcutItem in
 			let title = bookmark.displayName ?? ""
 			let type = bookmarkApplicationShortcutType
-			let userInfo = ["id": NSNumber(value: bookmark.id as Int64), "url": bookmark.URL.absoluteString] as [String : Any]
+			let userInfo = ["id": NSNumber(value: bookmark.id as Int64), "url": bookmark.URL.absoluteString] as! [String : NSSecureCoding]
 			let icon = UIApplicationShortcutIcon(templateImageName: "bookmark")
 			return UIApplicationShortcutItem(type: type, localizedTitle: title, localizedSubtitle: bookmark.URL.absoluteString, icon: icon, userInfo: userInfo)
 		}
@@ -662,7 +662,6 @@ class PolicyManager {
 
 	enum Action {
 		case load(URL, Bool)
-		case getTokenForSearch(String) // May only be at the end of the list
 	}
 	func actionList(for userInput: String) -> [Action] {
 		let httpsSites = DomainList(type: useHTTPSExclusivelyWhenPossible ? .httpsSites : .empty)
@@ -710,9 +709,7 @@ class PolicyManager {
 			}
 		}
 		let engine = searchEngine
-		if engine.needsTokenUpdate {
-			ret.append(.getTokenForSearch(userInput))
-		} else if let url = engine.url(for: userInput) {
+		if let url = engine.url(for: userInput) {
 			ret.append(.load(url, false))
 		}
 		return ret

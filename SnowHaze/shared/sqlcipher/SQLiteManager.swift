@@ -115,7 +115,7 @@ class SQLiteManager {
 				}
 				let center = NotificationCenter.default
 				if newValue {
-					let name = Notification.Name.UIApplicationDidReceiveMemoryWarning
+					let name = UIApplication.didReceiveMemoryWarningNotification
 					memoryObserver = center.addObserver(forName: name, object: nil, queue: nil) { _ in
 						SQLite.free(Int.max)
 					}
@@ -177,7 +177,7 @@ class SQLiteManager {
 
 #if os(iOS)
 		if let connection = connection, freeConnectionCachesOnMemoryWarning {
-			let name = Notification.Name.UIApplicationDidReceiveMemoryWarning
+			let name = UIApplication.didReceiveMemoryWarningNotification
 			let center = NotificationCenter.default
 			observer = center.addObserver(forName: name, object: nil, queue: nil) { [weak connection, weak thread] _ in
 				class Freeer: NSObject {

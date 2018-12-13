@@ -23,8 +23,8 @@ class ScanCodeActivity: UIActivity {
 		return AVCaptureDevice.default(for: AVMediaType.video) != nil
 	}
 
-	override var activityType : UIActivityType? {
-		return UIActivityType("Scan Code Activity")
+	override var activityType : UIActivity.ActivityType? {
+		return UIActivity.ActivityType("Scan Code Activity")
 	}
 
 	override var activityTitle : String? {
@@ -44,7 +44,7 @@ class ScanCodeActivity: UIActivity {
 		return tab != nil
 	}
 
-	override class var activityCategory : UIActivityCategory {
+	override class var activityCategory : UIActivity.Category {
 		return .action
 	}
 

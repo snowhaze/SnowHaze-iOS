@@ -49,7 +49,7 @@ protocol TabControllerNavigationDelegate: class {
 
 private extension WKWebView {
 	private var snapshotBounds: CGRect {
-		return UIEdgeInsetsInsetRect(bounds, scrollView.contentInset)
+		return bounds.inset(by: scrollView.contentInset)
 	}
 
 	func getSnapshot(callback: @escaping (UIImage?) -> Void) {
@@ -131,8 +131,6 @@ class TabController: NSObject, WebViewManager {
 
 	private(set) var webViewLoaded = false
 
-	private var waitingSnowHazeSearch: String?
-
 	private var observer: NSObjectProtocol?
 
 	weak var UIDelegate: TabControllerUIDelegate? {
@@ -191,7 +189,7 @@ class TabController: NSObject, WebViewManager {
 		}
 
 		DispatchQueue.main.async {
-			self.observations.insert(ret.observe(\.URL, options: .initial, changeHandler: { [weak self] webView, _ in
+			self.observations.insert(ret.observe(\.url, options: .initial, changeHandler: { [weak self] webView, _ in
 				if let me = self {
 					me.navigationDelegate?.tabController(me, isLoading: webView.url)
 				}
@@ -217,7 +215,10 @@ class TabController: NSObject, WebViewManager {
 				}))
 			}
 
-			self.observations.insert(ret.observe(\.loading, options: .initial, changeHandler: { [weak self] webView, _ in
+			self.observations.insert(ret.observe(\.isLoading, options: .initial, changeHandler: { [weak self] webView, _ in
+				if !webView.isLoading {
+					self?.tab.title = webView.title
+				}
 				if let me = self {
 					me.navigationDelegate?.tabController(me, didLoadTitle: webView.title)
 					me.navigationDelegate?.tabController(me, estimatedProgress: me.progress)
@@ -255,7 +256,7 @@ class TabController: NSObject, WebViewManager {
 			}))
 		}
 
-		self.observations.insert(ret.observe(\.URL, options: .initial, changeHandler: { [weak self] webView, _ in
+		self.observations.insert(ret.observe(\.url, options: .initial, changeHandler: { [weak self] webView, _ in
 			self?.updatePolicy(for: webView.url, webView: webView)
 		}))
 
@@ -699,23 +700,6 @@ extension TabController {
 
 // MARK: internals
 private extension TabController {
-	func waitForToken(with search: String) {
-		if observer == nil {
-			observer = NotificationCenter.default.addObserver(forName: SubscriptionManager.tokenUpdatedNotificationName, object: nil, queue: nil) { [weak self] _ in
-				if let me = self, let search = me.waitingSnowHazeSearch {
-					if PolicyManager.isAboutBlank(me.webView.url) {
-						let url = SearchEngine(type: .snowhaze).url(for: search)
-						me.load(url: url)
-					}
-				}
-			}
-		}
-		waitingSnowHazeSearch = search
-		let errorPage = ErrorPageGenerator(type: .authError).getHTML()
-		navigationDelegate?.tabControllerWillStartLoading(self)
-		webView.loadHTMLString(errorPage, baseURL: nil)
-	}
-
 	func loadFromInput(forTabPolicy list: (PolicyManager) -> [PolicyManager.Action]) {
 		lastUpgrade.reset()
 		let policy = PolicyManager.manager(for: tab)
@@ -765,9 +749,6 @@ private extension TabController {
 					navigationDelegate?.tabController(self, didUpgradeLoadOf: nextURL)
 				}
 				load(request: request)
-			case .getTokenForSearch(let search):
-				assert(actionTryList.isEmpty)
-				waitForToken(with: search)
 		}
 		return true
 	}
@@ -1076,10 +1057,7 @@ extension TabController {
 
 	func reload() {
 		updatePolicy(for: webView.url)
-		if let search = waitingSnowHazeSearch, PolicyManager.isAboutBlank(webView.url) {
-			let url = SearchEngine(type: .snowhaze).url(for: search)
-			load(url: url)
-		} else if PolicyManager.isAboutBlank(webView.url) || webView.url == nil {
+		if PolicyManager.isAboutBlank(webView.url) || webView.url == nil {
 			if let url = tab.history.last {
 				load(request: URLRequest(url: url as URL))
 			}
@@ -1097,7 +1075,6 @@ extension TabController {
 	}
 
 	func load(request: URLRequest) {
-		waitingSnowHazeSearch = nil
 		navigationDelegate?.tabControllerWillStartLoading(self)
 		updatePolicy(for: request.url)
 		webView.load(request)
@@ -1110,7 +1087,6 @@ extension TabController {
 	}
 
 	func clearMediaInfo() {
-		waitingSnowHazeSearch = nil
 		_ = webViewIfLoaded?.load(URLRequest(url: URL(string: "about:clear")!))
 	}
 
@@ -1153,9 +1129,6 @@ extension TabController {
 					navigationDelegate?.tabController(self, didUpgradeLoadOf: url)
 				}
 				load(request: request)
-			case .getTokenForSearch(let search):
-				assert(actionTryList.isEmpty)
-				waitForToken(with: search)
 		}
 	}
 }

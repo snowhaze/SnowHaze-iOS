@@ -239,7 +239,7 @@ private extension TabViewController {
 			top = topOffset
 			bottom = bottomOffset
 		}
-		let insets = UIEdgeInsetsMake(top, left, bottom, right)
+		let insets = UIEdgeInsets.init(top: top, left: left, bottom: bottom, right: right)
 
 		if let wv = webView, let superview = wv.superview {
 			var tbInsets = UIEdgeInsets(top: insets.top, left: 0, bottom: insets.bottom, right: 0)
@@ -283,7 +283,7 @@ extension TabViewController {
 		}
 		urlBar?.securityIconColor = assessment.color
 		urlBar?.securityIcon = assessment.image
-		urlBar?.securityName = assessment.name + NSLocalizedString("privacy assessment privacy postfix", comment: "privacy term to be appended to privacy assessment name")
+		urlBar?.securityName = assessment.name + NSLocalizedString("privacy assessment privacy suffix", comment: "privacy term to be appended to privacy assessment name")
 	}
 
 	private var scale: CGFloat {

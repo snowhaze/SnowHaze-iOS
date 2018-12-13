@@ -185,7 +185,7 @@ class ScanCodeViewController: UIViewController {
 				}
 			}
 		}
-		NotificationCenter.default.addObserver(self, selector: #selector(didRotate(_:)), name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(didRotate(_:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
 		let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
 		view.addGestureRecognizer(recognizer)
 	}

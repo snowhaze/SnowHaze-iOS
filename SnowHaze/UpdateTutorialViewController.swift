@@ -100,7 +100,7 @@ class UpdateTutorialViewController : TutorialViewController {
 				let attributedString = NSMutableAttributedString(string: tutorialText)
 				let warningRange = (tutorialText as NSString).range(of: unsafeCharacter)
 				if warningRange.location != NSNotFound {
-					attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.httpWarning, range: warningRange)
+					attributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.httpWarning, range: warningRange)
 				}
 				label.attributedText = attributedString
 

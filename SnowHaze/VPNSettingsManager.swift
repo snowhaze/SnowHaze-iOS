@@ -172,7 +172,7 @@ class VPNSettingsManager: SettingsViewManager {
 								cell.accessoryView = onoff
 							case .connecting:
 								cell.textLabel?.text = NSLocalizedString("connecting ipsec vpn state title", comment: "indication that the ipsec vpn is connecting")
-								let spinner = UIActivityIndicatorView(activityIndicatorStyle: .white)
+								let spinner = UIActivityIndicatorView(style: .white)
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 							case .disconnected:
@@ -183,12 +183,12 @@ class VPNSettingsManager: SettingsViewManager {
 								cell.accessoryView = onoff
 							case .disconnecting:
 								cell.textLabel?.text = NSLocalizedString("disconnecting ipsec vpn state title", comment: "indication that the ipsec vpn is disconnecting")
-								let spinner = UIActivityIndicatorView(activityIndicatorStyle: .white)
+								let spinner = UIActivityIndicatorView(style: .white)
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 							case .invalid:
 								cell.textLabel?.text = NSLocalizedString("invalid ipsec vpn state title", comment: "indication that the ipsec vpn profile is currently invalid")
-								let spinner = UIActivityIndicatorView(activityIndicatorStyle: .white)
+								let spinner = UIActivityIndicatorView(style: .white)
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 								if VPNManager.shared.ipsecManagerLoaded {
@@ -196,7 +196,7 @@ class VPNSettingsManager: SettingsViewManager {
 								}
 							case .reasserting:
 								cell.textLabel?.text = NSLocalizedString("reasserting ipsec vpn state title", comment: "indication that the ipsec vpn is reasserting")
-								let spinner = UIActivityIndicatorView(activityIndicatorStyle: .white)
+								let spinner = UIActivityIndicatorView(style: .white)
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 						}
@@ -271,7 +271,7 @@ class VPNSettingsManager: SettingsViewManager {
 				let format = NSLocalizedString("vpn profile missing subscription accessibility label format", comment: "format of the accessibility label of the vpn profile cell when user is not subscribed to snowhaze premium")
 				cell.accessibilityLabel = String(format: format, profileName)
 			} else if downloading.contains(profile.id) {
-				let activity = UIActivityIndicatorView(activityIndicatorStyle: .white)
+				let activity = UIActivityIndicatorView(style: .white)
 				cell.accessoryView = activity
 				activity.startAnimating()
 				let format = NSLocalizedString("vpn profile downloading accessibility label format", comment: "format of the accessibility label of the vpn profile cell when the profile is being downloaded")

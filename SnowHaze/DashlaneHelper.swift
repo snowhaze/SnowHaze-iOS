@@ -40,13 +40,13 @@ struct DashlaneHelper {
 		return extensionItem(for: url)
 	}
 
-	func isDashlaneResponce(type: UIActivityType?) -> Bool {
+	func isDashlaneResponce(type: UIActivity.ActivityType?) -> Bool {
 		return type?.rawValue == "com.dashlane.dashlanephonefinal.SafariExtension"
 	}
 
 	func fill(_ manager: WebViewManager, with response: [Any]?, completion: (() -> Void)?) {
 		let extensionItem = response!.first as! NSExtensionItem
-		let provider = extensionItem.attachments!.first! as! NSItemProvider
+		let provider = extensionItem.attachments!.first! 
 		provider.loadItem(forTypeIdentifier: "com.apple.property-list") { [weak manager] nsdict, _ in
 			guard let data = nsdict as? [String: String] else {
 				if let completion = completion {
@@ -95,11 +95,10 @@ struct DashlaneHelper {
 				completion(nil)
 				return
 			}
-			if new {
-				let data = extensionItem.attachments!.first! as! [String: String]
+			if new, let data = extensionItem.attachments!.first! as Any as? [String: String] {
 				completion(data[passwordReplyKey])
-			} else {
-				let provider = extensionItem.attachments!.first! as! NSItemProvider
+			} else if !new {
+				let provider = extensionItem.attachments!.first! 
 				provider.loadItem(forTypeIdentifier: "com.apple.property-list") { nsdict, _ in
 					guard let data = nsdict as? [String: String] else {
 						completion(nil)

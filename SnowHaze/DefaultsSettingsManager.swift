@@ -67,6 +67,7 @@ class DefaultsSettingsManager: SettingsViewManager {
 			}
 			self.updateHeaderColor(animated: true)
 			MainViewController.controller.updateNightMode()
+			ReviewPrompt.settingsReset()
 		}
 		alert.addAction(confirmAction)
 
@@ -86,6 +87,7 @@ class DefaultsSettingsManager: SettingsViewManager {
 		let reset = NSLocalizedString("reset page settings confirm dialog confirm option title", comment: "title for confirm option of dialog to confirm resetting of per page settings")
 		let confirmAction = UIAlertAction(title: reset, style: .destructive) { _ in
 			Settings.unsetAllPageSettings()
+			ReviewPrompt.settingsReset()
 		}
 		alert.addAction(confirmAction)
 

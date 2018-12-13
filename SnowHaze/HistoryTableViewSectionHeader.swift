@@ -34,7 +34,7 @@ class HistoryTableViewSectionHeader: UIView {
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)
-		let flexibleSize: UIViewAutoresizing = [.flexibleHeight, .flexibleWidth]
+		let flexibleSize: UIView.AutoresizingMask = [.flexibleHeight, .flexibleWidth]
 
 		tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(deleteButtonMissed(_:)))
 		tapRecognizer.delegate = self
@@ -75,7 +75,7 @@ class HistoryTableViewSectionHeader: UIView {
 	private func frameForDeleteButton(_ confirmMode: Bool) -> CGRect {
 		let title = NSLocalizedString("delete history section button title", comment: "title of button to delete all history section of a day")
 		let font = deleteButton.titleLabel!.font!
-		let size = title.size(withAttributes: [NSAttributedStringKey.font: font])
+		let size = title.size(withAttributes: [NSAttributedString.Key.font: font])
 
 		let width: CGFloat = confirmMode ? size.width + 15 : 20
 		return CGRect(x: bounds.width - 10 - width, y: 5, width: width, height: 20)

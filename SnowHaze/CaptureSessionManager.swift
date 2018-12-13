@@ -182,7 +182,7 @@ class CaptureSessionManager: NSObject {
 
 	override init() {
 		sessionQueue = DispatchQueue(label: "ch.illotros.snowhaze.capturesessionmanager.capture")
-		pipelineRunningTask = UIBackgroundTaskInvalid
+		pipelineRunningTask = UIBackgroundTaskIdentifier.invalid
 		super.init()
 	}
 
@@ -274,7 +274,7 @@ class CaptureSessionManager: NSObject {
 
 	private func videoPipelineDidFinishRunning() {
 		UIApplication.shared.endBackgroundTask(pipelineRunningTask)
-		pipelineRunningTask = UIBackgroundTaskInvalid
+		pipelineRunningTask = UIBackgroundTaskIdentifier.invalid
 	}
 
 	private func supportsFocus() -> Bool {

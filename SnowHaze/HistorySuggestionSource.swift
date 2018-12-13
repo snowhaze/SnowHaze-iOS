@@ -61,7 +61,7 @@ class HistorySuggestionSource: SuggestionSource {
 		let center: CGFloat = 4
 		let dateString = dateFormatter.string(from: date)
 		let timeString = timeFormatter.string(from: date)
-		let attributes = [NSAttributedStringKey.foregroundColor: UIColor.title, NSAttributedStringKey.font: UIFont.snowHazeFont(size: 12)]
+		let attributes = [NSAttributedString.Key.foregroundColor: UIColor.title, NSAttributedString.Key.font: UIFont.snowHazeFont(size: 12)]
 		let dateSize = dateString.size(withAttributes: attributes)
 		let timeSize = timeString.size(withAttributes: attributes)
 		UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), false, 0)

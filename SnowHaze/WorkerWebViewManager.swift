@@ -27,7 +27,6 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 	weak var delegate: WorkerWebViewManagerDelegate?
 
 	private var dec: (() -> Void)?
-	private var waitingSnowHazeSearch: String?
 	private var observer: NSObjectProtocol?
 
 	var lastUpgrade = HTTPSUpgradeState()
@@ -58,7 +57,7 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 				}
 			}))
 
-			self.observations.insert(ret.observe(\.loading, options: .initial, changeHandler: { [weak self] webView, _ in
+			self.observations.insert(ret.observe(\.isLoading, options: .initial, changeHandler: { [weak self] webView, _ in
 				if webView.isLoading {
 					self?.dec = InUseCounter.network.inc()
 				} else {
@@ -67,7 +66,7 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 				}
 			}))
 		}
-		self.observations.insert(ret.observe(\.URL, options: .initial, changeHandler: { [weak self] webView, _ in
+		self.observations.insert(ret.observe(\.url, options: .initial, changeHandler: { [weak self] webView, _ in
 			if let me = self {
 				me.update(for: webView.url, webView: webView)
 				me.delegate?.webViewManaget(me, isLoading: webView.url)
@@ -88,7 +87,6 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 	}
 
 	func load(request: URLRequest) {
-		waitingSnowHazeSearch = nil
 		update(for: request.url, webView: webView)
 		webView.load(request)
 	}
@@ -109,9 +107,6 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 					delegate?.webViewManaget(self, didUpgradeLoadOf: url)
 				}
 				load(request: request)
-			case .getTokenForSearch(let search):
-				assert(actionTryList.isEmpty)
-				waitForToken(with: search)
 		}
 	}
 
@@ -143,9 +138,6 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 						delegate?.webViewManaget(self, didUpgradeLoadOf: url)
 					}
 					load(request: request)
-				case .getTokenForSearch(let search):
-					assert(actionTryList.isEmpty)
-					waitForToken(with: search)
 			}
 		} else {
 			delegate?.webViewManagerDidFailLoad(self)
@@ -219,22 +211,6 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 
 /// internals
 private extension WorkerWebViewManager {
-	func waitForToken(with search: String) {
-		if observer == nil {
-			observer = NotificationCenter.default.addObserver(forName: SubscriptionManager.tokenUpdatedNotificationName, object: nil, queue: nil) { [weak self] _ in
-				if let me = self, let search = me.waitingSnowHazeSearch {
-					if PolicyManager.isAboutBlank(me.webView.url) {
-						let url = SearchEngine(type: .snowhaze).url(for: search)
-						me.load(url: url)
-					}
-				}
-			}
-		}
-		waitingSnowHazeSearch = search
-		let errorPage = ErrorPageGenerator(type: .authError).getHTML()
-		webView.loadHTMLString(errorPage, baseURL: nil)
-	}
-
 	func strippedURL(for navigationAction: WKNavigationAction) -> URL? {
 		guard let url = navigationAction.request.url, navigationAction.targetFrame?.isMainFrame ?? false else {
 			return nil

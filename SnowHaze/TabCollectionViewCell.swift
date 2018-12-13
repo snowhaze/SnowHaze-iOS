@@ -36,7 +36,7 @@ class TabCollectionViewCell: UICollectionViewCell {
 		gradientLayer.colors = [UIColor(white: 1, alpha: 1).cgColor, UIColor(white: 1, alpha: 0).cgColor]
 		gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
 		gradientLayer.endPoint = CGPoint(x: 0.5, y: 0.95)
-		gradientLayer.contentsGravity = kCAGravityResize
+		gradientLayer.contentsGravity = CALayerContentsGravity.resize
 		gradientLayer.frame = self.contentView.layer.bounds
 		return gradientLayer
 	}()

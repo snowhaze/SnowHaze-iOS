@@ -85,7 +85,7 @@
 			}
 		}
 		if (name == gl1_VERSION) {
-			return "WebGL 1.0 (OpenGL ES 2.0 Metal - 52.3.2)";
+			return "WebGL 1.0 (OpenGL ES 2.0 Metal - 58.4)";
 		}
 		return getParam1.apply(this, arguments);
 	};

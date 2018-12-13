@@ -32,15 +32,8 @@ class SearchEngineSettingsManager: SettingsViewManager {
 				case 5:		title = NSLocalizedString("wolframalpha search engine display name", comment: "name of wolframalpha search engine to be displayed to user")
 				case 6:		title = NSLocalizedString("ecosia search engine display name", comment: "name of ecosia search engine to be displayed to user")
 				case 7:		title = NSLocalizedString("startpage search engine display name", comment: "name of startpage search engine to be displayed to user")
-				case 8:		title = NSLocalizedString("hulbee search engine display name", comment: "name of hulbee search engine to be displayed to user")
+				case 8:		title = NSLocalizedString("swisscows search engine display name", comment: "name of swisscows search engine to be displayed to user")
 				case 9:		title = NSLocalizedString("duckduckgo search engine display name", comment: "name of duckduckgo search engine to be displayed to user")
-				case 10:	title = NSLocalizedString("snowhaze search engine display name", comment: "name of snowhaze search engine to be displayed to user")
-							if !SubscriptionManager.shared.hasSubscription {
-								let image = UIImageView(image: #imageLiteral(resourceName: "blocked"))
-								cell.accessibilityLabel = NSLocalizedString("snowhaze search engine missing subscription accessibility label", comment: "accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium")
-								cell.accessoryView = image
-							}
-				case 11:	title = NSLocalizedString("findx search engine display name", comment: "name of findx search engine to be displayed to user")
 				default:	fatalError("invalid index path")
 			}
 			cell.textLabel?.text = title
@@ -52,7 +45,7 @@ class SearchEngineSettingsManager: SettingsViewManager {
 			let type: SearchEngineType
 			switch indexPath.row {
 				case 0:		title = NSLocalizedString("main search engine name", comment: "used to refer to the search engine selected by the user")
-							type = SearchEngineType(rawValue: settings.value(for: searchEngineKey).integer!)!
+							type = SearchEngineType(rawValue: settings.value(for: searchEngineKey).integer!) ?? .none
 				case 1:		title = NSLocalizedString("wikipedia search engine display name", comment: "name of wikipedia search engine to be displayed to user")
 							type = SearchEngineType.wikipedia
 				case 2:		title = NSLocalizedString("wolframalpha search engine display name", comment: "name of wolframalpha search engine to be displayed to user")
@@ -70,7 +63,7 @@ class SearchEngineSettingsManager: SettingsViewManager {
 	override func numberOfRows(inSection section: Int) -> Int {
 		switch section {
 			case 0:		return 0
-			case 1:		return 12
+			case 1:		return 10
 			case 2:		return 3
 			default:	fatalError("invalid section")
 		}
@@ -104,8 +97,8 @@ class SearchEngineSettingsManager: SettingsViewManager {
 				return
 			}
 			let engine = Int64(indexPath.row)
-			let newEngine = SearchEngineType(rawValue: engine)!
-			let oldEngine = SearchEngineType(rawValue: settings.value(for: searchEngineKey).integer!)!
+			let newEngine = SearchEngineType(rawValue: engine) ?? .none
+			let oldEngine = SearchEngineType(rawValue: settings.value(for: searchEngineKey).integer!) ?? .none
 			suggestionSearchEngines = SearchEngine.updateSuggestionEngine(new: newEngine, old: oldEngine, inList: suggestionSearchEngines)
 
 			Settings.atomically {
@@ -125,10 +118,10 @@ class SearchEngineSettingsManager: SettingsViewManager {
 			reloadSection2(with: newEngine, tableView: tableView)
 			updateHeaderColor(animated: true)
 		} else if indexPath.section == 2 {
-			let defaultEngine = SearchEngineType(rawValue: settings.value(for: searchEngineKey).integer!)!
+			let mainEngine = SearchEngineType(rawValue: settings.value(for: searchEngineKey).integer!) ?? .none
 			let engine: SearchEngineType
 			switch indexPath.row {
-				case 0:		engine = defaultEngine
+				case 0:		engine = mainEngine
 				case 1:		engine = SearchEngineType.wikipedia
 				case 2:		engine = SearchEngineType.wolframAlpha
 				default:	fatalError("invalid index path")
@@ -140,7 +133,7 @@ class SearchEngineSettingsManager: SettingsViewManager {
 			}
 			settings.set(.text(SearchEngine.encode(suggestionSearchEngines)), for: searchSuggestionEnginesKey)
 
-			reloadSection2(with: defaultEngine, tableView: tableView)
+			reloadSection2(with: mainEngine, tableView: tableView)
 			updateHeaderColor(animated: true)
 		}
 	}

@@ -482,20 +482,14 @@
 /* name of startpage search engine to be displayed to user */
 "startpage search engine display name" = "Startpage";
 
-/* name of hulbee search engine to be displayed to user */
-"hulbee search engine display name" = "Hulbee";
+/* name of swisscows search engine to be displayed to user */
+"swisscows search engine display name" = "Swisscows";
 
 /* name of duckduckgo search engine to be displayed to user */
 "duckduckgo search engine display name" = "DuckDuckGo";
 
 /* name of none search engine to be displayed to user */
 "none search engine display name" = "Keni";
-
-/* name of snowhaze search engine to be displayed to user */
-"snowhaze search engine display name" = "SnowHaze";
-
-/* name of findx search engine to be displayed to user */
-"findx search engine display name" = "Findx";
 
 /* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
 "snowhaze search engine missing subscription accessibility label" = "SnowHaze - Benötigt es SnowHaze Premium Abo";
@@ -566,17 +560,11 @@
 /* subtitle for autocomplete search suggestions from startpage */
 "startpage search suggestion subtitle" = "Startpage Suechi";
 
-/* subtitle for autocomplete search suggestions from hulbee */
-"hulbee search suggestion subtitle" = "Hulbee Suechi";
+/* subtitle for autocomplete search suggestions from swisscows */
+"swisscows search suggestion subtitle" = "Swisscows Suechi";
 
 /* subtitle for autocomplete search suggestions from DuckDuckGo */
 "duckduckgo search suggestion subtitle" = "DuckDuckGo Suechi";
-
-/* subtitle for autocomplete search suggestions from snowhaze search */
-"snowhaze search search suggestion subtitle" = "SnowHaze Suechi";
-
-/* subtitle for autocomplete search suggestions from findx */
-"findx search suggestion subtitle" = "Findx Suechi";
 
 /* title of the activity to find some text on page */
 "find on page activity title" = "Site dürsueche";
@@ -1056,7 +1044,7 @@
 "close tab button accessibility label" = "Zuetue";
 
 /* privacy term to be appended to privacy assessment name */
-"privacy assessment privacy postfix" = "Privatsphäre";
+"privacy assessment privacy suffix" = "Privatsphäre";
 
 /* accessibility label of button to load the previous page */
 "previous page button accessibility label" = "Zrugg";
@@ -1454,7 +1442,7 @@
 /* title of button to switch to next tutorial page */
 "tutorial continue button title" = "Witer";
 
-/* TODO: + add update tutorial textshtml of first update tutorial page content */
+/* html of first update tutorial page content */
 "update tutorial welcome html" = "<h3>Willkomme bi SnowHaze 2.5</h3><p>Hallo, mir hei e nöii SnowHaze version für di.</p>";
 
 /* content of 2. update tutorial page */

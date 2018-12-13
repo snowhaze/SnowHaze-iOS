@@ -11,8 +11,8 @@ import Foundation
 class AddBookmarkActivity: UIActivity {
 	private var tab: Tab?
 
-	override var activityType : UIActivityType? {
-		return UIActivityType("Add Bookmark Activity")
+	override var activityType : UIActivity.ActivityType? {
+		return UIActivity.ActivityType("Add Bookmark Activity")
 	}
 
 	override var activityTitle : String? {
@@ -33,7 +33,7 @@ class AddBookmarkActivity: UIActivity {
 		return self.tab != nil
 	}
 
-	override class var activityCategory : UIActivityCategory {
+	override class var activityCategory : UIActivity.Category {
 		return .action
 	}
 

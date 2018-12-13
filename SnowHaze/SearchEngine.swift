@@ -17,10 +17,8 @@ enum SearchEngineType: Int64 {
 	case wolframAlpha
 	case ecosia
 	case startpage
-	case hulbee
+	case swisscows
 	case duckDuckGo
-	case snowhaze
-	case findx
 }
 
 class SearchEngine {
@@ -66,14 +64,7 @@ class SearchEngine {
 	static func decode(_ string: String) -> [SearchEngineType] {
 		let data = string.data(using: String.Encoding.utf8)!
 		let numbers = try! JSONSerialization.jsonObject(with: data) as! [NSNumber]
-		return numbers.map { SearchEngineType(rawValue: $0.int64Value)! }
-	}
-
-	var needsTokenUpdate: Bool {
-		switch type {
-			case .snowhaze:	return !SubscriptionManager.shared.hasValidToken
-			default:		return false
-		}
+		return numbers.map { SearchEngineType(rawValue: $0.int64Value) ?? .none }
 	}
 
 	func url(for search: String) -> URL? {
@@ -89,17 +80,8 @@ class SearchEngine {
 			case .wolframAlpha:	return URL(string: "https://m.wolframalpha.com/input/?i=" + escapedSearch)
 			case .ecosia:		return URL(string: "https://www.ecosia.org/search?q=" + escapedSearch)
 			case .startpage:	return URL(string: "https://www.startpage.com/do/dsearch?language=\(NSLocalizedString("localized startpage language", comment: "language for startpage in the language used by the user"))&query=" + escapedSearch)
-			case .hulbee:		return URL(string: "https://hulbee.com/?query=" + escapedSearch)
+			case .swisscows:	return URL(string: "https://swisscows.com/?query=" + escapedSearch)
 			case .duckDuckGo:	return URL(string: "https://duckduckgo.com/?q=" + escapedSearch)
-			case .snowhaze:
-				let manager = SubscriptionManager.shared
-				guard manager.hasValidToken, let token = manager.authorizationTokenHash?.addingPercentEncoding(withAllowedCharacters: allowedChars) else {
-					return nil
-				}
-				let originalLanguage = NSLocalizedString("localization code", comment: "code used to identify the current locale")
-				let language = originalLanguage.addingPercentEncoding(withAllowedCharacters: allowedChars)!
-				return URL(string: "https://search.snowhaze.com/?q=\(escapedSearch)&l=\(language)&t=\(token)&v=1")
-			case .findx:		return URL(string: "https://www.findx.com/web?q=" + escapedSearch)
 			case .none:			return nil
 		}
 	}

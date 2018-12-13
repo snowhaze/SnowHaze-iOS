@@ -15,7 +15,7 @@ class ScreenDimmer {
 
 		let oldKeyWindow = UIApplication.shared.keyWindow
 		overlayWindow = UIWindow(frame: UIScreen.main.bounds)
-		overlayWindow.windowLevel = UIWindowLevelStatusBar
+		overlayWindow.windowLevel = UIWindow.Level.statusBar
 		overlayWindow.backgroundColor = .black
 		overlayWindow.alpha = 0
 		overlayWindow.isHidden = true

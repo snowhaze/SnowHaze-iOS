@@ -15,7 +15,7 @@ protocol SearchBarDelegate: TextInputBarDelegate {
 
 class SearchBar: TextInputBar {
 	override var intrinsicContentSize : CGSize {
-		return CGSize(width: UIViewNoIntrinsicMetric, height: 45)
+		return CGSize(width: UIView.noIntrinsicMetric, height: 45)
 	}
 
 	var search: Search!

@@ -83,7 +83,7 @@ class AcknowledgementsSettingsManager: SettingsViewManager {
 		let textView = self.textView(forSection: indexPath.section)
 		let text = textView.text
 		let width = controller.tableView.bounds.width
-		let rect = text?.boundingRect(with: CGSize(width: width - 40, height: 10000), options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font : textView.font!], context: nil)
+		let rect = text?.boundingRect(with: CGSize(width: width - 40, height: 10000), options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font : textView.font!], context: nil)
 		return rect!.size.height + 20
 	}
 

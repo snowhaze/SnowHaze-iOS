@@ -18,8 +18,6 @@ class SearchEngineSuggestionSource: SuggestionSource {
 	var engine: SearchEngine
 	var tab: Tab
 
-	private var snowhazeSearchID = 0
-
 	init(engine: SearchEngine, tab: Tab) {
 		self.engine = engine
 		self.tab = tab
@@ -45,10 +43,8 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				case .wolframAlpha:	self.wolframAlphaSuggestion(for: base, callback: callback)
 				case .ecosia:		self.ecosiaSuggestion(for: base, callback: callback)
 				case .startpage:	self.startpageSuggestion(for: base, callback: callback)
-				case .hulbee:		self.hulbeeSuggestion(for: base, callback: callback)
+				case .swisscows:	self.swisscowsSuggestion(for: base, callback: callback)
 				case .duckDuckGo:	self.duckDuckGoSuggestion(for: base, callback: callback)
-				case .snowhaze:		self.snowhazeSuggestion(for: base, callback: callback)
-				case .findx:		self.findxSuggestion(for: base, callback: callback)
 				case .none:			return
 			}
 		}
@@ -302,7 +298,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func hulbeeSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func swisscowsSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -320,12 +316,12 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				guard let url = self.engine.url(for: title) else {
 					return
 				}
-				let subtitle = NSLocalizedString("hulbee search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from hulbee")
-				let image = #imageLiteral(resourceName: "hulbee")
+				let subtitle = NSLocalizedString("swisscows search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from swisscows")
+				let image = #imageLiteral(resourceName: "swisscows")
 				suggestions.append(Suggestion(title: title, subtitle: subtitle, url: url, image: image, priority: self.priority(for: index + 1)))
 			}
 			if !suggestions.isEmpty {
-				callback(suggestions, "hulbee")
+				callback(suggestions, "swisscows")
 			}
 		}
 	}
@@ -362,93 +358,5 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func snowhazeSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
-		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
-			return
-		}
-		let manager = SubscriptionManager.shared
-		guard manager.hasSubscription, manager.hasValidToken, let originalToken = manager.authorizationToken else {
-			if PolicyManager.globalManager().autoUpdateAuthToken {
-				SubscriptionManager.shared.updateAuthToken { success in
-					if success {
-						self.snowhazeSuggestion(for: search, callback: callback)
-					}
-				}
-			}
-			return
-		}
-		let token = originalToken.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)!
-		let lang = NSLocalizedString("localization code", comment: "code used to identify the current locale")
-		guard let url = URL(string: "https://search.snowhaze.com/suggestion.php?v=1&l=\(lang)&t=\(token)&q=\(queryString)") else {
-			return
-		}
-		let id = snowhazeSearchID + 1
-		snowhazeSearchID = id
-		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) { [weak self] in
-			guard let me = self, me.snowhazeSearchID == id else {
-				return
-			}
-			JSONFetcher(tab: me.tab).fetchJSON(from: url) { (json) -> Void in
-				guard let me = self, let array = json as? [String] else {
-					return
-				}
-				let phrases = array.prefix(maxCount)
-				var suggestions = [Suggestion]()
-				for (index, phrase) in phrases.enumerated() {
-					guard let url = me.engine.url(for: phrase) else {
-						return
-					}
-					let subtitle = NSLocalizedString("snowhaze search search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from snowhaze search")
-					let image = #imageLiteral(resourceName: "snowflake")
-					let priority = me.priority(for: index + 1)
-					let suggestion = Suggestion(title: phrase, subtitle: subtitle, url: url, image: image, priority: priority)
-					suggestions.append(suggestion)
-				}
-				if !suggestions.isEmpty {
-					callback(suggestions, "snowhaze")
-				}
-			}
-		}
-	}
-
-	func findxSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
-		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
-			return
-		}
-		guard let url = URL(string: "https://www.findx.com/api/web-search/suggestions/?q=" + queryString) else {
-			return
-		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
-			guard let array = json as? [[String: Any]] else {
-				return
-			}
-			let phrases = array.prefix(maxCount)
-			var suggestions = [Suggestion]()
-			var maxScore = 0.0
-			for phrase in phrases {
-				guard let title = phrase["phrase"] as? String else {
-					return
-				}
-				guard let score = phrase["score"] as? Double else {
-					return
-				}
-				guard let url = self.engine.url(for: title) else {
-					return
-				}
-				maxScore = max(maxScore, score)
-				let subtitle = NSLocalizedString("findx search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from findx")
-				let image = #imageLiteral(resourceName: "findx")
-				let priority = 60 * score / maxScore
-				let suggestion = Suggestion(title: title, subtitle: subtitle, url: url, image: image, priority: priority)
-				suggestions.append(suggestion)
-			}
-			if !suggestions.isEmpty {
-				callback(suggestions, "findx")
-			}
-		}
-	}
-
-	func cancelSuggestions() {
-		snowhazeSearchID += 1
-	}
+	func cancelSuggestions() { }
 }

@@ -25,7 +25,7 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 	private static let overlayWindow: UIWindow = {
 		let oldKeyWindow = UIApplication.shared.keyWindow
 		let overlayWindow = UIWindow(frame: UIScreen.main.bounds)
-		overlayWindow.windowLevel = UIWindowLevelStatusBar
+		overlayWindow.windowLevel = UIWindow.Level.statusBar
 		overlayWindow.backgroundColor = .clear
 		overlayWindow.alpha = 1
 		overlayWindow.isOpaque = false
@@ -73,10 +73,10 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 		delegate = self
 
 		if isMain {
-			NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: Notification.Name.UIApplicationDidEnterBackground, object: nil)
+			NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
 			NotificationCenter.default.addObserver(self, selector: #selector(manualLockEngage(_:)), name: PasscodeManager.manualLockRequestNotification, object: nil)
 		} else {
-			NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(_:)), name: Notification.Name.UIApplicationWillEnterForeground, object: nil)
+			NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
 		}
 
 		super.viewDidLoad()

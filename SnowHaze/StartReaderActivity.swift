@@ -17,8 +17,8 @@ class StartReaderActivity: UIActivity {
 		self.callback = callback
 	}
 
-	override var activityType : UIActivityType? {
-		return UIActivityType("Start Reader Activity")
+	override var activityType : UIActivity.ActivityType? {
+		return UIActivity.ActivityType("Start Reader Activity")
 	}
 
 	override var activityTitle : String? {
@@ -41,7 +41,7 @@ class StartReaderActivity: UIActivity {
 		return false
 	}
 
-	override class var activityCategory : UIActivityCategory {
+	override class var activityCategory : UIActivity.Category {
 		return .action
 	}
 

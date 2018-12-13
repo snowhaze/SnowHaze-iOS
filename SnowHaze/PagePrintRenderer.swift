@@ -45,7 +45,7 @@ class PagePrintRenderer: UIPrintPageRenderer {
 		let pageNumberString = numberFormatter.string(from: NSNumber(value: pageIndex + 1))!
 		let pageCountString = numberFormatter.string(from: NSNumber(value: numberOfPages))!
 		let indexString = pageNumberString + " " + pageIndexSeparator + " " + pageCountString
-		let attributes = [NSAttributedStringKey.font: UIFont.snowHazeFont(size: 12)]
+		let attributes = [NSAttributedString.Key.font: UIFont.snowHazeFont(size: 12)]
 		let indexSize = indexString.size(withAttributes: attributes)
 		let indexY = footerRect.maxY - indexSize.height
 		let indexX = footerRect.maxX - indexSize.width
@@ -67,7 +67,7 @@ class PagePrintRenderer: UIPrintPageRenderer {
 	}
 
 	override func drawHeaderForPage(at pageIndex: Int, in headerRect: CGRect) {
-		let attributes = [NSAttributedStringKey.font: UIFont.snowHazeFont(size: 12)]
+		let attributes = [NSAttributedString.Key.font: UIFont.snowHazeFont(size: 12)]
 		let titleSize = title.size(withAttributes: attributes)
 		let titleX = max(headerRect.minX, headerRect.midX - titleSize.width / 2)
 		let titleY = headerRect.minX

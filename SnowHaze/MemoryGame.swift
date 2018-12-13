@@ -221,7 +221,7 @@ class MemoryGame {
 			context?.fill(rect)
 			let base64: String
 			if let coloredImage = UIGraphicsGetImageFromCurrentImageContext() {
-				base64 = UIImagePNGRepresentation(coloredImage)?.base64EncodedString() ?? ""
+				base64 = coloredImage.pngData()?.base64EncodedString() ?? ""
 			} else {
 				base64 = ""
 			}
@@ -237,7 +237,7 @@ class MemoryGame {
 		let base64: String
 		if let iconFile = sortedIcons?.last {
 			if let icon = UIImage(named: iconFile) {
-				base64 = UIImagePNGRepresentation(icon)?.base64EncodedString() ?? ""
+				base64 = icon.pngData()?.base64EncodedString() ?? ""
 			} else {
 				base64 = ""
 			}

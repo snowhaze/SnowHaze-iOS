@@ -159,7 +159,7 @@ class RegexCache {
 		let ret = [String: Regex]()
 #if os(iOS)
 		RegexCache.syncToMain {
-			let name = Notification.Name.UIApplicationDidReceiveMemoryWarning
+			let name = UIApplication.didReceiveMemoryWarningNotification
 			let o = NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
 				self?.cache = [:]
 			}

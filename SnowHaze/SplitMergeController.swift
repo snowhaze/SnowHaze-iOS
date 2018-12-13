@@ -30,14 +30,14 @@ class SplitMergeController: UIViewController {
  */
 	var masterViewController: UIViewController! {
 		willSet {
-			masterViewController?.willMove(toParentViewController: nil)
+			masterViewController?.willMove(toParent: nil)
 			masterViewController?.view.removeFromSuperview()
-			masterViewController?.removeFromParentViewController()
+			masterViewController?.removeFromParent()
 		}
 		didSet {
-			addChildViewController(masterViewController)
+			addChild(masterViewController)
 			viewIfLoaded?.addSubview(masterViewController.view)
-			masterViewController.didMove(toParentViewController: self)
+			masterViewController.didMove(toParent: self)
 			navigationItem.title = masterViewController.navigationItem.title
 			if let _ = viewIfLoaded {
 				layout()
@@ -58,9 +58,9 @@ class SplitMergeController: UIViewController {
 					navigationController!.popToViewController(self, animated: true)
 				}
 			} else {
-				detailViewController?.willMove(toParentViewController: nil)
+				detailViewController?.willMove(toParent: nil)
 				detailViewController?.view.removeFromSuperview()
-				detailViewController?.removeFromParentViewController()
+				detailViewController?.removeFromParent()
 			}
 		}
 		didSet {
@@ -71,9 +71,9 @@ class SplitMergeController: UIViewController {
 					}
 				} else {
 					use(detailViewController.navigationItem)
-					addChildViewController(detailViewController)
+					addChild(detailViewController)
 					viewIfLoaded?.addSubview(detailViewController.view)
-					detailViewController.didMove(toParentViewController: self)
+					detailViewController.didMove(toParent: self)
 					if let _ = viewIfLoaded {
 						layout()
 					}
@@ -177,9 +177,9 @@ extension SplitMergeController {
 		if !oldConstrainedWidth && constrainedWidth {
 			use(masterViewController.navigationItem)
 			if let detailViewController = detailViewController {
-				detailViewController.willMove(toParentViewController: nil)
+				detailViewController.willMove(toParent: nil)
 				detailViewController.view.removeFromSuperview()
-				detailViewController.removeFromParentViewController()
+				detailViewController.removeFromParent()
 				if detailFocus {
 					navigationController!.pushViewController(detailViewController, animated: false)
 				}
@@ -190,9 +190,9 @@ extension SplitMergeController {
 				if navigationController!.topViewController == detailViewController {
 					navigationController!.popToViewController(self, animated: false)
 				}
-				addChildViewController(detailViewController)
+				addChild(detailViewController)
 				viewIfLoaded?.addSubview(detailViewController.view)
-				detailViewController.didMove(toParentViewController: self)
+				detailViewController.didMove(toParent: self)
 			}
 		}
 	}

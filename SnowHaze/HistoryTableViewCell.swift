@@ -35,7 +35,7 @@ class HistoryTableViewCell: UITableViewCell {
 		}
 	}
 
-	override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
 		timeFormatter.dateStyle = .none
 		timeFormatter.timeStyle = .short
@@ -54,7 +54,7 @@ class HistoryTableViewCell: UITableViewCell {
 	}
 
 	private func image(from string: String) -> UIImage {
-		let attributes = [NSAttributedStringKey.foregroundColor: UIColor.title, NSAttributedStringKey.font: UIFont.snowHazeFont(size: 12)]
+		let attributes = [NSAttributedString.Key.foregroundColor: UIColor.title, NSAttributedString.Key.font: UIFont.snowHazeFont(size: 12)]
 		let size = string.size(withAttributes: attributes)
 		UIGraphicsBeginImageContextWithOptions(size, false, 0)
 		string.draw(at: CGPoint.zero, withAttributes: attributes)

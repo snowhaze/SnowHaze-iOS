@@ -184,6 +184,7 @@
 		84C7BF3B20961AC6003C25B2 /* HistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE9320961AC5003C25B2 /* HistoryTableViewCell.swift */; };
 		84C7BF3C20961AC6003C25B2 /* WarningsSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE9420961AC6003C25B2 /* WarningsSettingsManager.swift */; };
 		84C7BF3D20961AC6003C25B2 /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE9520961AC6003C25B2 /* TabController.swift */; };
+		D701909421C32C1900180EE8 /* ReviewPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D701909321C32C1900180EE8 /* ReviewPrompt.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -406,6 +407,7 @@
 		84C7BE9420961AC6003C25B2 /* WarningsSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarningsSettingsManager.swift; sourceTree = "<group>"; };
 		84C7BE9520961AC6003C25B2 /* TabController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
 		A332F0A3DD107E44A936AAE6 /* Pods-SnowHaze.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SnowHaze.release.xcconfig"; path = "Pods/Target Support Files/Pods-SnowHaze/Pods-SnowHaze.release.xcconfig"; sourceTree = "<group>"; };
+		D701909321C32C1900180EE8 /* ReviewPrompt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviewPrompt.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -567,6 +569,7 @@
 				84C7BE4120961ABE003C25B2 /* ReaderMode.js */,
 				84C7BE7720961AC4003C25B2 /* Redirector.swift */,
 				84C7BE8B20961AC5003C25B2 /* RepeatCounter.swift */,
+				D701909321C32C1900180EE8 /* ReviewPrompt.swift */,
 				84C7BDE220961AB6003C25B2 /* ScanCodeActivity.swift */,
 				84C7BDE520961AB6003C25B2 /* ScanCodeViewController.swift */,
 				84C7BE4320961ABE003C25B2 /* SchemeType.swift */,
@@ -833,10 +836,11 @@
 				TargetAttributes = {
 					842737EA212DC5E200B535BC = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1010;
 					};
 					84C7BDAC20961A4D003C25B2 = {
 						CreatedOnToolsVersion = 9.3;
-						LastSwiftMigration = 0930;
+						LastSwiftMigration = 1010;
 					};
 				};
 			};
@@ -1073,6 +1077,7 @@
 				84C7BEEF20961AC6003C25B2 /* PopularSitesSuggestionSource.swift in Sources */,
 				84C7BEF820961AC6003C25B2 /* SplitMergeController.swift in Sources */,
 				84C7BF2F20961AC6003C25B2 /* Hex.swift in Sources */,
+				D701909421C32C1900180EE8 /* ReviewPrompt.swift in Sources */,
 				84C7BF3720961AC6003C25B2 /* PagePrintRenderer.swift in Sources */,
 				84C7BF1220961AC6003C25B2 /* WebViewManager.swift in Sources */,
 				84C7BF0F20961AC6003C25B2 /* Tab.swift in Sources */,
@@ -1326,7 +1331,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1345,7 +1350,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -1482,7 +1487,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1504,7 +1509,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

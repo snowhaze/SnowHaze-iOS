@@ -158,7 +158,7 @@ class SubscriptionSettingsManager: SettingsViewManager {
 					}
 					cell.accessoryType = (okDisappearDate?.timeIntervalSinceNow) ?? 0 > 0 ? .checkmark : .none
 					if isLoadingAuthToken {
-						let spinner = UIActivityIndicatorView(activityIndicatorStyle: .white)
+						let spinner = UIActivityIndicatorView(style: .white)
 						spinner.startAnimating()
 						cell.accessoryView = spinner
 					}
@@ -176,7 +176,7 @@ class SubscriptionSettingsManager: SettingsViewManager {
 			cell.accessoryType = manager.activeSubscription == id ? .checkmark : .none
 			cell.detailTextLabel?.text = productLoadFailedMessages[id]
 			if loadingProducts.contains(id) {
-				let spinner = UIActivityIndicatorView(activityIndicatorStyle: .white)
+				let spinner = UIActivityIndicatorView(style: .white)
 				spinner.startAnimating()
 				cell.accessoryView = spinner
 			}

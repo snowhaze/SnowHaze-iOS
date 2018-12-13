@@ -139,17 +139,15 @@ class PolicyAssessor {
 			case .wolframAlpha:	return 0.6
 			case .ecosia:		return 0.3
 			case .startpage:	return 0.8
-			case .hulbee:		return 0.7
+			case .swisscows:	return 0.5
 			case .duckDuckGo:	return 0.75
-			case .snowhaze:		return 0.95
-			case .findx:		return 0.9
 			case .none:			return 1
 		}
 	}
 
 	private func assessSearchEngine() -> Double {
 		let engineVal = integer(for: searchEngineKey)
-		let engine = SearchEngineType(rawValue: engineVal)!
+		let engine = SearchEngineType(rawValue: engineVal) ?? .none
 		var result = rate(searchEngine: engine)
 
 		let encoded = wrapper.value(for: searchSuggestionEnginesKey).text!

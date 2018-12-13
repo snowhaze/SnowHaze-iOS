@@ -10,7 +10,6 @@ import Foundation
 
 enum ErrorPageGeneratorType {
 	case pageError
-	case authError
 }
 
 class ErrorPageGenerator {
@@ -52,28 +51,7 @@ class ErrorPageGenerator {
 	func getHTML() -> String {
 		switch type {
 			case .pageError: return getErrorPageHTML()
-			case .authError: return getAuthErrorPageHTML()
 		}
-	}
-	
-	private func getAuthErrorPageHTML() -> String {
-		let defaultTitle = NSLocalizedString("error page auth default title", comment: "default auth error title")
-		let t = encode(html: title ?? defaultTitle)
-		let head = getHead(title: t)
-		
-		let msg: String
-		let info: String
-		if let m = message, !m.isEmpty {
-			msg = m
-			info = ""
-		} else {
-			msg = encode(html: NSLocalizedString("error page auth error default message", comment: "default auth error message"))
-			info = encode(html: NSLocalizedString("error page auth error default information", comment: "default auth error information"))
-		}
-		
-		let body = "<h1>\(t)</h1><p>\(msg)</p><p>\(info)</p>"
-		
-		return "<!DOCTYPE html><html>\(head)<body style=\"\(getBodyCSS())\">\(body)</body></html>"
 	}
 
 	private func getErrorPageHTML() -> String {

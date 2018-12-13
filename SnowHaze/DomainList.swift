@@ -82,7 +82,7 @@ class DomainList {
 	}
 
 	private static var listCache: [DomainListType: [String]] = {
-		let name = Notification.Name.UIApplicationDidReceiveMemoryWarning
+		let name = UIApplication.didReceiveMemoryWarningNotification
 		let center = NotificationCenter.default
 		center.addObserver(forName: name, object: nil, queue: nil, using: { _ in
 			DomainList.listCache = [:]
@@ -116,7 +116,7 @@ class DomainList {
 		}
 		let query = [String](repeating: "(?)", count: bindings.count).joined(separator: ",")
 		let result = try! db.execute("SELECT trackers FROM \(type.table) WHERE domain IN (VALUES \(query)) AND trackers IS NOT NULL ORDER BY length(domain) DESC LIMIT 1", with: bindings)
-		return result.first?.integerValue! ?? 20
+		return result.first?.integerValue! ?? 22
 	}
 
 	func search(top: Int64, matching: String) -> [(Int64, String)] {

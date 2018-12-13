@@ -239,7 +239,7 @@ class URLBar: UIView {
 	}
 
 	override var intrinsicContentSize : CGSize {
-		return CGSize(width: UIViewNoIntrinsicMetric, height: height(for: scale))
+		return CGSize(width: UIView.noIntrinsicMetric, height: height(for: scale))
 	}
 
 	@available(iOS 11, *)
@@ -341,8 +341,8 @@ class URLBar: UIView {
 		cancelButton.tintColor = .title
 		cancelButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
-		let flexibleTopRight: UIViewAutoresizing = [.flexibleRightMargin, .flexibleTopMargin]
-		let flexibleTopLeft: UIViewAutoresizing = [.flexibleLeftMargin, .flexibleTopMargin]
+		let flexibleTopRight: UIView.AutoresizingMask = [.flexibleRightMargin, .flexibleTopMargin]
+		let flexibleTopLeft: UIView.AutoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin]
 
 		prevButton.frame.origin.x = 12
 		prevButton.frame.origin.y = containerView.frame.origin.y - 5
@@ -469,7 +469,7 @@ class URLBar: UIView {
 			urlField.addInteraction(dropInteraction)
 		}
 
-		let flexibleTopWidth: UIViewAutoresizing = [.flexibleWidth, .flexibleTopMargin]
+		let flexibleTopWidth: UIView.AutoresizingMask = [.flexibleWidth, .flexibleTopMargin]
 		containerView.autoresizingMask = flexibleTopWidth
 		containerView.addSubview(urlField)
 		containerView.frame.origin.y = bounds.height - 45 - tabSelectionHeight + (showTabSelection ? tabSelectionShinkage : 0)
@@ -622,12 +622,6 @@ extension URLBar: UITextFieldDelegate {
 		}
 		DispatchQueue.main.async {
 			textField.selectedTextRange = textField.textRange(from: textField.beginningOfDocument, to: textField.endOfDocument)
-
-			if !(textField.text ?? "").isEmpty {
-				let menu = UIMenuController.shared
-				menu.setTargetRect(textField.frame, in: textField.superview!)
-				menu.setMenuVisible(true, animated: true)
-			}
 		}
 		delegate?.inputStringUpdated(for: self, input: textField.text ?? "")
 		startInput()

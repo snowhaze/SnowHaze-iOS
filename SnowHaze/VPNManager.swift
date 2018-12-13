@@ -129,7 +129,7 @@ struct IPSecProfile: VPNProfile, Equatable {
 		ret["names"] = names
 		ret["hosts"] = hosts
 		ret["credentials"] = configs.map { ["identity": $0.identity, "host": $0.host, "psk": $0.psk] }
-		let flagData = UIImagePNGRepresentation(flag)!
+		let flagData = flag.pngData()!
 		ret["flag"] = flagData.base64EncodedString()
 		if let timestamp = expiration?.timeIntervalSince1970 {
 			ret["expiration"] = timestamp
@@ -221,7 +221,7 @@ struct OVPNProfile: VPNProfile, Equatable {
 		if let profile = profile {
 			ret["profile"] = profile
 		}
-		let flagData = UIImagePNGRepresentation(flag)!
+		let flagData = flag.pngData()!
 		ret["flag"] = flagData.base64EncodedString()
 		if let timestamp = expiration?.timeIntervalSince1970 {
 			ret["expiration"] = timestamp

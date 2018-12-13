@@ -72,7 +72,7 @@ class SettingsViewManager: NSObject {
 	}
 
 	func makeActivity(for cell: UITableViewCell) -> UIActivityIndicatorView {
-		let activity = UIActivityIndicatorView(activityIndicatorStyle: .white)
+		let activity = UIActivityIndicatorView(style: .white)
 		activity.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleRightMargin, .flexibleBottomMargin]
 		activity.center = CGPoint(x: cell.bounds.midX, y: cell.bounds.midY)
 		activity.startAnimating()
@@ -193,7 +193,7 @@ class SettingsViewManager: NSObject {
 			return
 		}
 		uiSwitch.setOn(!uiSwitch.isOn, animated: true)
-		uiSwitch.sendActions(for: UIControlEvents.valueChanged)
+		uiSwitch.sendActions(for: UIControl.Event.valueChanged)
 	}
 
 	var contentWidth: CGFloat {

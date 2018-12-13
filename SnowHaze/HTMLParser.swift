@@ -49,8 +49,8 @@ class HTMLParser {
 		let tmpAttrString = NSMutableAttributedString(string: tmp)
 		for (mod, range) in mods {
 			switch mod {
-				case .Underline:	tmpAttrString.addAttribute(NSAttributedStringKey.underlineStyle, value: NSUnderlineStyle.styleSingle.rawValue, range: range)
-				case .Strong:		tmpAttrString.addAttribute(NSAttributedStringKey.font, value: boldFont, range: range)
+				case .Underline:	tmpAttrString.addAttribute(NSAttributedString.Key.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+				case .Strong:		tmpAttrString.addAttribute(NSAttributedString.Key.font, value: boldFont, range: range)
 			}
 		}
 		attributedString = NSAttributedString(attributedString: tmpAttrString)
