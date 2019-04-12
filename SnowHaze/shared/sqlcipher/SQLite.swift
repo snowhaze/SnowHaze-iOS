@@ -9,18 +9,23 @@
 import Foundation
 import Dispatch
 
-private let internalQueue = DispatchQueue(label: "ch.illotros.sqlite.internal")
-
 public extension String {
 	private static let escapeRx = try! NSRegularExpression(pattern: "[\\\\%_]")
 
-	public var backslashEscapeLike: String {
+	var backslashEscapeLike: String {
 		let range = NSRange(startIndex ..< endIndex, in: self)
 		return String.escapeRx.stringByReplacingMatches(in: self, range: range, withTemplate: "\\\\$0")
 	}
 
 	fileprivate init?(cUTF8: UnsafeRawPointer) {
 		self.init(cString: UnsafePointer<Int8>(OpaquePointer(cUTF8)), encoding: .utf8)
+	}
+
+	fileprivate init?(cUTF8: UnsafePointer<Int8>?) {
+		guard let cUTF8 = cUTF8 else {
+			return nil
+		}
+		self.init(cString: cUTF8, encoding: .utf8)
 	}
 
 	fileprivate init?(cUTF8: UnsafeRawPointer, length: Int32) {
@@ -79,10 +84,6 @@ private extension Int {
 public extension Data {
 	var sqliteEscaped: String {
 		return "x'" + reduce("") { $0 + String(format: "%02x", $1) } + "'"
-	}
-
-	fileprivate func withUnsafeBytes<ResultType, ContentType>(_ body: (UnsafePointer<ContentType>, UInt64) throws -> ResultType) rethrows -> ResultType {
-		return try self.withUnsafeBytes { return try body($0, UInt64(count)) }
 	}
 }
 
@@ -284,8 +285,90 @@ public class SQLite {
 		case statementJournalSpill(Int)
 	}
 
+	public enum Limit {
+		case length
+		case sqlLength
+		case column
+		case exprDepth
+		case compoundSelect
+		case vdbeOp
+		case functionArg
+		case attached
+		case likePatternLength
+		case variableNumber
+		case triggerDepth
+		case workerThreads
+	}
+
+	public func limit(_ limit: Limit, value: Int = -1) -> Int {
+		return internalQueue.sync { () -> Int in
+			let id: Int32
+			switch limit {
+				case .length:				id = SQLITE_LIMIT_LENGTH
+				case .sqlLength:			id = SQLITE_LIMIT_SQL_LENGTH
+				case .column:				id = SQLITE_LIMIT_COLUMN
+				case .exprDepth:			id = SQLITE_LIMIT_EXPR_DEPTH
+				case .compoundSelect:		id = SQLITE_LIMIT_COMPOUND_SELECT
+				case .vdbeOp:				id = SQLITE_LIMIT_VDBE_OP
+				case .functionArg:			id = SQLITE_LIMIT_FUNCTION_ARG
+				case .attached:				id = SQLITE_LIMIT_ATTACHED
+				case .likePatternLength:	id = SQLITE_LIMIT_LIKE_PATTERN_LENGTH
+				case .variableNumber:		id = SQLITE_LIMIT_VARIABLE_NUMBER
+				case .triggerDepth:			id = SQLITE_LIMIT_TRIGGER_DEPTH
+				case .workerThreads:		id = SQLITE_LIMIT_WORKER_THREADS
+			}
+			return Int(sqlite3_limit(connection, id, value.clampedTo32Bit))
+		}
+	}
+
+	public func progressHandler(_ steps: Int, callback: (() -> Bool)?) {
+		guard let callback = callback else {
+			sqlite3_progress_handler(connection, steps.clampedTo32Bit, nil, nil)
+			return
+		}
+		typealias ProgressHandler = ContextWrapper<() -> Bool>
+		let context = ProgressHandler(data: callback)
+		sqlite3_progress_handler(connection, steps.clampedTo32Bit, { context -> Int32 in
+			let callback = ProgressHandler.fromC(context)
+			return callback!.data() ? 1 : 0
+		}, context.toC)
+	}
+
+	public enum FileControlCommand {
+		case persistWal(Bool?)
+		case powersafeOverride(Bool?)
+	}
+
+	public func fileControl(dbName: String = "main", command: FileControlCommand) throws -> Int {
+		return try dbName.withCUTF8 { dbName in
+			switch command {
+				case .persistWal(let enable):
+					if let enable = enable {
+						var flag: Int = enable ? 1 : 0
+						try check(sqlite3_file_control(connection, dbName, SQLITE_FCNTL_PERSIST_WAL, &flag))
+						return 0
+					} else {
+						var flag: Int = -1
+						try check(sqlite3_file_control(connection, dbName, SQLITE_FCNTL_PERSIST_WAL, &flag))
+						return flag
+					}
+				case .powersafeOverride(let enable):
+					if let enable = enable {
+						var flag: Int = enable ? 1 : 0
+						try check(sqlite3_file_control(connection, dbName, SQLITE_FCNTL_POWERSAFE_OVERWRITE, &flag))
+						return 0
+					} else {
+						var flag: Int = -1
+						try check(sqlite3_file_control(connection, dbName, SQLITE_FCNTL_POWERSAFE_OVERWRITE, &flag))
+						return flag
+					}
+			}
+		}
+	}
+
 	public enum DBOption {
-	//	case mainDBName						/// not supported
+		/// set the name of the main database
+		case mainDBName(String?)
 
 		/// configure size and number of lookaside slots
 		case lookaside(UnsafeMutableRawPointer?, Int, Int)
@@ -310,16 +393,22 @@ public class SQLite {
 
 		/// enable, disable or query status of explain query plan including triggers in explanation
 		case triggerExplainQueryPlan(Bool?)
+
+		/// enable or disable resetting DB on VACUUM
+		case resetDatabase(Bool?)
+
+		/// activate or deactivate "defensive" flag for a database connection
+		case defensive(Bool?)
 	}
 
 	public enum BindingKey: Hashable {
 		case alphanumeric(String)
 		case numeric(Int)
 
-		public var hashValue: Int {
+		public func hash(into hasher: inout Hasher) {
 			switch self {
-				case .alphanumeric(let str):	return str.hashValue
-				case .numeric(let int):			return int.hashValue
+				case .alphanumeric(let str):	hasher.combine(str)
+				case .numeric(let int):			hasher.combine(int)
 			}
 		}
 
@@ -344,6 +433,7 @@ public class SQLite {
 			}
 
 			public static let persistent	= PrepareOptions(rawValue: UInt32(SQLITE_PREPARE_PERSISTENT))
+			public static let normalize		= PrepareOptions(rawValue: UInt32(SQLITE_PREPARE_NORMALIZE))
 		}
 
 		private let statement: OpaquePointer
@@ -374,7 +464,7 @@ public class SQLite {
 
 		public var expandedSql: String {
 			let cSql = sqlite3_expanded_sql(self.statement)!
-			let ret = String(cUTF8: cSql)!
+			let ret = String(cUTF8: UnsafeRawPointer(cSql))!
 			sqlite3_free(cSql)
 			return ret
 		}
@@ -449,7 +539,7 @@ public class SQLite {
 					let res = text.withCUTF8 { sqlite3_bind_text64(statement, keyIndex, $0, $1, TRANSIENT, UInt8(SQLITE_UTF8)) }
 					try check(res, connection: handle)
 				case .blob(let data):
-					let res = data.withUnsafeBytes { sqlite3_bind_blob64(statement, keyIndex, $0, $1, TRANSIENT) }
+					let res = data.withUnsafeBytes { sqlite3_bind_blob64(statement, keyIndex, $0.baseAddress, sqlite3_uint64($0.count), TRANSIENT) }
 					try check(res, connection: handle)
 			}
 		}
@@ -752,7 +842,13 @@ public class SQLite {
 		}
 	}
 
+	private static let internalQueue = DispatchQueue(label: "ch.illotros.sqlite.internal")
+	private static var nextID: UInt64 = 0
+
 	private let connection: OpaquePointer
+
+	private let internalQueue: DispatchQueue
+	private var dbNameBuffer: [CChar]? = nil
 
 	private lazy var fts5APIStmt = (try? statement(for: "SELECT fts5(?)")) ?? nil
 
@@ -782,19 +878,23 @@ public class SQLite {
 		public static let rwCreate: OpenFlags = [.readwrite, .create]
 	}
 
-	public convenience init?(path: String = ":memory:", flags: OpenFlags = .rwCreate) {
-		self.init(path: path, finalSetup: "", openName: path, flags: flags)
+	public enum FinalSetupOptions {
+		case statement(String)
+		case config(DBOption)
 	}
 
-	public convenience init?(url: URL, flags: OpenFlags = .rwCreate) {
+	public convenience init?(path: String = ":memory:", flags: OpenFlags = .rwCreate, setup: [FinalSetupOptions] = []) {
+		self.init(path: path, openName: path, flags: flags, setup: setup)
+	}
+
+	public convenience init?(url: URL, flags: OpenFlags = .rwCreate, setup: [FinalSetupOptions] = []) {
 		guard url.isFileURL else {
 			return nil
 		}
-		self.init(path: url.path, finalSetup: "", openName: url.absoluteString, flags: [flags, .uri])
+		self.init(path: url.path, openName: url.absoluteString, flags: [flags, .uri], setup: setup)
 	}
 
-	// finalSetup is only intended for use in subclasses like SQLCipher, in order to ensure database is readable before sanity check is performed. pass empty string if not used.
-	internal init?(path: String, finalSetup: String, openName: String, flags: OpenFlags) {
+	internal init?(path: String, openName: String, flags: OpenFlags, setup: [FinalSetupOptions]) {
 #if os(OSX) || os(iOS)
 		var pathComponents = (path as NSString).pathComponents
 		_ = pathComponents.popLast()
@@ -815,9 +915,19 @@ public class SQLite {
 			return nil
 		}
 
+		let id = SQLite.internalQueue.sync { () -> UInt64 in
+			let id = SQLite.nextID
+			SQLite.nextID += 1
+			return id
+		}
+		internalQueue = DispatchQueue(label: "ch.illotros.sqlite.internal-\(id)")
+
 		do {
-			if !finalSetup.isEmpty {
-				try execute(finalSetup)
+			for option in setup {
+				switch option {
+					case .statement(let stmt):	try execute(stmt)
+					case .config(let config):	let _ = try set(option: config)
+				}
 			}
 			try execute("SELECT count(*) FROM sqlite_master")
 		} catch _ {
@@ -969,11 +1079,25 @@ public class SQLite {
 		}
 	}
 
-	public func set(option: DBOption) throws -> Bool! {
-		let (ok, result) = internalQueue.sync { () -> (Int32, Bool?) in
+	public func set(option: DBOption) throws -> Bool? {
+		let (ok, result) = try internalQueue.sync { () -> (Int32, Bool?) in
 			let enable: Bool?
 			let verb: Int32
 			switch option {
+				case .mainDBName(let name):
+					if let name = name {
+						guard !name.contains("\0") else {
+							throw Error.sqliteSwiftError("C Strings cannot contain '\\0' characters: " + name)
+						}
+						let size = name.lengthOfBytes(using: .utf8)
+						var buffer = [CChar](repeating: 0, count: size + 1)
+						let result = name.getCString(&buffer, maxLength: size, encoding: .utf8)
+						dbNameBuffer = buffer
+						assert(result)
+					} else {
+						dbNameBuffer = nil
+					}
+					return (sqlite_db_option_constcharp(connection, SQLITE_DBCONFIG_MAINDBNAME, dbNameBuffer), nil)
 				case .lookaside(let pointer, let sizeInt, let slotsInt):
 					let size = sizeInt.clampedTo32Bit
 					let slots = slotsInt.clampedTo32Bit
@@ -991,16 +1115,22 @@ public class SQLite {
 					verb = SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER
 				case .loadExtension(let e):
 					enable = e
-					verb = SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER
+					verb = SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION
 				case .noCheckpointOnClose(let e):
 					enable = e
-					verb = SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER
+					verb = SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE
 				case .queryPlannerStabilityGuarantee(let e):
 					enable = e
-					verb = SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER
+					verb = SQLITE_DBCONFIG_ENABLE_QPSG
 				case .triggerExplainQueryPlan(let e):
 					enable = e
-					verb = SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER
+					verb = SQLITE_DBCONFIG_TRIGGER_EQP
+				case .resetDatabase(let e):
+					enable = e
+					verb = SQLITE_DBCONFIG_RESET_DATABASE
+				case .defensive(let e):
+					enable = e
+					verb = SQLITE_DBCONFIG_DEFENSIVE
 			}
 			let set: Int32
 			if let enable = enable {
@@ -1067,13 +1197,13 @@ public class SQLite {
 
 // custom convenience APIs
 public extension SQLite {
-	public enum TransactionType {
+	enum TransactionType {
 		case deferred
 		case immediate
 		case exclusive
 	}
 
-	public func inTransaction<T>(ofType type: TransactionType = .deferred, perform body: () throws -> T) throws -> T {
+	func inTransaction<T>(ofType type: TransactionType = .deferred, perform body: () throws -> T) throws -> T {
 		do {
 			switch type {
 				case .deferred:		try beginDefferedStmt.execute()
@@ -1089,7 +1219,7 @@ public extension SQLite {
 		}
 	}
 
-	public func inSavepointBlock(name: String? = nil, perform body: () throws -> Void) throws {
+	func inSavepointBlock(name: String? = nil, perform body: () throws -> Void) throws {
 		let savepointName = (name ?? "ch.illotros.sqlite.convenience.safepoint.name").sqliteEscaped
 		do {
 			try execute("SAVEPOINT \(savepointName)")
@@ -1107,12 +1237,12 @@ public extension SQLite {
 	private typealias FunctionContext = ContextWrapper<([Data], (Int, Any) -> Void, (Int) -> Any?) throws -> Data>
 	private typealias ObjWrapper = ContextWrapper<Any?>
 
-	public func register(name: String, nArgs: Int = 1, deterministic: Bool = true, function: @escaping ([Data]) throws -> Data) throws {
+	func register(name: String, nArgs: Int = 1, deterministic: Bool = true, function: @escaping ([Data]) throws -> Data) throws {
 		let fn: ([Data], (Int, Any) -> Void, (Int) -> Any?) throws -> Data = { data, _, _ in return try function(data) }
 		try register(name: name, nArgs: nArgs, deterministic: deterministic, function: fn)
 	}
 
-	public func register<T>(name: String, nArgs: Int = 1, deterministic: Bool = true, function: @escaping ([Data], (Int, T) -> Void, (Int) -> T?) throws -> Data) throws {
+	func register<T>(name: String, nArgs: Int = 1, deterministic: Bool = true, function: @escaping ([Data], (Int, T) -> Void, (Int) -> T?) throws -> Data) throws {
 		let encoding = deterministic ? SQLITE_UTF8 | SQLITE_DETERMINISTIC : SQLITE_UTF8
 		let cFunction: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
 			let context = FunctionContext.fromC(sqlite3_user_data(sqliteContext)!)
@@ -1138,7 +1268,7 @@ public extension SQLite {
 			try check(sqlite3_create_function_v2(connection, $0, nArgs.clampedTo32Bit, encoding, cContext, cFunction, nil, nil, { FunctionContext.releaseC($0) }))
 		}
 	}
-	public func register<T>(name: String, nArgs: Int = 1, deterministic: Bool = true, step: @escaping ([Data], T?) throws -> T, final: @escaping (T?) throws -> Data) throws {
+	func register<T>(name: String, nArgs: Int = 1, deterministic: Bool = true, step: @escaping ([Data], T?) throws -> T, final: @escaping (T?) throws -> Data) throws {
 		typealias AggregateContext = ContextWrapper<(step: ([Data], Any?) throws -> Any, final: (Any?) throws -> Data)>
 
 		let encoding = deterministic ? SQLITE_UTF8 | SQLITE_DETERMINISTIC : SQLITE_UTF8
@@ -1184,13 +1314,13 @@ public extension SQLite {
 		}
 	}
 
-	public func unregister(functionName: String, nArgs: Int = 1) throws {
+	func unregister(functionName: String, nArgs: Int = 1) throws {
 		try functionName.withCUTF8 {
 			try check(sqlite3_create_function_v2(connection, $0, nArgs.clampedTo32Bit, SQLITE_UTF8, nil, nil, nil, nil, nil))
 		}
 	}
 
-	public func register(name: String, collation: @escaping (String, String) -> ComparisonResult) throws {
+	func register(name: String, collation: @escaping (String, String) -> ComparisonResult) throws {
 		typealias CollationContext = ContextWrapper<(String, String) -> ComparisonResult>
 		
 		let context = CollationContext(data: collation)
@@ -1206,7 +1336,7 @@ public extension SQLite {
 		}
 	}
 
-	public func unregister(collationName: String) throws {
+	func unregister(collationName: String) throws {
 		try collationName.withCUTF8 {
 			try check(sqlite3_create_collation_v2(connection, $0, SQLITE_UTF8, nil, nil, nil))
 		}
@@ -1239,7 +1369,7 @@ public extension SQLite {
 			case .text(let string):
 				string.withCUTF8 { sqlite3_result_text64(context, $0, $1, TRANSIENT, UInt8(SQLITE_UTF8)) }
 			case .blob(let data):
-				data.withUnsafeBytes { sqlite3_result_blob64(context, $0, $1, TRANSIENT) }
+				data.withUnsafeBytes { sqlite3_result_blob64(context, $0.baseAddress, sqlite_uint64($0.count), TRANSIENT) }
 			case .float(let double):
 				sqlite3_result_double(context, double)
 			case .integer(let int):
@@ -1267,11 +1397,12 @@ public extension SQLite {
 	}
 }
 
+// FTS5
 public extension SQLite {
 	private typealias FactoryContext = ContextWrapper<([String]) throws -> ((FTS5TokenizeFlags, String) throws -> [(FTS5TokenFlags, String, Range<String.Index>)])>
 	private typealias TokenizerContext = ContextWrapper<(FTS5TokenizeFlags, String) throws -> [(FTS5TokenFlags, String, Range<String.Index>)]>
 
-	public func registerFTS5Tokenizer(named name: String, factory: @escaping ([String]) throws -> ((FTS5TokenizeFlags, String) throws -> [(FTS5TokenFlags, String, Range<String.Index>)])) throws {
+	func registerFTS5Tokenizer(named name: String, factory: @escaping ([String]) throws -> ((FTS5TokenizeFlags, String) throws -> [(FTS5TokenFlags, String, Range<String.Index>)])) throws {
 		var api: UnsafeMutablePointer<fts5_api>!
 		guard let stmt = fts5APIStmt else {
 			throw Error.sqliteSwiftError("failed to prepare statement")
@@ -1326,7 +1457,7 @@ public extension SQLite {
 		}
 	})
 
-	public struct FTS5TokenizeFlags: OptionSet {
+	struct FTS5TokenizeFlags: OptionSet {
 		public let rawValue: Int32
 
 		public init(rawValue value: Int32) {
@@ -1339,7 +1470,7 @@ public extension SQLite {
 		public static let aux		= FTS5TokenizeFlags(rawValue: FTS5_TOKENIZE_AUX)
 	}
 
-	public struct FTS5TokenFlags: OptionSet {
+	struct FTS5TokenFlags: OptionSet {
 		public let rawValue: Int32
 
 		public init(rawValue value: Int32) {
@@ -1347,6 +1478,118 @@ public extension SQLite {
 		}
 
 		public static let colocated	= FTS5TokenFlags(rawValue: FTS5_TOKEN_COLOCATED)
+	}
+}
+
+// Authorizer
+public extension SQLite {
+	private typealias AuthorizerContext = ContextWrapper<(AuthorizerAction, String?, String?) throws -> AuthorizerResponse>
+
+	enum AuthorizerAction {
+		case createIndex(table: String, index: String)
+		case createTable(table: String)
+		case createTempIndex(table: String, index: String)
+		case createTempTable(table: String)
+		case createTempTrigger(table: String, trigger: String)
+		case createTempView(view: String)
+		case createTrigger(table: String, trigger: String)
+		case createView(view: String)
+		case delete(table: String)
+		case dropIndex(table: String, index: String)
+		case dropTable(table: String)
+		case dropTempIndex(table: String, index: String)
+		case dropTempTable(table: String)
+		case dropTempTrigger(table: String, trigger: String)
+		case dropTempView(view: String)
+		case dropTrigger(table: String, trigger: String)
+		case dropView(view: String)
+		case insert(table: String)
+		case pragma(pragma: String, arg: String?)
+		case read(table: String, column: String)
+		case select
+		case transaction(operation: String)
+		case update(table: String, column: String)
+		case attach(file: String?)
+		case detach(database: String)
+		case alterTable(database: String, table: String)
+		case reindex(index: String)
+		case analyze(table: String)
+		case createVtable(table: String, module: String)
+		case dropVtable(table: String, module: String)
+		case function(function: String)
+		case savePoint(operation: String, savepoint: String)
+		case recursive
+
+		init(code: Int32, string1: UnsafePointer<Int8>?, string2: UnsafePointer<Int8>?) {
+			let s1 = String(cUTF8: string1)
+			let s2 = String(cUTF8: string2)
+			switch code {
+				case 1:		self = .createIndex(table: s2!, index: s1!)
+				case 2:		self = .createTable(table: s1!); assert(s2 == nil)
+				case 3:		self = .createTempIndex(table: s2!, index: s1!)
+				case 4:		self = .createTempTable(table: s1!); assert(s2 == nil)
+				case 5:		self = .createTempTrigger(table: s2!, trigger: s1!)
+				case 6:		self = .createTempView(view: s1!); assert(s2 == nil)
+				case 7:		self = .createTrigger(table: s2!, trigger: s1!)
+				case 8:		self = .createView(view: s1!); assert(s2 == nil)
+				case 9:		self = .delete(table: s1!); assert(s2 == nil)
+				case 10:	self = .dropIndex(table: s2!, index: s1!)
+				case 11:	self = .dropTable(table: s1!); assert(s2 == nil)
+				case 12:	self = .dropTempIndex(table: s2!, index: s1!)
+				case 13:	self = .createTempTable(table: s1!); assert(s2 == nil)
+				case 14:	self = .dropTempTrigger(table: s2!, trigger: s1!)
+				case 15:	self = .dropTempView(view: s1!); assert(s2 == nil)
+				case 16:	self = .dropTrigger(table: s2!, trigger: s1!)
+				case 17:	self = .dropView(view: s1!); assert(s2 == nil)
+				case 18:	self = .insert(table: s1!); assert(s2 == nil)
+				case 19:	self = .pragma(pragma: s1!, arg: s2)
+				case 20:	self = .read(table: s1!, column: s2!)
+				case 21:	self = .select; assert(s1 == nil && s2 == nil)
+				case 22:	self = .transaction(operation: s1!); assert(s2 == nil)
+				case 23:	self = .update(table: s1!, column: s2!)
+				case 24:	self = .attach(file: s1); assert(s2 == nil)
+				case 25:	self = .detach(database: s1!); assert(s2 == nil)
+				case 26:	self = .alterTable(database: s1!, table: s2!)
+				case 27:	self = .reindex(index: s1!); assert(s2 == nil)
+				case 28:	self = .analyze(table: s1!); assert(s2 == nil)
+				case 29:	self = .createVtable(table: s1!, module: s2!)
+				case 30:	self = .dropVtable(table: s1!, module: s2!)
+				case 31:	self = .function(function: s2!); assert(s1 == nil)
+				case 32:	self = .savePoint(operation: s1!, savepoint: s2!)
+				case 33:	self = .recursive; assert(s1 == nil && s2 == nil)
+				default:	fatalError("Unknown Action Code")
+			}
+		}
+	}
+	enum AuthorizerResponse {
+		case ok
+		case ignore
+		case deny
+
+		fileprivate var cCode: Int32 {
+			switch self {
+				case .ok:		return SQLITE_OK
+				case .ignore:	return SQLITE_IGNORE
+				case .deny:		return SQLITE_DENY
+			}
+		}
+	}
+
+	/// Note that the authorizer callback is never release; even when a new authorizer is registered or the DB is destroyed
+	func set(authorizer: @escaping (AuthorizerAction, String?, String?) throws -> AuthorizerResponse ) throws {
+		let context = AuthorizerContext(data: authorizer)
+		let result = sqlite3_set_authorizer(connection, { (context, code, s1, s2, s3, s4) -> Int32 in
+			let action = AuthorizerAction(code: code, string1: s1, string2: s2)
+			let db = String(cUTF8: s3)
+			let cause = String(cUTF8: s4)
+			do {
+				let result = try AuthorizerContext.fromC(context!).data(action, db, cause)
+				return result.cCode
+			} catch {
+				return -1
+			}
+		}, context.toC)
+		try check(result)
 	}
 }
 

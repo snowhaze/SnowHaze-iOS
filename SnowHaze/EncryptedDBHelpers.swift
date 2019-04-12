@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonCrypto
 
 private let settingsDB = "settings"
 private let browsingDB = "browsing"
@@ -36,8 +37,9 @@ func trySetupKey(key: String, completionHandler: ((Bool) -> Void)?) {
 			}
 			return
 		}
+		let _ = initSQLite
 		DispatchQueue.main.async {
-			if keyingData == nil, let _ = SQLCipher(path: dbPath, key: data) {
+			if keyingData == nil, let _ = SQLCipher(path: dbPath, key: data, cipherOptions: .compatibility(3), setupOptions: .all) {
 				keyingData = data
 				completionHandler?(true)
 			} else {
@@ -71,17 +73,20 @@ func rekey(connection: SQLCipher, key: String) throws {
 
 private func pbkdf(_ code: String) throws -> Data {
 	let salt = try dbKey.key().data(using: .utf8)!
-	let saltCount = salt.count
 	let data = code.data(using: .utf8)!
-	let dataCount = data.count
 	var result = Data(repeating: 0, count: SQLCipher.keySize)
-	let resultCount = result.count
 
-	let status = result.withUnsafeMutableBytes { result in
-		salt.withUnsafeBytes { (salt: UnsafePointer<UInt8>) -> Int32 in
-			data.withUnsafeBytes { (data: UnsafePointer<Int8>) -> Int32 in
+	let status = result.withUnsafeMutableBytes { rawResult in
+		salt.withUnsafeBytes { rawSalt -> Int32 in
+			data.withUnsafeBytes { rawData -> Int32 in
 				// 200000 rounds are just about barable on old devices. Use random value in that range to prevent use of rainbow tables
-				CCKeyDerivationPBKDF(CCPBKDFAlgorithm(kCCPBKDF2), data, dataCount, salt, saltCount, CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), 199293, result, resultCount)
+				let rounds: UInt32 = 199293
+				let data = rawData.bindMemory(to: Int8.self)
+				let salt = rawSalt.bindMemory(to: UInt8.self)
+				let result = rawResult.bindMemory(to: UInt8.self)
+				let kdfAlgo = CCPBKDFAlgorithm(kCCPBKDF2)
+				let hashAlgo = CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512)
+				return CCKeyDerivationPBKDF(kdfAlgo, data.baseAddress, data.count, salt.baseAddress, salt.count, hashAlgo, rounds, result.baseAddress, result.count)
 			}
 		}
 	}
@@ -89,16 +94,359 @@ private func pbkdf(_ code: String) throws -> Data {
 	return result
 }
 
+let initSQLite: Void = {
+	try! SQLite.set(option: .multithread)
+}()
 
 let db: SQLiteManager = {
 	precondition(keyingData != nil)
 
+	struct StaticData {
+		static var setupComplete = false
+	}
+
+	func authorizer(_ action: SQLite.AuthorizerAction, _ db: String?, _ cause: String?) -> SQLite.AuthorizerResponse {
+		if StaticData.setupComplete {
+			switch (action, db, cause) {
+				case (.select, nil, nil):																return .ok
+				case (.function("fts5"), nil, nil):														return .ok
+				case (.function("match"), nil, nil):													return .ok
+				case (.function("ifnull"), nil, nil):													return .ok
+				case (.function("strftime"), nil, nil):													return .ok
+				case (.transaction("BEGIN"), nil, nil):													return .ok
+				case (.transaction("COMMIT"), nil, nil):												return .ok
+				case (.pragma("data_version", nil), "main", nil):										return .ok
+				case (.pragma("rekey", let key), nil, nil):
+					if key?.matches("x\'[a-f0-9]{64}\'") ?? false {
+						return .ok
+					}
+					fatalError("attempting to encrypt database with invalid key \( key == nil ? "<null>" : "'\(key!)'")")
+
+				case (.insert("kvstore"), "main", nil):													return .ok
+				case (.read("kvstore", "key"), "main", nil):											return .ok
+				case (.read("kvstore", "value"), "main", nil):											return .ok
+				case (.delete("kvstore"), "main", nil):													return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_tab", "id"), "main", nil):					return .ok
+				case (.read("ch_illotros_snowhaze_browsing_tab", "title"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_tab", "active"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_tab", "root_id"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_tab", "history"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_tab", "snapshot"), "main", nil):				return .ok
+				case (.update("ch_illotros_snowhaze_browsing_tab", "title"), "main", nil):				return .ok
+				case (.update("ch_illotros_snowhaze_browsing_tab", "active"), "main", nil):				return .ok
+				case (.update("ch_illotros_snowhaze_browsing_tab", "history"), "main", nil):			return .ok
+				case (.update("ch_illotros_snowhaze_browsing_tab", "root_id"), "main", nil):			return .ok
+				case (.update("ch_illotros_snowhaze_browsing_tab", "snapshot"), "main", nil):			return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_tab"), "main", nil):						return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_tab"), "main", nil):						return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "url"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "title"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "url"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "title"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "timestamp"), "main", nil):		return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_history"), "main", nil):					return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history"), "main", nil):					return .ok
+
+				case (.insert("ch_illotros_snowhaze_settings_tab"), "main", nil):						return .ok
+				case (.read("ch_illotros_snowhaze_settings_tab", "key"), "main", nil):					return .ok
+				case (.read("ch_illotros_snowhaze_settings_tab", "value"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_settings_tab", "tab_id"), "main", nil):				return .ok
+				case (.delete("ch_illotros_snowhaze_settings_tab"), "main", nil):						return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark"), "main", nil):					return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", nil):			return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", nil):			return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark", "weight"), "main", nil):		return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark", "favicon"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "favicon"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "weight"), "main", nil):			return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_bookmark"), "main", nil):					return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):			return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_content"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_content", "id"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_content", "c0"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_content", "c1"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_content", "c2"), "main", nil):	return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_bookmark_fts_content"), "main", nil):		return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_docsize"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_docsize", "id"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_docsize", "sz"), "main", nil):	return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_bookmark_fts_docsize"), "main", nil):		return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_data"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_data", "id"), "main", nil):		return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_bookmark_fts_data"), "main", nil):			return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_idx"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_idx", "pgno"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_idx", "term"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_idx", "segid"), "main", nil):	return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_bookmark_fts_idx"), "main", nil):			return .ok
+
+				case (.delete("ch_illotros_snowhaze_settings_page"), "main", nil):						return .ok
+				case (.insert("ch_illotros_snowhaze_settings_page"), "main", nil):						return .ok
+				case (.read("ch_illotros_snowhaze_settings_page", "key"), "main", nil):					return .ok
+				case (.read("ch_illotros_snowhaze_settings_page", "value"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_settings_page", "domain"), "main", nil):				return .ok
+
+				case (.delete("ch_illotros_snowhaze_settings_global"), "main", nil):					return .ok
+				case (.insert("ch_illotros_snowhaze_settings_global"), "main", nil):					return .ok
+				case (.read("ch_illotros_snowhaze_settings_global", "key"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_settings_global", "value"), "main", nil):				return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "url"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "title"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):		return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_history_fts"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):			return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):			return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "ROWID"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "rank"), "main", nil):			return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "ch_illotros_snowhaze_browsing_history_fts"), "main", nil):				return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_content"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_content", "id"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_content", "c0"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_content", "c1"), "main", nil):	return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_history_fts_content"), "main", nil):		return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_docsize"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_docsize", "sz"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_docsize", "id"), "main", nil):	return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_history_fts_docsize"), "main", nil):		return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_data"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_data", "id"), "main", nil):		return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_history_fts_data"), "main", nil):			return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_idx"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_idx", "pgno"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_idx", "term"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_idx", "segid"), "main", nil):	return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_history_fts_idx"), "main", nil):			return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_config", "k"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_config", "v"), "main", nil):		return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_config", "k"), "main", nil):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_config", "v"), "main", nil):	return .ok
+
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "rank"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ch_illotros_snowhaze_browsing_bookmark_fts"), "main", nil):				return .ok
+
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):	return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_bookmark_fts"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):			return .ok
+
+				case (.read("sqlite_master", "ROWID"), "main", nil):									return .ok
+				case (.update("sqlite_master", "sql"), "main", nil):									return .ok
+				case (.update("sqlite_master", "type"), "main", nil):									return .ok
+				case (.update("sqlite_master", "name"), "main", nil):									return .ok
+				case (.update("sqlite_master", "tbl_name"), "main", nil):								return .ok
+				case (.update("sqlite_master", "rootpage"), "main", nil):								return .ok
+
+				default:																				fatalError("unauthorized operation \((action, db, cause))")
+			}
+		} else {
+			switch (action, db, cause) {
+				case (.select, nil, nil):																	return .ok
+				case (.function("fts5"), nil, nil):															return .ok
+				case (.transaction("BEGIN"), nil, nil):														return .ok
+				case (.transaction("COMMIT"), nil, nil):													return .ok
+				case (.transaction("ROLLBACK"), nil, nil):													return .ok
+				case (.detach("settings"), nil, nil):														return .ok
+				case (.detach("browsing"), nil, nil):														return .ok
+
+				case (.pragma("user_version", nil), "main", nil):											return .ok
+				case (.pragma("data_version", nil), "main", nil):											return .ok
+				case (.pragma("database_list", nil), nil, nil):												return .ok
+				case (.pragma("user_version", "1"), "main", nil):											return .ok
+				case (.pragma("auto_vacuum", "FULL"), nil, nil):											return .ok
+				case (.pragma("journal_mode", "DELETE"), nil, nil):											return .ok
+
+				case (.insert("sqlite_master"), "main", nil):												return .ok
+				case (.read("sqlite_master", "ROWID"), "main", nil):										return .ok
+				case (.update("sqlite_master", "sql"), "main", nil):										return .ok
+				case (.update("sqlite_master", "type"), "main", nil):										return .ok
+				case (.update("sqlite_master", "name"), "main", nil):										return .ok
+				case (.update("sqlite_master", "tbl_name"), "main", nil):									return .ok
+				case (.update("sqlite_master", "rootpage"), "main", nil):									return .ok
+
+				case (.createTable("sqlite_sequence"), "main", nil):										return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_bookmark"), "main", nil):					return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark"), "main", nil):						return .ok
+				case (.createTrigger("ch_illotros_snowhaze_browsing_bookmark", "ch_illotros_snowhaze_browsing_bookmark_fts_update"), "main", nil):								return .ok
+				case (.createTrigger("ch_illotros_snowhaze_browsing_bookmark", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"), "main", nil):								return .ok
+				case (.createTrigger("ch_illotros_snowhaze_browsing_bookmark", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"), "main", nil):								return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):									return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_history"), "main", nil):					return .ok
+				case (.createTrigger("ch_illotros_snowhaze_browsing_history", "ch_illotros_snowhaze_browsing_history_fts_update"), "main", nil):								return .ok
+				case (.createTrigger("ch_illotros_snowhaze_browsing_history", "ch_illotros_snowhaze_browsing_history_fts_insert"), "main", nil):								return .ok
+				case (.createTrigger("ch_illotros_snowhaze_browsing_history", "ch_illotros_snowhaze_browsing_history_fts_delete"), "main", nil):								return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history"), "main", nil):						return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", nil):					return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "url"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "title"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_tab"), "main", nil):						return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_tab"), "main", nil):							return .ok
+				case (.read("ch_illotros_snowhaze_browsing_tab", "id"), "main", nil):						return .ok
+
+				case (.createTable("ch_illotros_snowhaze_settings_tab"), "main", nil):						return .ok
+				case (.insert("ch_illotros_snowhaze_settings_tab"), "main", nil):							return .ok
+				case (.read("ch_illotros_snowhaze_settings_tab", "key"), "main", nil):						return .ok
+				case (.read("ch_illotros_snowhaze_settings_tab", "tab_id"), "main", nil):					return .ok
+				case (.createIndex("ch_illotros_snowhaze_settings_tab", "sqlite_autoindex_ch_illotros_snowhaze_settings_tab_1"), "main", nil):									return .ok
+
+				case (.createTable("ch_illotros_snowhaze_settings_global"), "main", nil):					return .ok
+				case (.insert("ch_illotros_snowhaze_settings_global"), "main", nil):						return .ok
+				case (.read("ch_illotros_snowhaze_settings_global", "key"), "main", nil):					return .ok
+				case (.createIndex("ch_illotros_snowhaze_settings_global", "sqlite_autoindex_ch_illotros_snowhaze_settings_global_1"), "main", nil):							return .ok
+
+				case (.createTable("ch_illotros_snowhaze_settings_page"), "main", nil):						return .ok
+				case (.insert("ch_illotros_snowhaze_settings_page"), "main", nil):							return .ok
+				case (.read("ch_illotros_snowhaze_settings_page", "key"), "main", nil):						return .ok
+				case (.read("ch_illotros_snowhaze_settings_page", "domain"), "main", nil):					return .ok
+				case (.createIndex("ch_illotros_snowhaze_settings_page", "sqlite_autoindex_ch_illotros_snowhaze_settings_page_1"), "main", nil):								return .ok
+
+				case (.createTable("kvstore"), "main", nil):												return .ok
+				case (.read("kvstore", "key"), "main", nil):												return .ok
+				case (.createIndex("kvstore", "sqlite_autoindex_kvstore_1"), "main", nil):					return .ok
+
+				case (.createVtable("ch_illotros_snowhaze_browsing_bookmark_fts", "fts5"), "main", nil):	return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):										return .ok
+
+				case (.createVtable("ch_illotros_snowhaze_browsing_history_fts", "fts5"), "main", nil):		return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts"), "main", nil):					return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_bookmark_fts_data"), "main", nil):		return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_data"), "main", nil):				return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_bookmark_fts_content"), "main", nil):		return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_content"), "main", nil):			return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_bookmark_fts_docsize"), "main", nil):		return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_docsize"), "main", nil):			return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_history_fts_data"), "main", nil):			return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_data"), "main", nil):				return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_history_fts_content"), "main", nil):		return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_content"), "main", nil):			return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_history_fts_docsize"), "main", nil):		return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_docsize"), "main", nil):			return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_history_fts_config"), "main", nil):		return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_config"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_config", "k"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_config", "v"), "main", nil):			return .ok
+				case (.createIndex("ch_illotros_snowhaze_browsing_history_fts_config", "sqlite_autoindex_ch_illotros_snowhaze_browsing_history_fts_config_1"), "main", nil):	return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_history_fts_idx"), "main", nil):			return .ok
+				case (.createIndex("ch_illotros_snowhaze_browsing_history_fts_idx", "sqlite_autoindex_ch_illotros_snowhaze_browsing_history_fts_idx_1"), "main", nil):			return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts_idx"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_idx", "term"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts_idx", "segid"), "main", nil):		return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_bookmark_fts_config"), "main", nil):		return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_config"), "main", nil):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_config", "k"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_config", "v"), "main", nil):		return .ok
+				case (.createIndex("ch_illotros_snowhaze_browsing_bookmark_fts_config", "sqlite_autoindex_ch_illotros_snowhaze_browsing_bookmark_fts_config_1"), "main", nil):	return .ok
+
+				case (.createTable("ch_illotros_snowhaze_browsing_bookmark_fts_idx"), "main", nil):			return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_idx"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_idx", "term"), "main", nil):		return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_idx", "segid"), "main", nil):		return .ok
+				case (.createIndex("ch_illotros_snowhaze_browsing_bookmark_fts_idx", "sqlite_autoindex_ch_illotros_snowhaze_browsing_bookmark_fts_idx_1"), "main", nil):		return .ok
+
+				case (.attach(nil), nil, nil):																return .ok
+				case (.pragma("cipher_default_compatibility", "3"), nil, nil):								return .ok
+				case (.function("replace"), nil, nil):														return .ok
+
+				case (.read("bookmark", "id"), "browsing", nil):											return .ok
+				case (.read("bookmark", "url"), "browsing", nil):											return .ok
+				case (.read("bookmark", "name"), "browsing", nil):											return .ok
+				case (.read("bookmark", "title"), "browsing", nil):											return .ok
+				case (.read("bookmark", "weight"), "browsing", nil):										return .ok
+				case (.read("bookmark", "favicon"), "browsing", nil):										return .ok
+
+				case (.read("history", "id"), "browsing", nil):												return .ok
+				case (.read("history", "url"), "browsing", nil):											return .ok
+				case (.read("history", "title"), "browsing", nil):											return .ok
+				case (.read("history", "timestamp"), "browsing", nil):										return .ok
+
+				case (.read("tab", "id"), "browsing", nil):													return .ok
+				case (.read("tab", "title"), "browsing", nil):												return .ok
+				case (.read("tab", "active"), "browsing", nil):												return .ok
+				case (.read("tab", "history"), "browsing", nil):											return .ok
+				case (.read("tab", "replace"), "browsing", nil):											return .ok
+				case (.read("tab", "snapshot"), "browsing", nil):											return .ok
+
+				case (.read("ch_illotros_snowhaze_settings_page", "key"), "settings", nil):					return .ok
+				case (.read("ch_illotros_snowhaze_settings_page", "value"), "settings", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_settings_page", "domain"), "settings", nil):				return .ok
+				case (.update("ch_illotros_snowhaze_settings_page", "domain"), "settings", nil):			return .ok
+
+				case (.read("ch_illotros_snowhaze_settings_global", "key"), "settings", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_settings_global", "value"), "settings", nil):				return .ok
+
+				case (.read("ch_illotros_snowhaze_settings_tab", "key"), "settings", nil):					return .ok
+				case (.read("ch_illotros_snowhaze_settings_tab", "value"), "settings", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_settings_tab", "tab_id"), "settings", nil):				return .ok
+				case (.delete("ch_illotros_snowhaze_settings_tab"), "settings", nil):						return .ok
+
+				default:																					fatalError("unauthorized operation \((action, db, cause))")
+			}
+		}
+	}
+
 	SQLiteManager.freeSQLiteCachesOnMemoryWarning = true
+	let _ = initSQLite
 	let manager = SQLiteManager(setup: { _ in
-		let connection = SQLCipher(path: dbPath, key: keyingData)!
+		let connection = SQLCipher(path: dbPath, key: keyingData, cipherOptions: .compatibility(3), setupOptions: .all)!
 		try! connection.execute("PRAGMA secure_delete = on")
 		try! connection.execute("PRAGMA foreign_keys = on")
 		try! connection.busyTimeout(100)
+
+		try! connection.set(authorizer: authorizer)
 
 		try! connection.registerFTS5Tokenizer(named: "lemma") { _ in
 			return { flags, rawText in
@@ -127,6 +475,8 @@ let db: SQLiteManager = {
 	let browsingKey = KeyManager(name: "browsingdata.db.passphrase")
 	let settingsKey = KeyManager(name: "settingsdata.db.passphrase")
 
+	try! manager.execute("PRAGMA cipher_default_compatibility = 3")
+
 	if let key = try! browsingKey.keyIfExists() {
 		let attachBrowsing = "ATTACH DATABASE ? AS \(browsingDB) KEY ?"
 		_ = try? manager.execute(attachBrowsing, with: [.text(browsingPath), .text(key)])
@@ -145,6 +495,10 @@ let db: SQLiteManager = {
 
 	try? FileManager.default.removeItem(atPath: browsingPath)
 	try? FileManager.default.removeItem(atPath: settingsPath)
+
+	StaticData.setupComplete = true
+
+	try! manager.connection.set(authorizer: authorizer)
 
 	browsingKey.set(key: nil)
 	settingsKey.set(key: nil)
@@ -189,7 +543,7 @@ private struct Migrator: SQLiteMigrator {
 		}
 
 		if dbres.contains(where: { $0[1]?.textValue == settingsDB }) {
-			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = REPLACE(domain, ':', '::') WHERE domain != ?", with: [.text(aboutBlankURL)])
+			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = replace(domain, ':', '::') WHERE domain != ?", with: [.text(aboutBlankURL)])
 			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = ? WHERE domain == ''", with: [.text(missingHostPseudoDomain)])
 			_ = try? connection.execute("INSERT INTO \(Settings.globalTableName) (key, value) SELECT key, value FROM \(settingsDB).\(Settings.globalTableName)")
 			_ = try? connection.execute("DELETE FROM \(settingsDB).\(Settings.tabTableName) WHERE tab_id NOT IN (SELECT id FROM \(TabStore.tableName))")

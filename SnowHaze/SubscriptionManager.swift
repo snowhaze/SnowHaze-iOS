@@ -8,6 +8,7 @@
 
 import Foundation
 import StoreKit
+import CommonCrypto
 
 protocol SubscriptionManagerDelegate: AnyObject {
 	func productListDidChange()
@@ -127,10 +128,8 @@ class SubscriptionManager: NSObject {
 		}
 		var hash = [UInt8](repeating: 0,  count: Int(CC_SHA512_DIGEST_LENGTH))
 		let data = token.data(using: .utf8)!
-		data.withUnsafeBytes {
-			_ = CC_SHA512($0, CC_LONG(data.count), &hash)
-		}
-		let hex = Data(bytes: hash).hex
+		_ = data.withUnsafeBytes { CC_SHA512($0.baseAddress, CC_LONG($0.count), &hash)}
+		let hex = Data(hash).hex
 		return String(hex[..<hex.index(hex.startIndex, offsetBy: 26)])
 	}
 

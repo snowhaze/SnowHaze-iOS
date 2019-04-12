@@ -3,7 +3,7 @@
 
 SnowHaze is the first and only iOS browser that truly protects your data! Designed for best possible privacy and security and made to be easily accessible for both beginners and tech-savvy privacy enthusiasts.
 
-SnowHaze offers everything from ad and tracking script blockers to a no-log VPN service and search engine.
+SnowHaze offers everything from ad and tracking script blockers to a no-log VPN service.
 
 Our primary focus has been on making SnowHaze the safest and most private browser on iOS. We also take small things seriously. What are these small things you ask? For example, SnowHaze will never establish any connection to any server without your explicit consent. Including our own. Visit [our homepage](https://snowhaze.com/) to see a complete list of SnowHaze's features.
 
@@ -44,7 +44,7 @@ The following steps are needed to build SnowHaze:
 
   * Clone the SnowHaze repository
   * Open the terminal and `cd` into the respective directory
-  * Run  `pod install`
+  * Run  `pod install --repo-update`
   * In Xcode, open the file SnowHaze.xcworkspace
   * For both SnowHaze App and the SnowHaze VPN Widget, set an arbitrary and *unique* ["Bundle Identifier"](https://cocoacasts.com/what-are-app-ids-and-bundle-identifiers/)
   * Build and run SnowHaze in the simulator

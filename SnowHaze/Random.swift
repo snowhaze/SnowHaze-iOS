@@ -9,15 +9,15 @@
 import Foundation
 
 public extension Array {
-	public var randomElement: Element {
+	var randomElement: Element {
 		return self[randomIndex]
 	}
 
-	public var randomIndex: Int {
+	var randomIndex: Int {
 		return random(count)
 	}
 
-	@discardableResult public mutating func removeRandomElement() -> Element {
+	@discardableResult mutating func removeRandomElement() -> Element {
 		return remove(at: randomIndex)
 	}
 }

@@ -307,7 +307,7 @@ private extension MainViewController {
 	}
 
 	@discardableResult func scroll(to tab: Tab, animated: Bool = true) -> IndexPath {
-		let indexPath = IndexPath(item: tabs.index(of: tab)!, section: 0)
+		let indexPath = IndexPath(item: tabs.firstIndex(of: tab)!, section: 0)
 		tabCollectionView.scrollToItem(at: indexPath, at: [], animated: animated)
 		return indexPath
 	}
@@ -374,7 +374,7 @@ private extension MainViewController {
 		hideTextInputBar()
 		updateNightMode()
 
-		urlBar.selectedTab = tabs.index(of: tab) ?? -1
+		urlBar.selectedTab = tabs.firstIndex(of: tab) ?? -1
 
 		if animated {
 			tabVC.view.frame.origin.y += pageContentView.bounds.height
@@ -475,7 +475,7 @@ private extension MainViewController {
 				return
 			}
 			if let h = dlHost, webView?.url?.host == h {
-				if DashlaneHelper.shared.isDashlaneResponce(type: type) {
+				if DashlaneHelper.shared.isDashlaneResponse(type: type) {
 					if let controller = tab?.controller {
 						DashlaneHelper.shared.fill(controller, with: returnedItems, completion: nil)
 					}
@@ -525,7 +525,7 @@ extension MainViewController {
 	}
 
 	func representingView(for tab: Tab?) -> UIView? {
-		guard let tab = tab, let index = tabs.index(of: tab) else {
+		guard let tab = tab, let index = tabs.firstIndex(of: tab) else {
 			return nil
 		}
 		return urlBar.representingViewForTab(at: index, isCurrent: true)
@@ -537,7 +537,7 @@ extension MainViewController {
 
 	func openSettings(_ type: SettingsViewController.SettingsType? = nil, unfold: Bool = false) {
 		let vcs = navigationController!.viewControllers
-		let index = vcs.index(of: self)!
+		let index = vcs.firstIndex(of: self)!
 		let show: () -> Void = {
 			SettingsViewController.requestedType = (type, unfold)
 			self.showSettings()
@@ -652,7 +652,7 @@ extension MainViewController {
 
 		ReviewPrompt.tabCloseReset()
 
-		let indexPath = IndexPath(item: tabs.index(of: lastTab!)!, section: 0)
+		let indexPath = IndexPath(item: tabs.firstIndex(of: lastTab!)!, section: 0)
 		if let attributes = tabCollectionView.layoutAttributesForItem(at: indexPath) {
 			let tabVC = self.tabVC
 			var frame = attributes.frame
@@ -1017,7 +1017,7 @@ extension MainViewController {
 		urlBar.tabTitleURLs = tabTitleURLs(masked: false)
 
 		if let tab = tabVC?.tab {
-			urlBar.selectedTab = tabs.index(of: tab) ?? -1
+			urlBar.selectedTab = tabs.firstIndex(of: tab) ?? -1
 		}
 	}
 

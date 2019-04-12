@@ -283,7 +283,7 @@ class SubscriptionSettingsManager: SettingsViewManager {
 					tableView.reloadRows(at: [indexPath], with: .fade)
 					manager.load(product: id) { [weak self] product, error in
 						let section = optionsSection
-						guard let row = manager.products.index(where: { $0.id == id }), let me = self else {
+						guard let row = manager.products.firstIndex(where: { $0.id == id }), let me = self else {
 							return
 						}
 						me.loadingProducts.remove(id)
@@ -297,7 +297,7 @@ class SubscriptionSettingsManager: SettingsViewManager {
 									return
 								}
 								self?.productLoadFailedMessages[id] = nil
-								if let index = SubscriptionManager.shared.products.index(where: { $0.id == id }) {
+								if let index = SubscriptionManager.shared.products.firstIndex(where: { $0.id == id }) {
 									let indexPath = IndexPath(row: index, section: section)
 									tableView.reloadRows(at: [indexPath], with: .fade)
 								}

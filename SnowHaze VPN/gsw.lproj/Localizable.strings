@@ -56,6 +56,9 @@
 /* label for the reasserting ipsec status */
 "reasserting ipsec status" = "Verbindet neu";
 
+/* label for when the ipsec vpn is in a state added to ios after the compilation of the extension */
+"unknown ipsec status" = "VPN Status nid understützt";
+
 /* format of the accessibbility label for the ipsec location flag */
 "flag accessibbility label format" = "Standort: %@";
 

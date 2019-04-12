@@ -10,7 +10,7 @@ import Foundation
 
 public extension Data {
 	private static let nonHexChars = CharacterSet(charactersIn: "0123456789abcdefABCDEF").inverted
-	public init?(hex: String) {
+	init?(hex: String) {
 		guard hex.rangeOfCharacter(from: Data.nonHexChars) == nil, hex.count % 2 == 0 else {
 			return nil
 		}
@@ -43,7 +43,7 @@ public extension Data {
 		}
 	}
 
-	public var hex: String {
+	var hex: String {
 		return reduce("") { $0 + String(format: "%02x", $1) }
 	}
 }

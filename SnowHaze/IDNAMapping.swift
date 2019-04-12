@@ -21,7 +21,7 @@ func idnaMap(_ component: String) -> [Unicode.Scalar]? {
 		}
 		let index: Int
 		if value <= 175 {
-			index = codePoints.index { $0 >= value } ?? (codePoints.count - 1)
+			index = codePoints.firstIndex { $0 >= value } ?? (codePoints.count - 1)
 		} else {
 			let lookupIndex = codePoints.binarySearchPosition(needle: value)
 			index = min(lookupIndex, codePoints.count - 1)

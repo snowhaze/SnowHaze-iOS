@@ -491,9 +491,6 @@
 /* name of none search engine to be displayed to user */
 "none search engine display name" = "Nenhum";
 
-/* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
-"snowhaze search engine missing subscription accessibility label" = "SnowHaze – Necessita da subscrição do SnowHaze Premium";
-
 /* title of settings subsection to choose search engine */
 "search engine selection setting subsection title" = "MOTOR DE BUSCA";
 
@@ -886,6 +883,9 @@
 
 /* indication that the ipsec vpn is reasserting */
 "reasserting ipsec vpn state title" = "Reconectando";
+
+/* indication that the ipsec vpn is in a state which was added to ios after compilation of the app */
+"unknown ipsec vpn state title" = "Status de VPN não suportado";
 
 /* prompt for user to select the ipsec vpn profile */
 "select ipsec vpn profile prompt" = "Selecionar Localização";
@@ -1334,15 +1334,6 @@
 /* title of button of http authentication prompt to retrieve credentials from 1password */
 "http authentication 1password button title" = "1Password";
 
-/* default auth error title */
-"error page auth default title" = "Erro de autorização";
-
-/* default auth error message */
-"error page auth error default message" = "Você não possui um token de autorização válido. Você pode atualizá-lo nas configurações de assinatura.";
-
-/* default auth error information */
-"error page auth error default information" = "Pode acontecer que você não tenha recebido o token depois de se inscrever. Este site será recarregado assim que receber um token.";
-
 /* message shown when no error message is available but an url */
 "error page unexpected error message with url" = "Ocorreu um erro inesperado durante a abertura do %@";
 
@@ -1530,5 +1521,5 @@
 "http warnings explanation prompt title" = "Avisos HTTP";
 
 /* conditions for the snowhaze premium autorenewing subscription */
-"premium subscription conditions" = "A inscrição anuais do SnowHaze Premium é válidas por um ano; a inscrição mensal SnowHaze Premium é válida por um mês. Durante este período, você tem acesso ao SnowHaze VPN, o motor de busca do SnowHaze e suas listas são atualizadas frequentemente. O pagamento é cobrado na sua conta iTunes ao confirmar a compra. Todas as inscrições são renovadas automaticamente, a menos que você desligue a renovação automática pelo menos 24 horas antes do final da assinatura. Sua conta será cobrada no prazo de 24 horas antes do final da assinatura. Você pode gerenciar sua assinatura nas configurações da conta tocando em 'Visualizar todas as minhas subscrições'. Qualquer parcela não utilizada de um período de teste gratuito será perdida quando você comprar a assinatura correspondente.";
+"premium subscription conditions" = "A inscrição anuais do SnowHaze Premium é válidas por um ano; a inscrição mensal SnowHaze Premium é válida por um mês. Durante este período, você tem acesso ao SnowHaze VPN e suas listas são atualizadas frequentemente. O pagamento é cobrado na sua conta iTunes ao confirmar a compra. Todas as inscrições são renovadas automaticamente, a menos que você desligue a renovação automática pelo menos 24 horas antes do final da assinatura. Sua conta será cobrada no prazo de 24 horas antes do final da assinatura. Você pode gerenciar sua assinatura nas configurações da conta tocando em 'Visualizar todas as minhas subscrições'. Qualquer parcela não utilizada de um período de teste gratuito será perdida quando você comprar a assinatura correspondente.";
 

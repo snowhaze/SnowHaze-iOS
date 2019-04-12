@@ -134,7 +134,7 @@ extension Array where Element: Equatable {
 				moveAdditionIndexes.reserveCapacity(additions.count)
 				moveDeletionIndexes.reserveCapacity(additions.count)
 				for (additionIndex, element) in additions.enumerated() {
-					if let deletionIndex = deletions.index(where: { $0.value == element.value }) {
+					if let deletionIndex = deletions.firstIndex(where: { $0.value == element.value }) {
 						let fromIndex = deletions[deletionIndex].index
 						let toIndex = element.index
 						let move = Move<Element>(fromIndex: fromIndex, toIndex: toIndex, value: element.value)
@@ -149,7 +149,7 @@ extension Array where Element: Equatable {
 				moveAdditionIndexes.reserveCapacity(deletions.count)
 				moveDeletionIndexes.reserveCapacity(deletions.count)
 				for (deletionIndex, element) in deletions.enumerated() {
-					if let additionIndex = additions.index(where: { $0.value == element.value }) {
+					if let additionIndex = additions.firstIndex(where: { $0.value == element.value }) {
 						let fromIndex = element.index
 						let toIndex = additions[additionIndex].index
 						let move = Move<Element>(fromIndex: fromIndex, toIndex: toIndex, value: element.value)

@@ -33,3 +33,7 @@ int sqlite_db_option_voidp_int_int(sqlite3* db, int config, void* value1, int va
 int sqlite_db_option_int_intp(sqlite3* db, int config, int value1, int* value2) {
 	return sqlite3_db_config(db, config, value1, value2);
 }
+
+int sqlite_db_option_constcharp(sqlite3* db, int config, const char* value) {
+	return sqlite3_db_config(db, config, value);
+}

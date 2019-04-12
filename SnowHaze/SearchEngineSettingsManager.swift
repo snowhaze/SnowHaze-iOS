@@ -92,10 +92,6 @@ class SearchEngineSettingsManager: SettingsViewManager {
 
 	override func didSelectRow(atIndexPath indexPath: IndexPath, tableView: UITableView) {
 		if indexPath.section == 1 {
-			if indexPath.row == 10 && !SubscriptionManager.shared.hasSubscription {
-				controller.switchToSubscriptionSettings()
-				return
-			}
 			let engine = Int64(indexPath.row)
 			let newEngine = SearchEngineType(rawValue: engine) ?? .none
 			let oldEngine = SearchEngineType(rawValue: settings.value(for: searchEngineKey).integer!) ?? .none

@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import CommonCrypto
 
 enum DomainListType {
 	case trackingScripts
 	case ads
 	case httpsSites
-	case privateSites			// does not contain www. prefixes (as a optimization)
+	case privateSites			// does not contain www. prefixes (as an optimization)
 	case nonPrivatePopularSites
 	case popularSites
 	case blogspot
@@ -41,6 +42,23 @@ class DomainList {
 
 	static let dbFileChangedNotification = Notification.Name(rawValue: "DomainListDBFileChangedNotification")
 
+	private static let cbVersionCacheLock = NSRecursiveLock()
+
+	private static var cbVersionBackingCache: [String: Int64]?
+	private static var cbVersionCache: [String: Int64] {
+		cbVersionCacheLock.lock()
+		var result = cbVersionBackingCache
+		if result == nil {
+			result = [:]
+			for row in try! dbManager.execute("SELECT id, version FROM content_blocker") {
+				result![row["id"]!.text!] = row["version"]!.integer!
+			}
+			cbVersionBackingCache = result
+		}
+		cbVersionCacheLock.unlock()
+		return result!
+	}
+
 	static let dbLocation: String = {
 		let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)
 		return (cachePath.first! as NSString).appendingPathComponent("lists.db")
@@ -48,31 +66,71 @@ class DomainList {
 
 	static let dbKey = Data(hex: "0000000000000000000000000000000000000000000000000000000000000000")!
 
+	private static func authorizer(_ action: SQLite.AuthorizerAction, _ db: String?, _ cause: String?) -> SQLite.AuthorizerResponse {
+		switch (action, db, cause) {
+			case (.select, nil, nil):									return .ok
+
+			case (.function("substr"), nil, nil):						return .ok
+			case (.function("length"), nil, nil):						return .ok
+			case (.function("like"), nil, nil):							return .ok
+
+			case (.read("content_blocker", "id"), "main", nil):			return .ok
+			case (.read("content_blocker", "source"), "main", nil):		return .ok
+			case (.read("content_blocker", "version"), "main", nil):	return .ok
+
+			case (.read("popular", "domain"), "main", nil):				return .ok
+			case (.read("popular", "rank"), "main", nil):				return .ok
+			case (.read("popular", "trackers"), "main", nil):			return .ok
+
+			case (.read("private", "domain"), "main", nil):				return .ok
+
+			case (.read("https", "domain"), "main", nil):				return .ok
+
+			case (.read("blogspot", "domain"), "main", nil):			return .ok
+
+			case (.read("danger", "type"), "main", nil):				return .ok
+			case (.read("danger", "domain"), "main", nil):				return .ok
+
+			case (.read("danger_hash", "type"), "main", nil):			return .ok
+			case (.read("danger_hash", "hash"), "main", nil):			return .ok
+
+			case (.read("parameter_stripping", "name"), "main", nil):	return .ok
+			case (.read("parameter_stripping", "host"), "main", nil):	return .ok
+			case (.read("parameter_stripping", "value"), "main", nil):	return .ok
+
+			case (.read("ad", "domain"), "main", nil):					return .ok
+
+			case (.read("tracking", "domain"), "main", nil):					return .ok
+
+			default:													fatalError("unauthorized operation \((action, db, cause))")
+		}
+	}
+
 	static let dbManager: SQLiteManager = {
 		SQLiteManager.freeSQLiteCachesOnMemoryWarning = true
+		let _ = initSQLite
 		var manager = SQLiteManager() { _ in
-			let updatedDB = SQLCipher(path: DomainList.dbLocation, key: DomainList.dbKey, flags: .readonly)
-			let query = "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name IN " +
-				"(VALUES ('tracking'), ('ad'), ('https'), ('private'), ('popular'), ('blogspot'), ('danger'), ('danger_hash'), ('content_blocker'), ('parameter_stripping'))"
-			let tblCnt = try? updatedDB?.execute(query)[0].integer ?? 0
-			let clQuery = "SELECT EXISTS (SELECT * FROM content_blocker WHERE id = ?)"
-			let clOK = try? updatedDB?.execute(clQuery, with: [.text(BlockerID.adBlocker1)])[0].boolValue ?? false
-			let hasTrackerCount: Bool
-			if let _ = try? updatedDB?.execute("SELECT trackers FROM popular LIMIT 0") {
-				hasTrackerCount = true
-			} else {
-				hasTrackerCount = false
-			}
-			let ok = ((tblCnt ?? 0) == 10) && (clOK ?? false) && hasTrackerCount
+			let updatedDB = SQLCipher(path: DomainList.dbLocation, key: DomainList.dbKey, flags: .readonly, cipherOptions: .compatibility(3), setupOptions: .all)
+			try! updatedDB?.execute("PRAGMA query_only=true")
+			let result = (try? updatedDB?.execute(dbVerificationQuery, with: [.text(BlockerID.adBlocker1)])) ?? nil
+			let tblCnt = result?[0].integer ?? 0
+			let clOK = result?[1].boolValue ?? false
+			let ok = tblCnt == 10 && clOK
+
 			let bundlePath = Bundle.main.path(forResource: "lists", ofType: "db")!
-			let db = ok ? updatedDB! : SQLCipher(path: bundlePath, key: DomainList.dbKey, flags: .readonly)!
+			let options = SQLCipher.CipherOptions.v4Defaults
+			let db = ok ? updatedDB! : SQLCipher(path: bundlePath, key: DomainList.dbKey, flags: .readonly, cipherOptions: options, setupOptions: .all)!
 			try! db.execute("PRAGMA query_only=true")
+			try! db.set(authorizer: authorizer)
 			return db
 		}
 		let center = NotificationCenter.default
 		let name = DomainList.dbFileChangedNotification
 		center.addObserver(forName: name, object: nil, queue: nil) {  _ in
+			cbVersionCacheLock.lock()
 			DomainList.dbManager.reload()
+			cbVersionBackingCache = nil
+			cbVersionCacheLock.unlock()
 		}
 		return manager
 	}()
@@ -116,7 +174,7 @@ class DomainList {
 		}
 		let query = [String](repeating: "(?)", count: bindings.count).joined(separator: ",")
 		let result = try! db.execute("SELECT trackers FROM \(type.table) WHERE domain IN (VALUES \(query)) AND trackers IS NOT NULL ORDER BY length(domain) DESC LIMIT 1", with: bindings)
-		return result.first?.integerValue! ?? 22
+		return result.first?.integerValue! ?? 17
 	}
 
 	func search(top: Int64, matching: String) -> [(Int64, String)] {
@@ -127,9 +185,7 @@ class DomainList {
 		let plainPattern = matching.backslashEscapeLike + "%"
 		let wwwPattern = "www." + plainPattern
 
-		// TODO: properly handle \, _ and % in domains (currently only found _ in relevant domains)
-		// using escaped like completly destroys performance before SQLite v3.21. SQLCipher currently uses v3.20.
-		let query = "SELECT rank, domain FROM \(type.table) WHERE domain LIKE ? OR domain LIKE ? ORDER BY rank LIMIT ?"
+		let query = "SELECT rank, domain FROM \(type.table) WHERE domain LIKE ? ESCAPE '\\' OR domain LIKE ? ESCAPE '\\' ORDER BY rank LIMIT ?"
 		let bindings: [SQLite.Data] = [.text(plainPattern), .text(wwwPattern), .integer(top)]
 		let result = try! db.execute(query, with: bindings)
 		return result.map { ($0[0]!.integer!, $0[1]!.text!) }
@@ -148,10 +204,8 @@ class DomainList {
 	private func sha256(_ string: String) -> SQLite.Data {
 		var hash = [UInt8](repeating: 0,  count: Int(CC_SHA256_DIGEST_LENGTH))
 		let data = string.data(using: .utf8)!
-		data.withUnsafeBytes {
-			_ = CC_SHA256($0, CC_LONG(data.count), &hash)
-		}
-		return .blob(Data(bytes: hash))
+		_ = data.withUnsafeBytes { CC_SHA256($0.baseAddress, CC_LONG($0.count), &hash) }
+		return .blob(Data(hash))
 	}
 
 	private let IPv4Rx = Regex(pattern: "^([0-9]+|0[xX][0-9a-fA-F]*)(?:.([0-9]+|0[xX][0-9a-fA-F]*)){0,3}$")
@@ -356,13 +410,11 @@ class DomainList {
 	}
 
 	static func hasContentBlocker(with id: String) -> Bool {
-		let result = try! dbManager.execute("SELECT EXISTS (SELECT * FROM content_blocker WHERE id = ?) AS list_exists", with: [.text(id)])
-		return result[0]["list_exists"]!.boolValue
+		return cbVersionCache[id] != nil
 	}
 
 	static func contentBlockerVersion(for id: String) -> Int64 {
-		let result = try! dbManager.execute("SELECT version FROM content_blocker WHERE id = ?", with: [.text(id)])
-		return result[0]["version"]!.integer!
+		return cbVersionCache[id]!
 	}
 
 	static func contentBlockerSource(for id: String) -> (Int64, String) {
@@ -370,3 +422,59 @@ class DomainList {
 		return (result[0]["version"]!.integer!, result[0]["source"]!.text!)
 	}
 }
+
+private let dbVerificationQuery = """
+SELECT
+	value
+FROM
+	(
+			SELECT
+				0 AS ord,
+				count(*) AS value
+			FROM
+				sqlite_master
+			WHERE
+					type = 'table'
+				AND
+						name
+					IN
+						(
+							'tracking',
+							'ad',
+							'https',
+							'private',
+							'popular',
+							'blogspot',
+							'danger',
+							'danger_hash',
+							'content_blocker',
+							'parameter_stripping'
+						)
+		UNION ALL
+			SELECT
+				1,
+				EXISTS
+					(
+						SELECT
+							*
+						FROM
+							content_blocker
+						WHERE
+							id = ?
+					)
+		UNION ALL
+			SELECT
+				2,
+				*
+			FROM
+				(
+					SELECT
+						trackers
+					FROM
+						popular
+					LIMIT 0
+				)
+	)
+ORDER BY
+	ord
+"""

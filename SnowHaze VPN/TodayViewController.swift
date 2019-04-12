@@ -125,6 +125,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 			case .disconnecting:	return NSLocalizedString("disconnecting ipsec status", comment: "label for the disconnecting ipsec status")
 			case .invalid:			return NSLocalizedString("invalid ipsec status", comment: "label for the invalid ipsec status")
 			case .reasserting:		return NSLocalizedString("reasserting ipsec status", comment: "label for the reasserting ipsec status")
+			@unknown default:		return NSLocalizedString("unknown ipsec status", comment: "label for when the ipsec vpn is in a state added to ios after the compilation of the extension")
 		}
 	}
 
@@ -172,6 +173,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 			case .disconnecting:	return false
 			case .invalid:			return false
 			case .reasserting:		return true
+			@unknown default:		return false
 		}
 	}
 
@@ -183,6 +185,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 			case .disconnecting:	return true
 			case .invalid:			return true
 			case .reasserting:		return true
+			@unknown default:		return true
 		}
 	}
 
@@ -255,6 +258,8 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 							fatalError("failed to save config")
 						case .configurationUnknown:
 							fatalError("unexpected error")
+						@unknown default:
+							fatalError("unsupported vpn error")
 					}
 				} else {
 					fatalError("unexpected error domain \((error as NSError).domain), code \(code)")
@@ -335,6 +340,9 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 								print("failed to load config")
 							case .configurationUnknown:
 								fatalError("unexpected error")
+							@unknown default:
+								fatalError("unsupported vpn error")
+
 						}
 					} else {
 						fatalError("unexpected error domain \((error as NSError).domain), code \(code)")

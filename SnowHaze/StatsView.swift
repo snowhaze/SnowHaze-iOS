@@ -99,7 +99,7 @@ class StatsView: UICollectionReusableView {
 	}
 
 	@objc private func statsViewTapped(_ sender: UITapGestureRecognizer) {
-		guard let view = sender.view, let index = stackView.arrangedSubviews.index(of: view) else {
+		guard let view = sender.view, let index = stackView.arrangedSubviews.firstIndex(of: view) else {
 			return
 		}
 		delegate?.statTapped(at: index, in: self)

@@ -55,7 +55,7 @@ class Settings {
 	}
 
 	deinit {
-		NotificationCenter.default.removeObserver(observer)
+		NotificationCenter.default.removeObserver(observer as Any)
 	}
 
 	class var dataAvailable: Bool {
@@ -151,7 +151,7 @@ class Settings {
 		guard var array = listeners[key] else {
 			return false
 		}
-		if let index = array.index(where: { $0.value === listener }) {
+		if let index = array.firstIndex(where: { $0.value === listener }) {
 			array.remove(at: index)
 		}
 		var deadIndexes = [Int]()
@@ -506,8 +506,9 @@ private class TabPageSettings: Settings, SettingsListener {
 		let tab: Int64
 		let page: String
 
-		var hashValue: Int {
-			return tab.hashValue ^ page.hashValue
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(tab)
+			hasher.combine(page)
 		}
 
 		static func ==(_ lhs: TabPage, _ rhs: TabPage) -> Bool {

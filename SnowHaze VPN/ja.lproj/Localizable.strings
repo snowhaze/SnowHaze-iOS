@@ -56,6 +56,9 @@
 /* label for the reasserting ipsec status */
 "reasserting ipsec status" = "再接続して";
 
+/* label for when the ipsec vpn is in a state added to ios after the compilation of the extension */
+"unknown ipsec status" = "サポートされていないVPNステータス";
+
 /* format of the accessibbility label for the ipsec location flag */
 "flag accessibbility label format" = "場所: %@";
 

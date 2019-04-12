@@ -106,7 +106,7 @@ class SettingsDefaultWrapper: SettingsListener {
 		guard var array = listeners[key] else {
 			return false
 		}
-		if let index = array.index(where: { $0.value === listener }) {
+		if let index = array.firstIndex(where: { $0.value === listener }) {
 			array.remove(at: index)
 		}
 		var deadIndexes = [Int]()

@@ -307,7 +307,7 @@ class AppSettingsManager: SettingsViewManager {
 		let newValue = Int64(indexPath.row)
 		settings.set(.integer(Int64(indexPath.row)), for: tabMaskingRuleKey)
 		for cell in tableView.visibleCells {
-			if let indexPath = tableView.indexPath(for: cell) {
+			if let indexPath = tableView.indexPath(for: cell), indexPath.section == tabMaskingSection {
 				let cellSelected = Int64(indexPath.row) == newValue
 				cell.accessoryType = cellSelected ? .checkmark : .none
 			}

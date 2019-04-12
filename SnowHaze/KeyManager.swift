@@ -63,7 +63,7 @@ public class KeyManager {
 	}
 
 	private func deleteKey() {
-		let query = [kSecAttrService: serviceName, kSecClass: kSecClassGenericPassword, kSecReturnData: kCFBooleanTrue] as NSDictionary
+		let query = [kSecAttrService: serviceName, kSecClass: kSecClassGenericPassword, kSecReturnData: kCFBooleanTrue!] as NSDictionary
 		let keychainErr = SecItemDelete(query)
 		if keychainErr != errSecSuccess && keychainErr != errSecItemNotFound {
 			fatalError("unexpected keychain error while deleting key: \(keychainErr)")
@@ -71,7 +71,7 @@ public class KeyManager {
 	}
 
 	public func keyIfExists() throws -> String? {
-		let query = [kSecAttrService: serviceName, kSecClass: kSecClassGenericPassword, kSecReturnData: kCFBooleanTrue] as NSDictionary
+		let query = [kSecAttrService: serviceName, kSecClass: kSecClassGenericPassword, kSecReturnData: kCFBooleanTrue!] as NSDictionary
 		var result: AnyObject?
 		let keychainErr = SecItemCopyMatching(query, &result)
 		if keychainErr == errSecSuccess {
@@ -97,7 +97,7 @@ public class KeyManager {
 	}
 
 	var persistentReference: Data? {
-		let query = [kSecAttrService: serviceName, kSecClass: kSecClassGenericPassword, kSecReturnPersistentRef: kCFBooleanTrue] as NSDictionary
+		let query = [kSecAttrService: serviceName, kSecClass: kSecClassGenericPassword, kSecReturnPersistentRef: kCFBooleanTrue!] as NSDictionary
 		var result: AnyObject?
 		guard SecItemCopyMatching(query, &result) == errSecSuccess else {
 			return nil

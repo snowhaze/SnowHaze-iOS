@@ -352,7 +352,7 @@ class VPNManager {
 
 	func didInstall(_ profile: OVPNProfile) {
 		assert(profile.profile != nil) // cannot use hasProfile since the .ovpn may have expired since installation started
-		let index = ovpnProfiles.index(where: { $0 == profile })!
+		let index = ovpnProfiles.firstIndex(where: { $0 == profile })!
 		installedProfiles[profile.id] = profile.expiration!.timeIntervalSince1970
 		let updated = OVPNProfile(data: profile.data, installed: installedProfiles)!
 		ovpnProfiles[index] = updated
@@ -467,6 +467,7 @@ extension VPNManager {
 			case .disconnecting:	return false
 			case .invalid:			return false
 			case .reasserting:		return true
+			@unknown default:		return false
 		}
 	}
 
@@ -506,6 +507,8 @@ extension VPNManager {
 							fatalError("failed to save config")
 						case .configurationUnknown:
 							fatalError("unexpected error")
+						@unknown default:
+							fatalError("unsupported vpn error")
 					}
 				} else {
 					fatalError("unexpected error domain \((error as NSError).domain), code \(code)")
@@ -547,6 +550,8 @@ extension VPNManager {
 								print("failed to load config")
 							case .configurationUnknown:
 								fatalError("unexpected error")
+							@unknown default:
+								fatalError("unsupported vpn error")
 						}
 					} else {
 						fatalError("unexpected error domain \((error as NSError).domain), code \(code)")
@@ -587,7 +592,7 @@ extension VPNManager {
 					if (error as NSError).domain == "NEVPNErrorDomain", let vpnError = NEVPNError.Code(rawValue: code) {
 						switch vpnError {
 							case .configurationInvalid:
-								print("config invalid")
+								break
 							case .configurationDisabled:
 								fatalError("was not trying to connect")
 							case .connectionFailed:
@@ -598,6 +603,8 @@ extension VPNManager {
 								fatalError("failed to delete config")
 							case .configurationUnknown:
 								fatalError("unexpected error")
+							@unknown default:
+								fatalError("unsupported vpn error")
 						}
 					} else {
 						fatalError("unexpected error domain \((error as NSError).domain), code \(code)")

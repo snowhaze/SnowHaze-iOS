@@ -40,7 +40,7 @@ struct DashlaneHelper {
 		return extensionItem(for: url)
 	}
 
-	func isDashlaneResponce(type: UIActivity.ActivityType?) -> Bool {
+	func isDashlaneResponse(type: UIActivity.ActivityType?) -> Bool {
 		return type?.rawValue == "com.dashlane.dashlanephonefinal.SafariExtension"
 	}
 
@@ -87,7 +87,7 @@ struct DashlaneHelper {
 		activity.popoverPresentationController?.sourceView = sourceView
 
 		activity.completionWithItemsHandler = { type, _ , returnedItems, _ in
-			guard self.isDashlaneResponce(type: type) else {
+			guard self.isDashlaneResponse(type: type) else {
 				completion(nil)
 				return
 			}

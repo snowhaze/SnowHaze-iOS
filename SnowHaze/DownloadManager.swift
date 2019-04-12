@@ -162,7 +162,8 @@ extension DownloadManager: URLSessionDownloadDelegate {
 	func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
 		let url = downloadTask.currentRequest?.url?.absoluteString
 		if url == domainsDBLocation || url == subscriptionDomainsDBLocation {
-			guard let db = SQLCipher(url: location, key: DomainList.dbKey, flags: .readonly) else {
+			let _ = initSQLite
+			guard let db = SQLCipher(url: location, key: DomainList.dbKey, flags: .readonly, cipherOptions: .compatibility(3), setupOptions: .all) else {
 				return
 			}
 			guard let integrityCheck = try? db.execute("PRAGMA quick_check") else {

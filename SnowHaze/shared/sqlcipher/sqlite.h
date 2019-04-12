@@ -14,3 +14,4 @@ int sqlite_option_context_context_int_string_fnpointer_int64(int config, void* c
 
 int sqlite_db_option_voidp_int_int(sqlite3* db, int config, void* value1, int value2, int value3);
 int sqlite_db_option_int_intp(sqlite3* db, int config, int value1, int* value2);
+int sqlite_db_option_constcharp(sqlite3* db, int config, const char* value);

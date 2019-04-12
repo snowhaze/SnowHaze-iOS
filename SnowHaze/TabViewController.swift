@@ -239,7 +239,7 @@ private extension TabViewController {
 			top = topOffset
 			bottom = bottomOffset
 		}
-		let insets = UIEdgeInsets.init(top: top, left: left, bottom: bottom, right: right)
+		let insets = UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
 
 		if let wv = webView, let superview = wv.superview {
 			var tbInsets = UIEdgeInsets(top: insets.top, left: 0, bottom: insets.bottom, right: 0)

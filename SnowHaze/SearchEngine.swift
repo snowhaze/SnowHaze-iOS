@@ -37,7 +37,7 @@ class SearchEngine {
 
 	static func remove(suggestionEngine engine: SearchEngineType, from: [SearchEngineType]) -> [SearchEngineType] {
 		var res = from
-		if let index = res.index(of: engine) {
+		if let index = res.firstIndex(of: engine) {
 			res.remove(at: index)
 		}
 		return res
@@ -45,7 +45,7 @@ class SearchEngine {
 
 	static func updateSuggestionEngine(new newEngine: SearchEngineType, old oldEngine: SearchEngineType, inList: [SearchEngineType]) -> [SearchEngineType] {
 		var res = inList
-		if let index = res.index(of: oldEngine) {
+		if let index = res.firstIndex(of: oldEngine) {
 			if res.contains(newEngine) {
 				res.remove(at: index)
 			} else {

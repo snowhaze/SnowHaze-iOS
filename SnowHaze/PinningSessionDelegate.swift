@@ -12,10 +12,10 @@ import Foundation
 class PinningSessionDelegate: NSObject, URLSessionDelegate {
 	static let pinnedHosts = ["api.snowhaze.com", "search.snowhaze.com"]
 
-	private static let primaryAPICert = SecPolicyEvaluator.cert(named: "api")!
-	private static let primarySearchCert = SecPolicyEvaluator.cert(named: "search")!
+	private static let primaryAPI1Cert = SecPolicyEvaluator.cert(named: "api1")!
+	private static let primaryAPI2Cert = SecPolicyEvaluator.cert(named: "api2")!
 	
-	static let pinnedCerts = [primaryAPICert, primarySearchCert]
+	static let pinnedCerts = [primaryAPI1Cert, primaryAPI2Cert]
 
 	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 		let space = challenge.protectionSpace

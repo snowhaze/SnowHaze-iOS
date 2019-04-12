@@ -135,12 +135,12 @@ class PolicyAssessor {
 			case .bing:			return 0.3
 			case .google:		return 0.2
 			case .yahoo:		return 0.1
-			case .wikipedia:	return 0.7
-			case .wolframAlpha:	return 0.6
-			case .ecosia:		return 0.3
-			case .startpage:	return 0.8
-			case .swisscows:	return 0.5
-			case .duckDuckGo:	return 0.75
+			case .wikipedia:	return 0.8
+			case .wolframAlpha:	return 0.65
+			case .ecosia:		return 0.35
+			case .startpage:	return 0.9
+			case .swisscows:	return 0.55
+			case .duckDuckGo:	return 0.85
 			case .none:			return 1
 		}
 	}
@@ -419,15 +419,15 @@ enum PolicyAssessmentResultType {
 class PolicyAssessmentResult {
 	let result: Double
 	var type: PolicyAssessmentResultType {
-		if result < 0.17 {
+		if result < 0.15 {
 			return .veryBad
-		} else if result < 0.33 {
+		} else if result < 0.35 {
 			return .bad
-		} else if result < 0.50 {
+		} else if result < 0.45 {
 			return .passable
-		} else if result < 0.67 {
+		} else if result < 0.55 {
 			return .ok
-		} else if result < 0.83 {
+		} else if result < 0.75 {
 			return .good
 		} else {
 			return .veryGood

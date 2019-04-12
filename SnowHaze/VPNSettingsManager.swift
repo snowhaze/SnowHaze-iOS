@@ -81,7 +81,7 @@ class VPNSettingsManager: SettingsViewManager {
 	}
 
 	private var selectedProfileIndex: Int? {
-		return VPNManager.shared.ipsecProfiles.index { $0.id == selectedProfile }
+		return VPNManager.shared.ipsecProfiles.firstIndex { $0.id == selectedProfile }
 	}
 
 	private var selectedProfile: String? {
@@ -90,9 +90,9 @@ class VPNSettingsManager: SettingsViewManager {
 
 	private static func listIndex(for profile: VPNProfile) -> Int? {
 		if let profile = profile as? IPSecProfile {
-			return VPNManager.shared.ipsecProfiles.index(where: { $0 == profile })
+			return VPNManager.shared.ipsecProfiles.firstIndex(where: { $0 == profile })
 		} else if let profile = profile as? OVPNProfile {
-			return VPNManager.shared.ovpnProfiles.index(where: { $0 == profile })
+			return VPNManager.shared.ovpnProfiles.firstIndex(where: { $0 == profile })
 		} else {
 			fatalError("A VPNProfile should be eigther a OVPNProfile or a IPSec profile")
 		}
@@ -115,12 +115,12 @@ class VPNSettingsManager: SettingsViewManager {
 			}
 			me.pingStats[id] = (time, rate)
 			if me.isIPSec {
-				if let index = VPNManager.shared.ipsecProfiles.index(where: { $0.id == id }) {
+				if let index = VPNManager.shared.ipsecProfiles.firstIndex(where: { $0.id == id }) {
 					let indexPath = IndexPath(row: index + 1, section: listSection)
 					me.controller?.tableView.reloadRows(at: [indexPath], with: .none)
 				}
 			} else {
-				if let index = VPNManager.shared.ovpnProfiles.index(where: { $0.id == id }) {
+				if let index = VPNManager.shared.ovpnProfiles.firstIndex(where: { $0.id == id }) {
 					let indexPath = IndexPath(row: index + 1, section: listSection)
 					me.controller?.tableView.reloadRows(at: [indexPath], with: .none)
 				}
@@ -196,6 +196,11 @@ class VPNSettingsManager: SettingsViewManager {
 								}
 							case .reasserting:
 								cell.textLabel?.text = NSLocalizedString("reasserting ipsec vpn state title", comment: "indication that the ipsec vpn is reasserting")
+								let spinner = UIActivityIndicatorView(style: .white)
+								spinner.startAnimating()
+								cell.accessoryView = spinner
+							@unknown default:
+								cell.textLabel?.text = NSLocalizedString("unknown ipsec vpn state title", comment: "indication that the ipsec vpn is in a state which was added to ios after compilation of the app")
 								let spinner = UIActivityIndicatorView(style: .white)
 								spinner.startAnimating()
 								cell.accessoryView = spinner
@@ -567,7 +572,7 @@ class VPNSettingsManager: SettingsViewManager {
 extension VPNSettingsManager: UIDocumentInteractionControllerDelegate {
 	func documentInteractionController(_ controller: UIDocumentInteractionController, willBeginSendingToApplication application: String?) {
 		let id = (controller.annotation as! [AnyHashable: Any])["id"] as! String
-		if let index = VPNManager.shared.ovpnProfiles.index(where: { $0.id == id }), application == "net.openvpn.connect.app" {
+		if let index = VPNManager.shared.ovpnProfiles.firstIndex(where: { $0.id == id }), application == "net.openvpn.connect.app" {
 			VPNManager.shared.didInstall(VPNManager.shared.ovpnProfiles[index])
 			updateHeaderColor(animated: true)
 			let indexPath = IndexPath(row: index, section: listSection)

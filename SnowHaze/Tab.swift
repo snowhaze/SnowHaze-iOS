@@ -410,6 +410,7 @@ class TabStore {
 		assert(Thread.isMainThread)
 		let oldItems = items
 		let id = item.id
+		let settings = Settings.settings(for: item).allValues
 		do {
 			try database.execute("DELETE FROM \(tableName) WHERE id = ?", with: [.integer(id)])
 			Settings.dropChache(for: item)
@@ -421,7 +422,7 @@ class TabStore {
 		notifyDiff(from: oldItems)
 		if undoTime > 0.1 {
 			let delId = nextDeletionId
-			undoStack.append((item, Date(timeIntervalSinceNow: undoTime), delId, Settings.settings(for: item).allValues))
+			undoStack.append((item, Date(timeIntervalSinceNow: undoTime), delId, settings))
 			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + undoTime) {
 				let now = Date()
 				self.undoStack = self.undoStack.filter { (tab, date, id, _) -> Bool in

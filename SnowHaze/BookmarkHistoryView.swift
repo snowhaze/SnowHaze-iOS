@@ -261,7 +261,7 @@ private extension BookmarkHistoryView {
 		let layout = bookmarkCollectionView.collectionViewLayout as! UICollectionViewFlowLayout
 		layout.itemSize = CGSize(width: 100, height: 160)
 		layout.minimumLineSpacing = 30
-		layout.sectionInset = UIEdgeInsets.init(top: 20, left: 20, bottom: 20, right: 20)
+		layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
 		layout.headerReferenceSize = CGSize(width: 100, height: 100)
 		bookmarkCollectionView.register(StatsView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "stats")
 

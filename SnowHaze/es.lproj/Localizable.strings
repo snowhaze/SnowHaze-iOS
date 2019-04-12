@@ -491,9 +491,6 @@
 /* name of none search engine to be displayed to user */
 "none search engine display name" = "Nada";
 
-/* accessibility label of snowhaze search engine when user is not subscribed to snowhaze premium */
-"snowhaze search engine missing subscription accessibility label" = "SnowHaze - requiere subscripción SnowHaze Premium";
-
 /* title of settings subsection to choose search engine */
 "search engine selection setting subsection title" = "MOTORES DE BÚSQUEDA";
 
@@ -886,6 +883,9 @@
 
 /* indication that the ipsec vpn is reasserting */
 "reasserting ipsec vpn state title" = "Reconectando";
+
+/* indication that the ipsec vpn is in a state which was added to ios after compilation of the app */
+"unknown ipsec vpn state title" = "Estado de VPN no soportado";
 
 /* prompt for user to select the ipsec vpn profile */
 "select ipsec vpn profile prompt" = "Seleccionar ubicación";
@@ -1334,15 +1334,6 @@
 /* title of button of http authentication prompt to retrieve credentials from 1password */
 "http authentication 1password button title" = "1Password";
 
-/* default auth error title */
-"error page auth default title" = "Error de autorización";
-
-/* default auth error message */
-"error page auth error default message" = "No tiene un token de autorización válido. Puede actualizarla en la configuración de la suscripción. Vuelve a suscribirte en la configuración de SnowHaze en Suscripciones.";
-
-/* default auth error information */
-"error page auth error default information" = "Puede ocurrir que no haya recibido el token después de la suscripción. Este sitio se recargará tan pronto como reciba un token.";
-
 /* message shown when no error message is available but an url */
 "error page unexpected error message with url" = "Ha ocurrido un error inesperado mientras se abría %@";
 
@@ -1515,7 +1506,7 @@
 "acknowledgements settings explanation format" = "<p>SnowHaze versión %@</p>El desarrollo de SnowHaze fue fuertemente facilitado por el código de terceros y proyectos de código abierto. Nos gustaría dar las gracias a los mantenedores de los siguientes proyectos por dejarnos utilizarlos; AgileBits Inc. para 1PasswordExtension, phishtank.com por la base de datos de verificación de phishing, Zetetic LLC por SQLCipher, los autores EasyList (easylist.github.io) fanboy, MonztA, Famlam y Khrin para las listas EasyList, EasyPrivacy y Fanboy's Social Blocking y los Usuarios de TeX polaca Grupo GUST para el Giro de fuentes tipográficas Adventor. SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. Licencias o avisos de copyright de proyectos de código abierto usados se pueden encontrar a continuación. Diseño por Basestudio.";
 
 /* explanations of the subscription settings tab */
-"subscription settings explanation" = "<p>Subscríbete a SnowHaze Premium para accesar a SnowHaze VPN, al motor de búsqueda de SnowHaze y a las actualizaciones frecuente de las listas de sitios. Los primeros 7 días son gratis para los que se suscriben por primera vez. Hay una subscripción auto-renovable anual o mensual.</p><p><strong>Autoactualización de opción</strong> actualiza las opciones de subscripción.</p><p><strong>Autoactualización de token</strong> actualiza el token de autorización.</p>El <strong>Token Hash actual</strong> es un código usado para verificar la subscripción actual.";
+"subscription settings explanation" = "<p>Subscríbete a SnowHaze Premium para accesar a SnowHaze VPN y a las actualizaciones frecuente de las listas de sitios. Los primeros 7 días son gratis para los que se suscriben por primera vez. Hay una subscripción auto-renovable anual o mensual.</p><p><strong>Autoactualización de opción</strong> actualiza las opciones de subscripción.</p><p><strong>Autoactualización de token</strong> actualiza el token de autorización.</p>El <strong>Token Hash actual</strong> es un código usado para verificar la subscripción actual.";
 
 /* explanations of the vpn settings tab */
 "vpn settings explanation" = "<p>Un VPN (Virtual Private Network:Red Virtual Privada en español) es una conexión encriptada a un servidor. Todas las conexiones entre tus dispositivos y el internet primero son enviadas a un servidor VPN. El recipiente sólo ve la dirección IP de servidor VPN pero no tu dirección de IP verdadera, que tiene mucha importancia para poder prevenir rastreos.</p><p>VPN te protege de ataques de hombre en el medio (MITM), esconde tu tráfico y siempre encripta tu tráfico del servidor de VPN.</p><p>Ofrecemos dos tipos diferentes de VPNs, que utilizan protocolos diferentes. Uno es un protocolo llamado IPSec y el otro es OpenVPN. La VPN que utiliza IPSec puede controlarse fácilmente con la aplicación SnowHaze, mientras que OpenVPN requiere que utilice la aplicación OpenVPN Connect y actualice sus perfiles mensualmente. Sin embargo, OpenVPN es ligeramente más seguro que IPSec. Se trata de una pequeña compensación entre la usabilidad (IPSec) y la seguridad (OpenVPN) que podemos dejar en sus manos.</p><p>SnowHaze VPN no registra absolutamente nada y es el único servicio VPN que utiliza autorización no identificable.</p><p>Subscríbete a SnowHaze Premium para usar el VPN. Si aún no configuras el VPN, por favor sigue los pasos en el tutorial o ve el tutorial en línea.</p><p><strong>Auto-rotar credenciales:</strong> Cambia automáticamente las credenciales de inicio de sesión del servidor mientras está conectado al servidor VPN.  De lo contrario, las credenciales cambian para cada sesión.</p><p><strong>Auto-Update localizaciones:</strong> Actualiza los VPN disponibles en los servidores locales.</p><strong>Mostrar Estado Ping:</strong> Muestra el tiempo que le toma a la información viajar de tu dispositivo hacia el servidor, y de vuelta.";
@@ -1530,5 +1521,5 @@
 "http warnings explanation prompt title" = "Advertencias HTTP";
 
 /* conditions for the snowhaze premium autorenewing subscription */
-"premium subscription conditions" = "La suscripción anual de SnowHaze Premium es válidas por un año; La suscripción mensual SnowHaze Premium es válida por un mes. Durante este tiempo, tiene acceso a la VPN de SnowHaze, al motor de búsqueda SnowHaze y sus listas se actualizan frecuentemente. El pago se cargará a su cuenta de iTunes al confirmar la compra. Todas las suscripciones se renuevan automáticamente a menos que desactive la renovación automática al menos 24 horas antes del final de la suscripción. Su cuenta se cargará dentro de las 24 horas anteriores al final de la suscripción. Puede administrar su suscripción en la configuración de su cuenta tocando en 'Ver todas mis suscripciones'. Cualquier parte no utilizada de un período de prueba gratuito se perderá al comprar la suscripción correspondiente.";
+"premium subscription conditions" = "La suscripción anual de SnowHaze Premium es válidas por un año; La suscripción mensual SnowHaze Premium es válida por un mes. Durante este tiempo, tiene acceso a la VPN de SnowHaze y sus listas se actualizan frecuentemente. El pago se cargará a su cuenta de iTunes al confirmar la compra. Todas las suscripciones se renuevan automáticamente a menos que desactive la renovación automática al menos 24 horas antes del final de la suscripción. Su cuenta se cargará dentro de las 24 horas anteriores al final de la suscripción. Puede administrar su suscripción en la configuración de su cuenta tocando en 'Ver todas mis suscripciones'. Cualquier parte no utilizada de un período de prueba gratuito se perderá al comprar la suscripción correspondiente.";
 
