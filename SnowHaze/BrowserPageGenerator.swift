@@ -1,5 +1,5 @@
 //
-//  ErrorPageGenerator.swift
+//  BrowserPageGenerator.swift
 //  SnowHaze
 //
 
@@ -8,11 +8,11 @@
 
 import Foundation
 
-enum ErrorPageGeneratorType {
+enum BrowserPageGeneratorType {
 	case pageError
 }
 
-class ErrorPageGenerator {
+class BrowserPageGenerator {
 	private let bodyPattern = "(?<=\\<body>(\\s|))[^\\s][\\w\\W]*?(?=\\s*\\</body>)"
 	private let paragraphPattern = "^<p[^>]*><span[^>]*>\\s*|\\s*</span></p>$"
 	private static let fontBase64 = try! Data(contentsOf: Bundle.main.url(forResource: SnowHazeFontName, withExtension: "otf")!).base64EncodedString()
@@ -32,7 +32,7 @@ class ErrorPageGenerator {
 	private let pageTextColor = UIColor.title.hex
 	private let pageTextAlign = "center"
 	
-	private let type: ErrorPageGeneratorType
+	private let type: BrowserPageGeneratorType
 
 	var title: String?
 	var message: String?
@@ -44,7 +44,7 @@ class ErrorPageGenerator {
 	var file: String?
 	var mimeType: String?
 	
-	init(type: ErrorPageGeneratorType) {
+	init(type: BrowserPageGeneratorType) {
 		self.type = type
 	}
 	
@@ -170,7 +170,7 @@ class ErrorPageGenerator {
 				+ "}"
 		let font = "@font-face {"
 			+ "font-family: '\(SnowHazeFontName)';"
-			+ "src: url('data:font/otf;base64,\(ErrorPageGenerator.fontBase64)') format('opentype');}"
+			+ "src: url('data:font/otf;base64,\(BrowserPageGenerator.fontBase64)') format('opentype');}"
 		return "<style>\(css)\(font)</style>"
 	}
 

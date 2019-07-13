@@ -75,7 +75,7 @@ internal extension URL {
 	}
 
 	var potentialXSS: Bool {
-		let components = URLComponents(url: self, resolvingAgainstBaseURL: false)!
+		let components = URLComponents(url: self, resolvingAgainstBaseURL: true)!
 		if isDangerous(components.path) {
 			return true
 		}

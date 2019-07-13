@@ -11,34 +11,6 @@ import Foundation
 public class SQLCipher: SQLite {
 	public static let keySize = 32
 
-	public struct SetupOptions: OptionSet {
-		public let rawValue: Int
-
-		public init(rawValue: Int) {
-			self.rawValue = rawValue
-		}
-
-		public static let none				= SetupOptions(rawValue: 0)
-		public static let defensive			= SetupOptions(rawValue: 1)
-		public static let cellSizeCheck		= SetupOptions(rawValue: 2)
-		public static let disableMemMap		= SetupOptions(rawValue: 4)
-		public static let all: SetupOptions	= [defensive, cellSizeCheck, disableMemMap]
-
-		var setupOptions: [FinalSetupOptions] {
-			var result = [FinalSetupOptions]()
-			if self.contains(SetupOptions.disableMemMap) {
-				result.append(.statement("PRAGMA mmap_size = 0"))
-			}
-			if self.contains(SetupOptions.defensive) {
-				result.append(.config(.defensive(true)))
-			}
-			if self.contains(SetupOptions.cellSizeCheck) {
-				result.append(.statement("PRAGMA cell_size_check = ON"))
-			}
-			return result
-		}
-	}
-
 	public enum HashAlgorithm: Equatable {
 		case sha1
 		case sha256
@@ -248,12 +220,12 @@ public class SQLCipher: SQLite {
 		return [FinalSetupOptions.statement("PRAGMA key = \"\(key.sqliteEscaped)\"")]
 	}
 
-	public init?(path: String, key: String, flags: OpenFlags = .rwCreate, cipherOptions: CipherOptions = .unspecified, setupOptions: SetupOptions = .none) {
+	public init?(path: String, key: String, flags: OpenFlags = .rwCreate, cipherOptions: CipherOptions = .unspecified, setupOptions: SQLite.SetupOptions = .none) {
 		let setup = setupOptions.setupOptions + SQLCipher.keyingOption(key: key) + cipherOptions.setupOptions
 		super.init(path: path, openName: path, flags: flags, setup: setup)
 	}
 
-	public init?(url: URL, key: String, flags: OpenFlags = .rwCreate, cipherOptions: CipherOptions = .unspecified, setupOptions: SetupOptions = .none) {
+	public init?(url: URL, key: String, flags: OpenFlags = .rwCreate, cipherOptions: CipherOptions = .unspecified, setupOptions: SQLite.SetupOptions = .none) {
 		guard url.isFileURL else {
 			return nil
 		}
@@ -261,12 +233,12 @@ public class SQLCipher: SQLite {
 		super.init(path: url.path, openName: url.absoluteString, flags: [flags, .uri], setup: setup)
 	}
 
-	public init?(path: String, key: Foundation.Data, flags: OpenFlags = .rwCreate, cipherOptions: CipherOptions = .unspecified, setupOptions: SetupOptions = .none) {
+	public init?(path: String, key: Foundation.Data, flags: OpenFlags = .rwCreate, cipherOptions: CipherOptions = .unspecified, setupOptions: SQLite.SetupOptions = .none) {
 		let setup = setupOptions.setupOptions + SQLCipher.keyingOption(key: key) + cipherOptions.setupOptions
 		super.init(path: path, openName: path, flags: flags, setup: setup)
 	}
 
-	public init?(url: URL, key: Foundation.Data, flags: OpenFlags = .rwCreate, cipherOptions: CipherOptions = .unspecified, setupOptions: SetupOptions = .none) {
+	public init?(url: URL, key: Foundation.Data, flags: OpenFlags = .rwCreate, cipherOptions: CipherOptions = .unspecified, setupOptions: SQLite.SetupOptions = .none) {
 		guard url.isFileURL else {
 			return nil
 		}

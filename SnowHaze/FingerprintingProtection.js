@@ -1,5 +1,7 @@
 "use strict";
 (function() {
+	const apply = Function.prototype.apply;
+	const call = Function.prototype.call;
 	var addEventListener = window.addEventListener;
 	var getAttribute = Element.prototype.getAttribute;
 	var removeAttribute = Element.prototype.removeAttribute;
@@ -13,11 +15,13 @@
 	OscillatorNode = undefined;
 	window.addEventListener = function (name, callback) {
 		if (name != 'deviceorientation') {
+			Function.prototype.apply = apply;
 			addEventListener.apply(this, arguments);
 		}
 	}
 	
 	var observer = new window.MutationObserver(function (changes) {
+		Function.prototype.call = call;
 		for (var index = 0; index < changes.length; index++) {
 			var change = changes[index];
 			var node;

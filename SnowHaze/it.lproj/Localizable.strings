@@ -59,6 +59,18 @@
 /* name of the vpn protected loads usage stat */
 "vpn protected loads usage stats name" = "Protezione\nVPN";
 
+/* format of the accessibility label of the https upgrades usage stat */
+"https upgrades usage stats accessibility format" = "%d Upgrade HTTPS";
+
+/* format of the accessibility label of the blocked trackers usage stat */
+"blocked trackers usage stats accessibility format" = "%d Trackers bloccati";
+
+/* format of the accessibility label of the ephemeral cookies usage stat */
+"ephemeral cookies usage stats accessibility format" = "%d Cookies eliminati";
+
+/* format of the accessibility label of the vpn protected loads usage stat */
+"vpn protected loads usage stats accessibility format" = "%d Protezione VPN";
+
 /* Used to confirm message */
 "js alert panel confirmation button title" = "OK";
 
@@ -858,13 +870,13 @@
 "installing ovpn requires openvpn connect alert message" = "Per poter utilizzare il VPN ti serve l’app OpenVPN Connect. Puoi scaricarlo nell’app Store.";
 
 /* format of the accessibility label of the vpn profile cell when user is not subscribed to snowhaze premium */
-"vpn profile missing subscription accessibility label format" = "%@ - Richiede abbonamento SnowHaze Premium";
+"vpn profile missing subscription accessibility label format" = "%@ VPN - Richiede abbonamento SnowHaze Premium";
 
 /* format of the accessibility label of the vpn profile cell when the profile is being downloaded */
 "vpn profile downloading accessibility label format" = "%@ - Scaricare";
 
 /* format of the accessibility label of the vpn profile cell when the profile credentials are not yet downloaded */
-"vpn profile download required accessibility label format" = "%@ - Richiede download";
+"vpn profile download required accessibility label format" = "%@ VPN - Richiede download";
 
 /* indication that the ipsec vpn is connected */
 "connected ipsec vpn state title" = "Collegato";
@@ -891,7 +903,7 @@
 "select ipsec vpn profile prompt" = "Selezionare posizione";
 
 /* accessibility label of prompt for user to select the ipsec vpn profile when user is not subscribed to snowhaze premium */
-"select ipsec vpn profile prompt missing subscription accessibility label" = "Selezionare posizione - Richiede abbonamento SnowHaze Premium";
+"select ipsec vpn profile prompt missing subscription accessibility label" = "Selezionare posizione VPN - Richiede abbonamento SnowHaze Premium";
 
 /* title of alert to warn users that a single installed VPN profile has expired */
 "vpn profile expiration warning single profile expired alert title" = "Profilo VPN scaduto";
@@ -1041,7 +1053,7 @@
 "more button accessibility label" = "Di più";
 
 /* accessibility label for button to close a tab */
-"close tab button accessibility label" = "Chiudi";
+"close tab button accessibility label" = "Chiudi la scheda";
 
 /* privacy term to be appended to privacy assessment name */
 "privacy assessment privacy suffix" = " privacy";
@@ -1118,6 +1130,9 @@
 /* name of the workflow app used to confirm opening of url in other app */
 "open url in app workflow app name" = "Workflow";
 
+/* name of the testflight app used to confirm opening of url in other app */
+"open url in app testflight app name" = "TestFlight";
+
 /* format string used to ask users if they want to open another app */
 "open url in app prompt format" = "Vuoi veramente aprire %@?";
 
@@ -1149,10 +1164,10 @@
 "block xss prompt title" = "Iniezione di codice bloccata";
 
 /* format string of message of prompt to block xss on a known host */
-"block xss known host prompt format" = "Blocca un URL potenzialmente dannoso su \"%@\" dal caricamento";
+"block xss known host prompt format" = "Blocca un URL potenzialmente dannoso su \"%@\" dal caricamento.";
 
 /* message of prompt to block xss on an unknown host */
-"block xss unknown host prompt message" = "Blocca un URL potenzialmente dannoso su dal caricamento";
+"block xss unknown host prompt message" = "Blocca un URL potenzialmente dannoso su dal caricamento.";
 
 /* title of block action of prompt to block xss on an unknown host */
 "block xss unknown host prompt block action title" = "Bloccare";
@@ -1164,7 +1179,7 @@
 "invalid certificate alert title" = "Certificato non valido";
 
 /* format of message of the alert that is displayed when trying to connect to a server with an invalid certificate */
-"invalid certificate alert message format" = "Il certificato per %@ non è valido";
+"invalid certificate alert message format" = "Il certificato per %@ non è valido.";
 
 /* title of continue button of the alert that is displayed when trying to connect to a server with an invalid certificate */
 "invalid certificate alert continue button title" = "Continua";
@@ -1173,10 +1188,10 @@
 "certificate domain name mismatch alert title" = "Nome dominio errato";
 
 /* format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is known */
-"certificate domain name mismatch known cert domain alert message format" = "Il certificato per %@ è stato rilasciato per '%@'";
+"certificate domain name mismatch known cert domain alert message format" = "Il certificato per %@ è stato rilasciato per '%@'.";
 
 /* format of message of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name and the domain the certificate was issued for is not available */
-"certificate domain name mismatch unknown cert domain alert message format" = "Il certificato per %@ è stato rilasciato per un differente dominio";
+"certificate domain name mismatch unknown cert domain alert message format" = "Il certificato per %@ è stato rilasciato per un differente dominio.";
 
 /* title of continue button of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name */
 "certificate domain name mismatch alert continue button title" = "Continua";
@@ -1317,7 +1332,7 @@
 "http authentication prompt missing realm prompt" = "Inserisci i tuoi dati della registrazione per %@";
 
 /* warning displayed when credentials entered in http authentication prompt will be transmitted insecurely */
-"http authentication prompt insecure transmission warning" = "ATTENZIONE: I tuoi dati del login verranno trasmessi in maniera non sicura";
+"http authentication prompt insecure transmission warning" = "ATTENZIONE: I tuoi dati del login verranno trasmessi in maniera non sicura!";
 
 /* placeholder for username in prompt for http authentication */
 "http authentication prompt username placeholder" = "Username";
@@ -1335,10 +1350,10 @@
 "http authentication 1password button title" = "1Password";
 
 /* message shown when no error message is available but an url */
-"error page unexpected error message with url" = "Si è verificato un errore nell'apertura da %@";
+"error page unexpected error message with url" = "Si è verificato un errore nell'apertura da %@.";
 
 /* message shown when no error message is available */
-"error page unexpected error message" = "Si è verificato un errore imprevisto";
+"error page unexpected error message" = "Si è verificato un errore imprevisto.";
 
 /* description of the error code on the errorpage */
 "error page error code description" = "Codice di errore";
@@ -1377,7 +1392,7 @@
 "unknown file type errorpage message" = "Questa pagina non può essere aperta, perché SnowHaze non supporta il tipo di dato";
 
 /* errormessage format of the network error errorpage */
-"network error errormessage format" = "SnowHaze non si è potuto connettere con %@";
+"network error errormessage format" = "SnowHaze non si è potuto connettere con %@.";
 
 /* errormessage format of the website error errorpage */
 "website error errormessage format" = "SnowHaze non ha potuto caricare la seguente pagina: %@";

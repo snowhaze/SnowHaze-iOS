@@ -42,8 +42,12 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 	private(set) lazy var webView: WKWebView = {
 		let policy = PolicyManager.manager(for: self.tab)
 		let config = policy.webViewConfiguration
-		let store = self.tab.controller?.dataStore ?? (PolicyManager.manager(for: self.tab).dataStore, WKProcessPool())
-		(config.websiteDataStore, config.processPool) = store
+		if let store = self.tab.controller?.dataStore {
+			(config.websiteDataStore, config.processPool) = store
+		} else {
+			let store = policy.dataStore
+			(config.websiteDataStore, config.processPool) = (store.store, store.pool ?? WKProcessPool())
+		}
 		let ret = WKWebView(frame: CGRect.zero, configuration: config)
 		ret.allowsLinkPreview = false
 		ret.customUserAgent = self.tab.controller?.userAgent ?? policy.userAgent

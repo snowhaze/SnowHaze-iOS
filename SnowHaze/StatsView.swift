@@ -14,6 +14,7 @@ protocol StatsViewDelegate: class {
 	func countForStat(_ index: Int, in statsView: StatsView) -> Int
 	func colorForStat(_ index: Int, in statsView: StatsView) -> UIColor
 	func dimmStat(_ index: Int, in statsView: StatsView) -> Bool
+	func accessibilityFormatOfStat(_ index: Int, in statsView: StatsView) -> String
 	func statTapped(at index: Int, in statsView: StatsView)
 }
 
@@ -72,6 +73,9 @@ class StatsView: UICollectionReusableView {
 		assert(statsCount >= 0)
 		for i in 0 ..< statsCount {
 			let dimmed = delegate.dimmStat(i, in: self)
+			let count = delegate.countForStat(i, in: self)
+			let categoryTitle = delegate.titleOfStat(i, in: self)
+			let accesibilityLabelFormat = delegate.accessibilityFormatOfStat(i, in: self)
 			let container = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 85))
 			let number = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 55))
 			let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(statsViewTapped(_:)))
@@ -82,7 +86,7 @@ class StatsView: UICollectionReusableView {
 			number.textColor = dimmed ? .darkTitle : delegate.colorForStat(i, in: self)
 			number.adjustsFontSizeToFitWidth = true
 			UIFont.setSnowHazeFont(on: number, scale: 2)
-			number.text = fmt(delegate.countForStat(i, in: self))
+			number.text = fmt(count)
 
 			let category = UILabel(frame: CGRect(x: 0, y: 55, width: 100, height: 30))
 			category.textAlignment = .center
@@ -90,10 +94,15 @@ class StatsView: UICollectionReusableView {
 			category.numberOfLines = 2
 			UIFont.setSnowHazeFont(on: category, scale: 0.6)
 			category.textColor = dimmed ? .darkTitle : .title
-			category.text = delegate.titleOfStat(i, in: self)
+			category.text = categoryTitle
 
 			container.addSubview(number)
 			container.addSubview(category)
+			container.accessibilityLabel = String(format: accesibilityLabelFormat, count)
+			container.isAccessibilityElement = true
+			if dimmed {
+				container.accessibilityTraits.insert(.notEnabled)
+			}
 			stackView.addArrangedSubview(container)
 		}
 	}

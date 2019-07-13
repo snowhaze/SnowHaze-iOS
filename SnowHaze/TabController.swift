@@ -111,7 +111,8 @@ class TabController: NSObject, WebViewManager {
 		if let store = internalDataStore {
 			return store
 		}
-		internalDataStore = (PolicyManager.manager(for: tab).dataStore, WKProcessPool())
+		let store = PolicyManager.manager(for: tab).dataStore
+		internalDataStore = (store.store, store.pool ?? WKProcessPool())
 		return internalDataStore!
 	}
 
@@ -457,7 +458,7 @@ extension TabController: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
 		if navigationResponse.isForMainFrame && !navigationResponse.canShowMIMEType {
 			decisionHandler(.cancel)
-			let errorpagegen = ErrorPageGenerator(type: .pageError)
+			let errorpagegen = BrowserPageGenerator(type: .pageError)
 			let title = NSLocalizedString("unknown file type errorpage title", comment: "title of the unknown file type errorpage")
 			errorpagegen.title = title
 			errorpagegen.message = NSLocalizedString("unknown file type errorpage message", comment: "errormessage of the unknown file type errorpage")
@@ -488,7 +489,7 @@ extension TabController: WKNavigationDelegate {
 		if let url = url {
 			pushTabHistory(url)
 		}
-		let errorpagegen = ErrorPageGenerator(type: .pageError)
+		let errorpagegen = BrowserPageGenerator(type: .pageError)
 		errorpagegen.errorCode = error.code
 		errorpagegen.errorDomain = error.domain
 		errorpagegen.errorReason = error.localizedFailureReason
@@ -512,7 +513,7 @@ extension TabController: WKNavigationDelegate {
 		if let url = url {
 			pushTabHistory(url)
 		}
-		let errorpagegen = ErrorPageGenerator(type: .pageError)
+		let errorpagegen = BrowserPageGenerator(type: .pageError)
 		errorpagegen.errorCode = error.code
 		errorpagegen.errorDomain = error.domain
 		errorpagegen.errorReason = error.localizedFailureReason
@@ -541,9 +542,13 @@ extension TabController: WKNavigationDelegate {
 		// Since navigationAction.sourceFrame is mostly uninitiallized in many cases where this function is called,
 		// navigationAction.sourceFrame.webView seems to be the only safe way of detecting if the request is a redirect.
 		if #available(iOS 11, *) {
-			if case .other = navigationAction.navigationType, let _ = navigationAction.sourceFrame.webView, navigationAction.request.isHTTPGet && navigationAction.targetFrame?.isMainFrame ?? false {
-				// WKWebView has quirk where it can unexpected undo redirects with huge timeout intervals. Try not to force it to do otherwise.
-				if navigationAction.request != reloadedRequest && navigationAction.request.timeoutInterval <= 120 {
+			if case .other = navigationAction.navigationType, let _ = navigationAction.sourceFrame.webView, navigationAction.targetFrame?.isMainFrame ?? false {
+				if navigationAction.request.url?.scheme?.lowercased() == "about" {
+					decisionHandler(.cancel)
+					return
+				}
+				// WKWebView has a quirk where it can unexpectedly undo redirects with huge timeout intervals. Try not to force it to do otherwise.
+				if navigationAction.request.isHTTPGet && navigationAction.request != reloadedRequest && navigationAction.request.timeoutInterval <= 120 {
 					reloadedRequest = navigationAction.request
 					decisionHandler(.cancel)
 					load(request: navigationAction.request)

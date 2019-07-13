@@ -51,13 +51,25 @@
 "https upgrades usage stats name" = "Upgrade\nHTTPS";
 
 /* name of the blocked trackers usage stat */
-"blocked trackers usage stats name" = "Trackers";
+"blocked trackers usage stats name" = "Trackers\nbloqueados";
 
 /* name of the ephemeral cookies usage stat */
 "ephemeral cookies usage stats name" = "Cookies\nexcluídos";
 
 /* name of the vpn protected loads usage stat */
 "vpn protected loads usage stats name" = "Proteções\nVPN";
+
+/* format of the accessibility label of the https upgrades usage stat */
+"https upgrades usage stats accessibility format" = "%d Upgrade HTTPS";
+
+/* format of the accessibility label of the blocked trackers usage stat */
+"blocked trackers usage stats accessibility format" = "%d Trackers bloqueados";
+
+/* format of the accessibility label of the ephemeral cookies usage stat */
+"ephemeral cookies usage stats accessibility format" = "%d Cookies excluídos";
+
+/* format of the accessibility label of the vpn protected loads usage stat */
+"vpn protected loads usage stats accessibility format" = "%d Proteções VPN";
 
 /* Used to confirm message */
 "js alert panel confirmation button title" = "OK";
@@ -858,13 +870,13 @@
 "installing ovpn requires openvpn connect alert message" = "Para usar o VPN necessita da aplicação OpenVPN Connect. Pode instala-la através da App Store agora.";
 
 /* format of the accessibility label of the vpn profile cell when user is not subscribed to snowhaze premium */
-"vpn profile missing subscription accessibility label format" = "%@ - Requer assinatura SnowHaze Premium";
+"vpn profile missing subscription accessibility label format" = "%@ VPN- Requer assinatura SnowHaze Premium";
 
 /* format of the accessibility label of the vpn profile cell when the profile is being downloaded */
 "vpn profile downloading accessibility label format" = "%@ - Download";
 
 /* format of the accessibility label of the vpn profile cell when the profile credentials are not yet downloaded */
-"vpn profile download required accessibility label format" = "%@ - Requer download";
+"vpn profile download required accessibility label format" = "%@ VPN - Requer download";
 
 /* indication that the ipsec vpn is connected */
 "connected ipsec vpn state title" = "Conectado";
@@ -891,7 +903,7 @@
 "select ipsec vpn profile prompt" = "Selecionar Localização";
 
 /* accessibility label of prompt for user to select the ipsec vpn profile when user is not subscribed to snowhaze premium */
-"select ipsec vpn profile prompt missing subscription accessibility label" = "Selecionar Localização - Requer assinatura SnowHaze Premium";
+"select ipsec vpn profile prompt missing subscription accessibility label" = "Selecionar Localização VPN - Requer assinatura SnowHaze Premium";
 
 /* title of alert to warn users that a single installed VPN profile has expired */
 "vpn profile expiration warning single profile expired alert title" = "Perfil VPN expirado";
@@ -1035,13 +1047,13 @@
 "content type blockers require ios 11 notice" = "Requer iOS 11";
 
 /* format of the accessibility label for the close tab button of the tab switcher bar */
-"close tab from tab selection bar accessibility label format" = "Guia Fechado '%@'";
+"close tab from tab selection bar accessibility label format" = "Feche a guia '%@'";
 
 /* accessibility label for more button (for tab settings) */
 "more button accessibility label" = "Mais";
 
 /* accessibility label for button to close a tab */
-"close tab button accessibility label" = "Fechar";
+"close tab button accessibility label" = "Feche a guia";
 
 /* privacy term to be appended to privacy assessment name */
 "privacy assessment privacy suffix" = " privacidade";
@@ -1118,6 +1130,9 @@
 /* name of the workflow app used to confirm opening of url in other app */
 "open url in app workflow app name" = "Workflow";
 
+/* name of the testflight app used to confirm opening of url in other app */
+"open url in app testflight app name" = "TestFlight";
+
 /* format string used to ask users if they want to open another app */
 "open url in app prompt format" = "Você realmente quer abrir o %@?";
 
@@ -1164,7 +1179,7 @@
 "invalid certificate alert title" = "Certificado inválido";
 
 /* format of message of the alert that is displayed when trying to connect to a server with an invalid certificate */
-"invalid certificate alert message format" = "O certificado para o '%@' não é válido";
+"invalid certificate alert message format" = "O certificado para o '%@' não é válido.";
 
 /* title of continue button of the alert that is displayed when trying to connect to a server with an invalid certificate */
 "invalid certificate alert continue button title" = "Continuar";
@@ -1317,7 +1332,7 @@
 "http authentication prompt missing realm prompt" = "Insira o sua identificação de conexão para '%@'";
 
 /* warning displayed when credentials entered in http authentication prompt will be transmitted insecurely */
-"http authentication prompt insecure transmission warning" = "ATENÇÃO: as suas credenciais serão transmitidas de maneira pouco segura";
+"http authentication prompt insecure transmission warning" = "ATENÇÃO: as suas credenciais serão transmitidas de maneira pouco segura!";
 
 /* placeholder for username in prompt for http authentication */
 "http authentication prompt username placeholder" = "Nome do utilizador";
@@ -1377,10 +1392,10 @@
 "unknown file type errorpage message" = "Este ficheiro não pode ser aberto porque o SnowHaze não reconhece este tipo de dados";
 
 /* errormessage format of the network error errorpage */
-"network error errormessage format" = "O SnowHaze não se pôde conectar a %@";
+"network error errormessage format" = "O SnowHaze não se pôde conectar a %@.";
 
 /* errormessage format of the website error errorpage */
-"website error errormessage format" = "O SnowHaze não se pôde carregar %@";
+"website error errormessage format" = "O SnowHaze não se pôde carregar %@.";
 
 /* title of the unknown file type errorpage */
 "unknown file type errorpage title" = "Tipo de ficheiro desconhecido";
@@ -1458,7 +1473,7 @@
 "update tutorial message from developers content" = "no message";
 
 /* explanations of the application settings */
-"application settings explanation" = "<p>Aqui você encontra as configurações gerais do SnowHaze.</p><p><strong>Sugestões sites locais:</strong>Pode selecionar se deseja que os sites das listas locais sejam sugeridos aquando da utilização de motores de pesquisa.</p><p><strong>Sugerir sites privados:</strong> Quando essa opção estiver ativada o SnowHaze pode sugerir site privados ao se realizar uma busca. Quando essa opção estiver desativada continuarão sendo sugeridos sites que não são privados. Por razões de proteção à juventude, você pode querer desativar esta opção.</p><p><strong>Auto-update a lista de Sites / Somente Wi-Fi</strong>Pode também escolher se as diferentes listas de sites web ( sites de rastreio, sites de publicidade, sites de phishing ou de falsificação de identidade, sites de malware) devem ser atualizados automaticamente ou se devem ser atualizados somente quando existe uma ligação Wi-Fi. A atualização das listas faz-se automaticamente se subscrever o SnowHaze Premium, se não for o caso, a atualização faz-se a cada mudança de versão do SnowHaze. Se escolher desligar as atualizações automáticas, as listas serão apagadas.</p><p><strong>Restaurar um Separador:</strong> Escolher o intervalo de tempo durante o qual é possível restaurar um separador quando este e abanado. Especifique se todos os separadores podem ser recuperados, incluindo os separadores Privados.</p><p><strong>Mascarar os Separados:</strong> O conteúdo de um separador pode ser mascarado quando este não é atualizado. Escolha os separadores que podem ser mascarados.</p><strong>Estatísticas:</strong> Mostra estatísticas na seção de marcadores do aplicativo.</p><p>Upgrade HTTPS: número de sites carregados com HTTPS em vez de HTTP graças a um recurso específico do SnowHaze</p><p>Trackers bloqueados: número de rastreadores bloqueados</p><p>Cookies Excluídos: Número de cookies excluídos</p>Proteções VPN: número de sites carregados conectados ao SnowHaze VPN";
+"application settings explanation" = "<p>Aqui você encontra as configurações gerais do SnowHaze.</p><p><strong>Sugestões sites locais:</strong>Pode selecionar se deseja que os sites das listas locais sejam sugeridos aquando da utilização de motores de pesquisa.</p><p><strong>Sugerir sites privados:</strong> Quando essa opção estiver ativada o SnowHaze pode sugerir site privados ao se realizar uma busca. Quando essa opção estiver desativada continuarão sendo sugeridos sites que não são privados. Por razões de proteção à juventude, você pode querer desativar esta opção.</p><p><strong>Auto-update a lista de Sites / Somente Wi-Fi</strong>Pode também escolher se as diferentes listas de sites web ( sites de rastreio, sites de publicidade, sites de phishing ou de falsificação de identidade, sites de malware) devem ser atualizados automaticamente ou se devem ser atualizados somente quando existe uma ligação Wi-Fi. A atualização das listas faz-se automaticamente se subscrever o SnowHaze Premium, se não for o caso, a atualização faz-se a cada mudança de versão do SnowHaze. Se escolher desligar as atualizações automáticas, as listas serão apagadas.</p><p><strong>Restaurar um Separador:</strong> Escolher o intervalo de tempo durante o qual é possível restaurar um separador quando este e abanado. Especifique se todos os separadores podem ser recuperados, incluindo os separadores Privados.</p><p><strong>Mascarar os Separados:</strong> O conteúdo de um separador pode ser mascarado quando este não é atualizado. Escolha os separadores que podem ser mascarados.</p><p><strong>Estatísticas:</strong> Mostra estatísticas na seção de marcadores do aplicativo.</p><p>Upgrade HTTPS: número de sites carregados com HTTPS em vez de HTTP graças a um recurso específico do SnowHaze</p><p>Trackers bloqueados: número de rastreadores bloqueados</p><p>Cookies Excluídos: Número de cookies excluídos</p>Proteções VPN: número de sites carregados conectados ao SnowHaze VPN";
 
 /* explanations of the javascript settings */
 "javascript settings explanation" = "<p>Definições do JavaScript. O JavaScript é uma linguagem de programação utilizada por inúmeros sites de internet e é suportado pela maior parte dos navegadores. O JavaScript permite-nos tirar o melhor partido possível dos sites em termos de apresentação e de utilização das diferentes funcionalidades. O JavaScript é responsável pela maior parte dos conteúdos interativos e dinâmicos.</p><p><strong>Autorizar JavaScript:</strong> Ativar esta opção, permite o carregamento de conteúdos do JavaScript. É preferível desativar esta opção quando navegar em sites pouco seguros. <u>Nota:</u> é possível que algumas páginas web apresentem alguns erros se esta opção estiver desativada.</p><p><strong>Autorizar Scripts de aplicação:</strong> Os scripts de aplicação são elementos do JavaScript gerados pelo SnowHaze. São utilizados para ativar determinadas funcionalidades tais como a pesquisa e a proteção do registo dos sites visitados.</p><strong>Gerenciador de Senhas:</strong> Desligue a integração dos gerenciadores de senhas.";
@@ -1506,7 +1521,7 @@
 "acknowledgements settings explanation format" = "<p>SnowHaze versão %@</p>O desenvolvimento do SnowHaze foi grandemente facilitado pelo uso de códigos de terceiros e de projetos de open source. Agradecemos às pessoas que gerem os seguintes projetos: AgileBits Inc. por 1PasswordExtension, phishtank.com por o banco de dados de verificação de phishing, Zetetic LLC por SQLCipher, os autores de EasyList (easylist.github.io) fanboy, MonztA, Famlam e Khrin para as listas EasyList, EasyPrivacy e Fanboy's Social Blocking e o Polish TeX Users Group GUS por TeX gyre Adventor. SnowHaze uses the Safebrowsing API provided by Google to generate advisories on sites that may be phishing sites or sites that may contain malware or unwanted software. The database is stored locally on your device and the list is updated regularly from SnowHaze’s servers. Your device will NEVER connect directly to Google’s servers in this regard. When updating the database absolutely NO data about your browsing behavior is sent to ANY server. As licenças e direitos de autor dos projetos de open source utiizados. Design por Basestudio.";
 
 /* explanations of the subscription settings tab */
-"subscription settings explanation" = "<p>Subscreva o SnowHaze Premium para ter acesso ao SnowHaze VPN, ao motor de pesquiza SnowHaze e a atualizações frequente de listas de sites. Os primeiros 7 dias são gratuitos para assinantes iniciantes. Existem subscrições de autorrenovação mensais ou anuais.</p><p><strong>Auto-update opções</strong> atualiza os planos de subscrição.</p><p><strong>Auto-Update token</strong> atualiza o autorização.</p><strong>Hash do token</strong> é um código utilizado para verificar a subscrição atual.";
+"subscription settings explanation" = "<p>Subscreva o SnowHaze Premium para ter acesso ao SnowHaze VPN e a atualizações frequente de listas de sites. Os primeiros 7 dias são gratuitos para assinantes iniciantes. Existem subscrições de autorrenovação mensais ou anuais.</p><p><strong>Auto-update opções</strong> atualiza os planos de subscrição.</p><p><strong>Auto-Update token</strong> atualiza o autorização.</p><strong>Hash do token</strong> é um código utilizado para verificar a subscrição atual.";
 
 /* explanations of the vpn settings tab */
 "vpn settings explanation" = "<p>Um VPN (Virtual Private Network) é uma conexão encriptada a um servidor. Toda e qualquer ligação entre o seu dispositivo e a internet passa primeiro pelo servidor VPN. O receptor vê somente o endereço IP do servidor VPN e não o seu endereço IP real, o que é altamente importante para prevenir o rastreamento.</p><p>O VPN protege-o dos ataques de interceptadores ( ataque MITM), oculta o seu trafego de dados, sempre a encriptação do seu trafego para o servidor de VPN.</p><p>Oferecemos dois tipos diferentes de VPNs, que usam protocolos diferentes. Um é um protocolo chamado IPSec, o outro é o OpenVPN. A VPN que usa o IPSec pode ser facilmente controlada no aplicativo SnowHaze, enquanto o OpenVPN exige que você use o aplicativo OpenVPN Connect e atualize seus perfis mensalmente. No entanto, o OpenVPN é um pouco mais seguro que o IPSec. Este é um pequeno compromisso entre usabilidade (IPSec) e segurança (OpenVPN) que podemos deixar com segurança para você.</p><p>A SnowHaze VPN não registra absolutamente nada e é o único serviço de VPN que usa autorização de não identificação.</p><p>Subscreva o SnowHaze Premium para poder usar o VPN. SE ainda não configurou o VPN, por favor siga os passos do tutorial online.</p><p><strong>Credenciais de rotação automática:</strong> Altera automaticamente as credenciais de login do servidor enquanto estiver conectado ao servidor VPN. Caso contrário, as credenciais mudam para cada sessão.</p><p><strong>Auto-Update os localização:</strong> atualiza a localização do servidor VPN disponível.</p><strong>Mostrar Ping:</strong> informa quanto tempo é necessário para que os dados sejam transferidos do seu dispositivo até ao servidor e de volta ao seu dispositivo.";

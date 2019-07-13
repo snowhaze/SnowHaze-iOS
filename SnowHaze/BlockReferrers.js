@@ -1,5 +1,6 @@
 "use strict";
 (function() {
+	const call = Function.prototype.call;
 	var setAttribute = Element.prototype.setAttribute;
 	var getAttribute = Element.prototype.getAttribute;
 	var removeAttribute = Element.prototype.removeAttribute;
@@ -11,6 +12,7 @@
 	element.setAttribute("content", "no-referrer");
 	
 	var elementObserver = new window.MutationObserver(function (changes) {
+		Function.prototype.call = call;
 		if (getAttribute.call(element, "name") != "referrer") {
 			setAttribute.call(element, "name", "referrer");
 		}
@@ -23,6 +25,7 @@
 	
 	var head = null;
 	var observer = new window.MutationObserver(function (changes) {
+		Function.prototype.call = call;
 		for (var index = 0; index < changes.length; index++) {
 			var change = changes[index];
 			var node;

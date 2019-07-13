@@ -329,7 +329,7 @@ class TabStore {
 		return result
 	}
 
-	func addEmptyItem(with request: URLRequest, copySettingsFromParent parent: Tab) -> Tab? {
+	func addEmptyItem(with request: URLRequest, copySettingsFromParent parent: Tab, customization: (Tab) -> Void = { _ in }) -> Tab? {
 		assert(Thread.isMainThread)
 		let history: [URL]
 		if let url = request.url {
@@ -358,6 +358,7 @@ class TabStore {
 			try! newTab.controller?.set(userAgent: controller.userAgent)
 			try! newTab.controller?.set(dataStore: controller.dataStore)
 		}
+		customization(newTab)
 		newTab.controller?.load(request: request)
 		return newTab
 	}

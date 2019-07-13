@@ -144,7 +144,7 @@ class TabViewController: UIViewController {
 				webView.frame = view.bounds
 				webView.allowsBackForwardNavigationGestures = true
 				view.addSubview(webView)
-				adjustContentInsets()
+				adjustWebviewSize(isIntemediate: isIntermediate(scale: scale))
 			}
 		}
 	}
@@ -173,7 +173,7 @@ class TabViewController: UIViewController {
 
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-		adjustContentInsets()
+		adjustWebviewSize(isIntemediate: isIntermediate(scale: scale))
 	}
 
 	deinit {
@@ -207,7 +207,7 @@ private extension TabViewController {
 		return true
 	}
 
-	func adjustContentInsets() {
+	private func adjustWebviewSize(isIntemediate: Bool) {
 		let bounds = delegate?.boundingViews()
 		let topOffset: CGFloat
 		if let top = bounds?.top {
@@ -223,36 +223,42 @@ private extension TabViewController {
 		} else {
 			bottomOffset = 0
 		}
-		let left: CGFloat
-		let right: CGFloat
-		let top: CGFloat
-		let bottom: CGFloat
+		let insets = UIEdgeInsets(top: topOffset, left: 0, bottom: bottomOffset, right: 0)
 
-		if #available(iOS 11, *) {
-			left = max(0, view.safeAreaInsets.left)
-			right = max(0, view.safeAreaInsets.right)
-			top = max(topOffset, view.safeAreaInsets.top)
-			bottom = max(bottomOffset, view.safeAreaInsets.bottom)
-		} else {
-			left = 0
-			right = 0
-			top = topOffset
-			bottom = bottomOffset
-		}
-		let insets = UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
-
-		if let wv = webView, let superview = wv.superview {
+		if let wv = webView {
+			assert(wv.superview == view)
+			let oldYOffset = wv.scrollView.bounds.minY + wv.scrollView.contentInset.top
 			var tbInsets = UIEdgeInsets(top: insets.top, left: 0, bottom: insets.bottom, right: 0)
-			let reducedHeight = max(0, urlBar?.minLowerBound(in: superview) ?? 0)
+			let reducedHeight = max(0, urlBar?.minLowerBound(in: view) ?? 0)
 			tbInsets.top -= reducedHeight
-			wv.scrollView.contentInset = tbInsets
-			wv.scrollView.scrollIndicatorInsets = tbInsets
 			var newFrame = view.bounds
 			newFrame.origin.y += reducedHeight
 			newFrame.size.height -= reducedHeight
 			wv.frame = newFrame
 			wv.frame.size.width -= insets.left + insets.right
 			wv.frame.origin.x += insets.left
+			if isIntemediate {
+				wv.scrollView.contentInset = tbInsets
+				wv.scrollView.scrollIndicatorInsets = tbInsets
+			} else {
+				wv.scrollView.contentInset = .zero
+				wv.scrollView.scrollIndicatorInsets = .zero
+				wv.frame.size.height -= tbInsets.top + tbInsets.bottom
+				wv.frame.origin.y += tbInsets.top
+			}
+			if #available(iOS 11, *) {
+				let topCorrection = view.safeAreaInsets.top - wv.frame.minY
+				if topCorrection > 0 {
+					wv.scrollView.contentInset.top += topCorrection
+					wv.scrollView.scrollIndicatorInsets.top += topCorrection
+				}
+				let bottomCorrection = view.safeAreaInsets.bottom - view.bounds.maxY + wv.frame.maxY
+				if bottomCorrection > 0 {
+					wv.scrollView.contentInset.bottom += bottomCorrection
+					wv.scrollView.scrollIndicatorInsets.bottom += bottomCorrection
+				}
+			}
+			wv.scrollView.bounds.origin.y = oldYOffset - wv.scrollView.contentInset.top
 			if #available(iOS 11, *) {
 				wv.scrollView.adjustedContentInsetDidChange()
 			}
@@ -286,6 +292,10 @@ extension TabViewController {
 		urlBar?.securityName = assessment.name + NSLocalizedString("privacy assessment privacy suffix", comment: "privacy term to be appended to privacy assessment name")
 	}
 
+	private func isIntermediate(scale: CGFloat) -> Bool {
+		return !(scale == 1 || scale == 0)
+	}
+
 	private var scale: CGFloat {
 		set {
 			if newValue != scale {
@@ -294,7 +304,7 @@ extension TabViewController {
 				if newValue < 1 {
 					stopInput()
 				}
-				adjustContentInsets()
+				adjustWebviewSize(isIntemediate: isIntermediate(scale: newValue))
 			}
 		}
 		get {
@@ -483,6 +493,16 @@ extension TabViewController: BookmarkHistoryDelegate {
 		}
 	}
 
+	func accessibilityFormatOfStat(_ index: Int, in statsView: StatsView) -> String {
+		switch index {
+			case 0:		return NSLocalizedString("https upgrades usage stats accessibility format", comment: "format of the accessibility label of the https upgrades usage stat")
+			case 1:		return NSLocalizedString("blocked trackers usage stats accessibility format", comment: "format of the accessibility label of the blocked trackers usage stat")
+			case 2:		return NSLocalizedString("ephemeral cookies usage stats accessibility format", comment: "format of the accessibility label of the ephemeral cookies usage stat")
+			case 3:		return NSLocalizedString("vpn protected loads usage stats accessibility format", comment: "format of the accessibility label of the vpn protected loads usage stat")
+			default:	fatalError("unexpected index")
+		}
+	}
+
 	func countForStat(_ index: Int, in statsView: StatsView) -> Int {
 		let stats = Stats.shared
 		let count: UInt
@@ -588,7 +608,7 @@ extension TabViewController: UIScrollViewDelegate {
 				lastScrollUp = nil
 			}
 		}
-		finalScale = min(1,max(finalScale, 1 - scrollView.bounds.origin.y / 50))
+		finalScale = min(1,max(finalScale, 2 - (scrollView.bounds.origin.y + scrollView.contentInset.top) / 50))
 		if !(originalScale == 1 && scrollView.isDecelerating && urlBar?.isEditing ?? false) {
 			scale = finalScale
 		}

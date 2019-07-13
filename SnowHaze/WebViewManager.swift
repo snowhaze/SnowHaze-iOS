@@ -101,7 +101,7 @@ internal extension WebViewManager {
 		guard policy.useHTTPSExclusivelyWhenPossible && DomainList(type: .httpsSites).contains(domain) else {
 			return nil
 		}
-		var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+		var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
 		components.scheme = "https"
 		return components.url
 	}

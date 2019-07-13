@@ -110,16 +110,18 @@ class DomainList {
 		SQLiteManager.freeSQLiteCachesOnMemoryWarning = true
 		let _ = initSQLite
 		var manager = SQLiteManager() { _ in
-			let updatedDB = SQLCipher(path: DomainList.dbLocation, key: DomainList.dbKey, flags: .readonly, cipherOptions: .compatibility(3), setupOptions: .all)
+			let setupOptions = SQLite.SetupOptions.secure.subtracting([.limitLikePatternLength, .limitLength, .limitVariableNumber])
+			let updatedDB = SQLCipher(path: DomainList.dbLocation, key: DomainList.dbKey, flags: .readonly, cipherOptions: .compatibility(3), setupOptions: setupOptions)
 			try! updatedDB?.execute("PRAGMA query_only=true")
-			let result = (try? updatedDB?.execute(dbVerificationQuery, with: [.text(BlockerID.adBlocker1)])) ?? nil
+			let result = (try? updatedDB?.execute(dbVerificationQuery, with: [.text(BlockerID.adBlocker1), .text(BlockerID.hstsPreloadUpgrader1)])) ?? nil
 			let tblCnt = result?[0].integer ?? 0
-			let clOK = result?[1].boolValue ?? false
-			let ok = tblCnt == 10 && clOK
+			let clOK1 = result?[1].boolValue ?? false
+			let clOK2 = result?[2].boolValue ?? false
+			let ok = tblCnt == 10 && clOK1 && clOK2
 
 			let bundlePath = Bundle.main.path(forResource: "lists", ofType: "db")!
 			let options = SQLCipher.CipherOptions.v4Defaults
-			let db = ok ? updatedDB! : SQLCipher(path: bundlePath, key: DomainList.dbKey, flags: .readonly, cipherOptions: options, setupOptions: .all)!
+			let db = ok ? updatedDB! : SQLCipher(path: bundlePath, key: DomainList.dbKey, flags: .readonly, cipherOptions: options, setupOptions: setupOptions)!
 			try! db.execute("PRAGMA query_only=true")
 			try! db.set(authorizer: authorizer)
 			return db
@@ -174,7 +176,7 @@ class DomainList {
 		}
 		let query = [String](repeating: "(?)", count: bindings.count).joined(separator: ",")
 		let result = try! db.execute("SELECT trackers FROM \(type.table) WHERE domain IN (VALUES \(query)) AND trackers IS NOT NULL ORDER BY length(domain) DESC LIMIT 1", with: bindings)
-		return result.first?.integerValue! ?? 17
+		return result.first?.integerValue! ?? 21
 	}
 
 	func search(top: Int64, matching: String) -> [(Int64, String)] {
@@ -187,7 +189,7 @@ class DomainList {
 
 		let query = "SELECT rank, domain FROM \(type.table) WHERE domain LIKE ? ESCAPE '\\' OR domain LIKE ? ESCAPE '\\' ORDER BY rank LIMIT ?"
 		let bindings: [SQLite.Data] = [.text(plainPattern), .text(wwwPattern), .integer(top)]
-		let result = try! db.execute(query, with: bindings)
+		let result = (try? db.execute(query, with: bindings)) ?? []
 		return result.map { ($0[0]!.integer!, $0[1]!.text!) }
 	}
 
@@ -465,6 +467,18 @@ FROM
 		UNION ALL
 			SELECT
 				2,
+				EXISTS
+					(
+						SELECT
+							*
+						FROM
+							content_blocker
+						WHERE
+							id = ?
+					)
+		UNION ALL
+			SELECT
+				3,
 				*
 			FROM
 				(

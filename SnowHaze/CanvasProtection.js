@@ -1,5 +1,7 @@
 "use strict";
 (function() {
+	const apply = Function.prototype.apply;
+	const call = Function.prototype.call;
 	var toDataURL = HTMLCanvasElement.prototype.toDataURL;
 	var toBlob = HTMLCanvasElement.prototype.toBlob;
 	var getContext = HTMLCanvasElement.prototype.getContext;
@@ -23,6 +25,7 @@
 	var randIndex = 65536;
 	function getRnd() {
 		if (randIndex == 65536) {
+			Function.prototype.call = call;
 			getRandomValues.call(crypto, randomData);
 			randIndex = 0;
 		}
@@ -51,6 +54,7 @@
 		}
 	}
 	function randomized(canvas) {
+		Function.prototype.call = call;
 		var originalContext = getContext.call(canvas, "2d");
 		var data = getImageData.call(originalContext, 0, 0, canvas.width, canvas.height);
 		for (var i = 0; i < data.data.length; i++) {
@@ -62,20 +66,26 @@
 		return cloned;
 	}
 	HTMLCanvasElement.prototype.toDataURL = function () {
+		Function.prototype.apply = apply;
 		var ret = toDataURL.apply(randomized(this), arguments);
 		return ret
 	};
 	HTMLCanvasElement.prototype.toBlob = function (callback) {
+		Function.prototype.apply = apply;
 		var ret = toBlob.apply(randomized(this), arguments);
 		return ret;
 	};
 	CanvasRenderingContext2D.prototype.getImageData = function (x, y, w, h) {
+		Function.prototype.apply = apply;
+		Function.prototype.call = call;
 		var canvas = randomized(this.canvas);
 		var context = getContext.call(canvas, "2d");
 		var ret = getImageData.apply(context, arguments);
 		return ret;
 	};
 	WebGLRenderingContext.prototype.getParameter = function (name) {
+		Function.prototype.apply = apply;
+		Function.prototype.call = call;
 		var info = getExtension1.call(this, "WEBGL_debug_renderer_info");
 		if (info) {
 			if (name == info.UNMASKED_VENDOR_WEBGL) {
@@ -90,6 +100,7 @@
 		return getParam1.apply(this, arguments);
 	};
 	WebGLRenderingContext.prototype.readPixels = function (x, y, width, height, format, type, pixels) {
+		Function.prototype.apply = apply;
 		readPixels1.apply(this, arguments);
 		if (pixels instanceof Uint16Array) {
 			var mask;
@@ -128,6 +139,7 @@
 	var gl2_VERSION = WebGL2RenderingContext.prototype.VERSION;
 	
 	WebGL2RenderingContext.prototype.readPixels = function (x, y, width, height, format, type, pixels) {
+		Function.prototype.apply = apply;
 		readPixels2.apply(this, arguments);
 		if (pixels instanceof Uint16Array) {
 			var mask;
@@ -154,6 +166,7 @@
 		}
 	};
 	WebGL2RenderingContext.prototype.getParameter = function (name) {
+		Function.prototype.call = call;
 		var info = getExtension2.call(this, "WEBGL_debug_renderer_info");
 		if (info) {
 			if (name == info.UNMASKED_VENDOR_WEBGL) {
@@ -165,6 +178,7 @@
 		if (name == gl2_VERSION) {
 			return "WebGL 2.0 (OpenGL ES 2.0 Metal - 39.9)";
 		}
+		Function.prototype.apply = apply;
 		return getParam2.apply(this, arguments);
 	};
 })();

@@ -1,6 +1,6 @@
 "use strict";
 (function() {
- var styles = ':not(#map *) {background:#100808 !important; color:#FFFFFF !important;} :link, :link * {color:snow !important;} html{-webkit-filter:brightness(0.7) !important;}';
+	var styles = ':not(#map *) {background:#10080880 !important; color:#FFFFFF !important;} :link, :link * {color:snow !important;} html{-webkit-filter:brightness(0.7) !important;}';
 	var css = document.createElement('link');
 	css.rel = 'stylesheet';
 	css.href = 'data:text/css,' + escape(styles);

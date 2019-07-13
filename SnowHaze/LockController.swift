@@ -11,6 +11,22 @@ import Foundation
 let snowhazeUILockWillDisengageNotification = Notification.Name(rawValue: "snowhazeUILockWillDisengageNotification")
 let snowhazeUILockDidDisengageNotification = Notification.Name(rawValue: "snowhazeUILockDidDisengageNotification")
 
+private extension UIResponder {
+	private class FirstResponderGatherer: NSObject {
+		var firstResponder: UIResponder?
+	}
+
+	@objc private func identifyFirstResponder(in gatherer: FirstResponderGatherer) {
+		gatherer.firstResponder = self
+	}
+
+	static var firstResponder: UIResponder? {
+		let gatherer = FirstResponderGatherer()
+		UIApplication.shared.sendAction(#selector(UIResponder.identifyFirstResponder(in:)), to: nil, from: gatherer, for: nil)
+		return gatherer.firstResponder
+	}
+}
+
 class LockController: PasscodeController, PasscodeControllerDelegate {
 	private(set) static var isDisengagingUILock = false
 
@@ -58,6 +74,7 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 	}
 
 	private var isMain = true
+	private var previousFirstResponder: UIResponder?
 
 	override func viewDidLoad() {
 		backgroundColor = .background
@@ -134,6 +151,7 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 		unhideVideos()
 		NotificationCenter.default.post(name: snowhazeUILockWillDisengageNotification, object: self)
 		LockController.isDisengagingUILock = true
+		previousFirstResponder?.becomeFirstResponder()
 		dismiss(animated: true) {
 			assert(LockController.isDisengagingUILock)
 			LockController.isDisengagingUILock = false
@@ -151,6 +169,8 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 		let overlayVC = LockController.overlayWindow.rootViewController!
 		if overlayVC.presentedViewController == nil {
 			let lvc = LockController()
+			lvc.previousFirstResponder = UIResponder.firstResponder
+			lvc.previousFirstResponder?.resignFirstResponder()
 			lvc.isMain = false
 			if manual {
 				lvc.autoPromptForBiometrics = false

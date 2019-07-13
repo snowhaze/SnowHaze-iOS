@@ -70,6 +70,7 @@ let lastEOLWarningVersionKey				= "ch.illotros.snowhaze.lastEOLWarningVersion"
 let trustedSiteKey							= "ch.illotros.snowhaze.trustedSite"
 let readerModeKey							= "ch.illotros.snowhaze.readerMode"
 let doNotResetAutoUpdateKey					= "ch.illotros.snowhaze.doNotResetAutoUpdate"
+let strictTabGroupSeparationKey				= "ch.illotros.snowhaze.strictTabGroupSeparation"
 
 let updateSubscriptionProductListKey		= "ch.illotros.snowhaze.updateSubscriptionProductList"
 let updateAuthorizationTokenKey				= "ch.illotros.snowhaze.updateAuthorizationToken"
@@ -159,6 +160,7 @@ private let defaults: [String: SQLite.Data] = [
 	skipRedirectsKey:						.false, // not reliable yet; planed for v3
 	suppressHistoryKey:						.false,
 	useFrontCameraForCodeScannerKey:		.false, // Requires iOS 10; intended for debug use only
+	strictTabGroupSeparationKey:			.true,
 
 	// Subscription
 	updateSubscriptionProductListKey:		.false,
@@ -248,8 +250,17 @@ class PolicyManager {
 		return allowPermanentDataStorage ? URLSessionConfiguration.default : URLSessionConfiguration.ephemeral
 	}
 
-	var dataStore: WKWebsiteDataStore {
-		return allowPermanentDataStorage ? WKWebsiteDataStore.default() : WKWebsiteDataStore.nonPersistent()
+	var dataStore: (store: WKWebsiteDataStore, pool: WKProcessPool?) {
+		struct LocaData {
+			static let pool = WKProcessPool()
+		}
+		let store = allowPermanentDataStorage ? WKWebsiteDataStore.default() : WKWebsiteDataStore.nonPersistent()
+		let pool = allowPermanentDataStorage && shareGlobalProcessPool ? LocaData.pool : nil
+		return (store, pool)
+	}
+
+	var shareGlobalProcessPool: Bool {
+		return !bool(for: strictTabGroupSeparationKey)
 	}
 
 	var allowJS: Bool {
@@ -363,18 +374,23 @@ class PolicyManager {
 		return UserAgent(type: agentTypes.randomElement).string
 	}
 
+	private struct Scripts {
+		static let referrerBlocker = WKUserScript(source: JSGenerator.named("BlockReferrers")!.generate()!, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+		static let nightMode = WKUserScript(source: JSGenerator.named("NightMode")!.generate()!, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+		static let canvasProtection = WKUserScript(source: JSGenerator.named("CanvasProtection")!.generate()!, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+		static let fingerprintingProtection = WKUserScript(source: JSGenerator.named("FingerprintingProtection")!.generate()!, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+		static let readerMode = WKUserScript(source: JSGenerator.named("ReaderMode")!.generate()!, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+	}
 	var userScripts: [WKUserScript] {
 		guard allowApplicationJS else {
 			return []
 		}
 		var ret = [WKUserScript]()
 		if bool(for: blockHTTPReferrersKey) {
-			let js = JSGenerator.named("BlockReferrers")!.generate()!
-			ret.append(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+			ret.append(Scripts.referrerBlocker)
 		}
 		if isInNightMode {
-			let js = JSGenerator.named("NightMode")!.generate()!
-			ret.append(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+			ret.append(Scripts.nightMode)
 		}
 		if #available(iOS 11, *) {
 			// tracking scripts are blocked with WKContentRuleLists
@@ -395,16 +411,13 @@ class PolicyManager {
 			}
 		}
 		if bool(for: blockCanvasDataAccessKey) {
-			let js = JSGenerator.named("CanvasProtection")!.generate()!
-			ret.append(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+			ret.append(Scripts.canvasProtection)
 		}
 		if bool(for: blockFingerprintingKey) {
-			let js = JSGenerator.named("FingerprintingProtection")!.generate()!
-			ret.append(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+			ret.append(Scripts.fingerprintingProtection)
 		}
 		if isInReaderMode {
-			let js = JSGenerator.named("ReaderMode")!.generate()!
-			ret.append(WKUserScript(source: js, injectionTime: .atDocumentEnd, forMainFrameOnly: false))
+			ret.append(Scripts.readerMode)
 		}
 		return ret
 	}
@@ -495,10 +508,25 @@ class PolicyManager {
 				}
 			}
 			if httpsOnly {
-				if let blocker = allBlockers[BlockerID.hstsPreloadUpgrader] {
+				if let blocker = allBlockers[BlockerID.hstsPreloadUpgrader1] {
 					blockers.append(blocker)
 				} else {
-					print("hsts preload upgrader not available")
+					print("hsts preload upgrader 1 not available")
+				}
+				if let blocker = allBlockers[BlockerID.hstsPreloadUpgrader2] {
+					blockers.append(blocker)
+				} else {
+					print("hsts preload upgrader 2 not available")
+				}
+				if let blocker = allBlockers[BlockerID.hstsPreloadUpgrader3] {
+					blockers.append(blocker)
+				} else {
+					print("hsts preload upgrader 3 not available")
+				}
+				if let blocker = allBlockers[BlockerID.hstsPreloadUpgrader4] {
+					blockers.append(blocker)
+				} else {
+					print("hsts preload upgrader 4 not available")
 				}
 			}
 
@@ -668,7 +696,7 @@ class PolicyManager {
 		var ret = [Action]()
 		if let url = userInput.punycodeURL {
 			if url.scheme!.lowercased() == "http" && httpsSites.contains(url.host!) {
-				var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+				var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
 				components.scheme = "https"
 				return [.load(components.url!, true)]
 			} else {

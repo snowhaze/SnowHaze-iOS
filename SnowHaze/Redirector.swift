@@ -433,7 +433,7 @@ struct Redirector {
 
 	// TODO: check how they deal with incomplete urls
 	func redirect(_ original: URL) -> URL? {
-		guard let comps = URLComponents(url: original, resolvingAgainstBaseURL: false), let host = comps.host else {
+		guard let comps = URLComponents(url: original, resolvingAgainstBaseURL: true), let host = comps.host else {
 			return nil
 		}
 		guard SubscriptionManager.shared.hasSubscription else {

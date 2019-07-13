@@ -12,6 +12,7 @@ private let compiledContentBlockerVersionKeyPrefix = "ch.illotros.snowhaze.conte
 
 class BlockerID {
 	fileprivate static let deprecatedAdBlocker = "ad-blocker"
+	fileprivate static let deprecatedHstsPreloadUpgrader = "hsts-preload-upgrader"
 
 	static let adBlocker1 = "ad-blocker-1-2"
 	static let adBlocker2 = "ad-blocker-2-2"
@@ -24,7 +25,11 @@ class BlockerID {
 	static let thirdPartiesCookiesBlocker = "third-party-cookies-blocker"
 
 	static let mixedContentBlocker = "mixed-content-blocker"
-	static let hstsPreloadUpgrader = "hsts-preload-upgrader"
+
+	static let hstsPreloadUpgrader1 = "hsts-preload-upgrader-1-4"
+	static let hstsPreloadUpgrader2 = "hsts-preload-upgrader-2-4"
+	static let hstsPreloadUpgrader3 = "hsts-preload-upgrader-3-4"
+	static let hstsPreloadUpgrader4 = "hsts-preload-upgrader-4-4"
 
 	static let documentContentTypeBlocker = "document-content-type-blocker"
 	static let imageContentTypeBlocker = "image-content-type-blocker"
@@ -49,7 +54,10 @@ class BlockerID {
 		thirdPartiesCookiesBlocker,
 
 		mixedContentBlocker,
-		hstsPreloadUpgrader,
+		hstsPreloadUpgrader1,
+		hstsPreloadUpgrader2,
+		hstsPreloadUpgrader3,
+		hstsPreloadUpgrader4,
 
 		documentContentTypeBlocker,
 		imageContentTypeBlocker,
@@ -61,6 +69,18 @@ class BlockerID {
 		mediaContentTypeBlocker,
 		popupContentTypeBlocker,
 		thirdPartyScriptsContentTypeBlocker,
+	]
+
+	fileprivate static let optionalContentBlockers = [
+		hstsPreloadUpgrader1,
+		hstsPreloadUpgrader2,
+		hstsPreloadUpgrader3,
+		hstsPreloadUpgrader4,
+	]
+
+	fileprivate static let deprecatedContentBlockers = [
+		deprecatedAdBlocker,
+		deprecatedHstsPreloadUpgrader,
 	]
 }
 
@@ -125,7 +145,7 @@ class ContentBlockerManager {
 		}
 		isLoading = true
 		BlockerID.allIDs.forEach { load(rules: $0) }
-		clear(for: BlockerID.deprecatedAdBlocker)
+		BlockerID.deprecatedContentBlockers.forEach { clear(for: $0) }
 	}
 
 	private func clear(for id: String) {
@@ -217,6 +237,9 @@ class ContentBlockerManager {
 	}
 
 	private var canLoadPages: Bool {
-		return compilationCnt == BlockerID.allIDs.count || (compilationCnt == BlockerID.allIDs.count - 1 && blockers[BlockerID.hstsPreloadUpgrader] == nil)
+		let outstandingOptionals = BlockerID.optionalContentBlockers.filter({ blockers[$0] == nil })
+		let requiredCount = BlockerID.allIDs.count - outstandingOptionals.count
+		assert(compilationCnt <= requiredCount)
+		return compilationCnt == requiredCount
 	}
 }

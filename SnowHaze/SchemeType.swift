@@ -22,6 +22,7 @@ enum SchemeType {
 	case whatsapp
 	case intent(URL?)
 	case workflow
+	case testFlight
 
 	init(_ url: URL?) {
 		guard let target = url, let scheme = target.scheme?.lowercased() else {
@@ -54,6 +55,8 @@ enum SchemeType {
 				self = .store
 			case "itmss":
 				self = .itunes
+			case "itms-beta":
+				self = .testFlight
 			case "mailto":
 				self = .mail
 			case "sms":
@@ -78,21 +81,24 @@ enum SchemeType {
 
 	var appName: String? {
 		switch self {
-			case .store:	return NSLocalizedString("open url in app app store app name", comment: "name of the app store app used to confirm opening of url in other app")
-			case .itunes:	return NSLocalizedString("open url in app itunes app name", comment: "name of the itunes app used to confirm opening of url in other app")
-			case .mail:		return NSLocalizedString("open url in app mail app name", comment: "name of the mail app used to confirm opening of url in other app")
-			case .sms:		return NSLocalizedString("open url in app messages app name", comment: "name of the messages app used to confirm opening of url in other app")
-			case .maps:		return NSLocalizedString("open url in app maps app name", comment: "name of the maps app used to confirm opening of url in other app")
-			case .whatsapp:	return NSLocalizedString("open url in app whatsapp app name", comment: "name of the whatsapp app used to confirm opening of url in other app")
-			case .workflow: return NSLocalizedString("open url in app workflow app name", comment: "name of the workflow app used to confirm opening of url in other app")
-			default:		return nil
+			case .store:		return NSLocalizedString("open url in app app store app name", comment: "name of the app store app used to confirm opening of url in other app")
+			case .itunes:		return NSLocalizedString("open url in app itunes app name", comment: "name of the itunes app used to confirm opening of url in other app")
+			case .mail:			return NSLocalizedString("open url in app mail app name", comment: "name of the mail app used to confirm opening of url in other app")
+			case .sms:			return NSLocalizedString("open url in app messages app name", comment: "name of the messages app used to confirm opening of url in other app")
+			case .maps:			return NSLocalizedString("open url in app maps app name", comment: "name of the maps app used to confirm opening of url in other app")
+			case .whatsapp:		return NSLocalizedString("open url in app whatsapp app name", comment: "name of the whatsapp app used to confirm opening of url in other app")
+			case .workflow: 	return NSLocalizedString("open url in app workflow app name", comment: "name of the workflow app used to confirm opening of url in other app")
+			case .testFlight:	return NSLocalizedString("open url in app testflight app name", comment: "name of the testflight app used to confirm opening of url in other app")
+			default:			return nil
 		}
 	}
 
 	var needsCheck: Bool {
 		switch self {
-			case .whatsapp:	return true
-			default:		return false
+			case .whatsapp:		return true
+			case .testFlight:	return true
+			case .workflow:		return true
+			default:			return false
 		}
 	}
 }

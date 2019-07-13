@@ -26,7 +26,7 @@
 		84C7BE9C20961AC6003C25B2 /* MaskingRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDCD20961AB6003C25B2 /* MaskingRule.swift */; };
 		84C7BE9D20961AC6003C25B2 /* MemoryGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDCE20961AB6003C25B2 /* MemoryGame.swift */; };
 		84C7BE9E20961AC6003C25B2 /* api1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDCF20961AB6003C25B2 /* api1.cer */; };
-		84C7BE9F20961AC6003C25B2 /* ErrorPageGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDD020961AB6003C25B2 /* ErrorPageGenerator.swift */; };
+		84C7BE9F20961AC6003C25B2 /* BrowserPageGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDD020961AB6003C25B2 /* BrowserPageGenerator.swift */; };
 		84C7BEA020961AC6003C25B2 /* FixedNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDD120961AB6003C25B2 /* FixedNavigationController.swift */; };
 		84C7BEA120961AC6003C25B2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDD320961AB6003C25B2 /* Localizable.strings */; };
 		84C7BEA220961AC6003C25B2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDD520961AB6003C25B2 /* InfoPlist.strings */; };
@@ -243,7 +243,7 @@
 		84C7BDCD20961AB6003C25B2 /* MaskingRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MaskingRule.swift; sourceTree = "<group>"; };
 		84C7BDCE20961AB6003C25B2 /* MemoryGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoryGame.swift; sourceTree = "<group>"; };
 		84C7BDCF20961AB6003C25B2 /* api1.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = api1.cer; sourceTree = "<group>"; };
-		84C7BDD020961AB6003C25B2 /* ErrorPageGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorPageGenerator.swift; sourceTree = "<group>"; };
+		84C7BDD020961AB6003C25B2 /* BrowserPageGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserPageGenerator.swift; sourceTree = "<group>"; };
 		84C7BDD120961AB6003C25B2 /* FixedNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FixedNavigationController.swift; sourceTree = "<group>"; };
 		84C7BDD420961AB6003C25B2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = Localizable.strings; sourceTree = "<group>"; };
 		84C7BDD620961AB6003C25B2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = InfoPlist.strings; sourceTree = "<group>"; };
@@ -511,7 +511,7 @@
 				84C7BE3B20961ABE003C25B2 /* en-GB.lproj */,
 				84C7BDDD20961AB6003C25B2 /* en.lproj */,
 				84C7BDFA20961AB8003C25B2 /* EncryptedDBHelpers.swift */,
-				84C7BDD020961AB6003C25B2 /* ErrorPageGenerator.swift */,
+				84C7BDD020961AB6003C25B2 /* BrowserPageGenerator.swift */,
 				84C7BE8220961AC4003C25B2 /* es.lproj */,
 				84C7BE2520961ABB003C25B2 /* ExternalBookmarkManager.swift */,
 				84C7BE6720961AC2003C25B2 /* ExternalBookmarksSettingsManager.swift */,
@@ -1021,7 +1021,7 @@
 				84C7BEE520961AC6003C25B2 /* Search.swift in Sources */,
 				84C7BEB120961AC6003C25B2 /* HeightChangingToolbarContainer.swift in Sources */,
 				84C7BEC820961AC6003C25B2 /* UpdateTutorialViewController.swift in Sources */,
-				84C7BE9F20961AC6003C25B2 /* ErrorPageGenerator.swift in Sources */,
+				84C7BE9F20961AC6003C25B2 /* BrowserPageGenerator.swift in Sources */,
 				84C7BED620961AC6003C25B2 /* StartReaderActivity.swift in Sources */,
 				84C7BF1B20961AC6003C25B2 /* ExternalBookmarksSettingsManager.swift in Sources */,
 				84C7BEC020961AC6003C25B2 /* UIFontHelpers.swift in Sources */,

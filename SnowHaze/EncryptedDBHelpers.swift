@@ -39,7 +39,7 @@ func trySetupKey(key: String, completionHandler: ((Bool) -> Void)?) {
 		}
 		let _ = initSQLite
 		DispatchQueue.main.async {
-			if keyingData == nil, let _ = SQLCipher(path: dbPath, key: data, cipherOptions: .compatibility(3), setupOptions: .all) {
+			if keyingData == nil, let _ = SQLCipher(path: dbPath, key: data, cipherOptions: .compatibility(3), setupOptions: .secure) {
 				keyingData = data
 				completionHandler?(true)
 			} else {
@@ -441,7 +441,10 @@ let db: SQLiteManager = {
 	SQLiteManager.freeSQLiteCachesOnMemoryWarning = true
 	let _ = initSQLite
 	let manager = SQLiteManager(setup: { _ in
-		let connection = SQLCipher(path: dbPath, key: keyingData, cipherOptions: .compatibility(3), setupOptions: .all)!
+		let alwaysExcludedOptions: SQLite.SetupOptions = [.limitVariableNumber, .limitLength]
+		let specificExcludedOptions: SQLite.SetupOptions = StaticData.setupComplete ? [] : [.limitAttached]
+		let setupOptions = SQLite.SetupOptions.secure.subtracting(alwaysExcludedOptions.union(specificExcludedOptions))
+		let connection = SQLCipher(path: dbPath, key: keyingData, cipherOptions: .compatibility(3), setupOptions: setupOptions)!
 		try! connection.execute("PRAGMA secure_delete = on")
 		try! connection.execute("PRAGMA foreign_keys = on")
 		try! connection.busyTimeout(100)
@@ -499,6 +502,7 @@ let db: SQLiteManager = {
 	StaticData.setupComplete = true
 
 	try! manager.connection.set(authorizer: authorizer)
+	let _ = manager.connection.limit(.attached, value: 0)
 
 	browsingKey.set(key: nil)
 	settingsKey.set(key: nil)

@@ -56,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
-		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
 			return false
 		}
 		guard let scheme = components.scheme?.lowercased() else {

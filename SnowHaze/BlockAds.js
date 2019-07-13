@@ -1,5 +1,7 @@
 "use strict";
 (function() {
+	const call = Function.prototype.call;
+	const urlConstructor = URL;
 	var blacklist = $blacklist$;
 	var blockedElements = ["SCRIPT", "IMG", "FRAME", "IFRAME", "VIDEO", "AUDIO", "STYLE", "SOURCE"];
 	
@@ -7,7 +9,8 @@
 	var indexOf = Array.prototype.indexOf;
 	document.addEventListener("beforeload", function(event) {
 		if (event.target.src) {
-			var url = new URL(event.target.src);
+			Function.prototype.call = call;
+			var url = new urlConstructor(event.target.src);
 			if (~indexOf.call(blockedElements, event.target.nodeName) && ~indexOf.call(blacklist, url.hostname)) {
 				preventDefault.call(event);
 			}
@@ -17,6 +20,7 @@
 	var getAttribute = Element.prototype.getAttribute;
 	var setAttribute = Element.prototype.setAttribute;
 	var observer = new window.MutationObserver(function (changes) {
+		Function.prototype.call = call;
 		for (var index = 0; index < changes.length; index++) {
 			var change = changes[index];
 			var node;

@@ -300,7 +300,7 @@ public class SQLite {
 		case workerThreads
 	}
 
-	public func limit(_ limit: Limit, value: Int = -1) -> Int {
+	@discardableResult public func limit(_ limit: Limit, value: Int = -1) -> Int {
 		return internalQueue.sync { () -> Int in
 			let id: Int32
 			switch limit {
@@ -881,13 +881,94 @@ public class SQLite {
 	public enum FinalSetupOptions {
 		case statement(String)
 		case config(DBOption)
+		case limit(Limit, Int)
 	}
 
-	public convenience init?(path: String = ":memory:", flags: OpenFlags = .rwCreate, setup: [FinalSetupOptions] = []) {
+	public struct SetupOptions: OptionSet {
+		public let rawValue: Int
+
+		public init(rawValue: Int) {
+			self.rawValue = rawValue
+		}
+
+		public static let none						= SetupOptions(rawValue: 0x0000)
+		public static let defensive					= SetupOptions(rawValue: 0x0001)
+		public static let cellSizeCheck				= SetupOptions(rawValue: 0x0002)
+		public static let disableMemMap				= SetupOptions(rawValue: 0x0004)
+		public static let limitLength				= SetupOptions(rawValue: 0x0008)
+		public static let limitSqlLength			= SetupOptions(rawValue: 0x0010)
+		public static let limitColumn				= SetupOptions(rawValue: 0x0020)
+		public static let limitExprDepth			= SetupOptions(rawValue: 0x0040)
+		public static let limitCompoundSelect		= SetupOptions(rawValue: 0x0080)
+		public static let limitVdbeOp				= SetupOptions(rawValue: 0x0100)
+		public static let limitFunctionArg			= SetupOptions(rawValue: 0x0200)
+		public static let limitAttached				= SetupOptions(rawValue: 0x0400)
+		public static let limitLikePatternLength	= SetupOptions(rawValue: 0x0800)
+		public static let limitVariableNumber		= SetupOptions(rawValue: 0x1000)
+		public static let limitTriggerDepth			= SetupOptions(rawValue: 0x2000)
+		public static let secure: SetupOptions		= [defensive, cellSizeCheck, disableMemMap, limitLength, limitSqlLength, limitColumn, limitExprDepth, limitCompoundSelect, limitVdbeOp, limitFunctionArg, limitAttached, limitLikePatternLength, limitVariableNumber, limitTriggerDepth]
+
+		var setupOptions: [FinalSetupOptions] {
+			var result = [FinalSetupOptions]()
+			if contains(SetupOptions.disableMemMap) {
+				result.append(.statement("PRAGMA mmap_size = 0"))
+			}
+			if contains(SetupOptions.defensive) {
+				result.append(.config(.defensive(true)))
+			}
+			if contains(SetupOptions.cellSizeCheck) {
+				result.append(.statement("PRAGMA cell_size_check = ON"))
+			}
+			if contains(SetupOptions.limitLength) {
+				result.append(.limit(.length, 1_000_000))
+			}
+			if contains(SetupOptions.limitSqlLength) {
+				result.append(.limit(.sqlLength, 100_000))
+			}
+			if contains(SetupOptions.limitColumn) {
+				result.append(.limit(.column, 100))
+			}
+			if contains(SetupOptions.limitExprDepth) {
+				result.append(.limit(.exprDepth, 10))
+			}
+			if contains(SetupOptions.limitCompoundSelect) {
+				result.append(.limit(.compoundSelect, 3))
+			}
+			if contains(SetupOptions.limitVdbeOp) {
+				result.append(.limit(.vdbeOp, 25_000))
+			}
+			if contains(SetupOptions.limitFunctionArg) {
+				result.append(.limit(.functionArg, 8))
+			}
+			if contains(SetupOptions.limitAttached) {
+				result.append(.limit(.attached, 0))
+			}
+			if contains(SetupOptions.limitLikePatternLength) {
+				result.append(.limit(.likePatternLength, 50))
+			}
+			if contains(SetupOptions.limitVariableNumber) {
+				result.append(.limit(.variableNumber, 10))
+			}
+			if contains(SetupOptions.limitTriggerDepth) {
+				result.append(.limit(.triggerDepth, 10))
+			}
+			return result
+		}
+	}
+
+	public convenience init?(path: String = ":memory:", flags: OpenFlags = .rwCreate, setup: SetupOptions = .none) {
+		self.init(path: path, flags: flags, setup: setup.setupOptions)
+	}
+
+	public convenience init?(url: URL, flags: OpenFlags = .rwCreate, setup: SetupOptions = .none) {
+		self.init(url: url, flags: flags, setup: setup.setupOptions)
+	}
+
+	public convenience init?(path: String = ":memory:", flags: OpenFlags = .rwCreate, setup: [FinalSetupOptions]) {
 		self.init(path: path, openName: path, flags: flags, setup: setup)
 	}
 
-	public convenience init?(url: URL, flags: OpenFlags = .rwCreate, setup: [FinalSetupOptions] = []) {
+	public convenience init?(url: URL, flags: OpenFlags = .rwCreate, setup: [FinalSetupOptions]) {
 		guard url.isFileURL else {
 			return nil
 		}
@@ -927,6 +1008,10 @@ public class SQLite {
 				switch option {
 					case .statement(let stmt):	try execute(stmt)
 					case .config(let config):	let _ = try set(option: config)
+					case .limit(let op, let value):
+						if value < limit(op) {
+							limit(op, value: value)
+						}
 				}
 			}
 			try execute("SELECT count(*) FROM sqlite_master")

@@ -436,12 +436,14 @@ private extension MainViewController {
 				activity.activityDidFinish(false)
 				return
 			}
-			guard let newtab = me.tabStore.addEmptyItem(with: URLRequest(url: url), copySettingsFromParent: tab) else {
+			let customization: (Tab) -> Void = { newtab in
+				let settings = Settings.settings(for: PolicyDomain(url: url), in: newtab)
+				settings.set(.true, for: readerModeKey)
+			}
+			guard let newtab = me.tabStore.addEmptyItem(with: URLRequest(url: url), copySettingsFromParent: tab, customization: customization) else {
 				activity.activityDidFinish(false)
 				return
 			}
-			let settings = Settings.settings(for: PolicyDomain(url: url), in: newtab)
-			settings.set(.true, for: readerModeKey)
 			me.set(tab: newtab, animated: true)
 			activity.activityDidFinish(true)
 		}
