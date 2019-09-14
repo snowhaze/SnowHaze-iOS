@@ -94,14 +94,17 @@ class TabViewController: UIViewController {
 				let wrapper = policy.settingsWrapper
 				let assessment = PolicyAssessor(wrapper: wrapper).assess(PolicyAssessor.allCategories)
 				updateSecAssessment(assessment)
-				let windows = UIApplication.shared.windows.suffix(from: 1)
-				for window in windows {
-					if let root = window.rootViewController {
-						if root is LockPresenterController {
-							continue
+				let allWindows = UIApplication.shared.windows
+				if !allWindows.isEmpty {
+					let windows = allWindows.suffix(from: 1)
+					for window in windows {
+						if let root = window.rootViewController {
+							if root is LockPresenterController {
+								continue
+							}
 						}
+						window.isHidden = true
 					}
-					window.isHidden = true
 				}
 				if let alert = presentedViewController as? UIAlertController {
 					alert.view.isHidden = true
@@ -113,14 +116,17 @@ class TabViewController: UIViewController {
 				urlBar?.progress = CGFloat(webView.estimatedProgress)
 				urlBar?.attributedTitle = tab.formatedDisplayTitle
 				updateSecAssessment()
-				let windows = UIApplication.shared.windows.suffix(from: 1)
-				for window in windows {
-					if let root = window.rootViewController {
-						if root is LockPresenterController {
-							continue
+				let allWindows = UIApplication.shared.windows
+				if !allWindows.isEmpty {
+					let windows = allWindows.suffix(from: 1)
+					for window in windows {
+						if let root = window.rootViewController {
+							if root is LockPresenterController {
+								continue
+							}
 						}
+						window.isHidden = false
 					}
-					window.isHidden = false
 				}
 				if let alert = presentedViewController as? UIAlertController {
 					alert.view.isHidden = false
@@ -589,26 +595,30 @@ extension TabViewController: UIScrollViewDelegate {
 		let hideLength: CGFloat = 150
 		let originalScale = scale
 		var finalScale = originalScale
-		let tooLow = scrollView.bounds.origin.y < 0
-		let tooHigh = scrollView.bounds.maxY > scrollView.contentSize.height
-		let y: CGFloat? = tooLow || tooHigh ? nil : scrollView.bounds.origin.y
+		let yOffset = scrollView.bounds.origin.y + scrollView.contentInset.top
+		let tooLow = yOffset < 0
+		let tooHigh = scrollView.bounds.maxY > scrollView.contentSize.height - scrollView.contentInset.bottom
+		let y: CGFloat? = tooLow || tooHigh ? nil : yOffset
 		let useNewY = scrollView.isDragging && !scrollView.isZooming
 		let newScrollPosition: CGFloat? = useNewY ? y : nil
 		if let newPosition = newScrollPosition, let oldPosition = lastScrollPosition {
 			let delta = oldPosition - newPosition
 			let scrollUp = delta < 0
-			if scrollUp == lastScrollUp ?? scrollUp {
+			if scrollUp == lastScrollUp {
 				let allowScaling = scrollView.contentSize.height - scrollView.bounds.height > 2.5 * hideLength || scale < 1
 				if allowScaling && abs(delta) < hideLength {
 					let diff = delta / hideLength
 					finalScale = min(1,max(0,scale + diff))
+					finalScale = min(1,max(finalScale, 3 - (yOffset) / 50))
 				}
 				lastScrollUp = scrollUp
-			} else {
+			} else if let _ = lastScrollUp {
 				lastScrollUp = nil
+			} else {
+				lastScrollUp = scrollUp
 			}
 		}
-		finalScale = min(1,max(finalScale, 2 - (scrollView.bounds.origin.y + scrollView.contentInset.top) / 50))
+		finalScale = min(1,max(finalScale, 1 - yOffset / 50))
 		if !(originalScale == 1 && scrollView.isDecelerating && urlBar?.isEditing ?? false) {
 			scale = finalScale
 		}

@@ -176,7 +176,7 @@ class DomainList {
 		}
 		let query = [String](repeating: "(?)", count: bindings.count).joined(separator: ",")
 		let result = try! db.execute("SELECT trackers FROM \(type.table) WHERE domain IN (VALUES \(query)) AND trackers IS NOT NULL ORDER BY length(domain) DESC LIMIT 1", with: bindings)
-		return result.first?.integerValue! ?? 21
+		return result.first?.integerValue! ?? 18
 	}
 
 	func search(top: Int64, matching: String) -> [(Int64, String)] {

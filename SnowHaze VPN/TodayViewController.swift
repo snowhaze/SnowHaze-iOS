@@ -227,7 +227,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
 			ike.disconnectOnSleep = false
 			ike.authenticationMethod = .sharedSecret
-			ike.useExtendedAuthentication = true
 
 			let alwaysConnect = NEOnDemandRuleConnect()
 			alwaysConnect.interfaceTypeMatch = .any

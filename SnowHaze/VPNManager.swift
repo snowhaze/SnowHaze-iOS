@@ -502,7 +502,7 @@ extension VPNManager {
 						case .connectionFailed:
 							fatalError("was not trying to connect")
 						case .configurationStale:
-							fatalError("was trying to load config already")
+							reload()
 						case .configurationReadWriteFailed:
 							fatalError("failed to save config")
 						case .configurationUnknown:
@@ -657,7 +657,6 @@ extension VPNManager {
 			ike.sharedSecretReference = psk.persistentReference!
 			ike.disconnectOnSleep = false
 			ike.authenticationMethod = .sharedSecret
-			ike.useExtendedAuthentication = true
 
 			let alwaysConnect = NEOnDemandRuleConnect()
 			alwaysConnect.interfaceTypeMatch = .any

@@ -70,7 +70,7 @@ class BookmarkHistoryView: UIView {
 
 	var bookmarks: [Bookmark] {
 		if internalBookmarks == nil {
-			internalBookmarks = delegate?.bookmarks
+			internalBookmarks = delegate?.bookmarks ?? []
 		}
 		return internalBookmarks!
 	}

@@ -197,7 +197,11 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 	}
 
 	private func hideVideos() {
-		let windows = UIApplication.shared.windows.suffix(from: 1)
+		let allWindows = UIApplication.shared.windows
+		guard !allWindows.isEmpty else {
+			return
+		}
+		let windows = allWindows.suffix(from: 1)
 		for window in windows {
 			if let root = window.rootViewController {
 				if root is LockPresenterController {
@@ -209,7 +213,11 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 	}
 
 	private func unhideVideos() {
-		let windows = UIApplication.shared.windows.suffix(from: 1)
+		let allWindows = UIApplication.shared.windows
+		guard !allWindows.isEmpty else {
+			return
+		}
+		let windows = allWindows.suffix(from: 1)
 		for window in windows {
 			if let root = window.rootViewController {
 				if root is LockPresenterController {

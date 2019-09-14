@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if os(iOS)
+import UIKit
+#endif
 
 struct Regex {
 	struct Match {

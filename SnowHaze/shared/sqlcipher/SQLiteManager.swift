@@ -7,6 +7,9 @@
 //
 
 import Foundation
+#if os(iOS)
+import UIKit
+#endif
 
 private let threadlocalConnectionKey = "ch.illotros.sqlitemanager.threadlocal.connection"
 
