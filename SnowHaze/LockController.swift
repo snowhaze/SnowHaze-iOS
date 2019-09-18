@@ -86,7 +86,6 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 			navigationController!.delegate = self
 		}
 		preferredStatusBarStyle = .lightContent
-		modalPresentationStyle = .formSheet
 		delegate = self
 
 		if isMain {
@@ -179,6 +178,7 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 				lvc.mode = .blank
 			}
 			LockController.overlayWindow.isHidden = false
+			lvc.modalPresentationStyle = .fullScreen
 			overlayVC.present(lvc, animated: manual, completion: nil)
 		}
 	}

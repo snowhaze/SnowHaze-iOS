@@ -201,7 +201,6 @@ extension SettingsViewController: UITableViewDataSource {
 		cell.imageView?.contentMode = .scaleAspectFit
 		cell.imageView?.tintColor = .tabCellBackground
 		UIFont.setSnowHazeFont(on: cell.textLabel!)
-		cell.backgroundColor = cell.backgroundColor
 		cell.selectedBackgroundView = UIView()
 		cell.selectedBackgroundView?.backgroundColor = UIColor(white: 1, alpha: 0.2)
 		return cell

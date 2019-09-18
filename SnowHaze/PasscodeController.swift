@@ -637,6 +637,10 @@ public class PasscodeController: UIViewController {
 
 		errorContainer.removeFromSuperview()
 
+		if #available(iOS 13.0, *) {
+			isModalInPresentation = true
+		}
+
 		switch mode {
 			case .change(let type, _):
 				entry.codeType = type

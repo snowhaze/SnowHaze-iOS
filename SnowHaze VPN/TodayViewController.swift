@@ -213,13 +213,23 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 			ike.deadPeerDetectionRate = .none
 			ike.enablePFS = true
 
-			ike.ikeSecurityAssociationParameters.encryptionAlgorithm = .algorithmAES256GCM
-			ike.ikeSecurityAssociationParameters.integrityAlgorithm = .SHA512
-			ike.ikeSecurityAssociationParameters.diffieHellmanGroup = .group16
+			if #available(iOS 13.0, *) {
+				ike.ikeSecurityAssociationParameters.encryptionAlgorithm = .algorithmChaCha20Poly1305
+				ike.ikeSecurityAssociationParameters.integrityAlgorithm = .SHA512
+				ike.ikeSecurityAssociationParameters.diffieHellmanGroup = .group16
 
-			ike.childSecurityAssociationParameters.encryptionAlgorithm = .algorithmAES256GCM
-			ike.childSecurityAssociationParameters.integrityAlgorithm = .SHA512
-			ike.childSecurityAssociationParameters.diffieHellmanGroup = .group16
+				ike.childSecurityAssociationParameters.encryptionAlgorithm = .algorithmChaCha20Poly1305
+				ike.childSecurityAssociationParameters.integrityAlgorithm = .SHA512
+				ike.childSecurityAssociationParameters.diffieHellmanGroup = .group16
+			} else {
+				ike.ikeSecurityAssociationParameters.encryptionAlgorithm = .algorithmAES256GCM
+				ike.ikeSecurityAssociationParameters.integrityAlgorithm = .SHA512
+				ike.ikeSecurityAssociationParameters.diffieHellmanGroup = .group16
+
+				ike.childSecurityAssociationParameters.encryptionAlgorithm = .algorithmAES256GCM
+				ike.childSecurityAssociationParameters.integrityAlgorithm = .SHA512
+				ike.childSecurityAssociationParameters.diffieHellmanGroup = .group16
+			}
 
 			if #available(iOS 11.0, *) {
 				ike.minimumTLSVersion = .version1_2
@@ -375,6 +385,8 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		let statusWidth = min(230, size.width - locationWidth - totalStatusMargins - switchWidth - flagWidth)
 		let additionalMargin = (size.width - statusWidth - locationWidth - totalStatusMargins - switchWidth - flagWidth) / (8 + oneIfWide)
 		var x = margin + 4 * additionalMargin
+
+		connectSwitch.layer.cornerRadius = connectSwitch.bounds.height / 2
 
 		flagImageView.frame = CGRect(x: x, y: 0, width: flagWidth, height: statusHeight)
 		x += margin + additionalMargin + flagWidth

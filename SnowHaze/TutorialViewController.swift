@@ -19,6 +19,13 @@ class TutorialViewController: UIViewController {
 		return ret
 	}()
 
+	override func loadView() {
+		super.loadView()
+		if #available(iOS 13.0, *) {
+			isModalInPresentation = true
+		}
+	}
+
 	private var overlap: CGFloat {
 		return overlapRel + overlapConst / view.bounds.height
 	}
@@ -53,9 +60,11 @@ class TutorialViewController: UIViewController {
 		let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(selectNext))
 		leftSwipe.direction = .left
 		view.addGestureRecognizer(leftSwipe)
+		leftSwipe.delegate = self
 		let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(selectPrev))
 		rightSwipe.direction = .right
 		view.addGestureRecognizer(rightSwipe)
+		rightSwipe.delegate = self
 	}
 
 	@available(iOS 11.0, *)
@@ -196,4 +205,30 @@ class TutorialViewController: UIViewController {
 	}
 
 	func didAnimate(from oldIndex: Int, to newIndex: Int) { }
+}
+
+extension TutorialViewController: UIGestureRecognizerDelegate {
+	func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+		return true
+	}
+
+	func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+		return true
+	}
+
+	func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive press: UIPress) -> Bool {
+		return true
+	}
+
+	func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+		return true
+	}
+
+	func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+		return false
+	}
+
+	func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+		return false
+	}
 }

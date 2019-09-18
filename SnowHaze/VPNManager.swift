@@ -642,13 +642,23 @@ extension VPNManager {
 			ike.localIdentifier = config.identity
 			ike.enablePFS = true
 
-			ike.ikeSecurityAssociationParameters.encryptionAlgorithm = .algorithmAES256GCM
-			ike.ikeSecurityAssociationParameters.integrityAlgorithm = .SHA512
-			ike.ikeSecurityAssociationParameters.diffieHellmanGroup = .group16
+			if #available(iOS 13.0, *) {
+				ike.ikeSecurityAssociationParameters.encryptionAlgorithm = .algorithmChaCha20Poly1305
+				ike.ikeSecurityAssociationParameters.integrityAlgorithm = .SHA512
+				ike.ikeSecurityAssociationParameters.diffieHellmanGroup = .group16
 
-			ike.childSecurityAssociationParameters.encryptionAlgorithm = .algorithmAES256GCM
-			ike.childSecurityAssociationParameters.integrityAlgorithm = .SHA512
-			ike.childSecurityAssociationParameters.diffieHellmanGroup = .group16
+				ike.childSecurityAssociationParameters.encryptionAlgorithm = .algorithmChaCha20Poly1305
+				ike.childSecurityAssociationParameters.integrityAlgorithm = .SHA512
+				ike.childSecurityAssociationParameters.diffieHellmanGroup = .group16
+			} else {
+				ike.ikeSecurityAssociationParameters.encryptionAlgorithm = .algorithmAES256GCM
+				ike.ikeSecurityAssociationParameters.integrityAlgorithm = .SHA512
+				ike.ikeSecurityAssociationParameters.diffieHellmanGroup = .group16
+
+				ike.childSecurityAssociationParameters.encryptionAlgorithm = .algorithmAES256GCM
+				ike.childSecurityAssociationParameters.integrityAlgorithm = .SHA512
+				ike.childSecurityAssociationParameters.diffieHellmanGroup = .group16
+			}
 
 			if #available(iOS 11.0, *) {
 				ike.minimumTLSVersion = .version1_2
