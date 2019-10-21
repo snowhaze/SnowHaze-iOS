@@ -568,19 +568,29 @@ extension TabController: WKNavigationDelegate {
 			return
 		}
 		reloadedRequest = nil
+		
+		let actionURL = navigationAction.request.url
+		let requestingDomain = navigationAction.sourceFrame.securityOrigin.host
+		
 		let finalDecision: (Bool) -> Void = { decision in
 			if !decision {
 				decisionHandler(.cancel)
 			} else if #available(iOS 11, *) {
-				ContentBlockerManager.shared.load { decisionHandler(.allow) }
+				ContentBlockerManager.shared.load {
+					if navigationAction.targetFrame?.isMainFrame ?? false {
+						self.updatePolicy(for: actionURL)
+					}
+					decisionHandler(.allow)
+				}
 			} else {
+				if navigationAction.targetFrame?.isMainFrame ?? false {
+					self.updatePolicy(for: actionURL)
+				}
 				decisionHandler(.allow)
 			}
 		}
 
 		lastUpgrade.dec()
-		let actionURL = navigationAction.request.url
-		let requestingDomain = navigationAction.sourceFrame.securityOrigin.host
 
 		if actionURL != lastUpgrade.url, let url = upgradeURL(for: actionURL, navigationAction: navigationAction) {
 			navigationDelegate?.tabController(self, didUpgradeLoadOf: url)

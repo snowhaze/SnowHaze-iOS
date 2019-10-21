@@ -36,6 +36,11 @@ class AppearanceSettingsManager: SettingsViewManager {
 		stepper.tintColor = .switchOn
 		stepper.addTarget(self, action: #selector(stepperValueChanged(_:)), for: .valueChanged)
 		stepper.value = self.settings.value(for: minFontSizeKey).floatValue!
+
+		// workaround for iOS 13 "feature"
+		stepper.setIncrementImage(stepper.incrementImage(for: .normal), for: .normal)
+		stepper.setDecrementImage(stepper.decrementImage(for: .normal), for: .normal)
+
 		return stepper
 	}()
 

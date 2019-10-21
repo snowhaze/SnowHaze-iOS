@@ -61,8 +61,9 @@ class SettingsViewManager: NSObject {
 		return uiSwitch
 	}
 
+	private class SettingsButton: UIButton { }
 	func makeButton(for cell: UITableViewCell) -> UIButton {
-		let button = UIButton(frame: cell.bounds)
+		let button = SettingsButton(frame: cell.bounds)
 		button.setTitleColor(.darkTitle, for: .disabled)
 		cell.textLabel?.text = ""
 		UIFont.setSnowHazeFont(on: button)
@@ -84,7 +85,7 @@ class SettingsViewManager: NSObject {
 		let id = "cell"
 		if let cell = tableView.dequeueReusableCell(withIdentifier: id) {
 			for subview in cell.subviews {
-				if subview is UIButton || subview is UIActivityIndicatorView {
+				if subview is SettingsButton || subview is UIActivityIndicatorView {
 					subview.removeFromSuperview()
 				}
 			}

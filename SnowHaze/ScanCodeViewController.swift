@@ -14,6 +14,7 @@ protocol ScanCodeViewControllerDelegate: class {
 	func codeScanner(_ scanner: ScanCodeViewController, viewControllerForCodePreview code: String) -> UIViewController?
 	func codeScanner(_ scanner: ScanCodeViewController, didSelectCode code: String?)
 	func codeScanner(_ scanner: ScanCodeViewController, canSelectCode code: String) -> Bool
+	func codeScannerDidDisappear(_ scanner: ScanCodeViewController)
 }
 
 class ScanCodeViewController: UIViewController {
@@ -208,6 +209,7 @@ class ScanCodeViewController: UIViewController {
 	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
 		sessionManager.stopRunning()
+		delegate?.codeScannerDidDisappear(self)
 	}
 
 	override func viewWillAppear(_ animated: Bool) {

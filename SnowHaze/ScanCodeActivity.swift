@@ -109,6 +109,10 @@ extension ScanCodeActivity: ScanCodeViewControllerDelegate {
 		activityDidFinish(code != nil)
 	}
 
+	func codeScannerDidDisappear(_ scanner: ScanCodeViewController) {
+		activityDidFinish(false)
+	}
+
 	@objc private func dismiss(_ sender: UIBarButtonItem) {
 		controller?.dismiss(animated: true, completion: nil)
 		controller = nil

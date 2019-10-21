@@ -203,6 +203,7 @@ extension SettingsViewController: UITableViewDataSource {
 		UIFont.setSnowHazeFont(on: cell.textLabel!)
 		cell.selectedBackgroundView = UIView()
 		cell.selectedBackgroundView?.backgroundColor = UIColor(white: 1, alpha: 0.2)
+		cell.accessoryView = UIImageView(image: #imageLiteral(resourceName: "chevron"))
 		return cell
 	}
 }

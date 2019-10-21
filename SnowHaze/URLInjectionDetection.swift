@@ -39,27 +39,26 @@ internal extension URL {
 	]
 
 	private static func genJSRx() -> Regex {
-		let funcRxs = problematicJSFunctions.map { fn -> String in
-			let (onObj, name) = fn
-			let pref = onObj ? "\\w+\\W*." : ""
-			return	pref + "\\W*\(name)\\W*\\(.*\\)" +
-				"|\\).*" + pref + "\\W*\(name)\\W*\\("
-		}
+		let objNames = problematicJSFunctions.compactMap { $0.0 ? $0.1 : nil}
+		let noObjNames = problematicJSFunctions.compactMap { !$0.0 ? $0.1 : nil}
+		let objRx = "\\w\\W*\\.\\W*(\(objNames.joined(separator: "|")))\\W*\\(.*\\)|\\).*\\w+\\W*.\\W*(\(objNames.joined(separator: "|")))\\W*\\("
+		let noObjRx = "\\W(\(noObjNames.joined(separator: "|")))\\W*\\(.*\\)|\\).*\\W*(\(noObjNames.joined(separator: "|")))\\W*\\("
+		let funcRxs = [objRx, noObjRx]
 		let modRxs = problematicJSModify.map { name -> String in
-			return	"\\w+\\W*\\.\\W*\(name)\\W*(\\.\\W*\\w+\\W*\\(.*\\)|\\W*=\\W*[\\w\"'+\\-{])|"
+			return	"\\w\\W*\\.\\W*\(name)\\W*(\\.\\W*\\w+\\W*\\(.*\\)|\\W*=\\W*[\\w\"'+\\-{])|"
 				+ "\\).*\\w+\\W*\\.\\W*\(name)\\W*\\.\\W*\\w+\\W*\\("
 		}
 		let readRxs = problematicJSReads.map { name -> String in
-			return "\\w+\\W*=\\W*\\w+\\W*\\.\\W*\(name)"
+			return "\\w\\W*=\\W*\\w+\\W*\\.\\W*\(name)"
 		}
-		let rx = (funcRxs + modRxs + readRxs).joined(separator: "|") + "|\\w+\\W*\\[(.*\".+\".*|.*'.+'.*)]"
+		let rx = (funcRxs + modRxs + readRxs).joined(separator: "|") + "|\\w\\W*\\[(.*\".+\".*|.*'.+'.*)]"
 		return Regex(pattern: rx)
 	}
 
 	private static let jsRx = genJSRx()
 	private static let htlmRx = Regex(pattern: "<\\W*(/\\W*)?(\\w+\\W*:\\W*)?\\w+\\.*>")
 
-	private static let sqliRx = Regex(pattern: "((\\(\\W*|.+\\Wunion(\\W|\\W.*\\W))select\\W.*(\\w|'.*'|\".*\"|\\*).*|.+\\Winsert(\\W|\\W.*\\W)into\\W.*\\w.*(\\Wvalues\\W|\\Wselect\\W)|\\Wupdate\\W.*\\w.*\\Wset\\W.*\\w.*=.+|.+\\Wdelete(\\W|\\W.*\\W)from\\W.*\\w)", options: .caseInsensitive)
+	private static let sqliRx = Regex(pattern: "((\\(\\W*|.\\Wunion(\\W|\\W.*\\W))select\\W.*(\\w|'.*'|\".*\"|\\*).*|.\\Winsert(\\W|\\W.*\\W)into\\W.*\\w.*(\\Wvalues\\W|\\Wselect\\W)|\\Wupdate\\W.*\\w.*\\Wset\\W.*\\w.*=.|.\\Wdelete(\\W|\\W.*\\W)from\\W.*\\w)", options: .caseInsensitive)
 
 	private static let jsCommentRx = Regex(pattern: "//[^\r\n'\"]*(?:$|[\r\n])|/\\*(?:[^*'\"]|\\*(?!/))*\\*/")
 

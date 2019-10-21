@@ -620,8 +620,11 @@ extension URLBar: UITextFieldDelegate {
 		if #available(iOS 11, *) {
 			dragInteraction?.isEnabled = false
 		}
-		DispatchQueue.main.async {
-			textField.selectedTextRange = textField.textRange(from: textField.beginningOfDocument, to: textField.endOfDocument)
+		textField.selectedTextRange = textField.textRange(from: textField.beginningOfDocument, to: textField.endOfDocument)
+		if #available(iOS 13, *) {
+			UIMenuController.shared.showMenu(from: self, rect: textField.convert(textField.bounds, to: self))
+		} else {
+			UIMenuController.shared.setMenuVisible(true, animated: true)
 		}
 		delegate?.inputStringUpdated(for: self, input: textField.text ?? "")
 		startInput()
