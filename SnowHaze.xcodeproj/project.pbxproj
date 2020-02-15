@@ -25,7 +25,7 @@
 		84C7BE9B20961AC6003C25B2 /* SearchSelect.js in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDCC20961AB6003C25B2 /* SearchSelect.js */; };
 		84C7BE9C20961AC6003C25B2 /* MaskingRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDCD20961AB6003C25B2 /* MaskingRule.swift */; };
 		84C7BE9D20961AC6003C25B2 /* MemoryGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDCE20961AB6003C25B2 /* MemoryGame.swift */; };
-		84C7BE9E20961AC6003C25B2 /* api1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDCF20961AB6003C25B2 /* api1.cer */; };
+		84C7BE9E20961AC6003C25B2 /* api3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDCF20961AB6003C25B2 /* api3.cer */; };
 		84C7BE9F20961AC6003C25B2 /* BrowserPageGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDD020961AB6003C25B2 /* BrowserPageGenerator.swift */; };
 		84C7BEA020961AC6003C25B2 /* FixedNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDD120961AB6003C25B2 /* FixedNavigationController.swift */; };
 		84C7BEA120961AC6003C25B2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDD320961AB6003C25B2 /* Localizable.strings */; };
@@ -242,7 +242,7 @@
 		84C7BDCC20961AB6003C25B2 /* SearchSelect.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = SearchSelect.js; sourceTree = "<group>"; };
 		84C7BDCD20961AB6003C25B2 /* MaskingRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MaskingRule.swift; sourceTree = "<group>"; };
 		84C7BDCE20961AB6003C25B2 /* MemoryGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoryGame.swift; sourceTree = "<group>"; };
-		84C7BDCF20961AB6003C25B2 /* api1.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = api1.cer; sourceTree = "<group>"; };
+		84C7BDCF20961AB6003C25B2 /* api3.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = api3.cer; sourceTree = "<group>"; };
 		84C7BDD020961AB6003C25B2 /* BrowserPageGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserPageGenerator.swift; sourceTree = "<group>"; };
 		84C7BDD120961AB6003C25B2 /* FixedNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FixedNavigationController.swift; sourceTree = "<group>"; };
 		84C7BDD420961AB6003C25B2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = Localizable.strings; sourceTree = "<group>"; };
@@ -476,7 +476,7 @@
 			children = (
 				84C7BE2220961ABB003C25B2 /* AcknowledgementsSettingsManager.swift */,
 				84C7BDEF20961AB7003C25B2 /* AddBookmarkActivity.swift */,
-				84C7BDCF20961AB6003C25B2 /* api1.cer */,
+				84C7BDCF20961AB6003C25B2 /* api3.cer */,
 				84C7BDF620961AB8003C25B2 /* AppDelegate.swift */,
 				84C7BE4920961ABF003C25B2 /* AppearanceSettingsManager.swift */,
 				84C7BDE720961AB7003C25B2 /* AppSettingsManager.swift */,
@@ -917,7 +917,7 @@
 				84C7BEA120961AC6003C25B2 /* Localizable.strings in Resources */,
 				84C7BF3120961AC6003C25B2 /* InfoPlist.strings in Resources */,
 				84C7BEFE20961AC6003C25B2 /* ScriptBlackListing.js in Resources */,
-				84C7BE9E20961AC6003C25B2 /* api1.cer in Resources */,
+				84C7BE9E20961AC6003C25B2 /* api3.cer in Resources */,
 				84C7BF2D20961AC6003C25B2 /* InfoPlist.strings in Resources */,
 				84C7BF3920961AC6003C25B2 /* LaunchScreen.storyboard in Resources */,
 				84C7BEB020961AC6003C25B2 /* InfoPlist.strings in Resources */,
@@ -1321,7 +1321,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 80;
+				CURRENT_PROJECT_VERSION = 82;
 				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1329,7 +1329,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.6.6;
+				MARKETING_VERSION = 2.6.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1342,7 +1342,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 80;
+				CURRENT_PROJECT_VERSION = 82;
 				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1350,7 +1350,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.6.6;
+				MARKETING_VERSION = 2.6.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1481,14 +1481,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 80;
+				CURRENT_PROJECT_VERSION = 82;
 				HEADER_SEARCH_PATHS = "Pods/**";
 				INFOPLIST_FILE = SnowHaze/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.6.6;
+				MARKETING_VERSION = 2.6.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";
@@ -1506,14 +1506,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 80;
+				CURRENT_PROJECT_VERSION = 82;
 				HEADER_SEARCH_PATHS = "Pods/**";
 				INFOPLIST_FILE = SnowHaze/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.6.6;
+				MARKETING_VERSION = 2.6.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";

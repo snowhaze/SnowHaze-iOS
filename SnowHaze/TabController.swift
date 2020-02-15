@@ -641,7 +641,7 @@ extension TabController: WKNavigationDelegate {
 		}
 
 		let xssHandler: (Bool) -> Void = { [weak self] cont in
-			guard let me = self else {
+			guard let me = self, cont else {
 				finalDecision(false)
 				return
 			}
@@ -720,9 +720,6 @@ private extension TabController {
 		let policy = PolicyManager.manager(for: tab)
 		policy.stopSuppressingHistory()
 		load(list(policy))
-
-		// if the new url is the same as the old one, history suppresion won't be setup again
-		policy.setupHistorySuppresion(for: webViewIfLoaded?.url)
 	}
 
 	func updatePolicy(for url: URL?) {

@@ -197,9 +197,9 @@ public class SQLite {
 
 		public var bool: Bool? {
 			switch integer {
-				case .some(0):	return false
-				case .some(1):	return true
-				default:		return nil
+				case 0:		return false
+				case 1:		return true
+				default:	return nil
 			}
 		}
 
@@ -399,6 +399,21 @@ public class SQLite {
 
 		/// activate or deactivate "defensive" flag for a database connection
 		case defensive(Bool?)
+
+		/// enable, disable or query status of writable schema
+		case writableSchema(Bool?)
+
+		/// enable, disable or query status of legacy alter table
+		case legacyAlterTable(Bool?)
+
+		/// enable, disable or query status of usage double quoted strings in dml statements
+		case dqsDml(Bool?)
+
+		/// enable, disable or query status of usage double quoted strings in ddl statements
+		case dqsDdl(Bool?)
+
+		/// enable, disable or query status of view
+		case views(Bool?)
 	}
 
 	public enum BindingKey: Hashable {
@@ -842,12 +857,11 @@ public class SQLite {
 		}
 	}
 
-	private static let internalQueue = DispatchQueue(label: "ch.illotros.sqlite.internal")
-	private static var nextID: UInt64 = 0
+	private static let internalQueue = DispatchQueue(label: "ch.illotros.sqlite.internal.static")
 
 	private let connection: OpaquePointer
 
-	private let internalQueue: DispatchQueue
+	private let internalQueue = DispatchQueue(label: "ch.illotros.sqlite.internal")
 	private var dbNameBuffer: [CChar]? = nil
 
 	private lazy var fts5APIStmt = (try? statement(for: "SELECT fts5(?)")) ?? nil
@@ -891,22 +905,25 @@ public class SQLite {
 			self.rawValue = rawValue
 		}
 
-		public static let none						= SetupOptions(rawValue: 0x0000)
-		public static let defensive					= SetupOptions(rawValue: 0x0001)
-		public static let cellSizeCheck				= SetupOptions(rawValue: 0x0002)
-		public static let disableMemMap				= SetupOptions(rawValue: 0x0004)
-		public static let limitLength				= SetupOptions(rawValue: 0x0008)
-		public static let limitSqlLength			= SetupOptions(rawValue: 0x0010)
-		public static let limitColumn				= SetupOptions(rawValue: 0x0020)
-		public static let limitExprDepth			= SetupOptions(rawValue: 0x0040)
-		public static let limitCompoundSelect		= SetupOptions(rawValue: 0x0080)
-		public static let limitVdbeOp				= SetupOptions(rawValue: 0x0100)
-		public static let limitFunctionArg			= SetupOptions(rawValue: 0x0200)
-		public static let limitAttached				= SetupOptions(rawValue: 0x0400)
-		public static let limitLikePatternLength	= SetupOptions(rawValue: 0x0800)
-		public static let limitVariableNumber		= SetupOptions(rawValue: 0x1000)
-		public static let limitTriggerDepth			= SetupOptions(rawValue: 0x2000)
-		public static let secure: SetupOptions		= [defensive, cellSizeCheck, disableMemMap, limitLength, limitSqlLength, limitColumn, limitExprDepth, limitCompoundSelect, limitVdbeOp, limitFunctionArg, limitAttached, limitLikePatternLength, limitVariableNumber, limitTriggerDepth]
+		public static let none						= SetupOptions(rawValue: 0x00000)
+		public static let defensive					= SetupOptions(rawValue: 0x00001)
+		public static let cellSizeCheck				= SetupOptions(rawValue: 0x00002)
+		public static let disableMemMap				= SetupOptions(rawValue: 0x00004)
+		public static let limitLength				= SetupOptions(rawValue: 0x00008)
+		public static let limitSqlLength			= SetupOptions(rawValue: 0x00010)
+		public static let limitColumn				= SetupOptions(rawValue: 0x00020)
+		public static let limitExprDepth			= SetupOptions(rawValue: 0x00040)
+		public static let limitCompoundSelect		= SetupOptions(rawValue: 0x00080)
+		public static let limitVdbeOp				= SetupOptions(rawValue: 0x00100)
+		public static let limitFunctionArg			= SetupOptions(rawValue: 0x00200)
+		public static let limitAttached				= SetupOptions(rawValue: 0x00400)
+		public static let limitLikePatternLength	= SetupOptions(rawValue: 0x00800)
+		public static let limitVariableNumber		= SetupOptions(rawValue: 0x01000)
+		public static let limitTriggerDepth			= SetupOptions(rawValue: 0x02000)
+		public static let nonwritableSchema			= SetupOptions(rawValue: 0x04000)
+		public static let disableViews				= SetupOptions(rawValue: 0x08000)
+		public static let disableTriggers			= SetupOptions(rawValue: 0x10000)
+		public static let secure: SetupOptions		= [defensive, cellSizeCheck, disableMemMap, limitLength, limitSqlLength, limitColumn, limitExprDepth, limitCompoundSelect, limitVdbeOp, limitFunctionArg, limitAttached, limitLikePatternLength, limitVariableNumber, limitTriggerDepth, nonwritableSchema, disableViews, disableTriggers]
 
 		var setupOptions: [FinalSetupOptions] {
 			var result = [FinalSetupOptions]()
@@ -915,6 +932,15 @@ public class SQLite {
 			}
 			if contains(SetupOptions.defensive) {
 				result.append(.config(.defensive(true)))
+			}
+			if contains(SetupOptions.nonwritableSchema) {
+				result.append(.config(.writableSchema(false)))
+			}
+			if contains(SetupOptions.disableViews) {
+				result.append(.config(.views(false)))
+			}
+			if contains(SetupOptions.disableViews) {
+				result.append(.config(.trigger(false)))
 			}
 			if contains(SetupOptions.cellSizeCheck) {
 				result.append(.statement("PRAGMA cell_size_check = ON"))
@@ -996,18 +1022,11 @@ public class SQLite {
 			return nil
 		}
 
-		let id = SQLite.internalQueue.sync { () -> UInt64 in
-			let id = SQLite.nextID
-			SQLite.nextID += 1
-			return id
-		}
-		internalQueue = DispatchQueue(label: "ch.illotros.sqlite.internal-\(id)")
-
 		do {
 			for option in setup {
 				switch option {
 					case .statement(let stmt):	try execute(stmt)
-					case .config(let config):	let _ = try set(option: config)
+					case .config(let config):	_ = try set(option: config)
 					case .limit(let op, let value):
 						if value < limit(op) {
 							limit(op, value: value)
@@ -1164,6 +1183,24 @@ public class SQLite {
 		}
 	}
 
+	public func dropModules(except: [String] = []) throws {
+		func accumulate(pointers: [UnsafePointer<Int8>?], for names: [String], callback: ([UnsafePointer<Int8>?]) throws -> Void) rethrows {
+			guard !names.isEmpty else {
+				try callback(pointers + [nil])
+				return
+			}
+			var names = names
+			let name = names.removeFirst()
+			try name.withCUTF8 { bytes in
+				try accumulate(pointers: pointers + [bytes] , for: names, callback: callback)
+			}
+		}
+		try accumulate(pointers: [], for: except) { pointers in
+			var pointers = pointers
+			try SQLite.check(sqlite3_drop_modules(connection, &pointers), connection: connection)
+		}
+	}
+
 	public func set(option: DBOption) throws -> Bool? {
 		let (ok, result) = try internalQueue.sync { () -> (Int32, Bool?) in
 			let enable: Bool?
@@ -1216,6 +1253,21 @@ public class SQLite {
 				case .defensive(let e):
 					enable = e
 					verb = SQLITE_DBCONFIG_DEFENSIVE
+				case .writableSchema(let e):
+					enable = e
+					verb = SQLITE_DBCONFIG_WRITABLE_SCHEMA
+				case .legacyAlterTable(let e):
+					enable = e
+					verb = SQLITE_DBCONFIG_LEGACY_ALTER_TABLE
+				case .dqsDml(let e):
+					enable = e
+					verb = SQLITE_DBCONFIG_DQS_DML
+				case .dqsDdl(let e):
+					enable = e
+					verb = SQLITE_DBCONFIG_DQS_DDL
+				case .views(let e):
+					enable = e
+					verb = SQLITE_DBCONFIG_ENABLE_VIEW
 			}
 			let set: Int32
 			if let enable = enable {

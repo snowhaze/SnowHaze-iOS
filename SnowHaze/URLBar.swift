@@ -171,29 +171,17 @@ class URLBar: UIView {
 			guard newValue != showsCancelButton else {
 				return
 			}
-			if newValue {
-				cancelButton.alpha = 0
-				cancelButton.isHidden = false
-				UIView.animate(withDuration: 0.3, animations: { () -> Void in
-					self.cancelButton.alpha = 1
-					self.reloadButton.alpha = 0
-				}, completion: { (finished) -> Void in
-					if finished {
-						self.reloadButton.isHidden = true
-					}
-				})
-			} else if !newValue {
-				reloadButton.alpha = 0
-				reloadButton.isHidden = false
-				UIView.animate(withDuration: 0.3, animations: { () -> Void in
-					self.reloadButton.alpha = 1
-					self.cancelButton.alpha = 0
-				}, completion: { (finished) -> Void in
-					if finished {
-						self.cancelButton.isHidden = true
-					}
-				})
-			}
+			let hideButton = newValue ? reloadButton : cancelButton
+			let showButton = newValue ? cancelButton : reloadButton
+			showButton.isHidden = false
+			UIView.animate(withDuration: 0.3, animations: { () -> Void in
+				showButton.alpha = 1
+				hideButton.alpha = 0
+			}, completion: { [weak self] _ -> Void in
+				if self?.showsCancelButton == newValue {
+					hideButton.isHidden = true
+				}
+			})
 		}
 	}
 
@@ -207,6 +195,11 @@ class URLBar: UIView {
 			showsCancelButton = false
 		}
 		urlField.resignFirstResponder()
+		if #available(iOS 13, *) {
+			UIMenuController.shared.hideMenu()
+		} else {
+			UIMenuController.shared.setMenuVisible(false, animated: true)
+		}
 	}
 
 	var constrainedWidth: Bool = false {
@@ -731,14 +724,14 @@ extension URLBar: UIDropInteractionDelegate {
 
 	func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {
 		if session.canLoadObjects(ofClass: URL.self) {
-			let _ = session.loadObjects(ofClass: URL.self) { [weak self]  urls in
+			_ = session.loadObjects(ofClass: URL.self) { [weak self]  urls in
 				assert(urls.count == 1)
 				DispatchQueue.main.async {
 					self?.didDrop(urls[0].absoluteString)
 				}
 			}
 		} else if session.canLoadObjects(ofClass: String.self) {
-			let _ = session.loadObjects(ofClass: String.self) { [weak self] strings in
+			_ = session.loadObjects(ofClass: String.self) { [weak self] strings in
 				assert(strings.count == 1)
 				DispatchQueue.main.async {
 					self?.didDrop(strings[0])

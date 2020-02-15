@@ -348,10 +348,10 @@ private class SQliteStatementCache {
 		let statement = try connection.statement(for: query, options: options)
 		if cachable, let statement = statement {
 			if statements.count >= size {
-				assert(statements.count == size)
-				let random = rand(statements.count)
-				let key = statements.index(statements.startIndex, offsetBy: random)
-				statements.remove(at: key)
+				assert(statements.count == size || statements.count == 1)
+				if let key = statements.randomElement()?.key {
+					statements[key] = nil
+				}
 			}
 			statements[query] = statement
 		}
@@ -366,27 +366,5 @@ private class SQliteStatementCache {
 	private func isCachable(query: String) -> Bool {
 		let nsRange = NSRange(query.startIndex ..< query.endIndex, in: query)
 		return SQliteStatementCache.pragmaRx.numberOfMatches(in: query, range: nsRange) == 0
-	}
-
-	private func rand(_ range: Int) -> Int {
-		var result = -1
-		while result < 0 {
-			var rand = 0
-			let randPtr = UnsafeMutablePointer<Int>(&rand)
-			let opaquePtr = OpaquePointer(randPtr)
-			let bytePtr = UnsafeMutablePointer<UInt8>(opaquePtr)
-			guard SecRandomCopyBytes(kSecRandomDefault, MemoryLayout<Int>.size, bytePtr) == errSecSuccess else {
-				continue
-			}
-			let coef = Int.max / range
-			if rand < 0 {
-				rand = -(rand + 1)
-			}
-			guard rand < coef * range else {
-				continue
-			}
-			result = rand % range
-		}
-		return result
 	}
 }

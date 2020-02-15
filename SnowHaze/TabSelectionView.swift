@@ -133,7 +133,7 @@ extension TabView: UIDragInteractionDelegate {
 }
 
 @available(iOS 11, *)
-extension TabView: UIDropInteractionDelegate{
+extension TabView: UIDropInteractionDelegate {
 	func dropInteraction(_ interaction: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
 		return session.canLoadObjects(ofClass: URL.self) && session.items.count == 1
 	}
@@ -149,7 +149,7 @@ extension TabView: UIDropInteractionDelegate{
 
 	func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {
 		if session.canLoadObjects(ofClass: URL.self) {
-			let _ = session.loadObjects(ofClass: URL.self) { [weak self]  urls in
+			_ = session.loadObjects(ofClass: URL.self) { [weak self]  urls in
 				assert(urls.count == 1)
 				DispatchQueue.main.async {
 					if let me = self, let delegate = me.delegate {

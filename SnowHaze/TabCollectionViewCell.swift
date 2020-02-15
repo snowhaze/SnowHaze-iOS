@@ -334,7 +334,7 @@ extension TabCollectionViewCell: UIDropInteractionDelegate{
 
 	func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {
 		if session.canLoadObjects(ofClass: URL.self) {
-			let _ = session.loadObjects(ofClass: URL.self) { [weak self]  urls in
+			_ = session.loadObjects(ofClass: URL.self) { [weak self]  urls in
 				assert(urls.count == 1)
 				let tab = self?.tab
 				DispatchQueue.main.async { [weak tab] in

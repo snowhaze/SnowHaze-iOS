@@ -340,7 +340,11 @@ class VPNSettingsManager: SettingsViewManager {
 
 	override func didSelectRow(atIndexPath indexPath: IndexPath, tableView: UITableView) {
 		if showList && indexPath.section == listSection && indexPath.row == 0 && isIPSec {
-			toggleOnOff(tableView.cellForRow(at: indexPath))
+			if SubscriptionManager.shared.hasSubscription {
+				super.didSelectRow(atIndexPath: indexPath, tableView: tableView)
+			} else {
+				controller.switchToSubscriptionSettings()
+			}
 		} else if indexPath.section == controlSection || indexPath.row == 0 {
 			super.didSelectRow(atIndexPath: indexPath, tableView: tableView)
 		} else if showList && indexPath.section == listSection && indexPath.row == VPNManager.shared.ipsecProfiles.count + 1 && isIPSec {

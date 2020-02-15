@@ -159,12 +159,51 @@ extension DownloadManager: URLSessionDownloadDelegate {
 		}
 	}
 
+	private func authorizer(action: SQLite.AuthorizerAction, db: String?, cause: String?) -> SQLite.AuthorizerResponse {
+		switch (action, db, cause) {
+			case (.pragma("cipher_integrity_check", nil), nil, nil):	return .ok
+			case (.pragma("foreign_key_check", nil), nil, nil):			return .ok
+			case (.pragma("quick_check", nil), nil, nil):				return .ok
+
+			case (.select, nil, nil):									return .ok
+			case (.function("count"), nil, nil):						return .ok
+			case (.function("json_valid"), nil, nil):					return .ok
+			case (.function("json_type"), nil, nil):					return .ok
+
+			case (.read("ad", "domain"), "main", nil):					return .ok
+			case (.read("blogspot", "domain"), "main", nil):			return .ok
+			case (.read("content_blocker", "id"), "main", nil):			return .ok
+			case (.read("content_blocker", "source"), "main", nil):		return .ok
+			case (.read("content_blocker", "version"), "main", nil):	return .ok
+			case (.read("danger", "domain"), "main", nil):				return .ok
+			case (.read("danger", "type"), "main", nil):				return .ok
+			case (.read("danger_hash", "hash"), "main", nil):			return .ok
+			case (.read("danger_hash", "type"), "main", nil):			return .ok
+			case (.read("https", "domain"), "main", nil):				return .ok
+			case (.read("parameter_stripping", "host"), "main", nil):	return .ok
+			case (.read("parameter_stripping", "name"), "main", nil):	return .ok
+			case (.read("parameter_stripping", "value"), "main", nil):	return .ok
+			case (.read("popular", "domain"), "main", nil):				return .ok
+			case (.read("popular", "rank"), "main", nil):				return .ok
+			case (.read("popular", "trackers"), "main", nil):			return .ok
+			case (.read("private", "domain"), "main", nil):				return .ok
+			case (.read("tracking", "domain"), "main", nil):			return .ok
+			default:													return .deny
+		}
+	}
+
 	func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
 		let url = downloadTask.currentRequest?.url?.absoluteString
 		if url == domainsDBLocation || url == subscriptionDomainsDBLocation {
-			let _ = initSQLite
+			_ = initSQLite
 			let setupOptions = SQLite.SetupOptions.secure.subtracting([.limitVariableNumber, .limitLength])
 			guard let db = SQLCipher(url: location, key: DomainList.dbKey, flags: .readonly, cipherOptions: .compatibility(3), setupOptions: setupOptions) else {
+				return
+			}
+			guard let _ = try? db.set(authorizer: authorizer) else {
+				return
+			}
+			guard let _ = try? db.dropModules() else {
 				return
 			}
 			guard (try? db.execute("PRAGMA cipher_integrity_check").isEmpty) ?? false else {

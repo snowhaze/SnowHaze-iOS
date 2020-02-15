@@ -294,6 +294,7 @@ class LocalSettingsView: UIView, UITableViewDelegate, UITableViewDataSource {
 		label.textColor = .localSettingsTitle
 		label.text = controller.title
 		label.textAlignment = .center
+		label.lineBreakMode = .byTruncatingHead
 		UIFont.setSnowHazeFont(on: label)
 		addSubview(label)
 

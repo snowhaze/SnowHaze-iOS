@@ -108,7 +108,7 @@ class DomainList {
 
 	static let dbManager: SQLiteManager = {
 		SQLiteManager.freeSQLiteCachesOnMemoryWarning = true
-		let _ = initSQLite
+		_ = initSQLite
 		var manager = SQLiteManager() { _ in
 			let setupOptions = SQLite.SetupOptions.secure.subtracting([.limitLikePatternLength, .limitLength, .limitVariableNumber])
 			let updatedDB = SQLCipher(path: DomainList.dbLocation, key: DomainList.dbKey, flags: .readonly, cipherOptions: .compatibility(3), setupOptions: setupOptions)
@@ -122,6 +122,7 @@ class DomainList {
 			let bundlePath = Bundle.main.path(forResource: "lists", ofType: "db")!
 			let options = SQLCipher.CipherOptions.v4Defaults
 			let db = ok ? updatedDB! : SQLCipher(path: bundlePath, key: DomainList.dbKey, flags: .readonly, cipherOptions: options, setupOptions: setupOptions)!
+			try! db.dropModules()
 			try! db.execute("PRAGMA query_only=true")
 			try! db.set(authorizer: authorizer)
 			return db
@@ -176,7 +177,7 @@ class DomainList {
 		}
 		let query = [String](repeating: "(?)", count: bindings.count).joined(separator: ",")
 		let result = try! db.execute("SELECT trackers FROM \(type.table) WHERE domain IN (VALUES \(query)) AND trackers IS NOT NULL ORDER BY length(domain) DESC LIMIT 1", with: bindings)
-		return result.first?.integerValue! ?? 17
+		return result.first?.integerValue! ?? 15
 	}
 
 	func search(top: Int64, matching: String) -> [(Int64, String)] {

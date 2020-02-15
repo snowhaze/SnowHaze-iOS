@@ -231,8 +231,7 @@ private extension TabViewController {
 		}
 		let insets = UIEdgeInsets(top: topOffset, left: 0, bottom: bottomOffset, right: 0)
 
-		if let wv = webView {
-			assert(wv.superview == view)
+		if let wv = webView, wv.superview == view {
 			let oldYOffset = wv.scrollView.bounds.minY + wv.scrollView.contentInset.top
 			var tbInsets = UIEdgeInsets(top: insets.top, left: 0, bottom: insets.bottom, right: 0)
 			let reducedHeight = max(0, urlBar?.minLowerBound(in: view) ?? 0)

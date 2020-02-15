@@ -412,6 +412,10 @@ class TabStore {
 		let oldItems = items
 		let id = item.id
 		let settings = Settings.settings(for: item).allValues
+		if let controller = item.controller, controller.webViewLoaded {
+			controller.stopLoading()
+		}
+		item.controller?.clearMediaInfo()
 		do {
 			try database.execute("DELETE FROM \(tableName) WHERE id = ?", with: [.integer(id)])
 			Settings.dropChache(for: item)
