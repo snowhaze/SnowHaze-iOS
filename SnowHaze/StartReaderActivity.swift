@@ -2,11 +2,12 @@
 //  StartReaderActivity.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class StartReaderActivity: UIActivity {
 	private let callback: (StartReaderActivity) -> Void

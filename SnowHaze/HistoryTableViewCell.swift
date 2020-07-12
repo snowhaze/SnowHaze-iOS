@@ -2,7 +2,7 @@
 //  HistoryTableViewCell.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -23,14 +23,12 @@ class HistoryTableViewCell: UITableViewCell {
 			detailTextLabel?.text = historyItem.url.absoluteString
 			let time = timeFormatter.string(from: historyItem.timestamp as Date)
 			imageView?.image = image(from: time)
-			if #available(iOS 11, *) {
-				if !dragRegistered {
-					dragRegistered = true
+			if !dragRegistered {
+				dragRegistered = true
 
-					let dragInteraction = UIDragInteraction(delegate: self)
-					dragInteraction.isEnabled = true
-					addInteraction(dragInteraction)
-				}
+				let dragInteraction = UIDragInteraction(delegate: self)
+				dragInteraction.isEnabled = true
+				addInteraction(dragInteraction)
 			}
 		}
 	}
@@ -42,8 +40,6 @@ class HistoryTableViewCell: UITableViewCell {
 		backgroundColor = UIColor(white: 1, alpha: 0.05)
 		textLabel?.textColor = .title
 		detailTextLabel?.textColor = .subtitle
-		UIFont.setSnowHazeFont(on: textLabel!)
-		UIFont.setSnowHazeFont(on: detailTextLabel!)
 		separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
 		selectedBackgroundView = UIView()
 		selectedBackgroundView?.backgroundColor = UIColor(white: 1, alpha: 0.2)
@@ -53,8 +49,16 @@ class HistoryTableViewCell: UITableViewCell {
 		super.init(coder: aDecoder)
 	}
 
+	override func prepareForReuse() {
+		super.prepareForReuse()
+		// UIKit sometimes resets the labels, making them loose their color
+		textLabel?.textColor = .title
+		detailTextLabel?.textColor = .subtitle
+	}
+
 	private func image(from string: String) -> UIImage {
-		let attributes = [NSAttributedString.Key.foregroundColor: UIColor.title, NSAttributedString.Key.font: UIFont.snowHazeFont(size: 12)]
+		typealias Keys = NSAttributedString.Key
+		let attributes = [Keys.foregroundColor: UIColor.title, Keys.font: UIFont.systemFont(ofSize: 12)]
 		let size = string.size(withAttributes: attributes)
 		UIGraphicsBeginImageContextWithOptions(size, false, 0)
 		string.draw(at: CGPoint.zero, withAttributes: attributes)
@@ -64,14 +68,13 @@ class HistoryTableViewCell: UITableViewCell {
 	}
 }
 
-@available(iOS 11, *)
 extension HistoryTableViewCell: UIDragInteractionDelegate {
 	func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
 		if let url = historyItem?.url {
 			let dragItem = UIDragItem(itemProvider: NSItemProvider(object: url as NSURL))
-			let sanitizedTitle = Tab.sanitize(title: historyItem?.title)
-			dragItem.localObject = (url, sanitizedTitle)
-			dragItem.previewProvider = { UIDragPreview(for: url, title: sanitizedTitle) }
+			let title = historyItem?.title
+			dragItem.localObject = (url, title)
+			dragItem.previewProvider = { UIDragPreview(for: url, title: title) }
 			return [dragItem]
 		} else {
 			return []

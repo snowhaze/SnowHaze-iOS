@@ -4,7 +4,7 @@
 	const urlConstructor = URL;
 	var blacklist = $blacklist$;
 	var blockedElements = ["SCRIPT", "IMG", "FRAME", "IFRAME", "VIDEO", "AUDIO", "STYLE", "SOURCE"];
-	
+
 	var preventDefault = Event.prototype.preventDefault;
 	var indexOf = Array.prototype.indexOf;
 	document.addEventListener("beforeload", function(event) {

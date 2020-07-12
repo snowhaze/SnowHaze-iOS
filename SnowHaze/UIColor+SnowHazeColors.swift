@@ -2,7 +2,7 @@
 //  UIColor+SnowHazeColors.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -21,7 +21,6 @@ extension UIColor {
 	static let selectedTutorialPage		= UIColor(red: 191 / 255.0, green: 151 / 255.0, blue:  90 / 255.0, alpha: 1   )
 	static let tutorialTextBG			= UIColor(red: 	42 / 255.0, green:  41 / 255.0, blue:  45 / 255.0, alpha: 1   )
 	static let tutorialTextBGSeparator	= UIColor(red: 194 / 255.0, green: 153 / 255.0, blue:  90 / 255.0, alpha: 0.78)
-	static let mixedContentBar			= UIColor(red: 250 / 255.0, green:  61 / 255.0, blue:  76 / 255.0, alpha: 1   )
 	static let tutorialSecondaryButton	= UIColor(red:  54 / 255.0, green:  51 / 255.0, blue:  56 / 255.0, alpha: 1   )
 	static let tutorialButtonBorder		= UIColor(red: 150 / 255.0, green: 150 / 255.0, blue: 150 / 255.0, alpha: 1   )
 	static let tutorialIconBorder		= UIColor(red: 188 / 255.0, green: 186 / 255.0, blue: 189 / 255.0, alpha: 1   )
@@ -38,15 +37,18 @@ extension UIColor {
 	static let cookieStats				= UIColor(red:  44 / 255.0, green: 137 / 255.0, blue: 160 / 255.0, alpha: 1   )
 	static let vpnStats					= UIColor(red: 160 / 255.0, green:  44 / 255.0, blue:  90 / 255.0, alpha: 1   )
 
-	static let title					= UIColor(white: 0.98 , alpha: 1)
-	static let darkTitle				= UIColor(white: 0.665, alpha: 1)
-	static let popover					= UIColor(white: 0.91 , alpha: 1)
-	static let subtitle					= UIColor(white: 0.75 , alpha: 1)
-	static let localSettingsTitle		= UIColor(white: 0.4  , alpha: 1)
-	static let localSettingsOffSubtitle	= UIColor(white: 0.71 , alpha: 1)
-	static let tabCellBackground		= UIColor(white: 0.96 , alpha: 1)
+	static let title					= UIColor(white: 0.98 , alpha: 1  )
+	static let darkTitle				= UIColor(white: 0.665, alpha: 1  )
+	static let popover					= UIColor(white: 0.91 , alpha: 1  )
+	static let popoverDismiss			= UIColor(white: 0    , alpha: 0.3)
+	static let subtitle					= UIColor(white: 0.75 , alpha: 1  )
+	static let localSettingsTitle		= UIColor(white: 0.4  , alpha: 1  )
+	static let localSettingsOffSubtitle	= UIColor(white: 0.71 , alpha: 1  )
+	static let settingsIcon				= UIColor(white: 0.96 , alpha: 1  )
+	static let pageInfoTitleBG			= UIColor(white: 0.6  , alpha: 1  )
+	static let pageInfoEvenCellBG		= UIColor(white: 0.85 , alpha: 1  )
+	static let pageInfoOddCellBG		= UIColor(white: 0.95 , alpha: 1  )
 
-	static let safetyIndicator			= goodPrivacy
 	static let httpWarning				= okPrivacy
 
 	var hex: String {

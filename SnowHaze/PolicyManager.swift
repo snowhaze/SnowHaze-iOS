@@ -2,18 +2,16 @@
 //  PolicyManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import WebKit
 
-let WebViewURLSchemes = ["http", "https", "data"]
+let WebViewURLSchemes = ["http", "https", "data", "javascript"]
 
-public let aboutBlankURL = "about:blank" // is also used in DB migration
-private let dataURIPseudoDomain = "data:uri"
-public let missingHostPseudoDomain = "missing:host" // is also used in DB migration
-private let aboutBlankURLS = [aboutBlankURL, aboutBlankURL + "%23", aboutBlankURL + "%23moreInformation"]
+let scaleStorageFactor: Int64 = 1_000_000
 
 let allowPermanentDataStorageKey			= "ch.illotros.snowhaze.allowPermanentStorage"
 let allowJavaScriptKey						= "ch.illotros.snowhaze.allowJavaScript"
@@ -29,6 +27,7 @@ let blockHTTPReferrersKey					= "ch.illotros.snowhaze.blockHTTPReferrers"
 let tryHTTPSfirstKey						= "ch.illotros.snowhaze.tryHTTPSfirst"
 let nightModeKey							= "ch.illotros.snowhaze.nightMode"
 let minFontSizeKey							= "ch.illotros.snowhaze.minFontSize"
+let webContentScaleKey						= "ch.illotros.snowhaze.webContentScale"
 let ignoresViewportScaleLimitsKey			= "ch.illotros.snowhaze.ignoresViewportScaleLimits"
 let blockTrackingScriptsKey					= "ch.illotros.snowhaze.blockTrackingScripts"
 let blockSocialMediaWidgetsKey				= "ch.illotros.snowhaze.blockSocialMediaWidgets"
@@ -60,8 +59,20 @@ let stripTrackingURLParametersKey			= "ch.illotros.snowhaze.stripTrackingURLPara
 let preventXSSKey							= "ch.illotros.snowhaze.preventXSS"
 let skipRedirectsKey						= "ch.illotros.snowhaze.skipRedirects"
 let useFrontCameraForCodeScannerKey			= "ch.illotros.snowhaze.useFrontCameraForCodeScanner"
+let allowCloseAllTabsKey					= "ch.illotros.snowhaze.allowCloseAllTabs"
 let autorotateIPSecCredentialsKey			= "ch.illotros.snowhaze.autorotateIPSecCredentials"
 let updateUsageStatsKey						= "ch.illotros.snowhaze.updateUsageStatsKey"
+let allowJSURLsInURLBarKey					= "ch.illotros.snowhaze.allowJSURLsInURLBar"
+let homepageURLKey							= "ch.illotros.snowhaze.homepageURL"
+let previewDelayKey							= "ch.illotros.snowhaze.previewDelay"
+let safebrowsingEnabledKey					= "ch.illotros.snowhaze.safebrowsing.enabled"
+let safebrowsingProxyKey					= "ch.illotros.snowhaze.safebrowsing.proxy"
+let safebrowsingHardFailKey					= "ch.illotros.snowhaze.safebrowsing.hardFail"
+let safebrowsingCacheSharingKey				= "ch.illotros.snowhaze.safebrowsing.cacheSharing"
+let requireHTTPSForTrustedSitesKey			= "ch.illotros.snowhaze.trustedSite.requireHTTPS"
+let upgradeAllHTTPKey						= "ch.illotros.snowhaze.trustedSite.upgradeAllHTTP"
+let blockDOHServersKey						= "ch.illotros.snowhaze.blockDOHServers"
+let warnCrossFrameNavigationKey				= "ch.illotros.snowhaze.warnCrossFrameNavigation"
 
 let lastOpenedVersionKey					= "ch.illotros.snowhaze.lastOpenedVersion"
 let lastTutorialVersionKey					= "ch.illotros.snowhaze.lastTutorialVersion"
@@ -71,6 +82,11 @@ let trustedSiteKey							= "ch.illotros.snowhaze.trustedSite"
 let readerModeKey							= "ch.illotros.snowhaze.readerMode"
 let doNotResetAutoUpdateKey					= "ch.illotros.snowhaze.doNotResetAutoUpdate"
 let strictTabGroupSeparationKey				= "ch.illotros.snowhaze.strictTabGroupSeparation"
+let useTorNetworkKey						= "ch.illotros.snowhaze.useTorNetwork"
+let startTorOnAppLaunchKey					= "ch.illotros.snowhaze.startTorOnAppLaunch"
+let useTorForAPICallsKey					= "ch.illotros.snowhaze.useTorForAPICalls"
+let rotateCircuitForNewTokensKey			= "ch.illotros.snowhaze.rotateTorCircuitForNewTokens"
+let sendDNTHeaderOverTorKey					= "ch.illotros.snowhaze.sendDNTHeaderOverTor"
 
 let updateSubscriptionProductListKey		= "ch.illotros.snowhaze.updateSubscriptionProductList"
 let updateAuthorizationTokenKey				= "ch.illotros.snowhaze.updateAuthorizationToken"
@@ -84,10 +100,11 @@ private let defaults: [String: SQLite.Data] = [
 	lastEOLWarningVersionKey:				.integer(0),
 
 	// Warnings:
-	showDangerousSitesWarningsKey:			.false,
+	showDangerousSitesWarningsKey:			.true,
 	showTLSCertificateWarningsKey:			.true,
 	stripTrackingURLParametersKey:			.false,
 	preventXSSKey:							.false,
+	warnCrossFrameNavigationKey:			.false,
 
 	// Website Data
 	allowPermanentDataStorageKey:			.false,
@@ -101,6 +118,7 @@ private let defaults: [String: SQLite.Data] = [
 	allowJavaScriptKey:						.true,
 	allowApplicationJavaScriptKey:			.true,
 	allowPasswordManagerIntegrationKey:		.true,
+	allowJSURLsInURLBarKey:					.false,
 
 	// User Agent
 	userAgentsKey:							.text(UserAgent.encode(UserAgent.defaultUserAgentTypes)),
@@ -121,16 +139,20 @@ private let defaults: [String: SQLite.Data] = [
 	blockFingerprintingKey:					.true,
 	blockSocialMediaWidgetsKey:				.true,
 	applyHideOnlyBlockRulesKey:				.false,
+	skipRedirectsKey:						.false,
 
 	// HTTPS
 	tryHTTPSfirstKey:						.true,
 	useHTTPSExclusivelyWhenPossibleKey:		.true,
 	blockMixedContentKey:					.true,
+	requireHTTPSForTrustedSitesKey:			.false,
+	upgradeAllHTTPKey:						.false,
 
 	// Appearence
 	nightModeKey:							.false,
 	minFontSizeKey:							.float(0),
 	ignoresViewportScaleLimitsKey:			.false,
+	webContentScaleKey:						.integer(scaleStorageFactor),
 
 	// Popover
 	popoverBlockingPolicyKey:				.integer(PopoverBlockingPolicyType.blockScripted.rawValue),
@@ -145,6 +167,7 @@ private let defaults: [String: SQLite.Data] = [
 	updateSiteListsKey:						.false,
 	useCellularForSiteListsUpdateKey:		.false,
 	updateUsageStatsKey:					.true,
+	homepageURLKey:							.null,
 
 	tabClosingUndoTimeLimitKey:				.float(10),
 	allowTabClosingUndoForAllTabsKey:		.false,
@@ -157,10 +180,11 @@ private let defaults: [String: SQLite.Data] = [
 	trustedSiteKey:							.false,
 	readerModeKey:							.false,
 	doNotResetAutoUpdateKey:				.false,
-	skipRedirectsKey:						.false, // not reliable yet; planed for v3
 	suppressHistoryKey:						.false,
-	useFrontCameraForCodeScannerKey:		.false, // Requires iOS 10; intended for debug use only
+	useFrontCameraForCodeScannerKey:		.false, // intended for debug use only
+	allowCloseAllTabsKey:					.true, // intended for debug use only
 	strictTabGroupSeparationKey:			.true,
+	previewDelayKey:						.float(5),
 
 	// Subscription
 	updateSubscriptionProductListKey:		.false,
@@ -171,12 +195,26 @@ private let defaults: [String: SQLite.Data] = [
 	showVPNServerPingStatsKey:				.true,
 	autorotateIPSecCredentialsKey:			.true,
 
-	// Content Type Blocer
+	// Content Blocer
 	contentTypeBlockerBlockedTypesKey:		.integer(ContentTypes.none.rawValue),
+	blockDOHServersKey:						.true,
+
+	// Safebrowsing
+	safebrowsingEnabledKey:					.false,
+	safebrowsingProxyKey:					.true,
+	safebrowsingHardFailKey:				.true,
+	safebrowsingCacheSharingKey:			.integer(SafebrowsingCacheSharing.prefix.rawValue),
+
+	// Tor
+	useTorNetworkKey:						.false,
+	startTorOnAppLaunchKey:					.false,
+	sendDNTHeaderOverTorKey:				.false,
+	useTorForAPICallsKey:					.false,
+	rotateCircuitForNewTokensKey:			.false,
 ]
 
 class PolicyManager {
-	private static var settingsDefaultsSetup = false
+	private static var globalSetupPerformed = false
 
 	class var dataAvailable: Bool {
 		return SettingsDefaultWrapper.dataAvailable
@@ -185,36 +223,24 @@ class PolicyManager {
 	let settingsWrapper: SettingsDefaultWrapper
 
 	static func globalManager() -> PolicyManager {
-		setupSettingsWrapper()
+		setup()
 		let wrapper = SettingsDefaultWrapper.wrapGlobalSettings()
 		return PolicyManager(wrapper: wrapper)
 	}
 
 	static func manager(for tab: Tab) -> PolicyManager {
-		setupSettingsWrapper()
+		precondition(!tab.deleted)
+		setup()
 		let wrapper = SettingsDefaultWrapper.wrapSettings(for: tab)
 		return PolicyManager(wrapper: wrapper)
 	}
 
 	static func manager(for url: URL?, in tab: Tab) -> PolicyManager {
-		setupSettingsWrapper()
+		precondition(!tab.deleted)
+		setup()
 		let domain = PolicyDomain(url: url)
 		let wrapper = SettingsDefaultWrapper.wrapSettings(for: domain, inTab: tab)
 		return PolicyManager(wrapper: wrapper)
-	}
-
-	static func isAboutBlank(_ url: URL?) -> Bool {
-		guard let url = url else {
-			return false
-		}
-		return aboutBlankURLS.contains(url.absoluteString)
-	}
-
-	static func isNormalDataURI(_ url: URL?) -> Bool {
-		guard let url = url else {
-			return false
-		}
-		return url.scheme?.lowercased() == "data" && url.host == nil
 	}
 
 	init(wrapper: SettingsDefaultWrapper) {
@@ -233,21 +259,55 @@ class PolicyManager {
 		return buildExpiration < Date() && settingsWrapper.value(for: lastEOLWarningVersionKey).integer! < currentVersion
 	}
 
-	var webViewConfiguration: WKWebViewConfiguration {
+	func webViewConfiguration(for manager: WebViewManager) -> WKWebViewConfiguration {
 		let config = WKWebViewConfiguration()
 		let userActionForMedia = bool(for: requiresUserActionForMediaPlaybackKey)
 		config.allowsInlineMediaPlayback = bool(for: allowsInlineMediaPlaybackKey)
-		if #available(iOS 10, *) {
-			config.ignoresViewportScaleLimits = bool(for: ignoresViewportScaleLimitsKey)
-			config.mediaTypesRequiringUserActionForPlayback = userActionForMedia ? .all : []
-		} else {
-			config.requiresUserActionForMediaPlayback = userActionForMedia
+		config.ignoresViewportScaleLimits = bool(for: ignoresViewportScaleLimitsKey)
+		config.mediaTypesRequiringUserActionForPlayback = userActionForMedia ? .all : []
+		if manager.tab.useTor {
+			let handler = TorSchemeHandler(dnt: bool(for: sendDNTHeaderOverTorKey))
+			config.setURLSchemeHandler(handler, forURLScheme: "tor")
+			config.setURLSchemeHandler(handler, forURLScheme: "tors")
 		}
 		return config
 	}
 
-	var urlSessionConfiguration: URLSessionConfiguration {
-		return allowPermanentDataStorage ? URLSessionConfiguration.default : URLSessionConfiguration.ephemeral
+	func urlSessionConfiguration(tabController: TabController?) -> URLSessionConfiguration? {
+		let config = allowPermanentDataStorage ? URLSessionConfiguration.default : URLSessionConfiguration.ephemeral
+		if tabController?.tab.useTor ?? useTor {
+			guard let proxy = TorServer.shared.connectionProxyDictionary else {
+				TorServer.shared.getURLSessionProxyConfig { _ in }
+				return nil
+			}
+			config.connectionProxyDictionary = proxy
+		}
+		config.httpAdditionalHeaders = ["User-Agent": tabController?.userAgent ?? userAgent]
+		return config
+	}
+
+	func awaitTorIfNecessary(for tab: Tab?, callback: @escaping (Bool) -> Void) {
+		guard tab?.useTor ?? useTor else {
+			callback(true)
+			return
+		}
+		TorServer.shared.start { error in
+			guard error == nil else {
+				callback(false)
+				return
+			}
+			TorServer.shared.getURLSessionProxyConfig { config in
+				callback(config != nil)
+			}
+		}
+	}
+
+	func torifyIfNecessary(for tab: Tab, url: URL?) -> URL? {
+		if let url = url, tab.useTor, url.canTorify {
+			return url.torified
+		} else {
+			return nil
+		}
 	}
 
 	var dataStore: (store: WKWebsiteDataStore, pool: WKProcessPool?) {
@@ -259,6 +319,18 @@ class PolicyManager {
 		return (store, pool)
 	}
 
+	var useTor: Bool {
+		return bool(for: useTorNetworkKey)
+	}
+
+	var useTorForAPICalls: Bool {
+		return bool(for: useTorForAPICallsKey)
+	}
+
+	var rotateCircuitForNewTokens: Bool {
+		return bool(for: rotateCircuitForNewTokensKey)
+	}
+
 	var shareGlobalProcessPool: Bool {
 		return !bool(for: strictTabGroupSeparationKey)
 	}
@@ -267,12 +339,20 @@ class PolicyManager {
 		return bool(for: allowJavaScriptKey)
 	}
 
+	var allowJSURLsInURLBar: Bool {
+		return bool(for: allowJSURLsInURLBarKey)
+	}
+
 	var allowPWManager: Bool {
 		return bool(for: allowPasswordManagerIntegrationKey)
 	}
 
 	var trust: Bool {
 		return bool(for: trustedSiteKey)
+	}
+
+	var trustedSiteUpdateRequired: Bool {
+		return trust && bool(for: requireHTTPSForTrustedSitesKey)
 	}
 
 	var updateProductList: Bool {
@@ -293,7 +373,7 @@ class PolicyManager {
 
 	var updateSiteLists: Bool {
 		let lastUpdate = (lastSiteListUpdate ?? .distantPast)
-		return !deleteSiteLists && ((lastUpdate < compilationDate) || (SubscriptionManager.shared.hasSubscription && lastUpdate.timeIntervalSinceNow < -7 * 24 * 60 * 60))
+		return !deleteSiteLists && ((lastUpdate < compilationDate) || (SubscriptionManager.status.confirmed && lastUpdate.timeIntervalSinceNow < -7 * 24 * 60 * 60))
 	}
 
 	var deleteSiteLists: Bool {
@@ -312,10 +392,31 @@ class PolicyManager {
 		return (attributes as NSDictionary).fileCreationDate()
 	}
 
+	var homepageURL: URL? {
+		guard let text = settingsWrapper.value(for: homepageURLKey).text else {
+			return nil
+		}
+		return URL(string: text)
+	}
+
+	var hasHomePage: Bool {
+		return settingsWrapper.value(for: homepageURLKey).text != nil
+	}
+
 	var minFontSize: CGFloat {
 		let data = settingsWrapper.value(for: minFontSizeKey)
 		let value = data.floatValue!
 		return CGFloat(value)
+	}
+
+	var webContentScale: CGFloat {
+		let data = settingsWrapper.value(for: webContentScaleKey)
+		let value = data.integer!
+		return CGFloat(value) / CGFloat(scaleStorageFactor)
+	}
+
+	var previewDelay: TimeInterval {
+		return settingsWrapper.value(for: previewDelayKey).float!
 	}
 
 	var allowApplicationJS: Bool {
@@ -366,12 +467,32 @@ class PolicyManager {
 		return bool(for: useFrontCameraForCodeScannerKey)
 	}
 
+	var allowCloseAllTabs: Bool {
+		return bool(for: allowCloseAllTabsKey)
+	}
+
 	/**
 	 *	Is not guarantied to return the same user agent even on multiple calls to same PolicyManager object
 	 */
 	var userAgent: String {
 		let agentTypes = UserAgent.decode(settingsWrapper.value(for: userAgentsKey).text!)
 		return UserAgent(type: agentTypes.randomElement).string
+	}
+
+	var safebrowsing: Bool {
+		return bool(for: safebrowsingEnabledKey)
+	}
+
+	var safebrowsingStorage: SafebrowsingStorage {
+		guard safebrowsing else {
+			return DummySafebrowsingStorage()
+		}
+		let id = settingsWrapper.value(for: safebrowsingCacheSharingKey).integer!
+		switch SafebrowsingCacheSharing(rawValue: id)! {
+			case .all:		return CachingSafebrowsingStorage()
+			case .prefix:	return PrefixCachingSafebrowsingStorage()
+			case .none:		return EphemeralSafebrowsingStorage()
+		}
 	}
 
 	private struct Scripts {
@@ -381,7 +502,7 @@ class PolicyManager {
 		static let fingerprintingProtection = WKUserScript(source: JSGenerator.named("FingerprintingProtection")!.generate()!, injectionTime: .atDocumentStart, forMainFrameOnly: false)
 		static let readerMode = WKUserScript(source: JSGenerator.named("ReaderMode")!.generate()!, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
 	}
-	var userScripts: [WKUserScript] {
+	func userScripts(with securityCookie: String, for tab: Tab) -> [WKUserScript] {
 		guard allowApplicationJS else {
 			return []
 		}
@@ -392,24 +513,6 @@ class PolicyManager {
 		if isInNightMode {
 			ret.append(Scripts.nightMode)
 		}
-		if #available(iOS 11, *) {
-			// tracking scripts are blocked with WKContentRuleLists
-		} else {
-			if blockTrackingScripts {
-				let blacklist = DomainList(type: .trackingScripts).domains
-				let js = JSGenerator.named("ScriptBlackListing")!.generate(with: ["blacklist": blacklist as AnyObject])!
-				ret.append(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false))
-			}
-		}
-		if #available(iOS 11, *) {
-			// ads are blocked with WKContentRuleLists
-		} else {
-			if blockAds {
-				let blacklist = DomainList(type: .ads).domains
-				let js = JSGenerator.named("BlockAds")!.generate(with: ["blacklist": blacklist as AnyObject])!
-				ret.append(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false))
-			}
-		}
 		if bool(for: blockCanvasDataAccessKey) {
 			ret.append(Scripts.canvasProtection)
 		}
@@ -419,11 +522,14 @@ class PolicyManager {
 		if isInReaderMode {
 			ret.append(Scripts.readerMode)
 		}
+		if tab.useTor {
+			let js = JSGenerator.named("TorifyURLs")!.generate()!
+			ret.append(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+		}
 		return ret
 	}
 
-	@available(iOS 11, *)
-	func withEnabledContentRuleLists(do work: @escaping ([WKContentRuleList], [WKUserScript]) -> Void) {
+	func withEnabledContentRuleLists(for tab: Tab, do work: @escaping ([WKContentRuleList], [WKUserScript]) -> Void) {
 		assert(ContentTypes.allTypes == [.document, .image, .styleSheet, .script, .font, .raw, .svgDocument, .media, .popup, .thirdPartyScripts])
 		let blockAds = self.blockAds
 		let blockTrackingScripts = self.blockTrackingScripts
@@ -432,9 +538,12 @@ class PolicyManager {
 		let rawType = settingsWrapper.value(for: contentTypeBlockerBlockedTypesKey).integer!
 		let blockedTypes = ContentTypes(rawValue: rawType)
 		let blockMixedContent = self.blockMixedContent
-		let httpsOnly = self.useHTTPSExclusivelyWhenPossible
+		let extendedHstsPreload = self.useHTTPSExclusivelyWhenPossible
+		let httpsOnly = bool(for: upgradeAllHTTPKey)
 		let cookieBlockingPolicy = CookieBlockingPolicy(rawValue: settingsWrapper.value(for: cookieBlockingPolicyKey).integer!)!
 		let applicationJS = allowApplicationJS
+		let tor = tab.useTor
+		let blockDOH = bool(for: blockDOHServersKey)
 
 		let typeBlockers: [(ContentTypes, String, String)] = [
 			(.document, BlockerID.documentContentTypeBlocker, "document"),
@@ -507,7 +616,7 @@ class PolicyManager {
 					print("mixed content blocker not available")
 				}
 			}
-			if httpsOnly {
+			if extendedHstsPreload {
 				if let blocker = allBlockers[BlockerID.hstsPreloadUpgrader1] {
 					blockers.append(blocker)
 				} else {
@@ -529,6 +638,20 @@ class PolicyManager {
 					print("hsts preload upgrader 4 not available")
 				}
 			}
+			if httpsOnly {
+				if let blocker = allBlockers[BlockerID.httpsOnlyContentBlocker] {
+					blockers.append(blocker)
+				} else {
+					print("all http upgrader not available")
+				}
+			}
+			if blockDOH {
+				if let blocker = allBlockers[BlockerID.dohServerBlocker] {
+					blockers.append(blocker)
+				} else {
+					print("doh blocker not available")
+				}
+			}
 
 			for (type, blockerID, name) in typeBlockers {
 				if blockedTypes.contains(type) {
@@ -538,6 +661,12 @@ class PolicyManager {
 						print("content type \(name) blocker content blocker not available")
 					}
 				}
+			}
+
+			if tor {
+				// TODO: consider leaving in place instead of removing & readding this particularly important one
+				// in this case, crash rather than continue if something went wrong
+				blockers.append(allBlockers[BlockerID.nonTorURLsBlocker]!)
 			}
 
 			work(blockers, applicationJS ? replacementScripts : [])
@@ -562,6 +691,10 @@ class PolicyManager {
 
 	var preventXSS: Bool {
 		return bool(for: preventXSSKey)
+	}
+
+	var warnCrossFrameNavigation: Bool {
+		return bool(for: warnCrossFrameNavigationKey)
 	}
 
 	var stripTrackingURLParameters: Bool {
@@ -614,7 +747,7 @@ class PolicyManager {
 	}
 
 	func setupHistorySuppresion(for url: URL?) {
-		guard bool(for: forgetPrivateSitesKey) else {
+		guard bool(for: forgetPrivateSitesKey), !isSuppressingHistory else {
 			return
 		}
 		struct Local {
@@ -643,19 +776,28 @@ class PolicyManager {
 		settingsWrapper.set(.integer(currentVersion), for: lastOpenedVersionKey)
 	}
 
-	var displayUpdateTutorial: Bool {
-		guard let lastVersion = settingsWrapper.value(for: lastTutorialVersionKey).integer else {
-			return false
+	func performLaunchOperations() {
+		struct LocalData {
+			static var performed = false
 		}
-		return !displayInstallTutorial && lastVersion < version_2_5_0__055
+		assert(Thread.isMainThread && !LocalData.performed)
+		LocalData.performed = true
+		if bool(for: startTorOnAppLaunchKey) {
+			TorServer.shared.start { _ in }
+		}
 	}
 
 	func updateEOLWarningVersion() {
 		settingsWrapper.set(.integer(currentVersion), for: lastEOLWarningVersionKey)
 	}
 
-	func searchSuggestionSources(for tab: Tab) -> [SuggestionSource] {
-		let localSources: [SuggestionSource] = [HistorySuggestionSource(), BookmarkSuggestionSource(), PopularSitesSuggestionSource(includePrivate: bool(for: suggestPrivateSitesKey), upgrade: useHTTPSExclusivelyWhenPossible, tab: tab)]
+	func suggestionSources(for tab: Tab) -> [SuggestionSource] {
+		let localSources: [SuggestionSource] = [
+			HistorySuggestionSource(),
+			BookmarkSuggestionSource(),
+			PopularSitesSuggestionSource(includePrivate: bool(for: suggestPrivateSitesKey), tab: tab),
+			HomeSuggestionSource()
+		]
 		let encoded = settingsWrapper.value(for: searchSuggestionEnginesKey).text!
 		let engines = SearchEngine.decode(encoded)
 		let engineSources: [SuggestionSource] = engines.map {
@@ -689,18 +831,25 @@ class PolicyManager {
 	}
 
 	enum Action {
-		case load(URL, Bool)
+		case load(URL, upgraded: Bool)
 	}
-	func actionList(for userInput: String) -> [Action] {
+	func actionList(for userInput: String, in tab: Tab) -> [Action] {
 		let httpsSites = DomainList(type: useHTTPSExclusivelyWhenPossible ? .httpsSites : .empty)
+		func enfoceHTTPS(for url: URL) -> Bool {
+			if httpsSites.contains(url.host!) {
+				return true
+			}
+			let policy = PolicyManager.manager(for: url, in: tab)
+			return policy.trustedSiteUpdateRequired
+		}
 		var ret = [Action]()
 		if let url = userInput.punycodeURL {
-			if url.scheme!.lowercased() == "http" && httpsSites.contains(url.host!) {
+			if url.normalizedScheme! == "http" && enfoceHTTPS(for: url) {
 				var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
 				components.scheme = "https"
-				return [.load(components.url!, true)]
+				return [.load(components.url!, upgraded: true)]
 			} else {
-				return [.load(url, false)]
+				return [.load(url, upgraded: false)]
 			}
 		}
 
@@ -709,22 +858,22 @@ class PolicyManager {
 			var https = [Action]()
 
 			if let url = encoded.extendToURL(https: true, www: false) {
-				let upgraded = httpsFirst || httpsSites.contains(url.host!)
-				https.append(.load(url, upgraded))
+				let upgraded = httpsFirst || enfoceHTTPS(for: url)
+				https.append(.load(url, upgraded: upgraded))
 			}
 			if let url = encoded.extendToURL(https: true, www: true), !encoded.hasWPrefix {
-				let upgraded = httpsFirst || httpsSites.contains(url.host!)
-				https.append(.load(url, https.isEmpty && upgraded))
+				let upgraded = httpsFirst || enfoceHTTPS(for: url)
+				https.append(.load(url, upgraded: https.isEmpty && upgraded))
 			}
 			var http = [Action]()
 			if let url = encoded.extendToURL(https: false, www: false) {
-				if !httpsSites.contains(url.host!) {
-					http.append(.load(url, false))
+				if !enfoceHTTPS(for: url) {
+					http.append(.load(url, upgraded: false))
 				}
 			}
 			if let url = encoded.extendToURL(https: false, www: true), !encoded.hasWPrefix {
-				if !httpsSites.contains(url.host!) {
-					http.append(.load(url, false))
+				if !enfoceHTTPS(for: url) {
+					http.append(.load(url, upgraded: false))
 				}
 			}
 			if httpsFirst {
@@ -738,7 +887,7 @@ class PolicyManager {
 		}
 		let engine = searchEngine
 		if let url = engine.url(for: userInput) {
-			ret.append(.load(url, false))
+			ret.append(.load(url, upgraded: false))
 		}
 		return ret
 	}
@@ -757,48 +906,94 @@ class PolicyManager {
 		return blockAds && DomainList(type: .ads).contains(host)
 	}
 
-	enum Danger: Int64 {
-		case malicious			= 1
-		case phish				= 2
-		case phishGoogle		= 3
-		case malware			= 4
-		case harmfulApplication	= 5
-		case unwantedSoftware	= 6
+	func dangerReasons(for url: URL?, in tabController: TabController, callback: @escaping (Set<Safebrowsing.Danger>) -> Void) {
+		guard bool(for: showDangerousSitesWarningsKey), let url = url else {
+			callback([])
+			return
+		}
+		let hardFail = bool(for: safebrowsingHardFailKey)
+		let networking: SafebrowsingNetworking
+		if !safebrowsing {
+			networking = DummySafebrowsingNetworking()
+		} else if let config = urlSessionConfiguration(tabController: tabController) {
+			if bool(for: safebrowsingProxyKey) {
+				networking = ProxySafebrowsingNetworking(configuration: config, rotateCredentials: rotateCircuitForNewTokens)
+			} else {
+				networking = GoogleSafebrowsingNetworking(configuration: config, tab: tabController.tab)
+			}
+		} else {
+			callback(hardFail ? [.networkIssue] : [])
+			return
+		}
+		let hasSubscription = SubscriptionManager.status.confirmed
+		let sb = Safebrowsing(network: networking, storage: tabController.safebrowsingStorage, local: true, softFail: !hardFail, hasSubscription: hasSubscription)
+		sb.types(for: url, callback: callback)
 	}
-	func dangerReasons(for url: URL?) -> Set<Danger> {
-		guard bool(for: showDangerousSitesWarningsKey) else {
-			return []
+
+	var updateSafebrowsing: Safebrowsing? {
+		guard let config = urlSessionConfiguration(tabController: nil), SubscriptionManager.status.confirmed else {
+			return nil
 		}
-		var types = Set<Int64>()
-		if let host = url?.host {
-			types = types.union(DomainList(type: .danger).types(forDomain: host))
+		let networking: SafebrowsingNetworking
+		if bool(for: safebrowsingProxyKey) {
+			networking = ProxySafebrowsingNetworking(configuration: config, rotateCredentials: rotateCircuitForNewTokens)
+		} else {
+			networking = GoogleSafebrowsingNetworking(configuration: config, tab: nil)
 		}
-		if let url = url {
-			types = types.union(DomainList(type: .dangerHash).types(forURL: url))
-		}
-		return Set(types.compactMap({ Danger(rawValue: $0) }))
+		let storage = CachingSafebrowsingStorage()
+		return Safebrowsing(network: networking, storage: storage, local: false, softFail: false, hasSubscription: true)
 	}
 }
 
 struct PolicyDomain {
+	public static let aboutBlankURL = "about:blank" // is also used in DB migration
+	private static let dataURIPseudoDomain = "data:uri"
+	public static let missingHostPseudoDomain = "missing:host" // is also used in DB migration
+	private static let aboutBlankURLS = [aboutBlankURL, aboutBlankURL + "%23", aboutBlankURL + "%23moreInformation"]
+
 	let domain: String
-	init(url: URL?) {
-		if PolicyManager.isAboutBlank(url) {
-			domain = aboutBlankURL
-		} else if PolicyManager.isNormalDataURI(url) {
-			domain = dataURIPseudoDomain
-		} else {
-			domain = url?.host?.replacingOccurrences(of: ":", with: "::") ?? missingHostPseudoDomain
+
+	static func isAboutBlank(_ url: URL?) -> Bool {
+		guard let url = url else {
+			return false
 		}
+		return aboutBlankURLS.contains(url.absoluteString)
+	}
+
+	static func isNormalDataURI(_ url: URL?) -> Bool {
+		guard let url = url else {
+			return false
+		}
+		return url.normalizedScheme == "data" && url.host == nil
+	}
+
+	init(url: URL?) {
+		if PolicyDomain.isAboutBlank(url) {
+			domain = PolicyDomain.aboutBlankURL
+		} else if PolicyDomain.isNormalDataURI(url) {
+			domain = PolicyDomain.dataURIPseudoDomain
+		} else if let host = url?.host {
+			domain = host.replacingOccurrences(of: ":", with: "::")
+		} else {
+			domain = PolicyDomain.missingHostPseudoDomain
+		}
+	}
+
+	var isAboutBlank: Bool {
+		return domain == PolicyDomain.aboutBlankURL
+	}
+
+	var isNormalDataURI: Bool {
+		return domain == PolicyDomain.dataURIPseudoDomain
 	}
 }
 
 // internals
 extension PolicyManager {
-	private static func setupSettingsWrapper() {
-		if !settingsDefaultsSetup {
+	private static func setup() {
+		if !globalSetupPerformed {
 			SettingsDefaultWrapper.standardDefaults = defaults
-			settingsDefaultsSetup = true
+			globalSetupPerformed = true
 		}
 	}
 

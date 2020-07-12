@@ -2,7 +2,7 @@
 //  EncryptedDBManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -130,11 +130,13 @@ let db: SQLiteManager = {
 				case (.read("ch_illotros_snowhaze_browsing_tab", "id"), "main", nil):					return .ok
 				case (.read("ch_illotros_snowhaze_browsing_tab", "title"), "main", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_browsing_tab", "active"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_tab", "deleted"), "main", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_browsing_tab", "root_id"), "main", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_browsing_tab", "history"), "main", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_browsing_tab", "snapshot"), "main", nil):				return .ok
 				case (.update("ch_illotros_snowhaze_browsing_tab", "title"), "main", nil):				return .ok
 				case (.update("ch_illotros_snowhaze_browsing_tab", "active"), "main", nil):				return .ok
+				case (.update("ch_illotros_snowhaze_browsing_tab", "deleted"), "main", nil):			return .ok
 				case (.update("ch_illotros_snowhaze_browsing_tab", "history"), "main", nil):			return .ok
 				case (.update("ch_illotros_snowhaze_browsing_tab", "root_id"), "main", nil):			return .ok
 				case (.update("ch_illotros_snowhaze_browsing_tab", "snapshot"), "main", nil):			return .ok
@@ -280,6 +282,7 @@ let db: SQLiteManager = {
 			switch (action, db, cause) {
 				case (.select, nil, nil):																	return .ok
 				case (.function("fts5"), nil, nil):															return .ok
+				case (.function("substr"), nil, nil):														return .ok
 				case (.transaction("BEGIN"), nil, nil):														return .ok
 				case (.transaction("COMMIT"), nil, nil):													return .ok
 				case (.transaction("ROLLBACK"), nil, nil):													return .ok
@@ -290,11 +293,15 @@ let db: SQLiteManager = {
 				case (.pragma("data_version", nil), "main", nil):											return .ok
 				case (.pragma("database_list", nil), nil, nil):												return .ok
 				case (.pragma("user_version", "1"), "main", nil):											return .ok
+				case (.pragma("user_version", "2"), "main", nil):											return .ok
 				case (.pragma("auto_vacuum", "FULL"), nil, nil):											return .ok
 				case (.pragma("journal_mode", "DELETE"), nil, nil):											return .ok
 
 				case (.insert("sqlite_master"), "main", nil):												return .ok
 				case (.read("sqlite_master", "ROWID"), "main", nil):										return .ok
+				case (.read("sqlite_master", "sql"), "main", nil):											return .ok
+				case (.read("sqlite_master", "type"), "main", nil):											return .ok
+				case (.read("sqlite_master", "name"), "main", nil):											return .ok
 				case (.update("sqlite_master", "sql"), "main", nil):										return .ok
 				case (.update("sqlite_master", "type"), "main", nil):										return .ok
 				case (.update("sqlite_master", "name"), "main", nil):										return .ok
@@ -324,6 +331,7 @@ let db: SQLiteManager = {
 				case (.read("ch_illotros_snowhaze_browsing_history", "title"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
 
 				case (.createTable("ch_illotros_snowhaze_browsing_tab"), "main", nil):						return .ok
+				case (.alterTable("main", "ch_illotros_snowhaze_browsing_tab"), nil, nil):					return .ok
 				case (.insert("ch_illotros_snowhaze_browsing_tab"), "main", nil):							return .ok
 				case (.read("ch_illotros_snowhaze_browsing_tab", "id"), "main", nil):						return .ok
 
@@ -424,6 +432,7 @@ let db: SQLiteManager = {
 				case (.read("ch_illotros_snowhaze_settings_page", "value"), "settings", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_settings_page", "domain"), "settings", nil):				return .ok
 				case (.update("ch_illotros_snowhaze_settings_page", "domain"), "settings", nil):			return .ok
+				case (.delete("ch_illotros_snowhaze_settings_page"), "main", nil):							return .ok
 
 				case (.read("ch_illotros_snowhaze_settings_global", "key"), "settings", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_settings_global", "value"), "settings", nil):				return .ok
@@ -490,7 +499,7 @@ let db: SQLiteManager = {
 	}
 
 	manager.migrator = Migrator()
-	try! manager.migrate()
+	try! manager.migrate(toVersion: 2)
 
 	_ = try? manager.execute("DETACH \(settingsDB)")
 	_ = try? manager.execute("DETACH \(browsingDB)")
@@ -546,12 +555,18 @@ private struct Migrator: SQLiteMigrator {
 		}
 
 		if dbres.contains(where: { $0[1]?.textValue == settingsDB }) {
-			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = replace(domain, ':', '::') WHERE domain != ?", with: [.text(aboutBlankURL)])
-			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = ? WHERE domain == ''", with: [.text(missingHostPseudoDomain)])
+			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = replace(domain, ':', '::') WHERE domain != ?", with: [.text(PolicyDomain.aboutBlankURL)])
+			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = ? WHERE domain == ''", with: [.text(PolicyDomain.missingHostPseudoDomain)])
 			_ = try? connection.execute("INSERT INTO \(Settings.globalTableName) (key, value) SELECT key, value FROM \(settingsDB).\(Settings.globalTableName)")
 			_ = try? connection.execute("DELETE FROM \(settingsDB).\(Settings.tabTableName) WHERE tab_id NOT IN (SELECT id FROM \(TabStore.tableName))")
 			_ = try? connection.execute("INSERT INTO \(Settings.tabTableName) (tab_id, key, value) SELECT tab_id, key, value FROM \(settingsDB).\(Settings.tabTableName)")
 			_ = try? connection.execute("INSERT INTO \(Settings.pageTableName) (domain, key, value) SELECT domain, key, value FROM \(settingsDB).\(Settings.pageTableName)")
 		}
+	}
+
+	func sqliteManager(_ manager: SQLiteManager, incrementalyUpgradeDatabase database: String, of connection: SQLite, toVersion version: UInt64) throws {
+		assert(version == 2)
+		try connection.execute("ALTER TABLE \(TabStore.tableName) ADD COLUMN deleted INTEGER DEFAULT FALSE")
+		try connection.execute("DELETE FROM \(Settings.pageTableName) WHERE domain = ?", with: [.text(PolicyDomain.aboutBlankURL)])
 	}
 }

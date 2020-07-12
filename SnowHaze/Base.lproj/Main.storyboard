@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Io8-bS-CR2">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Io8-bS-CR2">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -56,7 +56,7 @@
                                             <barButtonItem image="previous" id="SrP-c1-JGh">
                                                 <color key="tintColor" red="0.63529411759999999" green="0.52941176469999995" blue="0.3294117647" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <connections>
-                                                    <action selector="prevButtonPressed:" destination="D63-PW-bMq" id="L7F-zQ-Nac"/>
+                                                    <action selector="prevButtonPressed:by:" destination="D63-PW-bMq" id="CMy-0U-mxW"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="81w-Yq-uDJ">
@@ -65,7 +65,7 @@
                                             <barButtonItem image="next" id="VaF-yd-NS9">
                                                 <color key="tintColor" red="0.63529411759999999" green="0.52941176469999995" blue="0.3294117647" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <connections>
-                                                    <action selector="nextButtonPressed:" destination="D63-PW-bMq" id="NmF-fK-j6V"/>
+                                                    <action selector="nextButtonPressed:by:" destination="D63-PW-bMq" id="Fv8-fk-Ld9"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="Aph-XD-kQq">
@@ -83,7 +83,7 @@
                                             <barButtonItem image="tabs" id="jOG-pq-zTf">
                                                 <color key="tintColor" red="0.63529411759999999" green="0.52941176469999995" blue="0.3294117647" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <connections>
-                                                    <action selector="showTabsView:" destination="BYZ-38-t0r" id="a2I-gj-wtd"/>
+                                                    <action selector="tabsButtonPressed:by:" destination="D63-PW-bMq" id="J5t-Mx-nxz"/>
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="ybc-t7-JCo">
@@ -254,7 +254,7 @@
                                         <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="GnZ-l2-Hte" id="Eo7-8A-xPd">
-                                            <rect key="frame" x="0.0" y="0.0" width="348.5" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="349" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" red="1" green="0.99997437000274658" blue="0.99999129772186279" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
@@ -288,7 +288,7 @@
             </objects>
             <point key="canvasLocation" x="1005" y="1269"/>
         </scene>
-        <!--Tab View Controller-->
+        <!--Delegate-->
         <scene sceneID="DM7-F7-YK5">
             <objects>
                 <viewController storyboardIdentifier="TabViewController" id="cW6-iJ-ezF" customClass="TabViewController" customModule="SnowHaze" customModuleProvider="target" sceneMemberID="viewController">
@@ -319,6 +319,14 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iKH-o3-JFR" customClass="DownloadProgressIndicator" customModule="SnowHaze" customModuleProvider="target">
+                                <rect key="frame" x="337" y="629" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <connections>
+                                    <outlet property="delegate" destination="cW6-iJ-ezF" id="EOI-hu-CEw"/>
+                                </connections>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -330,6 +338,7 @@
                     </view>
                     <connections>
                         <outlet property="bookmarkHistoryView" destination="qmO-iI-rmc" id="vOG-VU-DNC"/>
+                        <outlet property="downloadProgress" destination="iKH-o3-JFR" id="nlc-CZ-CMu"/>
                         <outlet property="maskContent" destination="74Y-Vf-4Yh" id="VMn-d8-cwk"/>
                         <outlet property="maskImage" destination="ZLi-oR-wTA" id="TfE-f8-lGK"/>
                     </connections>

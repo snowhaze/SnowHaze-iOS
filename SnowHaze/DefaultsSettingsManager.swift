@@ -2,11 +2,12 @@
 //  DefaultsSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class DefaultsSettingsManager: SettingsViewManager {
 	override func html() -> String {
@@ -52,11 +53,11 @@ class DefaultsSettingsManager: SettingsViewManager {
 
 		let reset = NSLocalizedString("reset global settings confirm dialog confirm option title", comment: "title for confirm option of dialog to confirm resetting of global settings")
 		let confirmAction = UIAlertAction(title: reset, style: .destructive) { _ in
-			var resoreKeys = [lastTutorialVersionKey, lastOpenedVersionKey, lastEOLWarningVersionKey]
+			var resoreKeys = [lastTutorialVersionKey, lastOpenedVersionKey, lastEOLWarningVersionKey, doNotResetAutoUpdateKey]
 			if self.bool(for: doNotResetAutoUpdateKey) {
 				resoreKeys += [updateSiteListsKey, updateVPNListKey, updateAuthorizationTokenKey, updateSubscriptionProductListKey]
-				try? FileManager.default.removeItem(atPath: DomainList.dbLocation)
-				NotificationCenter.default.post(name: DomainList.dbFileChangedNotification, object: nil)
+			} else {
+				DomainList.set(updating: false)
 			}
 			let resore = resoreKeys.map { ($0, self.settings.value(for: $0)) }
 			Settings.atomically {
@@ -100,7 +101,7 @@ class DefaultsSettingsManager: SettingsViewManager {
 	}
 
 	@objc private func showTutorial(_ sender: UIButton) {
-		let tutorial = InstallTutorialViewController() 
+		let tutorial = InstallTutorialViewController()
 		controller.present(tutorial, animated: true, completion: nil)
 	}
 }

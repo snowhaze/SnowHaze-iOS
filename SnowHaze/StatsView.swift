@@ -2,11 +2,12 @@
 //  StatsView.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2018 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 protocol StatsViewDelegate: class {
 	func numerOfStats(in statsView: StatsView) -> Int
@@ -85,14 +86,14 @@ class StatsView: UICollectionReusableView {
 			number.autoresizingMask = .flexibleWidth
 			number.textColor = dimmed ? .darkTitle : delegate.colorForStat(i, in: self)
 			number.adjustsFontSizeToFitWidth = true
-			UIFont.setSnowHazeFont(on: number, scale: 2)
+			number.font = UIFont.systemFont(ofSize: 40)
 			number.text = fmt(count)
 
 			let category = UILabel(frame: CGRect(x: 0, y: 55, width: 100, height: 30))
 			category.textAlignment = .center
 			category.autoresizingMask = .flexibleWidth
 			category.numberOfLines = 2
-			UIFont.setSnowHazeFont(on: category, scale: 0.6)
+			category.font = UIFont.systemFont(ofSize: 11)
 			category.textColor = dimmed ? .darkTitle : .title
 			category.text = categoryTitle
 

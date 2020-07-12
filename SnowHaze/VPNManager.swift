@@ -2,12 +2,13 @@
 //  VPNManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import NetworkExtension
+import UIKit
 
 private let installedProfilesKey = "ch.illotros.ios.snowhaze.premium.vpn.profiles.installed"
 private let ovpnProfilesKey = "ch.illotros.ios.snowhaze.premium.vpn.profiles.all.data" // called ...profiles.all.data for historical reasons
@@ -141,6 +142,7 @@ struct IPSecProfile: VPNProfile, Equatable {
 struct OVPNProfile: VPNProfile, Equatable {
 	let names: [String: String]
 	let flag: UIImage
+	let flagChar: String?
 	let id: String
 	let hosts: [String]
 	let profile: String?
@@ -181,6 +183,7 @@ struct OVPNProfile: VPNProfile, Equatable {
 			return nil
 		}
 		self.flag = flag
+		self.flagChar = data["flagchar"] as? String
 		if let expirationTimestamp = data["expiration"] as? Double {
 			let date = Date(timeIntervalSince1970: expirationTimestamp)
 			if date > Date() {
@@ -218,6 +221,7 @@ struct OVPNProfile: VPNProfile, Equatable {
 		ret["id"] = id
 		ret["names"] = names
 		ret["hosts"] = hosts
+		ret["flagchar"] = flagChar
 		if let profile = profile {
 			ret["profile"] = profile
 		}
@@ -271,7 +275,7 @@ class VPNManager {
 		}
 
 		withLoadedManager { _ in
-			if !SubscriptionManager.shared.hasSubscription {
+			if !SubscriptionManager.status.possible {
 				self.disconnect()
 			}
 		}
@@ -297,7 +301,7 @@ class VPNManager {
 
 		if lastWarning >= -fiveDays {
 			return nil
-		} else if !SubscriptionManager.shared.stilHasSubscription(in: week) {
+		} else if !SubscriptionManager.shared.status(in: week).possible {
 			return nil
 		} else if expired > 0 {
 			return (expired > 1, true)
@@ -317,7 +321,7 @@ class VPNManager {
 
 	static let shared = VPNManager()
 
-	private let urlSession = URLSession(configuration: .ephemeral, delegate: PinningSessionDelegate(), delegateQueue: nil)
+	private let urlSession = SnowHazeURLSession()
 
 	private(set) var ovpnProfiles: [OVPNProfile] {
 		didSet {
@@ -362,15 +366,13 @@ class VPNManager {
 		if ovpnProfiles.isEmpty || ipsecProfiles.isEmpty {
 			return true
 		}
-		if !SubscriptionManager.shared.hasSubscription {
+		if !SubscriptionManager.status.confirmed {
 			return false
 		}
 		return ovpnProfiles.contains(where: { !$0.hasProfile }) || ipsecProfiles.contains(where: { !$0.hasProfile })
 	}
 
 	func updateProfileList(withCompletionHandler completionHandler: ((Bool) -> Void)?) {
-		let baseURL = "https://api.snowhaze.com/index.php"
-		var request: URLRequest
 		let timestamp = DataStore.shared.getDouble(for: lastProfileUpdateKey) ?? -Double.infinity
 		let date = Date(timeIntervalSince1970: timestamp)
 		guard date.timeIntervalSinceNow < -24 * 60 * 60 || needsProfileUpdate else {
@@ -381,79 +383,73 @@ class VPNManager {
 			}
 			return
 		}
-		let manager = SubscriptionManager.shared
-		if manager.hasValidToken, let token = manager.authorizationToken {
-			request = URLRequest(url: URL(string: baseURL)!)
-			request.setFormEncoded(data: ["t": token, "v": "2", "action": "vpn"])
-		} else if manager.hasSubscription {
-			if PolicyManager.globalManager().autoUpdateAuthToken {
-				SubscriptionManager.shared.updateAuthToken { success in
-					if success {
-						self.updateProfileList(withCompletionHandler: completionHandler)
-					} else if let handler = completionHandler {
-						handler(false)
-					}
-				}
-			} else if let handler = completionHandler {
-				handler(false)
-			}
-			return
-		} else {
-			request = URLRequest(url: URL(string: baseURL)!)
-			request.setFormEncoded(data: ["v": "2", "action": "vpn"])
-		}
 
 		if let handler = completionHandler {
-			downloadCompletionHandlers.append(handler)
+			self.downloadCompletionHandlers.append(handler)
 		}
 
-		guard !isDownloading else {
+		guard !self.isDownloading else {
 			return
 		}
 
-		isDownloading = true
-		let dec = InUseCounter.network.inc()
-		let task = urlSession.dataTask(with: request) { data, _, error in
-			dec()
-			guard let data = data, let dictionary = (try? JSONSerialization.jsonObject(with: data)) as? [String: [[String: Any]]] else {
-				DispatchQueue.main.async {
-					self.isDownloading = false
-					self.downloadCompletionHandlers.forEach { $0(false) }
-					self.downloadCompletionHandlers = []
-				}
-				return
+		self.isDownloading = true
+
+		func complete(success: Bool) -> Void {
+			self.isDownloading = false
+			self.downloadCompletionHandlers.forEach { $0(success) }
+			self.downloadCompletionHandlers = []
+		}
+
+		let manager = SubscriptionManager.shared
+		manager.tryWithTokens { token, retry in
+			if PolicyManager.globalManager().rotateCircuitForNewTokens {
+				self.urlSession.rotateTorCredentials()
 			}
-			DispatchQueue.main.async {
-				let installed = self.installedProfiles
-				guard let ovpn = dictionary["ovpn"] else {
-					return
-				}
-				guard let ipsec = dictionary["ipsec"] else {
-					return
-				}
-				let newOVPNProfiles = ovpn.compactMap { OVPNProfile(data: $0, installed: installed) }
-				let ovpnSuccess = newOVPNProfiles.count == ovpn.count
+			var request = URLRequest(url: URL(string: "https://api.snowhaze.com/index.php")!)
+			if let token = token {
+				request.setFormEncoded(data: ["t": token, "v": "3", "action": "vpn"])
+			} else if !manager.hasValidToken {
+				request.setFormEncoded(data: ["v": "3", "action": "vpn"])
+			} else {
+				return complete(success: false)
+			}
+			let dec = InUseCounter.network.inc()
+			self.urlSession.performDataTask(with: request) { data, response, error in
+				dec()
+				DispatchQueue.main.async {
+					guard let data = data, let dictionary = (try? JSONSerialization.jsonObject(with: data)) as? [String: [[String: Any]]], let response = response as? HTTPURLResponse else {
+						return complete(success: false)
+					}
+					if let _ = token, response.statusCode == 429 {
+						return retry()
+					}
+					guard response.statusCode == 200 else {
+						return complete(success: false)
+					}
+					guard let ovpn = dictionary["ovpn"], let ipsec = dictionary["ipsec"] else {
+						return complete(success: false)
+					}
 
-				let newIPSecProfiles = ipsec.compactMap { IPSecProfile(data: $0) }
-				let ipsecSuccess = newIPSecProfiles.count == ipsec.count
+					let installed = self.installedProfiles
+					let newOVPNProfiles = ovpn.compactMap { OVPNProfile(data: $0, installed: installed) }
+					let ovpnSuccess = newOVPNProfiles.count == ovpn.count
+					let newIPSecProfiles = ipsec.compactMap { IPSecProfile(data: $0) }
+					let ipsecSuccess = newIPSecProfiles.count == ipsec.count
 
-				self.isDownloading = false
-				if ovpnSuccess {
-					self.ovpnProfiles = newOVPNProfiles
-				}
+					if ovpnSuccess {
+						self.ovpnProfiles = newOVPNProfiles
+					}
+					if ipsecSuccess {
+						self.ipsecProfiles = newIPSecProfiles
+					}
 
-				if ipsecSuccess {
-					self.ipsecProfiles = newIPSecProfiles
+					if ovpnSuccess && ipsecSuccess {
+						DataStore.shared.set(Date().timeIntervalSince1970, for: lastProfileUpdateKey)
+					}
+					return complete(success: ipsecSuccess && ovpnSuccess)
 				}
-
-				if ovpnSuccess && ipsecSuccess {
-					DataStore.shared.set(Date().timeIntervalSince1970, for: lastProfileUpdateKey)
-				}
-				self.downloadCompletionHandlers.forEach { $0(ipsecSuccess && ovpnSuccess) }
-				self.downloadCompletionHandlers = []
 			}
 		}
-		task.resume()
 	}
 }
 
@@ -566,8 +562,6 @@ extension VPNManager {
 		}
 	}
 
-
-
 	func disconnect() {
 		withLoadedManager { reload in
 			let manager = NEVPNManager.shared()
@@ -660,9 +654,7 @@ extension VPNManager {
 				ike.childSecurityAssociationParameters.diffieHellmanGroup = .group16
 			}
 
-			if #available(iOS 11.0, *) {
-				ike.minimumTLSVersion = .version1_2
-			}
+			ike.minimumTLSVersion = .version1_2
 
 			ike.sharedSecretReference = psk.persistentReference!
 			ike.disconnectOnSleep = false
@@ -692,16 +684,18 @@ extension VPNManager {
 		withLoadedManager { _ in
 			let profile = self.ipsecProfiles.first { $0.id == self.selectedProfileID }
 			if self.ipsecConnected && self.lastIPSecCredSwap.timeIntervalSinceNow < -credsTimeout {
-				if let profile = profile, SubscriptionManager.shared.hasSubscription {
-					if PolicyManager.globalManager().autorotateIPSecCredentials || force {
-						self.connect(with: profile)
+				if SubscriptionManager.status.confirmed {
+					if let profile = profile {
+						if PolicyManager.globalManager().autorotateIPSecCredentials || force {
+							self.connect(with: profile)
+						}
+					} else {
+						self.disconnect()
 					}
-				} else if SubscriptionManager.shared.hasSubscription {
-					self.disconnect()
 				} else {
 					self.clearSavedProfile()
 				}
-			} else if !SubscriptionManager.shared.hasSubscription {
+			} else if !SubscriptionManager.status.possible {
 				self.clearSavedProfile()
 			} else if let profile = profile, !profile.hasProfile {
 				self.clearSavedProfile()

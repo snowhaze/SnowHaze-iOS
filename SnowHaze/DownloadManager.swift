@@ -2,7 +2,7 @@
 //  DownloadManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -14,29 +14,19 @@ private let subscriptionDomainsDBLocation = "https://api.snowhaze.com/index.php"
 class DownloadManager: PinningSessionDelegate {
 	static let shared = DownloadManager()
 
-	private lazy var mainSession: URLSession = {
-		URLSession(configuration: self.sessionConfig(background: false), delegate: self, delegateQueue: nil)
+	private lazy var backgroundSession: SnowHazeURLSession = {
+		SnowHazeURLSession(configuration: self.sessionConfig(), torConfig: self.sessionConfig(tor: true), delegate: self)
 	}()
 
-	private lazy var backgroundSession: URLSession = {
-		URLSession(configuration: self.sessionConfig(), delegate: self, delegateQueue: nil)
+	private lazy var backgroundWifiSession: SnowHazeURLSession = {
+		SnowHazeURLSession(configuration: self.sessionConfig(allowCellular: false), torConfig: self.sessionConfig(allowCellular: false, tor: true), delegate: self)
 	}()
 
-	private lazy var backgroundWifiSession: URLSession = {
-		URLSession(configuration: self.sessionConfig(allowCellular: false), delegate: self, delegateQueue: nil)
-	}()
-
-	func sessionConfig(allowCellular: Bool = true, background: Bool = true) -> URLSessionConfiguration {
+	private func sessionConfig(allowCellular: Bool = true, tor: Bool = false) -> URLSessionConfiguration {
 		var config: URLSessionConfiguration
-		if background {
-			config = URLSessionConfiguration.background(withIdentifier: "ch.illotros.snowhaze.backgrounddownload" + (allowCellular ? "" : ".wifi"))
-		} else {
-			config = URLSessionConfiguration()
-		}
+		config = URLSessionConfiguration.background(withIdentifier: "ch.illotros.snowhaze.backgrounddownload" + (allowCellular ? "" : ".wifi") + (tor ? "" : ".tor"))
 
 		config.allowsCellularAccess = allowCellular
-
-		config.tlsMinimumSupportedProtocol = .tlsProtocol12
 
 		config.httpCookieAcceptPolicy = .never
 		config.httpCookieStorage = nil
@@ -60,12 +50,8 @@ class DownloadManager: PinningSessionDelegate {
 	}
 
 	func stopSiteListsUpdate() {
-		backgroundSession.getAllTasks { tasks in
-			tasks.forEach { $0.cancel() }
-		}
-		backgroundWifiSession.getAllTasks { tasks in
-			tasks.forEach { $0.cancel() }
-		}
+		backgroundSession.cancelAllTasks()
+		backgroundWifiSession.cancelAllTasks()
 	}
 
 	func triggerSiteListsUpdate() {
@@ -75,16 +61,28 @@ class DownloadManager: PinningSessionDelegate {
 		}
 		listUpdateDec = InUseCounter.network.inc()
 		let session = appropriateListUpdateBackgroundSession(for: policy)
-		var request: URLRequest
 		let manager = SubscriptionManager.shared
-		if manager.hasSubscription, manager.hasValidToken, let token = manager.authorizationToken {
-			request = URLRequest(url: URL(string: subscriptionDomainsDBLocation)!)
-			request.setFormEncoded(data: ["t": token, "v": "2", "action": "list"])
-		} else {
-			request = URLRequest(url: URL(string: domainsDBLocation)!)
+		manager.tryWithTokens { token, _ in
+			let policy = PolicyManager.globalManager()
+			if policy.rotateCircuitForNewTokens {
+				session.rotateTorCredentials()
+			}
+			var request: URLRequest
+			if let token = token {
+				request = URLRequest(url: URL(string: subscriptionDomainsDBLocation)!)
+				request.setFormEncoded(data: ["t": token, "v": "3", "action": "list"])
+			} else if !manager.hasValidToken {
+				request = URLRequest(url: URL(string: domainsDBLocation)!)
+			} else {
+				self.listUpdateDec?()
+				self.listUpdateDec = nil
+				return
+			}
+			session.performDownloadTask(with: request) {
+				self.listUpdateDec?()
+				self.listUpdateDec = nil
+			}
 		}
-		let task = session.downloadTask(with: request)
-		task.resume()
 	}
 
 	func triggerProductListUpdate() {
@@ -144,19 +142,23 @@ class DownloadManager: PinningSessionDelegate {
 }
 
 extension DownloadManager: URLSessionDownloadDelegate {
-	func handleBackgroundTaskEvent(completionHandler: @escaping () -> Void) {
-		assert(pendingCompletionHandler == nil)
-		pendingCompletionHandler = completionHandler
-		_ = backgroundSession
-		_ = backgroundWifiSession
-	}
-
-	func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+	func performPendingCompletionHandler() {
 		DispatchQueue.main.async {
 			let handler = self.pendingCompletionHandler
 			self.pendingCompletionHandler = nil
 			handler?()
 		}
+	}
+
+	func handleBackgroundTaskEvent(completionHandler: @escaping () -> Void) {
+		assert(pendingCompletionHandler == nil)
+		pendingCompletionHandler = completionHandler
+		backgroundSession.loadSessions(failure: self.performPendingCompletionHandler)
+		backgroundWifiSession.loadSessions(failure: self.performPendingCompletionHandler)
+	}
+
+	func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+		performPendingCompletionHandler()
 	}
 
 	private func authorizer(action: SQLite.AuthorizerAction, db: String?, cause: String?) -> SQLite.AuthorizerResponse {
@@ -284,10 +286,6 @@ extension DownloadManager: URLSessionDownloadDelegate {
 
 /// Helpers
 private extension DownloadManager {
-	private func syncToMainThread<T>(_ work: () -> T) -> T {
-		return Thread.isMainThread ? work() : DispatchQueue.main.sync(execute: work)
-	}
-
 	func installSitesDB(from location: URL, modified: Date) {
 		assert(Thread.isMainThread)
 		// If DB isn't available, assume updates are enabled. File will be cleared on unlock otherwise.
@@ -304,7 +302,7 @@ private extension DownloadManager {
 		}
 	}
 
-	func appropriateListUpdateBackgroundSession(for policy: PolicyManager) -> URLSession {
+	func appropriateListUpdateBackgroundSession(for policy: PolicyManager) -> SnowHazeURLSession {
 		if policy.useCellularForSiteListsUpdate {
 			return backgroundSession
 		} else {

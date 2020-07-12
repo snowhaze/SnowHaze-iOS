@@ -2,11 +2,12 @@
 //  Setting.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 enum SettingsLevel {
 	case page
@@ -45,7 +46,7 @@ class Settings {
 	private var observer: NSObjectProtocol!
 
 	static func atomically(perform: () -> Void) {
-		try! db.inTransaction(perform: perform)
+		try! db.inTransaction(ofType: .exclusive, perform: perform)
 	}
 
 	init() {
@@ -80,6 +81,7 @@ class Settings {
 
 	static func dropChache(for tab: Tab) {
 		TabSettings.dropChacheFor(tab: tab)
+		TabPageSettings.dropChacheFor(tab: tab)
 	}
 
 	static func deleteSettings(for domain: PolicyDomain) {
@@ -99,10 +101,6 @@ class Settings {
 	}
 
 	func value(for key: String) -> SQLite.Data? {
-		fatalError("Settings is a Abstract Superclass")
-	}
-
-	var allValues: [String: SQLite.Data] {
 		fatalError("Settings is a Abstract Superclass")
 	}
 
@@ -246,10 +244,6 @@ private class GlobalSettings: Settings {
 		return cache[key]
 	}
 
-	override var allValues: [String: SQLite.Data] {
-		return cache
-	}
-
 	override func set(_ value: SQLite.Data, for key: String) {
 		assert(Thread.isMainThread)
 		notifyListenersOfNewValue(value, for: key, alreadySet: false)
@@ -332,10 +326,6 @@ private class TabSettings: Settings, SettingsListener {
 			return value
 		}
 		return globalSettings.value(for: key)
-	}
-
-	override var allValues: [String: SQLite.Data] {
-		return cache
 	}
 
 	override func set(_ value: SQLite.Data, for key: String) {
@@ -465,10 +455,6 @@ private class GlobalPageSettings: Settings {
 		return cache[key]
 	}
 
-	override var allValues: [String: SQLite.Data] {
-		return cache
-	}
-
 	override func set(_ value: SQLite.Data, for key: String) {
 		assert(Thread.isMainThread)
 		notifyListenersOfNewValue(value, for: key, alreadySet: false)
@@ -552,6 +538,10 @@ private class TabPageSettings: Settings, SettingsListener {
 		return TabPageSettings(domain: domain.domain, tab: tab)
 	}
 
+	static func dropChacheFor(tab: Tab) {
+		values = values.filter { $0.key.tab != tab.id }
+	}
+
 	override func value(for key: String) -> SQLite.Data? {
 		if let value = values[key] {
 			return value
@@ -560,17 +550,6 @@ private class TabPageSettings: Settings, SettingsListener {
 		} else {
 			return tabSettings.value(for: key)
 		}
-	}
-
-	override var allValues: [String: SQLite.Data] {
-		var values = tabSettings.allValues
-		for (key, value) in pageSettings.allValues {
-			values[key] = value
-		}
-		for (key, value) in values {
-			values[key] = value
-		}
-		return values
 	}
 
 	override func add(listener: SettingsListener, for key: String) {

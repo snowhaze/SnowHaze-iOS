@@ -2,13 +2,14 @@
 //  Version.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
-let versionDescription			= "2.6.7 Build 82"
-let currentVersion				= version_2_6_7__082
+let versionDescription			= "3.0 Build 83"
+let currentVersion				= version_3_0_0__083
 
+let version_3_0_0__083: Int64	= 03000000	// App Store
 let version_2_6_7__082: Int64	= 02060701	// App Store
 let version_2_6_7__081: Int64	= 02060700	// TestFlight
 let version_2_6_6__080: Int64	= 02060601	// App Store

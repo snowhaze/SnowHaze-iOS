@@ -2,11 +2,12 @@
 //	SearchBar.swift
 //	SnowHaze
 //
-
+//
 //	Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 protocol SearchBarDelegate: TextInputBarDelegate {
 	func searchBarSelectNext(_ bar: SearchBar)
@@ -42,7 +43,7 @@ class SearchBar: TextInputBar {
 		prevButton.frame = CGRect(x: frame.minX		, y: frame.minY, width: 40, height: frame.height)
 		nextButton.frame = CGRect(x: frame.minX + 40, y: frame.minY, width: 40, height: frame.height)
 		offsetLabel.frame = CGRect(x: 0				, y: frame.minY, width: 40, height: frame.height)
-		offsetLabel.font = UIFont.snowHazeFont(size: 15)
+		offsetLabel.font = UIFont.systemFont(ofSize: 15)
 		offsetLabel.textAlignment = .center
 		prevButton.autoresizingMask = .flexibleRightMargin
 		nextButton.autoresizingMask = .flexibleRightMargin
@@ -70,15 +71,8 @@ class SearchBar: TextInputBar {
 
 	override func layoutSubviews() {
 		super.layoutSubviews()
-		let usableWidth: CGFloat
-		let prevX: CGFloat
-		if #available(iOS 11, *) {
-			usableWidth = bounds.width - 2 * max(safeAreaInsets.left, safeAreaInsets.right)
-			prevX = bounds.minX + safeAreaInsets.left
-		} else {
-			usableWidth = bounds.width
-			prevX = bounds.minX
-		}
+		let usableWidth = bounds.width - 2 * max(safeAreaInsets.left, safeAreaInsets.right)
+		let prevX = bounds.minX + safeAreaInsets.left
 		let width = min(usableWidth / 2, usableWidth - 160)
 		let labelFraction: CGFloat = min(0.2, 100 / width)
 		textField.frame.size.width = width * (1 - labelFraction)

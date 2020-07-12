@@ -2,7 +2,7 @@
 //  BookmarkHistoryView.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -12,7 +12,7 @@ protocol BookmarkHistoryDelegate: StatsViewDelegate {
 	var viewControllerForPreviewing: UIViewController { get }
 
 	func previewController(for url: URL) -> PagePreviewController?
-	func load(url: URL)
+	func load(_ type: WebLoadType)
 
 	var historyItems: [[HistoryItem]]? { get }
 	func removeHistoryItem(at indexPath: IndexPath)
@@ -26,6 +26,12 @@ protocol BookmarkHistoryDelegate: StatsViewDelegate {
 	func rename(bookmark: Bookmark)
 
 	func makeBookmark(for: URL)
+
+	var downloads: [FileDownload] { get }
+	func delete(_ download: FileDownload, at index: Int)
+	func share(_ download: FileDownload, from sender: UIView)
+	func retry(_ download: FileDownload)
+	func cancel(_ download: FileDownload)
 }
 
 @IBDesignable
@@ -34,10 +40,13 @@ class BookmarkHistoryView: UIView {
 
 	private let bookmarkButton = UIButton()
 	private let historyBytton = UIButton()
-	private let bookmarkCollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
+	private let bookmarkCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
 	private let historyTableView = UITableView()
+	private let historyBGView = UIImageView(image: #imageLiteral(resourceName: "Background"))
 
 	private var historyHeaderCache = [Int: HistoryTableViewSectionHeader]()
+
+	private let downloadsList = DownloadsList()
 
 	private var lefSwipeRecognize: UISwipeGestureRecognizer!
 	private var rightSwipeRecognize: UISwipeGestureRecognizer!
@@ -45,9 +54,17 @@ class BookmarkHistoryView: UIView {
 	private let dateFormatter = DateFormatter()
 
 	private var showingHistoryInSingleMode = false
+	private var isShowingDownloads = false
+
+	private var observers = [NSObjectProtocol]()
 
 	private var internalHistoryItems: [[HistoryItem]]?
 	private var internalBookmarks: [Bookmark]?
+
+	// UITableView has a weird issue which makes this necessary
+	private lazy var lazySetup: Void = {
+		historyTableView.backgroundColor = .clear
+	}()
 
 	var hideStats = false {
 		didSet {
@@ -58,6 +75,7 @@ class BookmarkHistoryView: UIView {
 	weak var delegate: BookmarkHistoryDelegate? { // should be set before table-/collectionview cells are loaded and cannot be changed, as it is used for 3D touch previews
 		didSet {
 			reloadBookmarks()
+			downloadsList.reload()
 		}
 	}
 
@@ -78,6 +96,7 @@ class BookmarkHistoryView: UIView {
 	var constrainedHeight: Bool = false {
 		didSet {
 			setStatsHidden()
+			layoutSubviews()
 		}
 	}
 
@@ -95,10 +114,10 @@ class BookmarkHistoryView: UIView {
 					historyX = bounds.width
 					bookmarkX = 0
 				}
-				historyTableView.frame = bounds
-				historyTableView.frame.size.height -= headerHeight
-				historyTableView.frame.origin.y += headerHeight
-				historyTableView.frame.origin.x = historyX
+				historyBGView.frame = bounds
+				historyBGView.frame.size.height -= headerHeight
+				historyBGView.frame.origin.y += headerHeight
+				historyBGView.frame.origin.x = historyX
 
 				bookmarkCollectionView.frame = bounds
 				bookmarkCollectionView.frame.size.height -= headerHeight
@@ -110,7 +129,7 @@ class BookmarkHistoryView: UIView {
 				let bookmarkFrame = CGRect(x: 0, y: headerHeight, width: bounds.width / 2 - 0.5, height: bounds.height - headerHeight)
 				let historyFrame = CGRect(x: bounds.width / 2 + 0.5, y: headerHeight, width: bounds.width / 2 - 0.5, height: bounds.height - headerHeight)
 				bookmarkCollectionView.frame = bookmarkFrame
-				historyTableView.frame = historyFrame
+				historyBGView.frame = historyFrame
 			}
 		}
 	}
@@ -126,6 +145,7 @@ class BookmarkHistoryView: UIView {
 	}
 
 	override func layoutSubviews() {
+		let _ = lazySetup
 		if constrainedWidth {
 			let historyX: CGFloat
 			let bookmarkX: CGFloat
@@ -136,10 +156,10 @@ class BookmarkHistoryView: UIView {
 				historyX = bounds.width
 				bookmarkX = 0
 			}
-			historyTableView.frame = bounds
-			historyTableView.frame.size.height -= headerHeight
-			historyTableView.frame.origin.y += headerHeight
-			historyTableView.frame.origin.x = historyX
+			historyBGView.frame = bounds
+			historyBGView.frame.size.height -= headerHeight
+			historyBGView.frame.origin.y += headerHeight
+			historyBGView.frame.origin.x = historyX
 
 			bookmarkCollectionView.frame = bounds
 			bookmarkCollectionView.frame.size.height -= headerHeight
@@ -149,31 +169,22 @@ class BookmarkHistoryView: UIView {
 			let bookmarkFrame = CGRect(x: 0, y: headerHeight, width: bounds.width / 2 - 0.5, height: bounds.height - headerHeight)
 			let historyFrame = CGRect(x: bounds.width / 2 + 0.5, y: headerHeight, width: bounds.width / 2 - 0.5, height: bounds.height - headerHeight)
 			bookmarkCollectionView.frame = bookmarkFrame
-			historyTableView.frame = historyFrame
+			historyBGView.frame = historyFrame
+		}
+		if !constrainedHeight && isShowingDownloads {
+			historyTableView.frame = historyBGView.bounds
+			historyTableView.frame.size.height -= historyBGView.bounds.height * 2 / 5
+			downloadsList.frame = historyBGView.bounds
+			downloadsList.frame.origin.y += historyBGView.bounds.height * 3 / 5
+			downloadsList.frame.size.height -= historyBGView.bounds.height * 3 / 5
+		} else {
+			historyTableView.frame = historyBGView.bounds
+			downloadsList.frame = historyBGView.bounds
+			downloadsList.frame.origin.y += historyBGView.bounds.height
+			downloadsList.frame.size.height -= historyBGView.bounds.height * 3 / 5
 		}
 	}
 
-	@available (iOS 11, *)
-	override func safeAreaInsetsDidChange() {
-		super.safeAreaInsetsDidChange()
-		bookmarkCollectionView.contentInset = safeAreaInsets
-		bookmarkCollectionView.scrollIndicatorInsets = safeAreaInsets
-	}
-}
-
-// MARK: Actions
-extension BookmarkHistoryView {
-	@objc private func showBookmarks(_ sender: AnyObject) {
-		showHistory(false, animated: true)
-	}
-
-	@objc private func showHistory(_ sender: AnyObject) {
-		showHistory(true, animated: true)
-	}
-}
-
-// MARK: Internal methosds
-private extension BookmarkHistoryView {
 	func showHistory(_ history: Bool, animated: Bool) {
 		guard showingHistoryInSingleMode != history else {
 			return
@@ -183,7 +194,6 @@ private extension BookmarkHistoryView {
 		}
 		historyBytton.isEnabled = !history
 		bookmarkButton.isEnabled = history
-
 
 		lefSwipeRecognize.isEnabled = !history
 		rightSwipeRecognize.isEnabled = history
@@ -202,15 +212,71 @@ private extension BookmarkHistoryView {
 		}
 		if animated {
 			UIView.animate(withDuration: 0.3, animations: {
-				self.historyTableView.frame.origin.x = historyX
+				self.historyBGView.frame.origin.x = historyX
 				self.bookmarkCollectionView.frame.origin.x = bookmarkX
 			})
 		} else {
-			historyTableView.frame.origin.x = historyX
+			historyBGView.frame.origin.x = historyX
 			bookmarkCollectionView.frame.origin.x = bookmarkX
 		}
 	}
 
+	func showDownloads(_ show: Bool, animated: Bool) {
+		guard show != isShowingDownloads else {
+			return
+		}
+		isShowingDownloads = show
+		guard !constrainedHeight else {
+			return
+		}
+		func update() {
+			if show {
+				historyTableView.frame = historyBGView.bounds
+				historyTableView.frame.size.height -= historyBGView.bounds.height * 2 / 5
+				downloadsList.frame = historyBGView.bounds
+				downloadsList.frame.origin.y += historyBGView.bounds.height * 3 / 5
+				downloadsList.frame.size.height -= historyBGView.bounds.height * 3 / 5
+			} else {
+				historyTableView.frame = historyBGView.bounds
+				downloadsList.frame = historyBGView.bounds
+				downloadsList.frame.origin.y += historyBGView.bounds.height
+				downloadsList.frame.size.height -= historyBGView.bounds.height * 3 / 5
+			}
+		}
+		if animated {
+			UIView.animate(withDuration: 0.2) { update() }
+		} else {
+			update()
+		}
+	}
+
+	override func safeAreaInsetsDidChange() {
+		super.safeAreaInsetsDidChange()
+		bookmarkCollectionView.contentInset = safeAreaInsets
+		bookmarkCollectionView.horizontalScrollIndicatorInsets = safeAreaInsets
+		bookmarkCollectionView.verticalScrollIndicatorInsets = safeAreaInsets
+	}
+
+	deinit {
+		for observer in observers {
+			NotificationCenter.default.removeObserver(observer)
+		}
+	}
+}
+
+// MARK: Actions
+extension BookmarkHistoryView {
+	@objc private func showBookmarks(_ sender: AnyObject) {
+		showHistory(false, animated: true)
+	}
+
+	@objc private func showHistory(_ sender: AnyObject) {
+		showHistory(true, animated: true)
+	}
+}
+
+// MARK: Internal methosds
+private extension BookmarkHistoryView {
 	func setup() {
 		lefSwipeRecognize = UISwipeGestureRecognizer(target: self, action: #selector(showHistory(_:)))
 		lefSwipeRecognize.direction = .left
@@ -246,12 +312,7 @@ private extension BookmarkHistoryView {
 		historyBytton.addTarget(self, action: #selector(showHistory(_:)), for: .touchUpInside)
 		historyBytton.setTitleColor(.white, for: .disabled)
 
-		UIFont.setSnowHazeFont(on: bookmarkButton)
-		UIFont.setSnowHazeFont(on: historyBytton)
-
-		let bgImage = #imageLiteral(resourceName: "Background")
-		let bookmarkBGView = UIImageView(image: bgImage)
-		let historyBGView = UIImageView(image: bgImage)
+		let bookmarkBGView = UIImageView(image: #imageLiteral(resourceName: "Background"))
 		bookmarkBGView.contentMode = .scaleAspectFill
 		historyBGView.contentMode = .scaleAspectFill
 
@@ -267,14 +328,23 @@ private extension BookmarkHistoryView {
 
 		historyTableView.dataSource = self
 		historyTableView.delegate = self
-		historyTableView.backgroundView = historyBGView
 		historyTableView.alwaysBounceVertical = false
 		historyTableView.rowHeight = 50
 
-		if #available(iOS 11, *) {
-			bookmarkCollectionView.contentInset = safeAreaInsets
-			bookmarkCollectionView.scrollIndicatorInsets = safeAreaInsets
-		}
+		historyTableView.frame = historyBGView.bounds
+		historyTableView.autoresizingMask = [.flexibleWidth, .flexibleHeight, .flexibleBottomMargin]
+		historyTableView.isOpaque = false
+
+		downloadsList.frame = historyBGView.bounds
+		downloadsList.frame.origin.y += historyBGView.bounds.height
+		downloadsList.frame.size.height -= historyBGView.bounds.height * 3 / 5
+		downloadsList.autoresizingMask = [.flexibleWidth, .flexibleHeight, .flexibleTopMargin]
+		downloadsList.isOpaque = false
+		downloadsList.delegate = self
+
+		bookmarkCollectionView.contentInset = safeAreaInsets
+		bookmarkCollectionView.horizontalScrollIndicatorInsets = safeAreaInsets
+		bookmarkCollectionView.verticalScrollIndicatorInsets = safeAreaInsets
 
 		bookmarkCollectionView.register(BookmarkCollectionViewCell.self, forCellWithReuseIdentifier: "bookmarkCell")
 		historyTableView.register(HistoryTableViewCell.self, forCellReuseIdentifier: "historyCell")
@@ -285,17 +355,30 @@ private extension BookmarkHistoryView {
 		dateFormatter.timeStyle = .none
 		dateFormatter.doesRelativeDateFormatting = true
 
+		historyBGView.isUserInteractionEnabled = true
+		historyBGView.isOpaque = true
+		historyBGView.addSubview(historyTableView)
+		historyBGView.addSubview(downloadsList)
+		historyBGView.clipsToBounds = true
+
 		addSubview(bookmarkCollectionView)
-		addSubview(historyTableView)
+		addSubview(historyBGView)
 		addSubview(header)
 
-		if #available(iOS 11, *) {
-			let dropInteraction = UIDropInteraction(delegate: self)
-			dropInteraction.allowsSimultaneousDropSessions = false
-			bookmarkCollectionView.addInteraction(dropInteraction)
-		}
+		let dropInteraction = UIDropInteraction(delegate: self)
+		dropInteraction.allowsSimultaneousDropSessions = false
+		bookmarkCollectionView.addInteraction(dropInteraction)
 
-		NotificationCenter.default.addObserver(self, selector: #selector(significantTimeChange(_:)), name: UIApplication.significantTimeChangeNotification, object: nil)
+		let timeObserver = NotificationCenter.default.addObserver(forName: UIApplication.significantTimeChangeNotification, object: nil, queue: nil) { [weak self] _ in
+			self?.historyHeaderCache = [:]
+			self?.historyTableView.reloadSectionIndexTitles()
+		}
+		observers.append(timeObserver)
+
+		let fontObserver = NotificationCenter.default.addObserver(forName: UIContentSizeCategory.didChangeNotification, object: nil, queue: nil) { [weak self] _ in
+			self?.historyTableView.reloadData()
+		}
+		observers.append(fontObserver)
 	}
 
 	private func setStatsHidden() {
@@ -474,6 +557,25 @@ extension BookmarkHistoryView {
 	}
 }
 
+// MARK: Downloads List
+extension BookmarkHistoryView {
+	func reloadDownloads() {
+		downloadsList.reload()
+	}
+
+	func addDownload() {
+		downloadsList.add()
+	}
+
+	func reload(download index: Int) {
+		downloadsList.reload(at: index)
+	}
+
+	func delete(download index: Int) {
+		downloadsList.delete(at: index)
+	}
+}
+
 // MARK: Stats View
 extension BookmarkHistoryView {
 	func reloadStats() {
@@ -507,7 +609,6 @@ extension BookmarkHistoryView: HistoryTableViewSectionHeaderDelegate {
 	}
 }
 
-@available(iOS 11, *)
 extension BookmarkHistoryView: UIDropInteractionDelegate {
 	func dropInteraction(_ interaction: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
 		return session.canLoadObjects(ofClass: URL.self) && session.items.count == 1
@@ -527,7 +628,7 @@ extension BookmarkHistoryView: UIDropInteractionDelegate {
 			_ = session.loadObjects(ofClass: URL.self) { [weak self]  urls in
 				assert(urls.count == 1)
 				DispatchQueue.main.async {
-					if let me = self, let delegate = me.delegate {
+					if let self = self, let delegate = self.delegate {
 						delegate.makeBookmark(for: urls[0])
 					}
 				}
@@ -601,17 +702,40 @@ extension BookmarkHistoryView: UIViewControllerPreviewingDelegate {
 		guard let previewer = viewControllerToCommit as? PagePreviewController else {
 			return
 		}
-		guard let url = previewer.manager.webView.url else {
-			return
-		}
-		delegate?.load(url: url)
+		delegate?.load(previewer.commitLoad)
 	}
 }
 
-// MARK: Notifications
-extension BookmarkHistoryView {
-	@objc private func significantTimeChange(_ notification: Notification) {
-		historyHeaderCache = [:]
-		historyTableView.reloadSectionIndexTitles()
+extension BookmarkHistoryView: DownloadsListDelegate {
+	func downloadsList(_ downloadsList: DownloadsList, deleteDownloadAt index: Int) {
+		if let delegate = delegate {
+			delegate.delete(delegate.downloads[index], at: index)
+		}
+	}
+
+	func downloadsList(_ downloadsList: DownloadsList, shareDownloadAt index: Int, from sender: UIView) {
+		if let delegate = delegate {
+			delegate.share(delegate.downloads[index], from: sender)
+		}
+	}
+
+	func downloadsList(_ downloadsList: DownloadsList, cancelDownloadAt index: Int) {
+		if let delegate = delegate {
+			delegate.cancel(delegate.downloads[index])
+		}
+	}
+
+	func downloadsList(_ downloadsList: DownloadsList, retryDownloadAt index: Int) {
+		if let delegate = delegate {
+			delegate.retry(delegate.downloads[index])
+		}
+	}
+
+	func numberOfDownloads(inDownloadsList downloadsList: DownloadsList) -> Int {
+		return delegate?.downloads.count ?? 0
+	}
+
+	func downloadsList(_ downloadsList: DownloadsList, downloadAt index: Int) -> FileDownload {
+		return delegate!.downloads[index]
 	}
 }

@@ -2,11 +2,12 @@
 //  PasscodeController.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 private let servicePrefix = "ch.illotros.ios.passcodecontroller.touchid.keychainservicename.external."
 
@@ -99,12 +100,12 @@ public class PasscodeController: UIViewController {
 	public static var errorMessageColor = UIColor.title
 	public static var errorButtonColor = UIColor.button
 
-	public static var entryTextfielFont = UIFont.snowHazeFont(size: 25)
-	public static var pinDisplayFont = UIFont.snowHazeFont(size: 30)
-	public static var errorMessageFont = UIFont.snowHazeFont(size: 15)
-	public static var errorButtonFont = UIFont.snowHazeFont(size: 15)
-	public static var cancelButtonFont = UIFont.snowHazeFont(size: 18)
-	public static var promptLabelFont = UIFont.snowHazeFont(size: 17)
+	public static var entryTextfielFont = UIFont.systemFont(ofSize: 25)
+	public static var pinDisplayFont = UIFont.systemFont(ofSize: 30)
+	public static var errorMessageFont = UIFont.systemFont(ofSize: 15)
+	public static var errorButtonFont = UIFont.systemFont(ofSize: 15)
+	public static var cancelButtonFont = UIFont.systemFont(ofSize: 18)
+	public static var promptLabelFont = UIFont.systemFont(ofSize: 17)
 
 	public enum TextType {
 		case cancel
@@ -191,12 +192,7 @@ public class PasscodeController: UIViewController {
 			let updates = [kSecValueData: data] as NSDictionary
 			let updateErr = SecItemUpdate(query, updates)
 			if updateErr == errSecItemNotFound {
-				let acFlag: SecAccessControlCreateFlags
-				if #available(iOS 11.3, *) {
-					acFlag = .biometryCurrentSet
-				} else {
-					acFlag = .touchIDCurrentSet
-				}
+				let acFlag = SecAccessControlCreateFlags.biometryCurrentSet
 				guard let accessControll = SecAccessControlCreateWithFlags(nil, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, acFlag, nil) else {
 					completed(false)
 					return
@@ -280,7 +276,7 @@ public class PasscodeController: UIViewController {
 	private var stage: Stage = .done
 
 	override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-		return UI_USER_INTERFACE_IDIOM() == .pad ? .all : .portrait
+		return UIDevice.current.userInterfaceIdiom == .pad ? .all : .portrait
 	}
 
 	public enum Mode {
@@ -614,7 +610,7 @@ public class PasscodeController: UIViewController {
 		entry.codeType = type
 		entry.frame.origin.x = view.bounds.maxX
 		view.addSubview(entry)
-		UIView.animate(withDuration: 0.3, animations: { 
+		UIView.animate(withDuration: 0.3, animations: {
 			oldEntry.frame.origin.x = self.view.bounds.minX - oldEntry.frame.width
 			self.entry.frame = self.view.bounds
 		}, completion: { _ in
@@ -762,7 +758,7 @@ private class NumberPad: UIView {
 	convenience init() {
 		self.init(frame: NumberPad.setupFrame)
 	}
-	
+
 	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
@@ -893,7 +889,7 @@ private class PasscodeEntry: UIView {
 		label.textAlignment = .center
 		label.font = PasscodeController.promptLabelFont
 	}
-	
+
 	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
@@ -968,10 +964,10 @@ private class CodeDisplay: UIView, UITextFieldDelegate {
 				owner?.codeDisplayDidReturn(confirmed: false)
 			}
 			if case .longDigit = codeType {
-				if length <= 15 {
-					textField.text = [String](repeating: "\u{F106}", count: length).joined()
+				if length <= 10 {
+					textField.text = [String](repeating: "●", count: length).joined()
 				} else {
-					textField.text = "…" + [String](repeating: "\u{F106}", count: 14).joined()
+					textField.text = "..." + [String](repeating: "●", count: 9).joined()
 				}
 			}
 			typealias TextType = PasscodeController.TextType
@@ -1020,25 +1016,26 @@ private class CodeDisplay: UIView, UITextFieldDelegate {
 				case .digit6:
 					label.isHidden = false
 					textField.isHidden = true
+					textField.deselect = false
 				case .alphanumeric:
 					textField.isSecureTextEntry = true
 					label.isHidden = true
 					textField.isHidden = false
-					textField.rightView = oPWButton
+					textField.tintColor = PasscodeController.textFieldTintColor
+					textField.deselect = false
 				case .longDigit:
 					textField.isSecureTextEntry = false
 					label.isHidden = true
 					textField.isHidden = false
 					textField.rightView = nil
+					textField.tintColor = UIColor.clear
+					textField.deselect = true
 			}
 		}
 	}
 
 	init() {
 		super.init(frame: CGRect(x: 0, y: 0, width: 250, height: 35))
-		oPWButton?.setImage(#imageLiteral(resourceName: "onepassword-button"), for: .normal)
-		oPWButton?.tintColor = .black
-		oPWButton?.addTarget(self, action: #selector(oPWButtonPressed(_:)), for: .touchUpInside)
 
 		textField.frame = bounds
 		textField.backgroundColor = .white
@@ -1049,10 +1046,7 @@ private class CodeDisplay: UIView, UITextFieldDelegate {
 		textField.keyboardAppearance = .dark
 		textField.clearButtonMode = .always
 		textField.rightViewMode = .always
-		textField.tintColor = PasscodeController.textFieldTintColor
-		if #available(iOS 11, *) {
-			textField.textContentType = .password
-		}
+		textField.textContentType = .password
 		addSubview(textField)
 
 		label.frame = bounds
@@ -1063,52 +1057,13 @@ private class CodeDisplay: UIView, UITextFieldDelegate {
 		label.font = PasscodeController.pinDisplayFont
 		addSubview(label)
 	}
-	
+
 	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	private static var showPasscodeButton: Bool {
-		return OnePasswordExtension.shared().isAppExtensionAvailable() || DashlaneHelper.shared.dashlaneInstalled
-	}
-
-	private let oPWButton = CodeDisplay.showPasscodeButton ? UIButton(type: .system) : nil
-	private let textField = FixedTextFiel()
+	private let textField = FixedTextField()
 	private let label = UILabel()
-
-	@objc private func oPWButtonPressed(_ sender: UIButton) {
-		guard let controller = owner?.owner else {
-			return
-		}
-		if OnePasswordExtension.shared().isAppExtensionAvailable() {
-			if createLogin {
-				OnePasswordExtension.shared().changePasswordForLogin(forURLString: PasscodeController.pwManagerService, loginDetails: nil, passwordGenerationOptions: nil, for: controller, sender: sender) { [weak self] data, _ in
-					guard let data = data, let pw = data[AppExtensionPasswordKey] as? String else {
-						return
-					}
-					self?.text = pw
-					self?.owner?.codeDisplayDidReturn(confirmed: true)
-				}
-			} else {
-				OnePasswordExtension.shared().findLogin(forURLString: PasscodeController.pwManagerService, for: controller, sender: sender) { [weak self] data, _ in
-					guard let data = data, let pw = data[AppExtensionPasswordKey] as? String else {
-						return
-					}
-					self?.text = pw
-					self?.owner?.codeDisplayDidReturn(confirmed: false)
-				}
-			}
-		} else {
-			let creating = createLogin
-			DashlaneHelper.shared.promptForPasscode(for: PasscodeController.pwManagerService, new: creating, sourceView: sender, in: controller) { [weak self] passcode in
-				guard let pw = passcode else {
-					return
-				}
-				self?.text = pw
-				self?.owner?.codeDisplayDidReturn(confirmed: creating)
-			}
-		}
-	}
 
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
 		owner?.codeDisplayDidReturn(confirmed: false)
@@ -1116,27 +1071,47 @@ private class CodeDisplay: UIView, UITextFieldDelegate {
 	}
 
 	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-		let newstring = ((textField.text ?? "") as NSString).replacingCharacters(in: range, with: string)
-		text = newstring
-		return true
+		if case .alphanumeric = codeType {
+			let newstring = ((textField.text ?? "") as NSString).replacingCharacters(in: range, with: string)
+			text = newstring
+			return true
+		} else {
+			return false
+		}
 	}
 
 	func textFieldShouldClear(_ textField: UITextField) -> Bool {
 		text = ""
 		return true
 	}
-
-	func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-		if case .alphanumeric = codeType {
-			return true
-		} else {
-			return false
-		}
-	}
 }
 
-private class FixedTextFiel: UITextField {
+private class FixedTextField: UITextField {
 	override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
 		return CGRect(x: bounds.maxX - bounds.height + 5, y: bounds.minY + 5, width: bounds.height - 10, height: bounds.height - 10)
+	}
+
+	private var isDeselecting = false
+	var deselect = false {
+		didSet {
+			if deselect && !isDeselecting {
+				selectedTextRange = nil
+				isDeselecting = true
+				func scheduleDeselect() {
+					DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1)  { [weak self] in
+						guard let self = self else {
+							return
+						}
+						if self.deselect {
+							self.selectedTextRange = nil
+							scheduleDeselect()
+						} else {
+							self.isDeselecting = false
+						}
+					}
+				}
+				scheduleDeselect()
+			}
+		}
 	}
 }

@@ -2,11 +2,12 @@
 //  BookmarkRenameBar.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class BookmarkRenameBar: TextInputBar {
 	private let cancelButton = UIButton()
@@ -34,8 +35,12 @@ class BookmarkRenameBar: TextInputBar {
 	}
 
 	@objc private func cancelButtonPressed(_ sender: UIButton) {
+		cancel()
+	}
+
+	override func cancel() {
 		wasCanceled = true
-		delegate?.textInputBarDidDismiss(self)
+		super.cancel()
 	}
 
 	override func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -48,12 +53,7 @@ class BookmarkRenameBar: TextInputBar {
 
 	override func layoutSubviews() {
 		super.layoutSubviews()
-		let cancelX: CGFloat
-		if #available(iOS 11, *) {
-			cancelX = safeAreaInsets.left
-		} else {
-			cancelX = 0
-		}
+		let cancelX = safeAreaInsets.left
 		cancelButton.frame = CGRect(x: cancelX, y: bounds.minY, width: 80, height: bounds.height)
 	}
 

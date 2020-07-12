@@ -2,28 +2,29 @@
 //  MemoryGame.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class MemoryGame {
 	private static let images = [#imageLiteral(resourceName: "snowflake"), #imageLiteral(resourceName: "javascript"), #imageLiteral(resourceName: "searchengine"), #imageLiteral(resourceName: "mediaplayback"), #imageLiteral(resourceName: "https"), #imageLiteral(resourceName: "appearance"), #imageLiteral(resourceName: "popovers"), #imageLiteral(resourceName: "warning"), #imageLiteral(resourceName: "fingerprint"), #imageLiteral(resourceName: "crown"), #imageLiteral(resourceName: "openvpn"), #imageLiteral(resourceName: "weabsitedata"), #imageLiteral(resourceName: "useragent"), #imageLiteral(resourceName: "history"), #imageLiteral(resourceName: "trackingprotection"), #imageLiteral(resourceName: "bookmark"), #imageLiteral(resourceName: "contentblocker"), #imageLiteral(resourceName: "defaults"), #imageLiteral(resourceName: "contact"), #imageLiteral(resourceName: "acknowledgements")]
-	
+
 	private static let cssCardProto = """
 		.card-%@ .picture {
 			background-image: url("data:image/png;base64,%@");
 		}
 	"""
-	
+
 	private static let htmlCardProto = """
 		<div class="card card-%@">
 			<span class="cover"></span>
 			<span class="picture"></span>
 		</div>
 	"""
-	
+
 	private static let cssProto = """
 	<style>
 		#winmessage {
@@ -101,7 +102,7 @@ class MemoryGame {
 		%@
 	</style>
 	"""
-	
+
 	private static let javascriptProto = """
 	<script language="JavaScript">
 	const numTiles = %@;
@@ -179,21 +180,21 @@ class MemoryGame {
 	window.addEventListener('resize', resizeBoard);
 	</script>
 	"""
-	
+
 	let width: Int
 	let height: Int
-	
+
 	var size: Int {
 		return width * height
 	}
-	
+
 	lazy var selectedImages = randomize()
-	
+
 	init(width: Int = 4, height: Int = 4) {
 		self.width = width
 		self.height = height
 	}
-	
+
 	private func randomize() -> [Int] {
 		var selected = [Int]()
 		for _ in 0 ..< (size + 1) / 2 {
@@ -205,7 +206,7 @@ class MemoryGame {
 		}
 		return selected
 	}
-	
+
 	private func getCSS() -> String {
 		let cardCss = selectedImages.map({ index in
 			let image = MemoryGame.images[index]
@@ -229,7 +230,7 @@ class MemoryGame {
 
 			return String(format: MemoryGame.cssCardProto, String(index), base64)
 		}).joined()
-		
+
 		let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? NSDictionary
 		let primaryIconsDictionary = iconsDictionary?["CFBundlePrimaryIcon"] as? NSDictionary
 		let iconFiles = primaryIconsDictionary?["CFBundleIconFiles"] as? [String]
@@ -247,11 +248,11 @@ class MemoryGame {
 
 		return String(format: MemoryGame.cssProto, String(100.0 / Double(height)), String(100.0 / Double(width)), base64, cardCss)
 	}
-	
+
 	private func getJavascript() -> String {
 		return String(format: MemoryGame.javascriptProto, String(size))
 	}
-	
+
 	func getHTML() -> String {
 		var selected = selectedImages + selectedImages
 		var html = "<div id=\"board\">"

@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -59,7 +59,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
 			return false
 		}
-		guard let scheme = components.scheme?.lowercased() else {
+		guard let scheme = components.normalizedScheme else {
 			return false
 		}
 		let isControl: Bool

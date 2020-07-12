@@ -2,12 +2,13 @@
 //  ScanCodeViewController.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import AVFoundation
+import UIKit
 
 protocol ScanCodeViewControllerDelegate: class {
 	func codeScanner(_ scanner: ScanCodeViewController, canPreviewCode code: String) -> Bool
@@ -50,6 +51,8 @@ class ScanCodeViewController: UIViewController {
 			codeOverlay?.fontName = fontName
 			if let name = fontName {
 				errorMessageLabel?.font = UIFont(name: name, size: errorMessageLabel.font.pointSize)
+			} else {
+				errorMessageLabel?.font = UIFont.systemFont(ofSize: errorMessageLabel.font.pointSize)
 			}
 		}
 	}
@@ -158,11 +161,12 @@ class ScanCodeViewController: UIViewController {
 		errorMessageView.addSubview(errorMessageImageView)
 
 		DispatchQueue.global().async {
-			self.sessionManager = self.useFrontCamera ? ScanCodeViewController.globalFrontSessionManager : ScanCodeViewController.globalSessionManager;
+			typealias SCVC = ScanCodeViewController
+			self.sessionManager = self.useFrontCamera ? SCVC.globalFrontSessionManager : SCVC.globalSessionManager;
 			self.sessionManager.startRunning()
 			self.sessionManager.delegate = self;
-			
-			self.previewLayer = self.useFrontCamera ? ScanCodeViewController.globalFrontPreviewLayer : ScanCodeViewController.globalPreviewLayer
+
+			self.previewLayer = self.useFrontCamera ? SCVC.globalFrontPreviewLayer : SCVC.globalPreviewLayer
 
 			DispatchQueue.main.async {
 				self.previewLayer.frame = self.view.bounds
@@ -186,7 +190,8 @@ class ScanCodeViewController: UIViewController {
 				}
 			}
 		}
-		NotificationCenter.default.addObserver(self, selector: #selector(didRotate(_:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
+		let notification = UIApplication.didChangeStatusBarOrientationNotification
+		NotificationCenter.default.addObserver(self, selector: #selector(didRotate(_:)), name: notification, object: nil)
 		let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
 		view.addGestureRecognizer(recognizer)
 	}

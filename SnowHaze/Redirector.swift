@@ -2,7 +2,7 @@
 //  Redirector.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -431,35 +431,16 @@ struct Redirector {
 
 	private init() { }
 
-	// TODO: check how they deal with incomplete urls
 	func redirect(_ original: URL) -> URL? {
 		guard let comps = URLComponents(url: original, resolvingAgainstBaseURL: true), let host = comps.host else {
 			return nil
 		}
-		guard SubscriptionManager.shared.hasSubscription else {
-			return nil
-		}
-		if host == "click.icptrack.com" && comps.path == "/icp/relay.php" {
-			// http://click.icptrack.com/icp/relay.php?r=1041790300&msgid=2174702&act=76IT&c=416815&destination=%2Fwww.familytreenow.com
-			for param in comps.queryItems ?? [] {
-				if param.name == "destination" {
-					if let value = param.value {
-						if value.contains("://") {
-							return URL(string: value)
-						} else {
-							return URL(string: "http://" + value)
-						}
-					} else {
-						return nil
-					}
-				}
-			}
-		} else if googleHosts.contains(host) && comps.path == "/url" {
+		if googleHosts.contains(host) && comps.path == "/url" {
 			// https://www.google.ch/url?q=https://de.wikipedia.org/wiki/Test_(Begriffskl%25C3%25A4rung)&sa=U&ved=0ahUKEwik16rmrPnXAhUIOhQKHQj-DmUQFggYMAE&usg=AOvVaw2pUEKQD6-Jw9hnyxoGU3FA
 			for param in comps.queryItems ?? [] {
 				if param.name == "q" {
 					if let value = param.value {
-						return URL(string: value)
+						return URL(string: value, relativeTo: URL(string: "https://" + host))
 					} else {
 						return nil
 					}
@@ -470,18 +451,7 @@ struct Redirector {
 			for param in comps.queryItems ?? [] {
 				if param.name == "link" {
 					if let value = param.value?.unescapedHTMLEntities {
-						return URL(string: value)
-					} else {
-						return nil
-					}
-				}
-			}
-		} else if host == "www.wolf-pac.com" && comps.path == "/r" {
-			// http://www.wolf-pac.com/r?u=https:%2F%2Fzoom.us%2Fwebinar%2Fregister%2FWN_rVJtqJoQQ2O_Y_Q6WJl3CA
-			for param in comps.queryItems ?? [] {
-				if param.name == "u" {
-					if let value = param.value {
-						return URL(string: value)
+						return URL(string: value, relativeTo: original)
 					} else {
 						return nil
 					}
@@ -490,7 +460,8 @@ struct Redirector {
 		} else if host == "o.ello.co" {
 			// https://o.ello.co/http://danbassini.com/about-me
 			let path = comps.path
-			guard !path.isEmpty else {
+			let lowered = path.lowercased()
+			guard lowered.hasPrefix("/https://") || lowered.hasPrefix("/http://") else {
 				return nil
 			}
 			let index1 = path.index(after: path.startIndex)
@@ -501,7 +472,7 @@ struct Redirector {
 			for param in comps.queryItems ?? [] {
 				if param.name == "page" {
 					if let value = param.value {
-						return URL(string: value)
+						return URL(string: value, relativeTo: original)
 					} else {
 						return nil
 					}
@@ -512,7 +483,7 @@ struct Redirector {
 			for param in comps.queryItems ?? [] {
 				if param.name == "p" {
 					if let value = param.value {
-						return URL(string: value)
+						return URL(string: value, relativeTo: original)
 					} else {
 						return nil
 					}
@@ -536,6 +507,16 @@ struct Redirector {
 				} else if param.name == "redirectUrl" {
 					if let value = param.value {
 						url = URL(string: value)
+						let lowerScheme = url!.scheme?.lowercased()
+						guard lowerScheme == "http" || lowerScheme == "https" else {
+							return nil
+						}
+						guard let lowerHost = url!.host?.lowercased() else {
+							return nil
+						}
+						guard lowerHost == "apple.com" || lowerHost.hasSuffix(".apple.com") else {
+							return nil
+						}
 					}
 					if isRedirect {
 						return url

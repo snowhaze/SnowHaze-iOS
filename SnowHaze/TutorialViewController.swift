@@ -2,11 +2,12 @@
 //  TutorialViewController.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 private let overlapConst: CGFloat = 100
 private let overlapRel: CGFloat = 0.125
@@ -26,13 +27,13 @@ class TutorialViewController: UIViewController {
 		}
 	}
 
-	private var overlap: CGFloat {
+	private var standardOverlap: CGFloat {
 		return overlapRel + overlapConst / view.bounds.height
 	}
 
 	private var index = 0
 
-	var views: [(UIView, UIView)] {
+	var views: [(UIView, UIView, CGFloat)] {
 		fatalError("TutorialViewController is intended as an abstract superclass")
 	}
 
@@ -67,7 +68,6 @@ class TutorialViewController: UIViewController {
 		rightSwipe.delegate = self
 	}
 
-	@available(iOS 11.0, *)
 	override func viewSafeAreaInsetsDidChange() {
 		super.viewSafeAreaInsetsDidChange()
 		pageControl.frame = CGRect(x: view.bounds.minX, y: view.bounds.minY + view.safeAreaInsets.top, width: view.bounds.width, height: 20)
@@ -81,6 +81,7 @@ class TutorialViewController: UIViewController {
 		view.insertSubview(mainView, belowSubview: pageControl)
 
 		let secondaryView = views[index].1
+		let overlap = standardOverlap * views[index].2
 		secondaryView.frame = view.bounds
 		secondaryView.frame.origin.y += secondaryView.frame.height * (1-overlap)
 		secondaryView.frame.size.height = secondaryView.frame.height * overlap
@@ -106,6 +107,7 @@ class TutorialViewController: UIViewController {
 		pageControl.currentPage = index
 		let newMainView = views[index].0
 		let newSecView = views[index].1
+		let overlap = standardOverlap * views[index].2
 
 		newMainView.frame = view.bounds
 		newMainView.frame.origin.x += view.bounds.width
@@ -156,6 +158,7 @@ class TutorialViewController: UIViewController {
 		pageControl.currentPage = index
 		let newMainView = views[index].0
 		let newSecView = views[index].1
+		let overlap = standardOverlap * views[index].2
 
 		newMainView.frame = view.bounds
 		newMainView.frame.origin.x -= view.bounds.width
@@ -187,7 +190,7 @@ class TutorialViewController: UIViewController {
 	}
 
 	override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
-		return UI_USER_INTERFACE_IDIOM() == .pad ? .all : .portrait
+		return UIDevice.current.userInterfaceIdiom == .pad ? .all : .portrait
 	}
 
 	override var preferredStatusBarStyle : UIStatusBarStyle {

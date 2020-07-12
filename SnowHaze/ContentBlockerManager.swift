@@ -2,11 +2,12 @@
 //  ContentBlockerManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import WebKit
 
 private let compiledContentBlockerVersionKeyPrefix = "ch.illotros.snowhaze.contenblockermanager.contentblocker.compiled.version."
 
@@ -25,6 +26,9 @@ class BlockerID {
 	static let thirdPartiesCookiesBlocker = "third-party-cookies-blocker"
 
 	static let mixedContentBlocker = "mixed-content-blocker"
+	static let httpsOnlyContentBlocker = "upgrade-all-http-blocker"
+	static let nonTorURLsBlocker = "non-tor-urls-blocker"
+	static let dohServerBlocker = "doh-server-blocker"
 
 	static let hstsPreloadUpgrader1 = "hsts-preload-upgrader-1-4"
 	static let hstsPreloadUpgrader2 = "hsts-preload-upgrader-2-4"
@@ -52,7 +56,10 @@ class BlockerID {
 
 		allCookiesBlocker,
 		thirdPartiesCookiesBlocker,
+		nonTorURLsBlocker,
+		dohServerBlocker,
 
+		httpsOnlyContentBlocker,
 		mixedContentBlocker,
 		hstsPreloadUpgrader1,
 		hstsPreloadUpgrader2,
@@ -71,8 +78,14 @@ class BlockerID {
 		thirdPartyScriptsContentTypeBlocker,
 	]
 
-	fileprivate static let optionalContentBlockers = [
+	static let checkBlockers = [
+		adBlocker1,
 		hstsPreloadUpgrader1,
+		nonTorURLsBlocker,
+		httpsOnlyContentBlocker,
+	]
+
+	fileprivate static let optionalContentBlockers = [
 		hstsPreloadUpgrader2,
 		hstsPreloadUpgrader3,
 		hstsPreloadUpgrader4,
@@ -84,11 +97,6 @@ class BlockerID {
 	]
 }
 
-private func syncToMainThread<T>(_ work: () -> T) -> T {
-	return Thread.isMainThread ? work() : DispatchQueue.main.sync(execute: work)
-}
-
-@available(iOS 11, *)
 class ContentBlockerManager {
 	private init() {
 		observer = NotificationCenter.default.addObserver(forName: DomainList.dbFileChangedNotification, object: nil, queue: nil) { _ in
@@ -144,7 +152,10 @@ class ContentBlockerManager {
 			return
 		}
 		isLoading = true
-		BlockerID.allIDs.forEach { load(rules: $0) }
+		let optional = BlockerID.optionalContentBlockers
+		let nonOptional = BlockerID.allIDs.filter { !optional.contains($0) }
+		nonOptional.forEach { load(rules: $0) }
+		optional.forEach { load(rules: $0) }
 		BlockerID.deprecatedContentBlockers.forEach { clear(for: $0) }
 	}
 

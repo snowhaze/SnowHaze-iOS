@@ -2,11 +2,12 @@
 //  PopoverBlockingPolicy.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import WebKit
 
 enum PopoverBlockingPolicyType: Int64 {
 	case allwaysBlock

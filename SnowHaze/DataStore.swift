@@ -2,7 +2,7 @@
 //  DataStore.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -58,12 +58,24 @@ class DataStore {
 		}
 	}
 
+	func set(_ value: Bool?, for key: String) {
+		if let value = value {
+			set(SQLite.Data(value), for: key)
+		} else {
+			set(SQLite.Data.null, for: key)
+		}
+	}
+
 	func getString(for key: String) -> String? {
 		return store[key]?.textValue
 	}
 
 	func getData(for key: String) -> Data? {
 		return store[key]?.blobValue
+	}
+
+	func getBool(for key: String) -> Bool? {
+		return store[key]?.boolValue
 	}
 
 	func getDouble(for key: String) -> Double? {

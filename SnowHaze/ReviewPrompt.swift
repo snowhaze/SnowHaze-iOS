@@ -2,8 +2,8 @@
 //  ReviewPrompt.swift
 //  SnowHaze
 //
-
-//  Copyright © 2018 Benjamin Andris Suter-Dörig. All rights reserved.
+//
+//  Copyright © 2018 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
@@ -14,6 +14,10 @@ class ReviewPrompt {
 	private static var closedTabs = 0
 
 	static func settingsReset() {
+		prompt()
+	}
+
+	static func allTabsClosed() {
 		prompt()
 	}
 
@@ -32,9 +36,7 @@ class ReviewPrompt {
 		guard !prompted else {
 			return
 		}
-		if #available(iOS 10.3, *) {
-			SKStoreReviewController.requestReview()
-		}
+		SKStoreReviewController.requestReview()
 		prompted = true
 	}
 }

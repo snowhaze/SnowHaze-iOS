@@ -2,11 +2,17 @@
 //  WebViewManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import WebKit
+
+enum InputType {
+	case plainInput
+	case url
+}
 
 struct HTTPSUpgradeState {
 	private(set) var url: URL? = nil
@@ -31,16 +37,26 @@ struct HTTPSUpgradeState {
 	}
 }
 
-protocol WebViewManager: class {
+enum WebLoadType {
+	case userInput(String)
+	case url(URL)
+}
+protocol WebViewManager: WKScriptMessageHandler {
 	var webView: WKWebView { get }
 	var tab: Tab { get }
+	var securityCookie: String { get }
+
+	func load(_ type: WebLoadType)
+	func load(input: String, type: InputType)
+	func load(url: URL?)
+	func load(userInput: String)
 }
 
-private class BlockCallGuard {
-	var called = false
-	deinit {
-		guard called else {
-			fatalError("Block Was not Called")
+extension WebViewManager {
+	func load(input: String, type: InputType) {
+		switch type {
+			case .url:			load(url: URL(string: input))
+			case .plainInput:	load(userInput: input)
 		}
 	}
 }
@@ -55,7 +71,7 @@ extension WebViewManager {
 		webView.configuration.preferences.javaScriptEnabled = true
 		let blockGuard = BlockCallGuard()
 		let ret: () -> Void = {
-			blockGuard.called = true
+			blockGuard.called()
 			let policy = PolicyManager.manager(for: self.webView.url, in: self.tab)
 			self.webView.configuration.preferences.javaScriptEnabled = policy.allowJS
 		}
@@ -73,7 +89,7 @@ extension WebViewManager {
 		return true
 	}
 
-	@discardableResult func evaluate(_ script: String?, completionHandler: ((Any?, Error?) -> Void)?) -> Bool {
+	@discardableResult func evaluate(_ script: String?, completionHandler: ((Any?, Error?) -> Void)? = nil) -> Bool {
 		guard let script = script else {
 			return false
 		}
@@ -82,8 +98,14 @@ extension WebViewManager {
 		}
 		return result
 	}
-}
 
+	func load(_ type: WebLoadType) {
+		switch type {
+			case .url(let url):			load(url: url)
+			case .userInput(let input):	load(userInput: input)
+		}
+	}
+}
 
 // Internals. Only intended for classes implementing WebViewManager
 internal extension WebViewManager {
@@ -94,11 +116,12 @@ internal extension WebViewManager {
 		guard navigationAction.request.isHTTPGet else {
 			return nil
 		}
-		guard let domain = url.host , url.scheme?.lowercased() == "http" else {
+		guard let domain = url.host , url.normalizedScheme == "http" else {
 			return nil
 		}
 		let policy = PolicyManager.manager(for: url, in: tab)
-		guard policy.useHTTPSExclusivelyWhenPossible && DomainList(type: .httpsSites).contains(domain) else {
+		let httpsSites = DomainList(type: policy.useHTTPSExclusivelyWhenPossible ? .httpsSites: .empty)
+		guard httpsSites.contains(domain) || policy.trustedSiteUpdateRequired else {
 			return nil
 		}
 		var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
@@ -111,13 +134,41 @@ internal extension WebViewManager {
 		webView.configuration.userContentController.removeAllUserScripts()
 		webView.configuration.preferences.minimumFontSize = policy.minFontSize
 		webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = policy.allowAutomaticJSPopovers
-		policy.userScripts.forEach { webView.configuration.userContentController.addUserScript($0) }
-		if #available(iOS 11, *) {
-			webView.configuration.userContentController.removeAllContentRuleLists()
-			policy.withEnabledContentRuleLists { lists, replacements in
-				lists.forEach { webView.configuration.userContentController.add($0) }
-				replacements.forEach { webView.configuration.userContentController.addUserScript($0) }
-			}
+		policy.userScripts(with: securityCookie, for: tab).forEach { webView.configuration.userContentController.addUserScript($0) }
+		webView.configuration.userContentController.removeAllContentRuleLists()
+		policy.withEnabledContentRuleLists(for: tab) { lists, replacements in
+			lists.forEach { webView.configuration.userContentController.add($0) }
+			replacements.forEach { webView.configuration.userContentController.addUserScript($0) }
 		}
+	}
+
+	func rawLoad(_ request: URLRequest, in webView: WKWebView?) {
+		guard let webView = webView else {
+			return
+		}
+		let jsSchemePrefix = "javascript:"
+		if request.url?.normalizedScheme == "javascript" && request.url?.absoluteString.lowercased().hasPrefix(jsSchemePrefix) ?? false {
+			let policy = PolicyManager.manager(for: self.webView.url, in: self.tab)
+			if policy.allowJSURLsInURLBar {
+				let url = request.url!.absoluteString
+				let substring = url[url.index(url.startIndex, offsetBy: jsSchemePrefix.count) ..< url.endIndex]
+				let js = substring.removingPercentEncoding ?? String(substring)
+				webView.configuration.preferences.javaScriptEnabled = true
+				webView.evaluateJavaScript(js)
+				webView.configuration.preferences.javaScriptEnabled = policy.allowJS
+			} else {
+				webView.loadHTMLString(BrowserPageGenerator(type: .jsUrlBlocked).getHTML(), baseURL: nil)
+			}
+		} else {
+			var request = request
+			if tab.useTor {
+				request.url = request.url?.torified
+			}
+			webView.load(request)
+		}
+	}
+
+	func didReceive(scriptMessage message: WKScriptMessage, from userContentController: WKUserContentController) {
+		print(message)
 	}
 }

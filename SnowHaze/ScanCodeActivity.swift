@@ -2,12 +2,13 @@
 //  ScanCodeActivity.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import AVFoundation
+import UIKit
 
 protocol ScanCodeActivityDelegate: class {
 	func activity(_ activity: ScanCodeActivity, didScanCode code: String)
@@ -55,7 +56,6 @@ class ScanCodeActivity: UIActivity {
 		vc.codeColor = .title
 		vc.errorColor = .title
 		vc.errorIcon = #imageLiteral(resourceName: "no_camera")
-		vc.fontName = SnowHazeFontName
 		vc.modalPresentationStyle = .popover
 		vc.delegate = self
 		vc.errorMessage = NSLocalizedString("code scan no camera access error message", comment: "error message displayed when user tries to scan a code but has not (yet) granted camera access")

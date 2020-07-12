@@ -2,7 +2,7 @@
 //  Tab.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -22,29 +22,11 @@ private enum TabError: Error {
 	case conversionError
 }
 
-private extension UIImage {
-	var pngData: Data {
-		return self.pngData()!
-	}
-}
-
 func ==(_ a: Tab, _ b: Tab) -> Bool {
 	return a.id == b.id
 }
 
 class Tab: Equatable {
-	private static let lockCharacter = "\u{F100}"
-	private static let incompleteLockCharacter = "\u{F101}"
-	private static let barCharacter = "\u{F102}"
-	private static let trustedCharacter = "\u{F104}"
-	private static let unsafeCharacter = "\u{F105}"
-	private static let lockCharacters = CharacterSet(charactersIn: lockCharacter + incompleteLockCharacter + barCharacter + trustedCharacter + unsafeCharacter)
-
-	static func sanitize(title: String?) -> String? {
-		let filteredTitle = title?.components(separatedBy: Tab.lockCharacters).joined()
-		return filteredTitle?.trimmingCharacters(in: .whitespacesAndNewlines)
-	}
-
 	let id: Int64
 	let root: Int64?
 	var history: [URL]  {
@@ -59,66 +41,103 @@ class Tab: Equatable {
 		}
 	}
 
-	private var displayTitle: String {
-		if controller?.unused ?? true {
-			return NSLocalizedString("home screen page title", comment: "title of home page displayed in url bar")
+	fileprivate(set) var deleted = false
+	private var internalUseTor: Bool?
+
+	enum TLSStatus {
+		case http
+		case mixed
+		case other
+		case secure
+		case ev(String)
+	}
+	var tlsStatus: TLSStatus {
+		guard let controller = controller, !controller.unused else {
+			return .other
+		}
+		let isAboutBlank = PolicyDomain.isAboutBlank(controller.url)
+		let isHTTPS = displayURL?.normalizedScheme == "https"
+		let manager = ContentBlockerManager.shared
+		let policy = PolicyManager.manager(for: displayURL, in: self)
+		let hasMixedBlocker = manager.blockers[BlockerID.mixedContentBlocker] != nil
+		let blockMixedContent = (policy.blockMixedContent && hasMixedBlocker) || useTor
+		let secure = ((controller.hasOnlySecureContent ?? false) || (useTor && isHTTPS)) && (controller.serverTrust != nil)
+		if let _ = controller.url, !secure && !(isHTTPS && blockMixedContent) {
+			if !(controller.isLoading ?? true) && isHTTPS && !isAboutBlank {
+				return .mixed
+			} else if !isAboutBlank && !(isHTTPS && controller.isLoading ?? false) {
+				return .http
+			}
+		}
+		if isHTTPS {
+			if let organization = controller.serverTrust?.evOrganization {
+				return .ev(organization)
+			}
+			return .secure
+		}
+		return .other
+	}
+
+	var useTor: Bool {
+		precondition(Thread.isMainThread)
+		if let useTor = internalUseTor {
+			return useTor
+		}
+		internalUseTor = PolicyManager.manager(for: self).useTor
+		return internalUseTor!
+	}
+
+	private var displayTitle: ([UIImage], String) {
+		guard let controller = controller, !controller.unused else {
+			let title = NSLocalizedString("home screen page title", comment: "title of home page displayed in url bar")
+			return (useTor ? [UIImage(named: "tor_indicator")!] : [], title)
+		}
+		let url = displayURL
+		let isAboutBlank = PolicyDomain.isAboutBlank(controller.url)
+		let policy = PolicyManager.manager(for: displayURL, in: self)
+
+		var attachments = [UIImage]()
+		if policy.trust || isAboutBlank {
+			attachments.append(UIImage(named: "trusted")!)
+		}
+		if useTor {
+			attachments.append(UIImage(named: "tor_indicator")!)
+		}
+		switch tlsStatus {
+			case .http:		attachments.append(UIImage(named: "http_warning")!)
+			case .mixed:	attachments.append(UIImage(named: "mixed_content_warning")!)
+			default:		break
+		}
+		if let title = title , !title.isEmpty {
+			return (attachments, title)
 		} else {
-			let title: String
-			let url = displayURL
-			if let organization = controller?.evOrganization {
-				title = organization
-			} else if let tabTitle = self.title , !tabTitle.isEmpty {
-				title = tabTitle
-			} else {
-				title = url?.host ?? ""
-			}
-			let titleComponents = title.components(separatedBy: Tab.lockCharacters)
-			let safeTitle = titleComponents.joined(separator: "")
-			var insert = ""
-			if PolicyManager.manager(for: displayURL, in: self).trust {
-				insert += Tab.trustedCharacter + " "
-			}
-			let isHTTPS = url?.scheme?.lowercased() == "https"
-			let blockMixedContent: Bool
-			if #available(iOS 11, *) {
-				let policy = PolicyManager.manager(for: displayURL, in: self)
-				let manager = ContentBlockerManager.shared
-				let mixedBlocker = BlockerID.mixedContentBlocker
-				blockMixedContent = policy.blockMixedContent && manager.blockers[mixedBlocker] != nil
-			} else {
-				blockMixedContent = false
-			}
-			if controller?.hasOnlySecureContent ?? false || (isHTTPS && blockMixedContent) {
-				insert += Tab.lockCharacter + " "
-			} else if let realURL = controller?.url, !(controller?.isLoading ?? true) && isHTTPS && !PolicyManager.isAboutBlank(realURL) {
-				insert += Tab.incompleteLockCharacter + Tab.barCharacter + " "
-			} else if let realURL = controller?.url, !PolicyManager.isAboutBlank(realURL) && !isHTTPS {
-				insert += Tab.unsafeCharacter + " "
-			}
-			return " " + insert + safeTitle
+			return (attachments, url?.host ?? "")
 		}
 	}
 
 	var displayURL: URL? {
-		if let url = controller?.url {
-			if !PolicyManager.isAboutBlank(url) {
-				return url
-			}
+		if let url = controller?.url, !PolicyDomain.isAboutBlank(url) {
+			return url
 		}
-		return history.last
+		return history.last ?? controller?.url
 	}
 
 	var formatedDisplayTitle: NSAttributedString {
-		return format(displayTitle, isEV: controller?.evOrganization != nil)
+		return format(displayTitle)
 	}
 
 	var uppercaseFormatedDisplayTitle: NSAttributedString {
-		return format(displayTitle.localizedUppercase, isEV: controller?.evOrganization != nil)
+		let data = displayTitle
+		return format((data.0, data.1.localizedUppercase))
+	}
+
+	var torProxyCredentials: (String, String)? {
+		return controller?.torProxyCredentials
 	}
 
 	var snapshot: UIImage?  {
 		didSet {
-			snapshotData = snapshot?.pngData
+			snapshotData = snapshot?.pngData()
 		}
 	}
 
@@ -149,7 +168,8 @@ class Tab: Equatable {
 	}
 
 	func cleanup() {
-		controller?.clearMediaInfo()
+		controller?.stopLoading()
+		controller?.cleanup()
 		controller = nil
 	}
 
@@ -161,7 +181,7 @@ class Tab: Equatable {
 		self.history = history
 		self.title = title
 		self.snapshot = snapshot
-		self.snapshotData = snapshot?.pngData
+		self.snapshotData = snapshot?.pngData()
 		self.active = active
 	}
 
@@ -197,30 +217,21 @@ class Tab: Equatable {
 		}
 	}
 
-
-	private func format(_ title: String, isEV: Bool) -> NSAttributedString {
-		let formated = NSMutableAttributedString(string: title)
-
-		if isEV {
-			let range = NSRange(title.startIndex ..< title.endIndex, in: title)
-			formated.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.safetyIndicator, range: range)
+	private func format(_ data: ([UIImage], String)) -> NSAttributedString {
+		let title = data.1
+		let images = data.0
+		let attachments = images.map { image -> NSAttributedString in
+			let attachment = NSTextAttachment()
+			attachment.image = image
+			attachment.bounds = CGRect(x: 0, y: -9, width: 30, height: 30)
+			return NSAttributedString(attachment: attachment)
 		}
-
-		let barRange = (title as NSString).range(of: String(Tab.barCharacter))
-		if barRange.location != NSNotFound {
-			formated.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.mixedContentBar, range: barRange)
+		let result = NSMutableAttributedString()
+		for attachment in attachments {
+			result.append(attachment)
 		}
-
-		let checkRange = (title as NSString).range(of: String(Tab.trustedCharacter))
-		if checkRange.location != NSNotFound {
-			formated.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.safetyIndicator, range: checkRange)
-		}
-
-		let warningRange = (title as NSString).range(of: String(Tab.unsafeCharacter))
-		if warningRange.location != NSNotFound {
-			formated.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.httpWarning, range: warningRange)
-		}
-		return formated
+		result.append(NSAttributedString(string: title))
+		return result
 	}
 
 	fileprivate var bindings: [String: SQLite.Data] {
@@ -245,7 +256,7 @@ class Tab: Equatable {
 }
 
 class TabStore {
-	private var undoStack: [(Tab, Date, Int64, [String: SQLite.Data])] = []
+	private var undoStack: [([(Tab, Date)], Date, Int64)] = []
 	private var deletionId: Int64 = 0
 	private var nextDeletionId: Int64 {
 		deletionId += 1
@@ -262,7 +273,7 @@ class TabStore {
 	var items: [Tab] {
 		assert(Thread.isMainThread)
 		if internalItems == nil {
-			let query = "SELECT * FROM \(tableName) ORDER BY IFNULL(root_id, id) ASC, id ASC"
+			let query = "SELECT * FROM \(tableName) WHERE NOT deleted ORDER BY IFNULL(root_id, id) ASC, id ASC"
 			guard let rows = try? database.execute(query) else {
 				return []
 			}
@@ -307,11 +318,16 @@ class TabStore {
 		}
 	}
 
-	private init(db: SQLiteManager) {
+	private init?(db: SQLiteManager) {
 		database = db
+		do {
+			try database.execute("DELETE FROM \(tableName) WHERE deleted")
+		} catch {
+			return nil
+		}
 	}
 
-	@discardableResult func addEmptyItem(withSettings values: [String: SQLite.Data] = [:], parent: Tab? = nil) -> Tab? {
+	@discardableResult func add(withSettings values: [String: SQLite.Data] = [:], parent: Tab? = nil, loadHomepage: Bool = true) -> Tab? {
 		var result: Tab?
 		var notify: (() -> ())?
 		try! database.inTransaction {
@@ -326,10 +342,13 @@ class TabStore {
 			}
 		}
 		notify?()
+		if loadHomepage, let tab = result, let url = PolicyManager.manager(for: tab).homepageURL {
+			tab.controller?.load(url: url)
+		}
 		return result
 	}
 
-	func addEmptyItem(with request: URLRequest, copySettingsFromParent parent: Tab, customization: (Tab) -> Void = { _ in }) -> Tab? {
+	func add(with request: URLRequest, copySettingsFromParent parent: Tab, customization: (Tab) -> Void = { _ in }) -> Tab? {
 		assert(Thread.isMainThread)
 		let history: [URL]
 		if let url = request.url {
@@ -357,6 +376,7 @@ class TabStore {
 		if let controller = parent.controller {
 			try! newTab.controller?.set(userAgent: controller.userAgent)
 			try! newTab.controller?.set(dataStore: controller.dataStore)
+			try! newTab.controller?.set(safebrowsingStorage: controller.safebrowsingStorage)
 		}
 		customization(newTab)
 		newTab.controller?.load(request: request)
@@ -365,25 +385,12 @@ class TabStore {
 
 	private func addItem(with history: [URL], snapshot: UIImage?, title: String?, root: Int64?) -> (() -> ())? {
 		assert(Thread.isMainThread)
-		class Callguard {
-			var called = false
-			init() {
-				DispatchQueue.main.async {
-					self.check()
-				}
-			}
-			func check() {
-				if !called {
-					fatalError("update notification was deffered for too long")
-				}
-			}
-		}
 		do {
 			let strings = history.map() { return $0.absoluteString }
 			let oldItems = items
 			let jsonData = try! JSONSerialization.data(withJSONObject: strings)
 			let json = String(data: jsonData, encoding: .utf8)!
-			let snapshotBinding = SQLite.Data(snapshot?.pngData)
+			let snapshotBinding = SQLite.Data(snapshot?.pngData())
 			let titleBinding = SQLite.Data(title)
 			let rootBinding: SQLite.Data
 			if let root = root {
@@ -395,9 +402,9 @@ class TabStore {
 			let query = "INSERT INTO \(tableName) (root_id, history, snapshot, active, title) VALUES (?, ?, ?, ?, ?)"
 			try database.execute(query, with: bindings)
 			internalItems = nil
-			let callguard = Callguard()
+			let callguard = SyncBlockCallGuard()
 			return {
-				callguard.called = true
+				callguard.called()
 				self.notifyDiff(from: oldItems)
 			}
 		} catch {
@@ -405,91 +412,95 @@ class TabStore {
 		}
 	}
 
-	static let store: TabStore = TabStore(db: db)
+	static let store: TabStore = TabStore(db: db)!
 
-	@discardableResult func remove(_ item: Tab, undoTime: TimeInterval) -> Bool {
+	private func delete(_ tabs: [(Tab, Date)]) {
+		for (tab, _) in tabs {
+			assert(!tab.deleted)
+			tab.cleanup()
+		}
+
+		DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+			Settings.atomically {
+				for (tab, _) in tabs {
+					assert(!tab.deleted)
+					try! self.database.execute("DELETE FROM \(self.tableName) WHERE id = ?", with: [.integer(tab.id)])
+					tab.deleted = true
+					Settings.dropChache(for: tab)
+				}
+			}
+		}
+	}
+
+	func remove(_ item: Tab, undoTime: TimeInterval) {
+		remove([(item, undoTime)])
+	}
+
+	func remove(_ tabs: [(Tab, TimeInterval)]) {
 		assert(Thread.isMainThread)
 		let oldItems = items
-		let id = item.id
-		let settings = Settings.settings(for: item).allValues
-		if let controller = item.controller, controller.webViewLoaded {
-			controller.stopLoading()
+		let ids = tabs.map { $0.0.id }
+		let deletedIds = Set(ids)
+		try! database.inTransaction(ofType: .exclusive) {
+			for (tab, _) in tabs {
+				try! database.execute("UPDATE \(tableName) SET deleted = 1 WHERE id = ?", with: [.integer(tab.id)])
+				tabCache[tab.id] = nil
+			}
 		}
-		item.controller?.clearMediaInfo()
-		do {
-			try database.execute("DELETE FROM \(tableName) WHERE id = ?", with: [.integer(id)])
-			Settings.dropChache(for: item)
-		} catch {
-			return false
-		}
-		internalItems = internalItems?.filter { $0.id != item.id }
-		tabCache[id] = nil
+		internalItems = internalItems?.filter { !deletedIds.contains($0.id) }
 		notifyDiff(from: oldItems)
-		if undoTime > 0.1 {
+		let now = Date()
+		let storable = tabs.map { ($0.0, Date(timeInterval: $0.1, since: now)) }
+		if let undoTime = tabs.map({ $0.1 }).max(), undoTime > 0.1 {
 			let delId = nextDeletionId
-			undoStack.append((item, Date(timeIntervalSinceNow: undoTime), delId, settings))
+			undoStack.append((storable, Date(timeIntervalSinceNow: undoTime), delId))
 			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + undoTime) {
 				let now = Date()
-				self.undoStack = self.undoStack.filter { (tab, date, id, _) -> Bool in
-					if (tab == item && id == delId) || date <= now {
-						item.cleanup()
+				self.undoStack = self.undoStack.filter { tabs, date, id -> Bool in
+					if id == delId || date <= now {
+						self.delete(tabs)
 						return false
 					}
 					return true
 				}
 			}
 		} else {
-			item.cleanup()
+			delete(storable)
 		}
-		return true
 	}
 
 	var canUndoDeletion: Bool {
 		return !undoStack.isEmpty
 	}
 
-	@discardableResult func undoDeletion() -> Tab? {
-		assert(Thread.isMainThread)
+	func undoDeletion() -> [Tab] {
+		precondition(Thread.isMainThread)
 		guard canUndoDeletion else {
-			return nil
+			return []
 		}
-		let (tab, _, _, settingsValues) = undoStack.popLast()!
-		var res: Tab? = nil
+		let tabs = undoStack.popLast()!.0
+
+		let now = Date()
+		let needDelete = tabs.filter { $0.1.timeIntervalSince(now) <= 0 }
+		delete(needDelete)
+
+		let recoverable = tabs.compactMap { $0.1.timeIntervalSince(now) > 0 ? $0.0 : nil }
 
 		let oldItems = items
-		try! database.inTransaction {
-			guard insertNoNotify(item: tab) else {
-				return
-			}
-			res = tab
+		try! database.inTransaction(ofType: .exclusive) {
+			for tab in recoverable {
+				assert(!tab.deleted)
+				try! database.execute("UPDATE \(tableName) SET deleted = 0 WHERE id = ?", with: [.integer(tab.id)])
+				internalItems = nil
+				tabCache[tab.id] = tab
 
-			if tab.active {
-				makeActive(tab)
-			}
-
-			let settings = Settings.settings(for: tab)
-			for (key, value) in settingsValues {
-				settings.set(value, for: key)
+				if tab.active {
+					makeActive(tab)
+				}
 			}
 		}
-		if res != nil {
-			notifyDiff(from: oldItems)
-		}
-		return res
-	}
-
-	private func insertNoNotify(item: Tab) -> Bool {
-		assert(Thread.isMainThread)
-		let query = "INSERT INTO \(tableName) (id, root_id, history, snapshot, active, title) VALUES (:id, :root_id, :history, :snapshot, :active, :title)"
-		let bindings = item.bindings
-		do {
-			try database.execute(query, with: bindings)
-			internalItems = nil
-			tabCache[item.id] = item
-			return true
-		} catch {
-			return false
-		}
+		notifyDiff(from: oldItems)
+		return recoverable
 	}
 
 	@discardableResult fileprivate func save(item: Tab) -> Bool {

@@ -2,20 +2,21 @@
 //  BrowserPageGenerator.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 enum BrowserPageGeneratorType {
 	case pageError
+	case jsUrlBlocked
 }
 
 class BrowserPageGenerator {
 	private let bodyPattern = "(?<=\\<body>(\\s|))[^\\s][\\w\\W]*?(?=\\s*\\</body>)"
 	private let paragraphPattern = "^<p[^>]*><span[^>]*>\\s*|\\s*</span></p>$"
-	private static let fontBase64 = try! Data(contentsOf: Bundle.main.url(forResource: SnowHazeFontName, withExtension: "otf")!).base64EncodedString()
 
 	// Style of reload button
 	private let buttonBorder = "none"
@@ -31,7 +32,7 @@ class BrowserPageGenerator {
 	private let pageBGColor = UIColor.background.hex
 	private let pageTextColor = UIColor.title.hex
 	private let pageTextAlign = "center"
-	
+
 	private let type: BrowserPageGeneratorType
 
 	var title: String?
@@ -43,15 +44,25 @@ class BrowserPageGenerator {
 	var errorReason: String?
 	var file: String?
 	var mimeType: String?
-	
+
 	init(type: BrowserPageGeneratorType) {
 		self.type = type
 	}
-	
+
 	func getHTML() -> String {
 		switch type {
-			case .pageError: return getErrorPageHTML()
+			case .pageError:	return getErrorPageHTML()
+			case .jsUrlBlocked:	return getJsUrlBlockedHTML()
 		}
+	}
+
+	private func getJsUrlBlockedHTML() -> String {
+		let memoryGame = MemoryGame()
+		let title = NSLocalizedString("javascript urls disabled error page title", comment: "title of the error page to inform the user that javascript urls are disabled")
+		let head = getHead(title: title)
+		let message = NSLocalizedString("javascript urls disabled error page message", comment: "message of the error page to inform the user that javascript urls are disabled")
+		let body = encode(html: message)
+		return "<!DOCTYPE html><html>\(head)<body style=\"\(getBodyCSS())\"><div style=\"margin: 5em 0.5em;\">\(body)</div>\(memoryGame.getHTML())</body></html>"
 	}
 
 	private func getErrorPageHTML() -> String {
@@ -165,18 +176,11 @@ class BrowserPageGenerator {
 	}
 
 	private func getCSSStyle() -> String {
-		let css = "#moreInformationLink {"
-				+	"display: none;"
-				+ "}"
-		let font = "@font-face {"
-			+ "font-family: '\(SnowHazeFontName)';"
-			+ "src: url('data:font/otf;base64,\(BrowserPageGenerator.fontBase64)') format('opentype');}"
-		return "<style>\(css)\(font)</style>"
+		return "<style>#moreInformationLink {display: none;}</style>"
 	}
 
 	private func getBodyCSS() -> String {
-		return "background-color:#\(pageBGColor); color:#\(pageTextColor); text-align:\(pageTextAlign);"
-			+ "font-family:'\(SnowHazeFontName)'; overflow-wrap: break-word;"
+		return "background-color:#\(pageBGColor); color:#\(pageTextColor); text-align:\(pageTextAlign);overflow-wrap: break-word;"
 	}
 
 	private func getButtonCSS() -> String {

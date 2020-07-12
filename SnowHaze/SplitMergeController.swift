@@ -2,7 +2,7 @@
 //  SplitMergeController.swift
 //  iostest
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -12,10 +12,23 @@ import UIKit
 extension UIViewController {
 /**
  *	The SplitMergeController currently presentling self.
- *	Only works reliably in masterViewController.
  */
 	var splitMergeController: SplitMergeController? {
-		return parent as? SplitMergeController
+		if let smc =  parent as? SplitMergeController {
+			if smc.masterViewController == self || smc.detailViewController == self {
+				return smc
+			}
+		} else if let nvc = navigationController {
+			if let index = nvc.viewControllers.lastIndex(of: self), index > 0 {
+				let previous = nvc.viewControllers[index - 1]
+				if let smc = previous as? SplitMergeController {
+					if smc.detailViewController == self {
+						return smc
+					}
+				}
+			}
+		}
+		return nil
 	}
 }
 
@@ -53,6 +66,7 @@ class SplitMergeController: UIViewController {
 		willSet {
 			detailFocus = false
 			use(masterViewController.navigationItem)
+			navigationItem.rightBarButtonItem = nil
 			if constrainedWidth {
 				if let _ = viewIfLoaded , navigationController!.topViewController == detailViewController {
 					navigationController!.popToViewController(self, animated: true)
@@ -79,6 +93,14 @@ class SplitMergeController: UIViewController {
 					}
 				}
 				detailFocus = true
+			}
+		}
+	}
+
+	var detailRightBarButtonItem: UIBarButtonItem? {
+		didSet {
+			if let _ = detailViewController, !constrainedWidth {
+				navigationItem.setRightBarButton(detailRightBarButtonItem, animated: true)
 			}
 		}
 	}
@@ -148,8 +170,9 @@ class SplitMergeController: UIViewController {
 
 	private func layout() {
 		let size = view.bounds.size
-		if self.constrainedWidth {
+		if constrainedWidth {
 			masterViewController.view.frame = CGRect(origin: CGPoint.zero, size: size)
+			navigationItem.setRightBarButton(nil, animated: true)
 		} else {
 			let masterWidth = (size.width - 200) * 0.3 + 200
 			let detailWidth = size.width - masterWidth
@@ -158,6 +181,7 @@ class SplitMergeController: UIViewController {
 			masterViewController.view.frame = masterFrame
 			backgroundImageView.frame = detailFrame
 			detailViewController?.view.frame = detailFrame
+			navigationItem.setRightBarButton(detailRightBarButtonItem, animated: true)
 		}
 	}
 

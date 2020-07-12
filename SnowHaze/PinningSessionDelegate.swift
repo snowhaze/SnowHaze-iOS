@@ -2,22 +2,21 @@
 //  PinningSessionDelegate.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2018 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 
-
-class PinningSessionDelegate: NSObject, URLSessionDelegate {
-	static let pinnedHosts = ["api.snowhaze.com", "search.snowhaze.com"]
+public class PinningSessionDelegate: NSObject, URLSessionDelegate {
+	static let pinnedHosts = ["api.snowhaze.com", "ipv4.api.snowhaze.com", "ipv6.api.snowhaze.com"]
 
 	private static let api2Cert = SecPolicyEvaluator.cert(named: "api2")!
 	private static let api3Cert = SecPolicyEvaluator.cert(named: "api3")!
-	
+
 	static let pinnedCerts = [api2Cert, api3Cert]
 
-	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+	public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 		let space = challenge.protectionSpace
 		guard space.authenticationMethod == NSURLAuthenticationMethodServerTrust else {
 			completionHandler(.performDefaultHandling, nil)

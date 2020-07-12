@@ -13,14 +13,14 @@
 	var cloneNode = Node.prototype.cloneNode;
 	var getRandomValues = window.crypto.getRandomValues;
 	var crypto = window.crypto;
-	
+
 	var gl1_UNSIGNED_SHORT_5_6_5 = WebGLRenderingContext.prototype.UNSIGNED_SHORT_5_6_5;
 	var gl1_UNSIGNED_SHORT_4_4_4_4 = WebGLRenderingContext.prototype.UNSIGNED_SHORT_4_4_4_4;
 	var gl1_UNSIGNED_SHORT_5_5_5_1 = WebGLRenderingContext.prototype.UNSIGNED_SHORT_5_5_5_1;
 	var gl1_VENDOR = WebGLRenderingContext.prototype.VENDOR;
 	var gl1_RENDERER = WebGLRenderingContext.prototype.RENDERER;
 	var gl1_VERSION = WebGLRenderingContext.prototype.VERSION;
-	
+
 	var randomData = new Uint8Array(65536);
 	var randIndex = 65536;
 	function getRnd() {
@@ -126,18 +126,18 @@
 			}
 		}
 	};
-	
+
 	var readPixels2 = WebGL2RenderingContext.prototype.readPixels;
 	var getParam2 = WebGL2RenderingContext.prototype.getParameter;
 	var getExtension2 = WebGL2RenderingContext.prototype.getExtension;
-	
+
 	var gl2_UNSIGNED_SHORT_5_6_5 = WebGL2RenderingContext.prototype.UNSIGNED_SHORT_5_6_5;
 	var gl2_UNSIGNED_SHORT_4_4_4_4 = WebGL2RenderingContext.prototype.UNSIGNED_SHORT_4_4_4_4;
 	var gl2_UNSIGNED_SHORT_5_5_5_1 = WebGL2RenderingContext.prototype.UNSIGNED_SHORT_5_5_5_1;
 	var gl2_VENDOR = WebGL2RenderingContext.prototype.VENDOR;
 	var gl2_RENDERER = WebGL2RenderingContext.prototype.RENDERER;
 	var gl2_VERSION = WebGL2RenderingContext.prototype.VERSION;
-	
+
 	WebGL2RenderingContext.prototype.readPixels = function (x, y, width, height, format, type, pixels) {
 		Function.prototype.apply = apply;
 		readPixels2.apply(this, arguments);

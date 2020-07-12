@@ -2,12 +2,13 @@
 //  ExternalBookmarkManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import CoreSpotlight
+import UIKit
 
 let bookmarkSearchDomainID = "ch.illotros.snowhaze.core-spotlight.domain.bookmark"
 let bookmarkUTID = "ch.illotros.snowhaze.bookmark"

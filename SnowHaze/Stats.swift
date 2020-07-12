@@ -2,11 +2,12 @@
 //  Stats.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2018 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import WebKit
 
 let statsResetNotificationName = Notification.Name(rawValue: "StatsResetNotification")
 
@@ -78,7 +79,7 @@ class Stats {
 	}
 
 	private var vpnConnected: Bool {
-		guard SubscriptionManager.shared.hasSubscription else {
+		guard SubscriptionManager.status.possible else {
 			return false
 		}
 		if VPNManager.shared.ipsecConnected {
@@ -143,10 +144,6 @@ class Stats {
 		guard policy.keepStats, !policy.allowPermanentDataStorage, let store = tab.controller?.webbsiteDataStore else {
 			return
 		}
-		if #available(iOS 11, *) {
-			store.httpCookieStore.getAllCookies { self.set($0.filter({ !$0.isSessionOnly }).count, for: store) }
-		} else {
-			store.fetchDataRecords(ofTypes: Set(arrayLiteral: WKWebsiteDataTypeCookies)) { self.set($0.count, for: store) }
-		}
+		store.httpCookieStore.getAllCookies { self.set($0.filter({ !$0.isSessionOnly }).count, for: store) }
 	}
 }

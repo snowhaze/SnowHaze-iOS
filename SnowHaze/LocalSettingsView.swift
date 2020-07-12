@@ -2,35 +2,16 @@
 //	LocalSettingsView.swift
 //	SnowHaze
 //
-
+//
 //	Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
-
-private class OverrideSettingsDefaultWrapper: SettingsDefaultWrapper {
-	let wrapper: SettingsDefaultWrapper
-
-	init(wrapper: SettingsDefaultWrapper, prioritySettings: [String: SQLite.Data]) {
-		self.wrapper = wrapper
-		super.init(defaults: prioritySettings, settings: wrapper.settings)
-	}
-
-	override func value(for key: String) -> SQLite.Data {
-		if let value = defaults[key] {
-			return value
-		}
-		return wrapper.value(for: key)
-	}
-}
+import UIKit
 
 class TabSettingsController: LocalSettingsController {
 	override var numberOfSettings: Int {
-		if #available(iOS 10, *) {
-			return 7
-		} else {
-			return 6
-		}
+		return SubscriptionManager.status.possible ? 8 : 7
 	}
 
 	override var title: String {
@@ -50,6 +31,7 @@ class TabSettingsController: LocalSettingsController {
 			case 4:		return NSLocalizedString("allow javascript setting title", comment: "title of allow javascript setting")
 			case 5:		return NSLocalizedString("desktop user agent tab setting title", comment: "title of tab setting to use desktop user agents")
 			case 6:		return NSLocalizedString("ignore scale limits setting title", comment: "title of ignore scale limits setting")
+			case 7:		return NSLocalizedString("use tor setting title", comment: "title of use tor setting")
 			default:	fatalError("Invalid Index")
 		}
 	}
@@ -63,6 +45,7 @@ class TabSettingsController: LocalSettingsController {
 			case 4:		return allowJavaScriptKey
 			case 5:		return userAgentsKey
 			case 6:		return ignoresViewportScaleLimitsKey
+			case 7:		return useTorNetworkKey
 			default:	fatalError("Invalid Index")
 		}
 	}
@@ -111,19 +94,15 @@ class TabSettingsController: LocalSettingsController {
 
 class PageSettingsController: LocalSettingsController {
 	override var numberOfSettings: Int {
-		if #available(iOS 11, *) {
-			return 11
-		} else {
-			return 9
-		}
+		return 11
 	}
 
 	var url: URL?
 
 	private var host: String {
-		if PolicyManager.isAboutBlank(url) { // error pages have this URL
-			return NSLocalizedString("page settings errorpage description", comment: "displayed instead of domain name if the current page is an errorpage in page settings")
-		} else if PolicyManager.isNormalDataURI(url) {
+		if PolicyDomain.isAboutBlank(url) {
+			return NSLocalizedString("page settings blank page description", comment: "displayed instead of domain name if the current page is an about:blank in page settings")
+		} else if PolicyDomain.isNormalDataURI(url) {
 			return NSLocalizedString("page settings data uris description", comment: "displayed instead of domain name if the current page is a data URI in page settings")
 		}
 		let thisPage = NSLocalizedString("page settings domain name placeholder", comment: "displayed instead of domain name if url.host is nil in page settings")
@@ -208,6 +187,51 @@ class PageSettingsController: LocalSettingsController {
 	}
 }
 
+class FastPageSettingsController: LocalSettingsController {
+	private let showJS: Bool
+
+	override init(wrapper: SettingsDefaultWrapper) {
+		showJS = !(wrapper.value(for: allowJavaScriptKey).bool ?? false)
+		super.init(wrapper: wrapper)
+	}
+
+	override var title: String? {
+		return nil
+	}
+
+	override var buttonTitle: String {
+		return NSLocalizedString("page settings apply button title", comment: "button of apply button of page settings")
+	}
+
+	override var tempButtonTitle: String? {
+		return NSLocalizedString("temporary page settings button title", comment: "title of button to temporarily set a page setting")
+	}
+
+	override var numberOfSettings: Int {
+		return 2
+	}
+
+	override func keyForSetting(at index: Int) -> String {
+		let index = index + (showJS ? 0 : 1)
+		switch index {
+			case 0:		return allowJavaScriptKey
+			case 1:		return blockAdsKey
+			case 2:		return trustedSiteKey
+			default:	fatalError()
+		}
+	}
+
+	override func nameForSetting(at index: Int) -> String {
+		let index = index + (showJS ? 0 : 1)
+		switch index {
+			case 0:		return NSLocalizedString("allow javascript setting title", comment: "title of allow javascript setting")
+			case 1:		return NSLocalizedString("block ads setting title", comment: "title of block ads setting")
+			case 2:		return NSLocalizedString("mark as trusted setting title", comment: "title of mark as trusted setting")
+			default:	fatalError()
+		}
+	}
+}
+
 class LocalSettingsController {
 	let wrapper: SettingsDefaultWrapper
 
@@ -223,7 +247,7 @@ class LocalSettingsController {
 		fatalError("LocalSettingsViewController is an abstract superclass")
 	}
 
-	var title: String {
+	var title: String? {
 		fatalError("LocalSettingsViewController is an abstract superclass")
 	}
 
@@ -295,7 +319,6 @@ class LocalSettingsView: UIView, UITableViewDelegate, UITableViewDataSource {
 		label.text = controller.title
 		label.textAlignment = .center
 		label.lineBreakMode = .byTruncatingHead
-		UIFont.setSnowHazeFont(on: label)
 		addSubview(label)
 
 		tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -306,11 +329,15 @@ class LocalSettingsView: UIView, UITableViewDelegate, UITableViewDataSource {
 		tableView.alwaysBounceVertical = false
 		addSubview(tableView)
 
+		if controller.title == nil {
+			tableView.frame.origin.y -= 30
+			tableView.frame.size.height += 30
+		}
+
 		dissmissButton.setTitle(controller.buttonTitle, for: [])
 		dissmissButton.autoresizingMask = [.flexibleTopMargin, .flexibleWidth]
 		dissmissButton.setTitleColor(.button, for: [])
 		dissmissButton.addTarget(self, action: #selector(finishSetup(_:)), for: .touchUpInside)
-		UIFont.setSnowHazeFont(on: dissmissButton)
 		addSubview(dissmissButton)
 
 		if let tempTitle = controller.tempButtonTitle {
@@ -321,7 +348,6 @@ class LocalSettingsView: UIView, UITableViewDelegate, UITableViewDataSource {
 			tempDissmissButton.autoresizingMask = [.flexibleTopMargin, .flexibleWidth, .flexibleLeftMargin]
 			tempDissmissButton.setTitleColor(.button, for: [])
 			tempDissmissButton.addTarget(self, action: #selector(finishSetup(_:)), for: .touchUpInside)
-			UIFont.setSnowHazeFont(on: tempDissmissButton)
 			addSubview(tempDissmissButton)
 
 			let separator = UIView(frame: CGRect(x: 139.5, y: 200, width: 1, height: 30))
@@ -355,7 +381,6 @@ class LocalSettingsView: UIView, UITableViewDelegate, UITableViewDataSource {
 			return cell
 		}
 		let cell = UITableViewCell(style: .default, reuseIdentifier: id)
-		UIFont.setSnowHazeFont(on: cell.textLabel!)
 		let uiSwitch = UISwitch()
 		uiSwitch.tintColor = .switchOff
 		uiSwitch.backgroundColor = .switchOff

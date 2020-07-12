@@ -2,14 +2,15 @@
 //  AppearanceSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class AppearanceSettingsManager: SettingsViewManager {
-	private let labelWidth: CGFloat = 20
+	private let labelWidth: CGFloat = 25
 	private let margin: CGFloat = 10
 
 	override func html() -> String {
@@ -20,28 +21,41 @@ class AppearanceSettingsManager: SettingsViewManager {
 		return PolicyAssessor(wrapper: settings).assess([.appearance]).color
 	}
 
-	private lazy var label: UILabel = {
-		let label = UILabel(frame: CGRect(x: 0, y: 0, width: self.labelWidth, height: self.stepper.frame.height))
-		label.textColor = .subtitle
-		UIFont.setSnowHazeFont(on: label)
-		label.textAlignment = .right
-		return label
+	private lazy var labels: (fontSize: UILabel, scale: UILabel) = {
+		let font = UILabel(frame: CGRect(x: 0, y: 0, width: self.labelWidth, height: self.steppers.fontSize.frame.height))
+		font.textColor = .subtitle
+		font.textAlignment = .right
+
+		let scale = UILabel(frame: CGRect(x: 0, y: 0, width: self.labelWidth, height: self.steppers.scale.frame.height))
+		scale.textColor = .subtitle
+		scale.textAlignment = .right
+		return (font, scale)
 	}()
 
-	private lazy var stepper: UIStepper = {
-		let stepper = UIStepper()
-		stepper.minimumValue = 0
-		stepper.maximumValue = 75
-		stepper.stepValue = 5
-		stepper.tintColor = .switchOn
-		stepper.addTarget(self, action: #selector(stepperValueChanged(_:)), for: .valueChanged)
-		stepper.value = self.settings.value(for: minFontSizeKey).floatValue!
+	private lazy var steppers: (fontSize: UIStepper, scale: UIStepper) = {
+		let font = UIStepper()
+		font.minimumValue = 0
+		font.maximumValue = 75
+		font.stepValue = 5
+		font.tintColor = .switchOn
+		font.addTarget(self, action: #selector(fontSizeStepperValueChanged(_:)), for: .valueChanged)
+		font.value = self.settings.value(for: minFontSizeKey).floatValue!
+
+		let scale = UIStepper()
+		scale.minimumValue = Double(3 * scaleStorageFactor / 10)
+		scale.maximumValue = Double(3 * scaleStorageFactor)
+		scale.stepValue = Double(scaleStorageFactor / 10)
+		scale.tintColor = .switchOn
+		scale.addTarget(self, action: #selector(scaleStepperValueChanged(_:)), for: .valueChanged)
+		scale.value = Double(self.settings.value(for: webContentScaleKey).integer!)
 
 		// workaround for iOS 13 "feature"
-		stepper.setIncrementImage(stepper.incrementImage(for: .normal), for: .normal)
-		stepper.setDecrementImage(stepper.decrementImage(for: .normal), for: .normal)
+		font.setIncrementImage(font.incrementImage(for: .normal), for: .normal)
+		font.setDecrementImage(font.decrementImage(for: .normal), for: .normal)
+		scale.setIncrementImage(scale.incrementImage(for: .normal), for: .normal)
+		scale.setDecrementImage(scale.decrementImage(for: .normal), for: .normal)
 
-		return stepper
+		return (font, scale)
 	}()
 
 	override func cellForRow(atIndexPath indexPath: IndexPath, tableView: UITableView) -> UITableViewCell {
@@ -54,35 +68,40 @@ class AppearanceSettingsManager: SettingsViewManager {
 			cell.accessoryView = uiSwitch
 		} else if indexPath.row == 1 {
 			cell.textLabel?.text = NSLocalizedString("minimum font size setting title", comment: "title of minimum font size setting")
+			let stepper = steppers.fontSize
 			stepper.frame.origin.x = labelWidth + margin
 			let view = UIView(frame: CGRect(x: 0, y: 0, width: labelWidth + stepper.frame.width + margin, height: stepper.frame.height))
-			view.addSubview(label)
+			view.addSubview(labels.fontSize)
 			view.addSubview(stepper)
 			cell.accessoryView = view
-			updateLabelForStepper()
+			updateLabelForSteppers()
+		} else if indexPath.row == 2 {
+			cell.textLabel?.text = NSLocalizedString("content scale setting title", comment: "title of content scale setting")
+			let stepper = steppers.scale
+			stepper.frame.origin.x = labelWidth + margin
+			let view = UIView(frame: CGRect(x: 0, y: 0, width: labelWidth + stepper.frame.width + margin, height: stepper.frame.height))
+			view.addSubview(labels.scale)
+			view.addSubview(stepper)
+			cell.accessoryView = view
+			updateLabelForSteppers()
 		} else {
 			let uiSwitch = makeSwitch()
 			cell.textLabel?.text = NSLocalizedString("ignore scale limits setting title", comment: "title of ignore scale limits setting")
 			uiSwitch.isOn = bool(for: ignoresViewportScaleLimitsKey)
 			uiSwitch.addTarget(self, action: #selector(toggleIgnoreScaleLimits(_:)), for: .valueChanged)
 			cell.accessoryView = uiSwitch
-			if #available(iOS 10, *) {
-				// obviouly don't show the notice
-			} else {
-				cell.detailTextLabel?.text = NSLocalizedString("ignore scale limits requires ios 10 notice", comment: "notice displayed on iOS 9 devices to indicate that ignoring scale limits requires ios 10 or newer")
-			}
 		}
 		return cell
 	}
 
 	override func numberOfRows(inSection section: Int) -> Int {
-		return 3
+		return 4
 	}
 
 	@objc private func toggleNightMode(_ sender: UISwitch) {
 		set(sender.isOn, for: nightModeKey)
 		updateHeaderColor(animated: true)
-		
+
 		// Also is done in DefaultsSettingsManager on Settings Reset
 		MainViewController.controller.updateNightMode()
 	}
@@ -92,13 +111,20 @@ class AppearanceSettingsManager: SettingsViewManager {
 		updateHeaderColor(animated: true)
 	}
 
-	@objc private func stepperValueChanged(_ sender: UIStepper) {
+	@objc private func fontSizeStepperValueChanged(_ sender: UIStepper) {
 		settings.set(.float(sender.value), for: minFontSizeKey)
-		updateLabelForStepper()
+		updateLabelForSteppers()
 		updateHeaderColor(animated: true)
 	}
 
-	private func updateLabelForStepper() {
-		label.text = "\(Int(stepper.value))"
+	@objc private func scaleStepperValueChanged(_ sender: UIStepper) {
+		settings.set(.integer(Int64(sender.value)), for: webContentScaleKey)
+		updateLabelForSteppers()
+		updateHeaderColor(animated: true)
+	}
+
+	private func updateLabelForSteppers() {
+		labels.fontSize.text = "\(Int(steppers.fontSize.value))"
+		labels.scale.text = String(format: "%.1f", steppers.scale.value / Double(scaleStorageFactor))
 	}
 }

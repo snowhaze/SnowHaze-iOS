@@ -2,11 +2,12 @@
 //	SearchEngineSettingsManager.swift
 //	SnowHaze
 //
-
+//
 //	Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class SearchEngineSettingsManager: SettingsViewManager {
 	override func html() -> String {
@@ -23,7 +24,8 @@ class SearchEngineSettingsManager: SettingsViewManager {
 		let cell = getCell(for: tableView)
 		if indexPath.section == 1 {
 			let title: String
-			switch indexPath.row {
+			let engine = rawValue(for: indexPath.row)
+			switch engine {
 				case 0:		title = NSLocalizedString("none search engine display name", comment: "name of none search engine to be displayed to user")
 				case 1:		title = NSLocalizedString("bing search engine display name", comment: "name of bing search engine to be displayed to user")
 				case 2:		title = NSLocalizedString("google search engine display name", comment: "name of google search engine to be displayed to user")
@@ -34,10 +36,11 @@ class SearchEngineSettingsManager: SettingsViewManager {
 				case 7:		title = NSLocalizedString("startpage search engine display name", comment: "name of startpage search engine to be displayed to user")
 				case 8:		title = NSLocalizedString("swisscows search engine display name", comment: "name of swisscows search engine to be displayed to user")
 				case 9:		title = NSLocalizedString("duckduckgo search engine display name", comment: "name of duckduckgo search engine to be displayed to user")
+				case 12:	title = NSLocalizedString("qwant search engine display name", comment: "name of qwant search engine to be displayed to user")
 				default:	fatalError("invalid index path")
 			}
 			cell.textLabel?.text = title
-			if Int64(indexPath.row) == settings.value(for: searchEngineKey).integer {
+			if engine == settings.value(for: searchEngineKey).integer {
 				cell.accessoryType = .checkmark
 			}
 		} else if indexPath.section == 2{
@@ -63,7 +66,7 @@ class SearchEngineSettingsManager: SettingsViewManager {
 	override func numberOfRows(inSection section: Int) -> Int {
 		switch section {
 			case 0:		return 0
-			case 1:		return 10
+			case 1:		return 11
 			case 2:		return 3
 			default:	fatalError("invalid section")
 		}
@@ -92,7 +95,7 @@ class SearchEngineSettingsManager: SettingsViewManager {
 
 	override func didSelectRow(atIndexPath indexPath: IndexPath, tableView: UITableView) {
 		if indexPath.section == 1 {
-			let engine = Int64(indexPath.row)
+			let engine = rawValue(for: indexPath.row)
 			let newEngine = SearchEngineType(rawValue: engine) ?? .none
 			let oldEngine = SearchEngineType(rawValue: settings.value(for: searchEngineKey).integer!) ?? .none
 			suggestionSearchEngines = SearchEngine.updateSuggestionEngine(new: newEngine, old: oldEngine, inList: suggestionSearchEngines)
@@ -103,8 +106,8 @@ class SearchEngineSettingsManager: SettingsViewManager {
 			}
 			for cell in tableView.visibleCells {
 				let indexPath = tableView.indexPath(for: cell)
-				if indexPath?.section == 1 {
-					if indexPath?.row == Int(engine) {
+				if let indexPath = indexPath, indexPath.section == 1 {
+					if rawValue(for: indexPath.row) == engine {
 						cell.accessoryType = .checkmark
 					} else {
 						cell.accessoryType = .none
@@ -154,5 +157,9 @@ class SearchEngineSettingsManager: SettingsViewManager {
 				}
 			}
 		}
+	}
+
+	private func rawValue(for index: Int) -> Int64 {
+		return Int64(index + (index < 10 ? 0: 2))
 	}
 }

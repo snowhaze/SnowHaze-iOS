@@ -2,7 +2,7 @@
 //  SubscriptionManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -13,11 +13,12 @@ import CommonCrypto
 protocol SubscriptionManagerDelegate: AnyObject {
 	func productListDidChange()
 	func restoreFinished(succesfully success: Bool)
-	func activeAubscriptionStatusChanged(fromId: String?)
+	func activeSubscriptionChanged(fromId: String?)
 	func purchaseFailed(besause description: String?)
+	func apiErrorOccured(_ error: V3APIConnection.Error)
+	func hasPreexistingPayments(until expiration: Date, renews: Bool, purchasing: SubscriptionManager.Product)
+	func verificationBlobChanged(from: String?)
 }
-
-let subscriptionPurchasedNotificationName = Notification.Name(rawValue: "SubscriptionPurchasedNotification")
 
 private let monthlyId = "ch.illotros.ios.snowhaze.premium.monthly"
 private let yearlyId = "ch.illotros.ios.snowhaze.premium.yearly"
@@ -31,9 +32,32 @@ private let activeSubscriptionRenewsKey = "ch.illotros.snowhaze.subscriptionmana
 private let authorizationTokenKey = "ch.illotros.snowhaze.subscriptionmanager.authorizationtoken"
 private let authorizationTokenExpirationDateKey = "ch.illotros.snowhaze.subscriptionmanager.authorizationtoken.expiration"
 private let authorizationTokenUpdateDateKey = "ch.illotros.snowhaze.subscriptionmanager.authorizationtoken.updatedate"
+private let verificationBlobKey = "ch.illotros.snowhaze.subscriptionmanager.authorizationtoken.verification-blob"
 
 class SubscriptionManager: NSObject {
-	static let tokenUpdatedNotificationName = Notification.Name("subscriptionManagerAuthorizationTokenUpdatedNotificationName")
+	enum Status {
+		case confimed
+		case likely
+		case none
+
+		var confirmed: Bool {
+			switch self {
+				case .confimed:	return true
+				case .likely:	return false
+				case .none:		return false
+			}
+		}
+
+		var possible: Bool {
+			switch self {
+				case .confimed:	return true
+				case .likely:	return true
+				case .none:		return false
+			}
+		}
+	}
+	static let tokenUpdatedNotification = Notification.Name("subscriptionManagerAuthorizationTokenUpdatedNotificationName")
+	static let statusUpdatedNotification = Notification.Name("subscriptionManagerSubscriptionStatusChangedNotificationName")
 
 	private lazy var paymentQueue: SKPaymentQueue = {
 		let queue = SKPaymentQueue.default()
@@ -46,30 +70,63 @@ class SubscriptionManager: NSObject {
 		_ = loadReceipt()
 		setupTokenExpiration()
 		setupSubscriptionExpiration()
+		lastNotifiedStatus = status
+		NotificationCenter.default.addObserver(self, selector: #selector(masterSecretChanged), name: V3APIConnection.masterSecretChangedNotification, object: nil)
 	}
 
-	private lazy var urlSession = URLSession(configuration: .ephemeral, delegate: PinningSessionDelegate(), delegateQueue: nil)
+	private lazy var urlSession = SnowHazeURLSession()
 
 	weak var delegate: SubscriptionManagerDelegate?
 
 	static let shared = SubscriptionManager()
 
-	var hasSubscription: Bool {
-		return stilHasSubscription(in: 0)
+	static var status: Status {
+		return shared.status
 	}
 
-	func stilHasSubscription(in time: TimeInterval) -> Bool {
-		guard activeSubscription != nil else {
-			return false
+	var status: Status {
+		return status(in: 0)
+	}
+
+	func status(in time: TimeInterval) -> Status {
+		guard activeSubscription != nil || V3APIConnection.hasSecret else {
+			return .none
 		}
 		if subscriptionRenews {
-			return true
+			return .confimed
 		}
-		return expirationDate?.timeIntervalSinceNow ?? Double.infinity > time
+		guard let expirationDate = expirationDate else {
+			return activeSubscription != nil ? .likely : .none
+		}
+		return expirationDate.timeIntervalSinceNow >= time ? .confimed : .none
+	}
+
+	private var lastNotifiedStatus: Status!
+	private func possibleStatusChange() {
+		if status != lastNotifiedStatus {
+			lastNotifiedStatus = status
+			NotificationCenter.default.post(name: SubscriptionManager.statusUpdatedNotification, object: self)
+		}
+	}
+
+	@objc private func masterSecretChanged() {
+		possibleStatusChange()
 	}
 
 	var hasValidToken: Bool {
-		return authorizationToken != nil && (authorizationTokenExpiration ?? .distantPast) > Date() && hasSubscription
+		return !validTokens.isEmpty
+	}
+
+	private func set(activeSubscription new: String?) {
+		if let _ = new {
+			V3APIConnection.invalidateReceipt()
+		}
+		let old = self.activeSubscription
+		guard old != new else {
+			return
+		}
+		activeSubscription = new
+		delegate?.activeSubscriptionChanged(fromId: old)
 	}
 
 	private(set) var activeSubscription: String? = DataStore.shared.getString(for: activeSubscriptionIdKey) {
@@ -79,39 +136,140 @@ class SubscriptionManager: NSObject {
 			}
 		}
 		didSet {
-			if hasSubscription && !hasValidToken && PolicyManager.globalManager().autoUpdateAuthToken {
+			if status.possible && !hasValidToken && PolicyManager.globalManager().autoUpdateAuthToken {
 				updateAuthToken(completionHandler: nil)
 			}
-			if oldValue == nil && activeSubscription != nil {
-				DispatchQueue.main.async {
-					// Wait until subscriptionRenews & expirationDate are set, so hasSubscription is properly computed.
-					if self.hasSubscription {
-						NotificationCenter.default.post(name: subscriptionPurchasedNotificationName, object: self)
-					}
+			possibleStatusChange()
+		}
+	}
+
+	func tryWithTokens(work: @escaping (String?, @escaping () -> Void) -> Void) {
+		func dispatch(with tokens: [String]) {
+			var tokens = tokens
+			let token = tokens.isEmpty ? nil : tokens.removeFirst()
+			work(token) {
+				assert(token != nil)
+				DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval.random(in: 0 ... 10)) {
+					dispatch(with: tokens)
 				}
 			}
 		}
-	}
-
-	private(set) var authorizationToken: String? = DataStore.shared.getString(for: authorizationTokenKey) {
-		willSet {
-			if authorizationToken != newValue {
-				DataStore.shared.set(newValue, for: authorizationTokenKey)
+		if !hasValidToken && status.confirmed && PolicyManager.globalManager().autoUpdateAuthToken {
+			SubscriptionManager.shared.updateAuthToken { success in
+				DispatchQueue.main.async {
+					dispatch(with: self.validTokens.shuffled())
+				}
+			}
+		} else {
+			DispatchQueue.main.async {
+				dispatch(with: self.validTokens.shuffled())
 			}
 		}
 	}
 
-	private var authorizationTokenExpiration: Date? = SubscriptionManager.toDate(DataStore.shared.getDouble(for: authorizationTokenExpirationDateKey)) {
+	private var validTokens: [String] {
+		guard let tokens = authorizationTokens, status.confirmed else {
+			return []
+		}
+		let now = Date()
+		return tokens.filter({ $0.1 > now }).map { $0.0 }
+	}
+
+	private static func loadTokens() -> [(String, Date)]? {
+		if let token = DataStore.shared.getString(for: authorizationTokenKey) {
+			let data = token.data(using: .utf8)!
+			if let decode = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]] {
+				let tokens = decode.map { dictionary -> (String, Date)? in
+					let possibleToken = dictionary["token"]
+					let possibleExpiration = dictionary["expiration"]
+					guard let token = possibleToken as? String, let expiration = possibleExpiration as? TimeInterval else {
+						return nil
+					}
+					return (token, Date(timeIntervalSince1970: expiration))
+				}
+				return tokens as? [(String, Date)]
+			} else if let time = DataStore.shared.getDouble(for: authorizationTokenExpirationDateKey) {
+				let date = Date(timeIntervalSince1970: time)
+				return [(token, date)]
+			} else {
+				return nil
+			}
+		} else {
+			return nil
+		}
+	}
+
+	func clearAuthTokens() {
+		authorizationTokenUpdateDate = nil
+		authorizationTokens = nil
+		set(verificationBlob: nil)
+	}
+
+	private var authorizationTokens = SubscriptionManager.loadTokens() {
 		willSet {
-			if authorizationTokenExpiration != newValue {
-				DataStore.shared.set(newValue?.timeIntervalSince1970, for: authorizationTokenExpirationDateKey)
+			func areEqual(_ a: [(String, Date)]?, _ b: [(String, Date)]?) -> Bool {
+				guard let a = a else {
+					return b == nil
+				}
+				guard let b = b else {
+					return false
+				}
+				return a.elementsEqual(b, by: { $0 == $1 })
+			}
+			if !areEqual(authorizationTokens, newValue) {
+				let tokens = newValue?.map { return ["token": $0.0, "expiration": $0.1.timeIntervalSince1970] }
+				let json: String?
+				if let tokens = tokens {
+					let data = try! JSONSerialization.data(withJSONObject: tokens)
+					json = String(data: data, encoding: .utf8)!
+				} else {
+					json = nil
+				}
+				DataStore.shared.set(json, for: authorizationTokenKey)
+				DataStore.shared.delete(authorizationTokenExpirationDateKey)
 			}
 		}
 		didSet {
-			if oldValue != authorizationTokenExpiration {
-				setupTokenExpiration()
+			func equal(_ lhs: [(String, Date)]?, _ rhs: [(String, Date)]?) -> Bool {
+				guard let a = lhs, let b = rhs else {
+					return lhs == nil && rhs == nil
+				}
+				guard a.count == b.count else {
+					return false
+				}
+				for i in 0..<a.count {
+					guard a[i].0 == b[i].0 && a[i].1 == b[i].1 else {
+						return false
+					}
+				}
+				return true
+			}
+			if !equal(oldValue, authorizationTokens) {
+				NotificationCenter.default.post(name: SubscriptionManager.tokenUpdatedNotification, object: self)
 			}
 		}
+	}
+
+	var hasVerificationBlob: Bool {
+		return verificationBlob != nil
+	}
+
+	var verificationBlobBase64: String? {
+		return verificationBlob?.base64EncodedString()
+	}
+
+	private var verificationBlob = DataStore.shared.getData(for: verificationBlobKey) {
+		willSet {
+			if newValue != verificationBlob {
+				DataStore.shared.set(newValue, for: verificationBlobKey)
+			}
+		}
+	}
+
+	private func set(verificationBlob: Data?) {
+		let oldBlob = self.verificationBlobBase64
+		self.verificationBlob = verificationBlob
+		delegate?.verificationBlobChanged(from: oldBlob)
 	}
 
 	private(set) var authorizationTokenUpdateDate: Date? = SubscriptionManager.toDate(DataStore.shared.getDouble(for: authorizationTokenUpdateDateKey)) {
@@ -123,14 +281,13 @@ class SubscriptionManager: NSObject {
 	}
 
 	var authorizationTokenHash: String? {
-		guard let token = authorizationToken else {
+		guard validTokens.count == 1, let token = validTokens.first else {
 			return nil
 		}
 		var hash = [UInt8](repeating: 0,  count: Int(CC_SHA512_DIGEST_LENGTH))
 		let data = token.data(using: .utf8)!
 		_ = data.withUnsafeBytes { CC_SHA512($0.baseAddress, CC_LONG($0.count), &hash)}
-		let hex = Data(hash).hex
-		return String(hex[..<hex.index(hex.startIndex, offsetBy: 26)])
+		return Data(hash).hex
 	}
 
 	private static func toDate(_ time: Double?) -> Date? {
@@ -139,6 +296,10 @@ class SubscriptionManager: NSObject {
 		} else {
 			return nil
 		}
+	}
+
+	private var authorizationTokenExpiration: Date? {
+		return authorizationTokens?.map({ $0.1 }).min()
 	}
 
 	private(set) var expirationDate: Date? = SubscriptionManager.toDate(DataStore.shared.getDouble(for: activeSubscriptionExpirationKey)) {
@@ -150,6 +311,7 @@ class SubscriptionManager: NSObject {
 		didSet {
 			if expirationDate != oldValue {
 				setupSubscriptionExpiration()
+				possibleStatusChange()
 			}
 		}
 	}
@@ -159,6 +321,9 @@ class SubscriptionManager: NSObject {
 			if subscriptionRenews != newValue {
 				DataStore.shared.set(Int64(newValue ? 1 : 0), for: activeSubscriptionRenewsKey)
 			}
+		}
+		didSet {
+			possibleStatusChange()
 		}
 	}
 
@@ -170,9 +335,15 @@ class SubscriptionManager: NSObject {
 		guard timeInterval >= 0 else {
 			DispatchQueue.main.async {
 				if self.authorizationTokenExpiration?.timeIntervalSinceNow ?? 0 <= 0 {
-					self.authorizationToken = nil
-					self.authorizationTokenExpiration = nil
-					NotificationCenter.default.post(name: SubscriptionManager.tokenUpdatedNotificationName, object: self)
+					let now = Date()
+					let newTokens = (self.authorizationTokens ?? []).filter { $0.1 > now }
+					if newTokens.isEmpty {
+						self.authorizationTokens = nil
+						self.set(verificationBlob: nil)
+					} else {
+						self.authorizationTokens = newTokens
+						// don't update verification blob, since newTokens is just a filtered version of previous tokens
+					}
 				}
 			}
 			return
@@ -190,7 +361,7 @@ class SubscriptionManager: NSObject {
 		guard timeInterval >= 0 else {
 			DispatchQueue.main.async {
 				if !self.subscriptionRenews && self.expirationDate?.timeIntervalSinceNow ?? 0 <= 0 {
-					self.activeSubscription = nil
+					self.set(activeSubscription: nil)
 				}
 			}
 			return
@@ -260,7 +431,16 @@ class SubscriptionManager: NSObject {
 		return array.map({ Product.cached($0) }).filter { [monthlyId, yearlyId].contains($0.id) }
 	}
 
-	private(set) var products = SubscriptionManager.loadProducts() {
+	var products: (yearly: Product?, monthly: Product?)? {
+		guard !productsArray.isEmpty else {
+			return nil
+		}
+		let yearly = productsArray.first { $0.id == yearlyId }
+		let montly = productsArray.first { $0.id == monthlyId }
+		return (yearly, montly)
+	}
+
+	private var productsArray = SubscriptionManager.loadProducts() {
 		willSet {
 			let array = newValue.map { $0.dictionary }
 			let data = try! JSONSerialization.data(withJSONObject: array)
@@ -272,11 +452,11 @@ class SubscriptionManager: NSObject {
 
 	private func loadReceipt() -> Data? {
 		guard let url = Bundle.main.appStoreReceiptURL else {
-			activeSubscription = nil
+			set(activeSubscription: nil)
 			return nil
 		}
 		guard let data = try? Data(contentsOf: url) else {
-			activeSubscription = nil
+			set(activeSubscription: nil)
 			return nil
 		}
 		return data
@@ -297,7 +477,7 @@ class SubscriptionManager: NSObject {
 		let request = SKProductsRequest(productIdentifiers: ids)
 		loadCompletionHandlers[request] = { products, _ in
 			if let products = products {
-				self.products = products.map { .real($0) }
+				self.productsArray = products.map { .real($0) }
 				self.delegate?.productListDidChange()
 				DataStore.shared.set(Date().timeIntervalSince1970, for: lastProductUpdateKey)
 			}
@@ -311,22 +491,48 @@ class SubscriptionManager: NSObject {
 		paymentQueue.restoreCompletedTransactions()
 	}
 
-	func purchase(_ product: SKProduct) {
-		paymentQueue.add(SKPayment(product: product))
+	func purchase(_ product: Product, force: Bool = false) {
+		if let skProduct = product.product {
+			purchase(skProduct, force: force)
+		} else {
+			load(product: product.id) { [weak self] product, error in
+				if let product = product {
+					self?.purchase(product, force: force)
+				}
+			}
+		}
 	}
 
-	func load(product: String, completionHandler: @escaping (SKProduct?, Error?) -> Void) {
+	private func purchase(_ product: SKProduct, force: Bool) {
+		if V3APIConnection.hasSecret && !force {
+			V3APIConnection.getSubscriptionDuration { [weak self] subscription, error in
+				if let error = error {
+					self?.delegate?.apiErrorOccured(error)
+					return
+				}
+				if let (expiration, renews) = subscription, renews || expiration.timeIntervalSinceNow > 2 * 24 * 60 * 60 {
+					self?.delegate?.hasPreexistingPayments(until: expiration, renews: renews, purchasing: Product.real(product))
+					return
+				}
+				self?.paymentQueue.add(SKPayment(product: product))
+			}
+		} else {
+			paymentQueue.add(SKPayment(product: product))
+		}
+	}
+
+	private func load(product: String, completionHandler: @escaping (SKProduct?, Error?) -> Void) {
 		load(products: [product]) { completionHandler($0?.first, $1) }
 	}
 
-	func load(products: [String], completionHandler: @escaping ([SKProduct]?, Error?) -> Void) {
+	private func load(products: [String], completionHandler: @escaping ([SKProduct]?, Error?) -> Void) {
 		let request = SKProductsRequest(productIdentifiers: Set(products))
 		loadCompletionHandlers[request] = completionHandler
 		request.delegate = self
 		request.start()
 	}
 
-	func updateAuthToken(completionHandler: ((Bool) -> Void)? = nil) {
+	private func updateAuthTokenV2(completionHandler: ((Bool) -> Void)?) {
 		guard let data = loadReceipt(), let _ = activeSubscription else {
 			if let handler = completionHandler {
 				DispatchQueue.main.async {
@@ -335,18 +541,10 @@ class SubscriptionManager: NSObject {
 			}
 			return
 		}
-		if let _ = authorizationToken, (authorizationTokenUpdateDate ?? Date.distantPast).timeIntervalSinceNow > -24 * 60 * 60 {
-			if let handler = completionHandler {
-				DispatchQueue.main.async {
-					handler(false)
-				}
-			}
-			return
-		}
 		var request = URLRequest(url: URL(string: "https://api.snowhaze.com/index.php")!)
-		request.setFormEncoded(data: ["receipt": data.base64EncodedString(), "v": "2", "action": "auth"])
+		request.setFormEncoded(data: ["receipt": data.base64EncodedString(), "v": "3", "action": "auth"])
 		let dec = InUseCounter.network.inc()
-		let task = urlSession.dataTask(with: request) { data, _, error in
+		urlSession.performDataTask(with: request) { data, _, error in
 			dec()
 			guard let data = data, let dictionary = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
 				if let handler = completionHandler {
@@ -359,16 +557,15 @@ class SubscriptionManager: NSObject {
 			guard let token = dictionary["token"] as? String, let renew = dictionary["renew"] as? Bool, let expiration = dictionary["expiration"] as? Double, let tokenExpiration = dictionary["token_expiration"] as? Double, let id = dictionary["id"] as? String else {
 				if let expired = dictionary["expired"] as? Bool, expired {
 					DispatchQueue.main.async {
-						let old = self.activeSubscription
-						self.activeSubscription = nil
-						self.subscriptionRenews = false
-						self.expirationDate = nil
-						self.authorizationToken = nil
-						self.authorizationTokenExpiration = nil
-						self.authorizationTokenUpdateDate = nil
-						self.delegate?.activeAubscriptionStatusChanged(fromId: old)
+						if !V3APIConnection.hasSecret {
+							self.subscriptionRenews = false
+							self.expirationDate = nil
+							self.authorizationTokens = nil
+							self.set(verificationBlob: nil)
+							self.authorizationTokenUpdateDate = nil
+							self.set(activeSubscription: nil)
+						}
 						completionHandler?(true)
-						NotificationCenter.default.post(name: SubscriptionManager.tokenUpdatedNotificationName, object: self)
 					}
 				}
 				if let handler = completionHandler {
@@ -379,19 +576,103 @@ class SubscriptionManager: NSObject {
 				return
 			}
 			DispatchQueue.main.async {
-				let old = self.activeSubscription
-				self.activeSubscription = id
-				self.subscriptionRenews = renew
-				self.expirationDate = Date(timeIntervalSince1970: expiration)
-				self.authorizationToken = token
-				self.authorizationTokenExpiration = Date(timeIntervalSince1970: tokenExpiration)
-				self.authorizationTokenUpdateDate = Date()
-				self.delegate?.activeAubscriptionStatusChanged(fromId: old)
+				if !V3APIConnection.hasSecret {
+					self.subscriptionRenews = renew
+					self.expirationDate = Date(timeIntervalSince1970: expiration)
+					self.authorizationTokens = [(token, Date(timeIntervalSince1970: tokenExpiration))]
+					self.set(verificationBlob: nil)
+					self.authorizationTokenUpdateDate = Date()
+					self.set(activeSubscription: id)
+				}
 				completionHandler?(true)
-				NotificationCenter.default.post(name: SubscriptionManager.tokenUpdatedNotificationName, object: self)
 			}
 		}
-		task.resume()
+	}
+
+	private func updateAuthTokenV3(completionHandler: ((Bool) -> Void)?) {
+		if activeSubscription == nil, (authorizationTokenUpdateDate ?? Date.distantPast).timeIntervalSinceNow > -1 * 60 * 60 {
+			if let completionHandler = completionHandler {
+				DispatchQueue.main.async {
+					completionHandler(false)
+				}
+			}
+			return
+		}
+		V3APIConnection.withUploadedReceipt { error in
+			guard error == nil else {
+				completionHandler?(false)
+				return
+			}
+			var completionCount = 0
+			var ok = true
+			var tokens: [(String, Date)]? = nil
+			var verificationBlob: Data? = nil
+			func complete(success: Bool) {
+				ok = ok && success
+				completionCount += 1
+				if completionCount == 2, V3APIConnection.hasSecret {
+					if ok {
+						if tokens!.isEmpty {
+							self.authorizationTokens = nil
+							self.set(verificationBlob: nil)
+						} else {
+							self.authorizationTokens = tokens
+							self.set(verificationBlob: verificationBlob!)
+						}
+						self.authorizationTokenUpdateDate = Date()
+					}
+					completionHandler?(ok)
+				}
+			}
+			V3APIConnection.getTokens { tokenData, error in
+				if case .accountNotAuthorized = error {
+					tokens = []
+					complete(success: true)
+					return
+				}
+				guard error == nil else {
+					complete(success: false)
+					return
+				}
+				let (newTokens, expiration, verification) = tokenData!
+				tokens = tokens ?? newTokens.map { ($0, Date(timeIntervalSince1970: Double(expiration))) }
+				verificationBlob = verification
+				complete(success: true)
+			}
+			V3APIConnection.getSubscriptionDuration { data, error in
+				guard error == nil else {
+					complete(success: false)
+					return
+				}
+				if let data = data {
+					let (date, renews) = data
+					self.subscriptionRenews = renews
+					self.expirationDate = date
+				} else {
+					self.subscriptionRenews = false
+					self.expirationDate = nil
+					tokens = []
+					self.set(activeSubscription: nil)
+				}
+				complete(success: true)
+			}
+		}
+	}
+
+	func updateAuthToken(completionHandler: ((Bool) -> Void)? = nil) {
+		if !validTokens.isEmpty, (authorizationTokenUpdateDate ?? Date.distantPast).timeIntervalSinceNow > -24 * 60 * 60 {
+			if let handler = completionHandler {
+				DispatchQueue.main.async {
+					handler(false)
+				}
+			}
+			return
+		}
+		if V3APIConnection.hasSecret {
+			updateAuthTokenV3(completionHandler: completionHandler)
+		} else {
+			updateAuthTokenV2(completionHandler: completionHandler)
+		}
 	}
 }
 
@@ -401,12 +682,7 @@ extension SubscriptionManager: SKPaymentTransactionObserver {
 			for transaction in transactions {
 				switch transaction.transactionState {
 					case .purchased, .restored:
-						let old = self.activeSubscription
-						let new = transaction.payment.productIdentifier
-						if old != new {
-							self.activeSubscription = new
-							self.delegate?.activeAubscriptionStatusChanged(fromId: old)
-						}
+						self.set(activeSubscription: transaction.payment.productIdentifier)
 						queue.finishTransaction(transaction)
 					case .failed:
 						self.delegate?.purchaseFailed(besause: transaction.error?.localizedDescription)

@@ -2,7 +2,7 @@
 //  TabCollectionViewCell.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -141,7 +141,6 @@ class TabCollectionViewCell: UICollectionViewCell {
 			titleLabel.frame = CGRect(x: barHeight, y: 0, width: width - 2 * barHeight, height: barHeight)
 			titleLabel.textColor = .button
 			titleLabel.textAlignment = .center
-			UIFont.setSnowHazeFont(on: titleLabel)
 			titleLabel.autoresizingMask = [.flexibleBottomMargin, .flexibleWidth]
 			contentView.addSubview(titleLabel)
 		}
@@ -153,18 +152,16 @@ class TabCollectionViewCell: UICollectionViewCell {
 		if contentView.layer.mask == nil {
 			contentView.layer.mask = gradientLayer
 		}
-		if #available(iOS 11, *) {
-			if !dragDropRegistered {
-				dragDropRegistered = true
+		if !dragDropRegistered {
+			dragDropRegistered = true
 
-				let dragInteraction = UIDragInteraction(delegate: self)
-				dragInteraction.isEnabled = true
-				addInteraction(dragInteraction)
+			let dragInteraction = UIDragInteraction(delegate: self)
+			dragInteraction.isEnabled = true
+			addInteraction(dragInteraction)
 
-				let dropInteraction = UIDropInteraction(delegate: self)
-				dropInteraction.allowsSimultaneousDropSessions = false
-				addInteraction(dropInteraction)
-			}
+			let dropInteraction = UIDropInteraction(delegate: self)
+			dropInteraction.allowsSimultaneousDropSessions = false
+			addInteraction(dropInteraction)
 		}
 		if !registeredForNotifications {
 			registeredForNotifications = true
@@ -291,14 +288,13 @@ extension TabCollectionViewCell {
 	}
 }
 
-@available(iOS 11, *)
 extension TabCollectionViewCell: UIDragInteractionDelegate {
 	func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
 		if let url = tab?.displayURL {
 			let dragItem = UIDragItem(itemProvider: NSItemProvider(object: url as NSURL))
-			let sanitizedTitle = Tab.sanitize(title: tab?.title)
-			dragItem.localObject = (url, sanitizedTitle)
-			dragItem.previewProvider = { UIDragPreview(for: url, title: sanitizedTitle) }
+			let plainTitle = tab?.title
+			dragItem.localObject = (url, plainTitle)
+			dragItem.previewProvider = { UIDragPreview(for: url, title: plainTitle) }
 			return [dragItem]
 		} else {
 			return []
@@ -317,7 +313,6 @@ extension TabCollectionViewCell: UIDragInteractionDelegate {
 	}
 }
 
-@available(iOS 11, *)
 extension TabCollectionViewCell: UIDropInteractionDelegate{
 	func dropInteraction(_ interaction: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
 		return session.canLoadObjects(ofClass: URL.self) && session.items.count == 1

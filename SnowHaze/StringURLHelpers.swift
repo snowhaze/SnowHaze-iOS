@@ -2,7 +2,7 @@
 //  StringURLHelpers.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -39,7 +39,7 @@ internal extension String {
 		guard let url = validated(URL(string: "http://" + self.lowercased())) else {
 			return false
 		}
-		return url.host == "localhost"
+		return url.normalizedHost == "localhost"
 	}
 
 	var hasWPrefix: Bool {
@@ -50,13 +50,13 @@ internal extension String {
 		guard let url = url else {
 			return nil
 		}
-		guard let scheme = url.scheme?.lowercased() else {
+		guard let scheme = url.normalizedScheme else {
 			return nil
 		}
 		guard url.absoluteString.components(separatedBy: .whitespacesAndNewlines).count == 1 else {
 			return nil
 		}
-		if scheme == "data" && !url.absoluteString.contains(" ") {
+		if scheme == "data" && !url.absoluteString.contains(" ") || scheme == "javascript" {
 			return url
 		}
 		guard let host = url.host else {
@@ -348,6 +348,18 @@ internal extension String {
 			pos = range.upperBound
 		}
 		result  += self[pos ..< endIndex]
+		return result
+	}
+
+	var htmlEscaped: String {
+		var result = ""
+		for code in unicodeScalars {
+			if CharacterSet.alphanumerics.contains(code) && code.isASCII {
+				result.append(Character(code))
+			} else {
+				result += String(format: "&#%d;", code.value)
+			}
+		}
 		return result
 	}
 }

@@ -2,7 +2,7 @@
 //  TabViewController.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -17,6 +17,7 @@ protocol TabViewControllerDelegate: class {
 	func stopShowingOverlays()
 	func showRenameBar(fallback: String?, prefill: String?, callback: @escaping (String?) -> Void)
 	func boundingViews() -> (top: UIView?, bottom: UIView?)
+	func showDownloads()
 }
 
 class TabViewController: UIViewController {
@@ -26,11 +27,16 @@ class TabViewController: UIViewController {
 	private var lastScrollPosition: CGFloat?
 	private var lastScrollUp: Bool?
 
+	private static var docController: UIDocumentInteractionController?
+	private static var sendingFile = false
+
 	weak var delegate: TabViewControllerDelegate?
 
 	@IBOutlet weak var maskContent: UIView!
 	@IBOutlet weak var maskImage: UIImageView!
+	@IBOutlet weak var downloadProgress: DownloadProgressIndicator!
 
+	private var contentScale: CGFloat = 0
 
 	var tab: Tab? {
 		willSet {
@@ -47,8 +53,12 @@ class TabViewController: UIViewController {
 			guard let controller = tab.controller else {
 				return
 			}
+			contentScale = PolicyManager.manager(for: tab).webContentScale
+
 			webView = controller.webView
 			scale = 1
+
+			webView.transform = CGAffineTransform(scaleX: contentScale, y: contentScale)
 
 			controller.UIDelegate = self
 			controller.navigationDelegate = self
@@ -143,16 +153,21 @@ class TabViewController: UIViewController {
 		didSet {
 			if let webView = webView {
 				webView.scrollView.delegate = self
-				if #available(iOS 11, *) {
-					webView.scrollView.contentInsetAdjustmentBehavior = .never
-				}
+				webView.scrollView.contentInsetAdjustmentBehavior = .never
 				webView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 				webView.frame = view.bounds
 				webView.allowsBackForwardNavigationGestures = true
-				view.addSubview(webView)
+				view.insertSubview(webView, belowSubview: downloadProgress)
 				adjustWebviewSize(isIntemediate: isIntermediate(scale: scale))
 			}
 		}
+	}
+
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		bookmarkHistoryView.showDownloads(!FileDownload.downloads.isEmpty, animated: false)
+		bookmarkHistoryView.reloadDownloads()
+		FileDownload.delegate = self
 	}
 
 	override func viewDidLoad() {
@@ -169,7 +184,7 @@ class TabViewController: UIViewController {
 		NotificationCenter.default.addObserver(self, selector: #selector(deletedHistoryItem(_:)), name: DELETE_HISTORY_NOTIFICATION, object: historyStore)
 
 		NotificationCenter.default.addObserver(self, selector: #selector(reloadStatsView(_:)), name: statsResetNotificationName, object: nil)
-		NotificationCenter.default.addObserver(self, selector: #selector(reloadStatsView(_:)), name: subscriptionPurchasedNotificationName, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(reloadStatsView(_:)), name: SubscriptionManager.statusUpdatedNotification, object: nil)
 
 		bookmarkHistoryView.delegate = self
 		bookmarkHistoryView.constrainedWidth = traitCollection.horizontalSizeClass == .compact
@@ -190,10 +205,46 @@ class TabViewController: UIViewController {
 
 // MARK: Internals
 private extension TabViewController {
+	func isIntermediate(scale: CGFloat) -> Bool {
+		return !(scale == 1 || scale == 0)
+	}
+
+	var scale: CGFloat {
+		set {
+			if newValue != scale {
+				urlBar?.scale = newValue
+				delegate?.showToolBar(degree: newValue)
+				if newValue < 1 {
+					stopInput()
+				}
+				if !isIntermediate(scale: newValue) {
+					webView?.scrollView.showsHorizontalScrollIndicator = false
+					webView?.scrollView.showsVerticalScrollIndicator = false
+				}
+				adjustWebviewSize(isIntemediate: isIntermediate(scale: newValue))
+				if !isIntermediate(scale: newValue) {
+					webView?.scrollView.showsHorizontalScrollIndicator = true
+					webView?.scrollView.showsVerticalScrollIndicator = true
+				}
+			}
+		}
+		get {
+			return urlBar?.scale ?? 1
+		}
+	}
+
 	func display(_ alert: UIAlertController, domain: String?, fallbackHandler: @escaping () -> Void) -> Bool {
 		guard !TabAlertTransitioningDelegate.shared.isBusy else {
 			if let controller = tab?.controller {
 				TabAlertTransitioningDelegate.shared.notify(controller: controller)
+			} else {
+				fallbackHandler()
+			}
+			return false
+		}
+		guard presentedViewController == nil else {
+			if let controller = tab?.controller {
+				TabAlertTransitioningDelegate.shared.additionalNotify(controller: controller)
 			} else {
 				fallbackHandler()
 			}
@@ -244,44 +295,58 @@ private extension TabViewController {
 			wv.frame.origin.x += insets.left
 			if isIntemediate {
 				wv.scrollView.contentInset = tbInsets
-				wv.scrollView.scrollIndicatorInsets = tbInsets
+				wv.scrollView.horizontalScrollIndicatorInsets = tbInsets
+				wv.scrollView.verticalScrollIndicatorInsets = tbInsets
 			} else {
 				wv.scrollView.contentInset = .zero
-				wv.scrollView.scrollIndicatorInsets = .zero
+				wv.scrollView.horizontalScrollIndicatorInsets = .zero
+				wv.scrollView.verticalScrollIndicatorInsets = .zero
 				wv.frame.size.height -= tbInsets.top + tbInsets.bottom
 				wv.frame.origin.y += tbInsets.top
 			}
-			if #available(iOS 11, *) {
-				let topCorrection = view.safeAreaInsets.top - wv.frame.minY
-				if topCorrection > 0 {
-					wv.scrollView.contentInset.top += topCorrection
-					wv.scrollView.scrollIndicatorInsets.top += topCorrection
-				}
-				let bottomCorrection = view.safeAreaInsets.bottom - view.bounds.maxY + wv.frame.maxY
-				if bottomCorrection > 0 {
-					wv.scrollView.contentInset.bottom += bottomCorrection
-					wv.scrollView.scrollIndicatorInsets.bottom += bottomCorrection
-				}
+			let topCorrection = view.safeAreaInsets.top - wv.frame.minY
+			if topCorrection > 0 {
+				wv.scrollView.contentInset.top += topCorrection
+				wv.scrollView.horizontalScrollIndicatorInsets.top += topCorrection
+				wv.scrollView.verticalScrollIndicatorInsets.top += topCorrection
 			}
+			let bottomCorrection = view.safeAreaInsets.bottom - view.bounds.maxY + wv.frame.maxY
+			if bottomCorrection > 0 {
+				wv.scrollView.contentInset.bottom += bottomCorrection
+				wv.scrollView.horizontalScrollIndicatorInsets.bottom += bottomCorrection
+				wv.scrollView.verticalScrollIndicatorInsets.bottom += bottomCorrection
+			}
+			wv.scrollView.contentInset.scale(1 / contentScale)
+			wv.scrollView.horizontalScrollIndicatorInsets.scale(1 / contentScale)
+			wv.scrollView.verticalScrollIndicatorInsets.scale(1 / contentScale)
 			wv.scrollView.bounds.origin.y = oldYOffset - wv.scrollView.contentInset.top
-			if #available(iOS 11, *) {
-				wv.scrollView.adjustedContentInsetDidChange()
-			}
+			wv.scrollView.adjustedContentInsetDidChange()
 		}
 		bookmarkHistoryView?.frame = view.bounds
 		bookmarkHistoryView?.frame.size.height -= insets.top + insets.bottom
 		bookmarkHistoryView?.frame.origin.y += insets.top
+
+		downloadProgress.frame.origin.x = view.bounds.maxX - downloadProgress.frame.width - 8 - insets.right
+		downloadProgress.frame.origin.y = view.bounds.maxY - downloadProgress.frame.height - 8 - insets.bottom
 	}
 }
 
 // MARK: Control
 extension TabViewController {
+	func load(_ input: String) {
+		tab?.controller?.load(userInput: input)
+	}
+
 	func webViewForShareAction() -> WKWebView? {
 		return tab?.controller?.unused ?? true ? nil : webView
 	}
 
 	func stopInput() {
 		urlBar?.stopInput()
+	}
+
+	func showHistory(animated: Bool) {
+		bookmarkHistoryView.showHistory(true, animated: animated)
 	}
 
 	func showControls() {
@@ -297,23 +362,15 @@ extension TabViewController {
 		urlBar?.securityName = assessment.name + NSLocalizedString("privacy assessment privacy suffix", comment: "privacy term to be appended to privacy assessment name")
 	}
 
-	private func isIntermediate(scale: CGFloat) -> Bool {
-		return !(scale == 1 || scale == 0)
-	}
-
-	private var scale: CGFloat {
-		set {
-			if newValue != scale {
-				urlBar?.scale = newValue
-				delegate?.showToolBar(degree: newValue)
-				if newValue < 1 {
-					stopInput()
-				}
-				adjustWebviewSize(isIntemediate: isIntermediate(scale: newValue))
-			}
+	func updateContentScale() {
+		guard let tab = tab else {
+			return
 		}
-		get {
-			return urlBar?.scale ?? 1
+		let newScale = PolicyManager.manager(for: tab).webContentScale
+		if newScale != contentScale {
+			contentScale = newScale
+			webView.transform = CGAffineTransform(scaleX: contentScale, y: contentScale)
+			adjustWebviewSize(isIntemediate: isIntermediate(scale: scale))
 		}
 	}
 }
@@ -361,6 +418,24 @@ extension TabViewController: TabControllerUIDelegate {
 
 	func tabController(_ controller: TabController, displayAlert alert: UIAlertController, forDomain domain: String?, fallbackHandler: @escaping () -> Void) -> Bool {
 		return display(alert, domain: domain, fallbackHandler: fallbackHandler)
+	}
+
+	func tabController(_ controller: TabController, download url: URL, file: String?, cookies: [HTTPCookie], download: @escaping () -> Void) -> Bool {
+		let title = NSLocalizedString("file download confirmation prompt title", comment: "title of alert to confirm a file download")
+		let fmt = NSLocalizedString("file download confirmation prompt message format", comment: "format of message of alert to confirm a file download")
+		let message = String(format: fmt, file ?? url.lastPathComponent, url.absoluteString)
+		let alertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+		let okText = NSLocalizedString("file download confirmation prompt download button title", comment: "title of download button of alert to confirm a file download")
+		let cancelText = NSLocalizedString("file download confirmation prompt cancel button title", comment: "title of cancel button of alert to confirm a file download")
+		let cancelAction = UIAlertAction(title: cancelText, style: .cancel)
+		let downloadAction = UIAlertAction(title: okText, style: .default) { _ in download() }
+		alertController.addAction(cancelAction)
+		alertController.addAction(downloadAction)
+		if let urlBar = urlBar {
+			alertController.popoverPresentationController?.sourceView = urlBar
+			alertController.popoverPresentationController?.sourceRect = urlBar.shareButtonFrame(in: urlBar) ?? urlBar.bounds
+		}
+		return display(alertController, domain: nil) { }
 	}
 }
 
@@ -426,15 +501,12 @@ extension TabViewController: BookmarkHistoryDelegate {
 		guard let tab = self.tab else {
 			return nil
 		}
-		return PagePreviewController(url: url, tab: tab)
+		let policy = PolicyManager.manager(for: url, in: tab)
+		return PagePreviewController(url: url, tab: tab, delay: policy.previewDelay)
 	}
 
-	func load(url: URL) {
-		tab?.controller?.load(url: url)
-	}
-
-	func load(_ input: String) {
-		tab?.controller?.load(userInput: input)
+	func load(_ type: WebLoadType) {
+		tab?.controller?.load(type)
 	}
 
 	var historyItems: [[HistoryItem]]? {
@@ -532,13 +604,39 @@ extension TabViewController: BookmarkHistoryDelegate {
 	}
 
 	func dimmStat(_ index: Int, in statsView: StatsView) -> Bool {
-		return index == 3 && !SubscriptionManager.shared.hasSubscription
+		return index == 3 && !SubscriptionManager.status.possible
 	}
 
 	func statTapped(at index: Int, in statsView: StatsView) {
-		if index == 3 && !SubscriptionManager.shared.hasSubscription {
+		if index == 3 && !SubscriptionManager.status.possible {
 			MainViewController.openSettings(type: .subscription)
 		}
+	}
+
+	var downloads: [FileDownload] {
+		return FileDownload.downloads
+	}
+
+	func delete(_ download: FileDownload, at index: Int) {
+		FileDownload.delete(at: index)
+	}
+
+	func share(_ download: FileDownload, from sender: UIView) {
+		guard let url = download.url, let superview = sender.superview else {
+			return
+		}
+		let docController = UIDocumentInteractionController(url: url)
+		docController.delegate = self
+		docController.presentOpenInMenu(from: sender.frame, in: superview, animated: true)
+		TabViewController.docController = docController
+	}
+
+	func retry(_ download: FileDownload) {
+		download.start()
+	}
+
+	func cancel(_ download: FileDownload) {
+		download.stop()
 	}
 }
 
@@ -623,6 +721,34 @@ extension TabViewController: UIScrollViewDelegate {
 		}
 		lastScrollPosition = newScrollPosition
 	}
+
+	private func collapse() {
+		if scale < 0.67 {
+			UIView.animate(withDuration: 0.2) {
+				self.scale = 0
+			}
+		} else {
+			UIView.animate(withDuration: 0.2) {
+				self.scale = 1
+			}
+		}
+	}
+
+	func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+		collapse()
+	}
+
+	func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+		if !decelerate {
+			collapse()
+		}
+	}
+
+	func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
+		UIView.animate(withDuration: 0.2) {
+			self.scale = 1
+		}
+	}
 }
 
 private class TabAlertTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
@@ -630,6 +756,15 @@ private class TabAlertTransitioningDelegate: NSObject, UIViewControllerTransitio
 
 	private(set) var proxiedDelegate: UIViewControllerTransitioningDelegate?
 	private(set) var waitingControllers = [TabController]()
+	private var additionalNotifyScheduled = false
+
+	private func notify() {
+		let oldWaiting = waitingControllers
+		waitingControllers = []
+		for controller in oldWaiting {
+			controller.notifyNextUIEvent()
+		}
+	}
 
 	func notify(controller: TabController) {
 		precondition(isBusy)
@@ -637,27 +772,93 @@ private class TabAlertTransitioningDelegate: NSObject, UIViewControllerTransitio
 		waitingControllers.append(controller)
 	}
 
+	// TODO: find clean solution
+	func additionalNotify(controller: TabController) {
+		precondition(!isBusy)
+		precondition(Thread.isMainThread)
+		waitingControllers.append(controller)
+		guard !additionalNotifyScheduled else {
+			return
+		}
+		additionalNotifyScheduled = true
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+			self.additionalNotifyScheduled = false
+			self.notify()
+		}
+	}
+
 	func setup(delegate: UIViewControllerTransitioningDelegate?) {
 		precondition(Thread.isMainThread)
 		proxiedDelegate = delegate
-		isBusy = true
 	}
 
 	private(set) var isBusy = false
 
 	func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+		isBusy = true
 		return proxiedDelegate?.animationController?(forPresented: presented, presenting: presenting, source: source)
 	}
 
 	func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
 		DispatchQueue.main.async {
-			let oldWaiting = self.waitingControllers
-			self.waitingControllers = []
 			self.isBusy = false
-			for controller in oldWaiting {
-				controller.notifyNextUIEvent()
-			}
+			self.notify()
 		}
 		return proxiedDelegate?.animationController?(forDismissed: dismissed)
+	}
+}
+
+extension TabViewController: FileDownloadDelegate {
+	func downloadDeleted(_ download: FileDownload, index: Int) {
+		bookmarkHistoryView.delete(download: index)
+		if FileDownload.downloads.isEmpty {
+			bookmarkHistoryView.showDownloads(false, animated: true)
+		}
+	}
+
+	func newDownloadStarted(_ download: FileDownload) {
+		bookmarkHistoryView.addDownload()
+	}
+
+	func downloadStatusChanged(_ download: FileDownload, index: Int) {
+		bookmarkHistoryView.showDownloads(true, animated: true)
+		bookmarkHistoryView.reload(download: index)
+		downloadProgress.progress = FileDownload.progress
+	}
+}
+
+extension TabViewController: DownloadProgressIndicatorDelegate {
+	func downloadProgressIndicatorTapped(_ indicator: DownloadProgressIndicator) {
+		if webView.isHidden {
+			bookmarkHistoryView.showHistory(true, animated: true)
+		} else {
+			delegate?.showDownloads()
+		}
+	}
+}
+
+private extension UIEdgeInsets {
+	mutating func scale(_ scale: CGFloat) {
+		top *= scale
+		bottom *= scale
+		left *= scale
+		right *= scale
+	}
+}
+
+extension TabViewController: UIDocumentInteractionControllerDelegate {
+	func documentInteractionController(_ controller: UIDocumentInteractionController, willBeginSendingToApplication application: String?) {
+		TabViewController.sendingFile = true
+	}
+
+	func documentInteractionController(_ controller: UIDocumentInteractionController, didEndSendingToApplication application: String?) {
+		TabViewController.sendingFile = false
+		TabViewController.docController = nil
+	}
+
+	func documentInteractionControllerDidDismissOpenInMenu(_ controller: UIDocumentInteractionController) {
+		if !TabViewController.sendingFile {
+			TabViewController.docController = nil
+		}
 	}
 }

@@ -2,7 +2,7 @@
 //  SecPolicyEvaluator.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -35,52 +35,54 @@ class SecPolicyEvaluator {
 	private(set) var issue: SecChallengeHandlerIssue = .notEvaluated
 	private(set) var error: Int = Int(errSecSuccess)
 
-	private func result(for policy: SecPolicy) throws -> Bool {
-		let uspecifiedResult = SecTrustResultType.unspecified
-		let proceedResult = SecTrustResultType.proceed
-		var result = SecTrustResultType.invalid
-		SecTrustSetPolicies(trust, policy)
-		let error = SecTrustEvaluate(trust, &result)
-		guard error == errSecSuccess else {
-			let errorDomain = "ch.illotros.snowhaze.internalErrorDomain.OSStatus"
-			throw NSError(domain: errorDomain, code: Int(error), userInfo: nil)
-		}
-		return (result == uspecifiedResult || result == proceedResult)
-	}
-
 	func evaluate(_ policy: SecChallengeHandlerPolicy, completionHandler: @escaping (Bool) -> Void) {
 		let callback: (Bool) -> Void = { result in
 			DispatchQueue.main.sync { completionHandler(result) }
 		}
 		DispatchQueue.global(qos: .userInitiated).async {
-			self.error = Int(errSecSuccess)
+			self.error = Int(errSecUnimplemented)
 			if policy != .allowInvalidCerts {
-				do {
-					guard try self.result(for: SecPolicyCreateSSL(true, nil)) else {
+				let evalDomain = policy == .allowDomainMismatch ? nil : self.domain as CFString
+				self.error = Int(SecTrustSetPolicies(self.trust, SecPolicyCreateSSL(true, evalDomain)))
+				guard self.error == Int(errSecSuccess) else {
+					self.issue = .unrecoverable
+					callback(false)
+					return
+				}
+				var error: CFError? = nil
+				let result = SecTrustEvaluateWithError(self.trust, &error)
+				guard (error == nil) == result else {
+					self.issue = .unrecoverable
+					callback(false)
+					return
+				}
+				if let error = error {
+					// weird hack to get around compiler bug
+					// TODO: remove once compiler is fixed
+					guard let error = (error as Any) as? NSError else {
+						self.issue = .unrecoverable
+						callback(false)
+						return
+					}
+					guard error.domain == kCFErrorDomainOSStatus as String else {
+						self.issue = .unrecoverable
+						callback(false)
+						return
+					}
+					self.error = error.code
+					if error.code == errSecHostNameMismatch {
+						self.issue = .domainMismatch(certDomain: ServerTrust(trust: self.trust).certificates[0]?.commonName)
+						callback(false)
+						return
+					} else {
+						print(error)
 						self.issue = .invalidCert
 						callback(false)
 						return
 					}
-					if policy != .allowDomainMismatch {
-						guard try self.result(for: SecPolicyCreateSSL(true, self.domain as CFString)) else {
-							let res: String?
-							if let cert = SecTrustGetCertificateAtIndex(self.trust, 0) {
-								res = SecCertificateCopySubjectSummary(cert) as String?
-							} else {
-								res = nil
-							}
-							self.issue = .domainMismatch(certDomain: res)
-							callback(false)
-							return
-						}
-					}
-				} catch let error {
-					self.issue = .unrecoverable
-					self.error = (error as NSError).code
-					callback(false)
-					return
 				}
 			}
+			self.error = Int(errSecSuccess)
 			self.issue = .none
 			callback(true)
 		}

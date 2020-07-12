@@ -2,23 +2,17 @@
 //  InUseCounter.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import UIKit
 
 class InUseCounter {
-	static let network = InUseCounter(using: { using in UIApplication.shared.isNetworkActivityIndicatorVisible = using })
-
-	private class BlockCallGuard {
-		var called = false
-		deinit {
-			guard called else {
-				fatalError("Block Was not Called")
-			}
-		}
-	}
+	static let network = InUseCounter(using: { using in
+		// although isNetworkActivityIndicatorVisible remains deprecated, iOS 13 has restarted displaying it
+		UIApplication.shared.isNetworkActivityIndicatorVisible = using
+	})
 
 	let using: (Bool) -> Void
 	let queue: DispatchQueue
@@ -38,8 +32,7 @@ class InUseCounter {
 		}
 		let blockGuard = BlockCallGuard()
 		return {
-			precondition(!blockGuard.called)
-			blockGuard.called = true
+			blockGuard.called()
 			self.queue.async {
 				self.count -= 1
 				if self.count == 0 {

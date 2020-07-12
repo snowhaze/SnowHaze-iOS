@@ -2,27 +2,33 @@
 //  DataFetcher.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 
-class DataFetcher: NSObject, URLSessionDelegate {
+class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 	private lazy var session = setupSession()
-	private let tab: Tab
+	private weak var tab: Tab!
 
 	init(tab: Tab) {
 		self.tab = tab
 		super.init()
 	}
 
+	var usable: Bool {
+		precondition(Thread.isMainThread)
+		return !(tab?.deleted ?? true)
+	}
+
 	private func upgrade(_ url: URL) -> URL {
-		guard let domain = url.host , url.scheme!.lowercased() == "http" else {
+		guard let domain = url.host , url.normalizedScheme! == "http" else {
 			return url
 		}
 		let policy = PolicyManager.manager(for: url, in: tab)
-		guard policy.useHTTPSExclusivelyWhenPossible && DomainList(type: .httpsSites).contains(domain) else {
+		let httpsSites = DomainList(type: policy.useHTTPSExclusivelyWhenPossible ? .httpsSites: .empty)
+		guard httpsSites.contains(domain) || policy.trustedSiteUpdateRequired else {
 			return url
 		}
 		var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
@@ -31,8 +37,12 @@ class DataFetcher: NSObject, URLSessionDelegate {
 	}
 
 	func fetch(_ originalUrl: URL, callback: @escaping (Data?) -> Void) {
+		guard let session = session else {
+			callback(nil)
+			return
+		}
 		let dec = InUseCounter.network.inc()
-		let url = upgrade(originalUrl)
+		let url = upgrade(originalUrl.detorified ?? originalUrl)
 		let task = session.dataTask(with: url, completionHandler: { (data, _, error) -> Void in
 			dec()
 			guard error == nil else {
@@ -44,11 +54,62 @@ class DataFetcher: NSObject, URLSessionDelegate {
 		task.resume()
 	}
 
-	private func setupSession() -> URLSession {
+	enum DownloadEvent {
+		case progressUnknown
+		case progress(Int64, Int64)
+		case complete(url: URL, file: String?, mime: String?)
+		case error(Error)
+	}
+	enum DownloadError: Error {
+		case sessionInitializationError
+		case missingURL
+		case contextReleased
+	}
+	private var downloadCallbacks = [URLSessionDownloadTask: (DownloadEvent) -> Void]()
+	func download(_ request: URLRequest, callback: @escaping (DownloadEvent) -> Void) {
+		assert(Thread.isMainThread)
+		guard usable else {
+			callback(.error(DownloadError.contextReleased))
+			return
+		}
+		var request = request
+		guard let url = request.url else {
+			callback(.error(DownloadError.missingURL))
+			return
+		}
+		request.url = upgrade(url)
+		guard let session = session else {
+			callback(.error(DownloadError.sessionInitializationError))
+			return
+		}
+		let task = session.downloadTask(with: request)
+		let dec = InUseCounter.network.inc()
+		downloadCallbacks[task] = { event in
+			switch event {
+				case .error, .complete:	dec()
+				default:				break
+			}
+			callback(event)
+		}
+		callback(.progressUnknown)
+		task.resume()
+	}
+
+	private func setupSession() -> URLSession? {
+		guard let controller = tab.controller else {
+			return nil
+		}
 		let tabPolicy = PolicyManager.manager(for: tab)
-		let config = tabPolicy.urlSessionConfiguration
-		config.httpAdditionalHeaders = ["User-Agent": tab.controller?.userAgent ?? tabPolicy.userAgent]
+		guard let config = tabPolicy.urlSessionConfiguration(tabController: controller) else {
+			return nil
+		}
 		return URLSession(configuration: config, delegate: self, delegateQueue: nil)
+	}
+
+	func cancel() {
+		session?.getAllTasks { tasks in
+			tasks.forEach { $0.cancel() }
+		}
 	}
 
 	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -63,6 +124,37 @@ class DataFetcher: NSObject, URLSessionDelegate {
 		}
 		controller.accept(space.serverTrust!, for: space.host) { result in
 			completionHandler(result ? .performDefaultHandling : .cancelAuthenticationChallenge, nil)
+		}
+	}
+
+	func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+		syncToMainThread {
+			let callback = downloadCallbacks[downloadTask]!
+			downloadCallbacks[downloadTask] = nil
+			let fileName = downloadTask.response?.suggestedFilename
+			let mime = downloadTask.response?.mimeType
+			callback(.complete(url: location, file: fileName, mime: mime))
+		}
+	}
+
+	func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+		if let error = error, let downloadTask = task as? URLSessionDownloadTask {
+			syncToMainThread {
+				let callback = downloadCallbacks[downloadTask]!
+				downloadCallbacks[downloadTask] = nil
+				callback(.error(error))
+			}
+		}
+	}
+
+	func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+		syncToMainThread {
+			let callback = downloadCallbacks[downloadTask]!
+			if totalBytesWritten > totalBytesExpectedToWrite {
+				callback(.progressUnknown)
+			} else {
+				callback(.progress(totalBytesWritten, totalBytesExpectedToWrite))
+			}
 		}
 	}
 }

@@ -2,7 +2,7 @@
 //  Search.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -56,17 +56,17 @@ class Search {
 			default:	throttle = 0
 		}
 		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + throttle) { [weak self] in
-			guard let me = self, me.searchPattern == search, !me.searchInitiated else {
+			guard let self = self, self.searchPattern == search, !self.searchInitiated else {
 				return
 			}
-			me.searchInitiated = true
-			me.tab.controller?.evaluate(script) { (result, error) -> Void in
-				DispatchQueue.main.async {
-					guard let me = self, let count = result as? NSNumber, search == me.searchPattern else {
+			self.searchInitiated = true
+			self.tab.controller?.evaluate(script) { (result, error) -> Void in
+				DispatchQueue.main.async { [weak self] in
+					guard let self = self, let count = result as? NSNumber, search == self.searchPattern else {
 						return
 					}
-					me.matchCount = count.uintValue
-					me.matchIndex = search.isEmpty ? 0 : 1
+					self.matchCount = count.uintValue
+					self.matchIndex = search.isEmpty ? 0 : 1
 				}
 			}
 		}

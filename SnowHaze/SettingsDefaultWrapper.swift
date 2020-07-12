@@ -2,7 +2,7 @@
 //  SettingsDefaultWrapper.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -132,5 +132,21 @@ class SettingsDefaultWrapper: SettingsListener {
 				}
 			}
 		}
+	}
+}
+
+class OverrideSettingsDefaultWrapper: SettingsDefaultWrapper {
+	let wrapper: SettingsDefaultWrapper
+
+	init(wrapper: SettingsDefaultWrapper, prioritySettings: [String: SQLite.Data]) {
+		self.wrapper = wrapper
+		super.init(defaults: prioritySettings, settings: wrapper.settings)
+	}
+
+	override func value(for key: String) -> SQLite.Data {
+		if let value = defaults[key] {
+			return value
+		}
+		return wrapper.value(for: key)
 	}
 }

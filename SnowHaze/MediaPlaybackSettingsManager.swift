@@ -2,11 +2,12 @@
 //  MediaPlaybackSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class MediaPlaybackSettingsManager: SettingsViewManager {
 	override func html() -> String {

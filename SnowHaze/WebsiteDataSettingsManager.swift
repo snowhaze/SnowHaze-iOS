@@ -2,11 +2,13 @@
 //  WebsiteDataSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import WebKit
+import UIKit
 
 class WebsiteDataSettingsManager: SettingsViewManager {
 	override func html() -> String {
@@ -83,28 +85,6 @@ class WebsiteDataSettingsManager: SettingsViewManager {
 
 	override func heightForHeader(inSection section: Int) -> CGFloat {
 		return section == 1 ? 40 : super.heightForHeader(inSection: section)
-	}
-
-	override func titleForFooter(inSection section: Int) -> String? {
-		if section == 1 {
-			if #available(iOS 11, *) {
-				// obviously don't show notice
-			} else {
-				return NSLocalizedString("cookie blocking requires ios 11 notice", comment: "notice displayed on iOS 10 and lower devices to indicate that cookie blocking requires ios 11 or newer")
-			}
-		}
-		return super.titleForFooter(inSection: section)
-	}
-
-	override func heightForFooter(inSection section: Int) -> CGFloat {
-		if section == 1 {
-			if #available(iOS 11, *) {
-				// obviously don't show notice
-			} else {
-				return super.heightForFooter(inSection: section) + 20
-			}
-		}
-		return super.heightForFooter(inSection: section)
 	}
 
 	@objc private func toggleDataStorage(_ sender: UISwitch) {

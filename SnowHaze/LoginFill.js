@@ -10,13 +10,13 @@
 		}
 		return result;
 	}
-	
+
 	function findPWField(target) {
 		var pwfield = null;
 		if (!(pwfield = target.querySelector("input[type='password']"))) pwfield = iterateFrames(target, findPWField);
 		return pwfield;
 	}
-	
+
 	function queryUserField(target) {
 		var userqueries = ["input[type='text']#user", "input[type='text']#username", "input[type='text']#user_name", "input[type='text'][name='user']", "input[type='text'][name='username']", "input[type='text'][name='user_name']","input[type='email']","input[type='text']"];
 		var userfield = null;
@@ -26,13 +26,13 @@
 		}
 		return userfield;
 	}
-	
+
 	function findUserField(target) {
 		var userfield = null;
 		if (!(userfield = queryUserField(target))) userfield = iterateFrames(target, findUserField);
 		return userfield;
 	}
-	
+
 	var pwfield = findPWField(document);
 	var userfield = null;
 	if (pwfield && pwfield.form) userfield = findUserField(pwfield.form);

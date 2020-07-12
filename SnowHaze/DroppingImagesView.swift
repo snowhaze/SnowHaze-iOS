@@ -2,12 +2,13 @@
 //  DroppingImagesView.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import CoreMotion
+import UIKit
 
 class DroppingImagesView: UIView {
 	private lazy var animator: UIDynamicAnimator = {
@@ -56,9 +57,9 @@ class DroppingImagesView: UIView {
 		imageView.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin]
 		imageView.tintColor = imageColor
 		addSubview(imageView)
-		let imageX = CGFloat(random(Int(bounds.width) + 1)) + bounds.origin.x
+		let imageX = CGFloat(random(UInt32(bounds.width) + 1)) + bounds.origin.x
 		let offset = isInit ? 0 : 2 * bounds.height / 3
-		let imageY = CGFloat(random(Int(bounds.height) / 3 + 1)) + bounds.origin.y + offset
+		let imageY = CGFloat(random(UInt32(bounds.height) / 3 + 1)) + bounds.origin.y + offset
 		imageView.bounds.size = imageSize
 		imageView.center = CGPoint(x: imageX, y: imageY)
 		var displayPath: UIBezierPath? = nil
@@ -100,7 +101,6 @@ class DroppingImagesView: UIView {
 						return
 					}
 					let gravity: CGVector
-
 
 					switch UIApplication.shared.statusBarOrientation {
 						case .landscapeLeft:		gravity = CGVector(dx: acceleration.y, dy: acceleration.x)
@@ -183,7 +183,7 @@ private class PathOverlayView: UIView {
 	}
 
 	init() {
-		super.init(frame: CGRect.zero)
+		super.init(frame: .zero)
 		setup()
 	}
 }

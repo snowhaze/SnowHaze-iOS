@@ -2,11 +2,12 @@
 //  TrackingSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class TrackingSettingsManager: SettingsViewManager {
 	override func html() -> String {
@@ -44,27 +45,21 @@ class TrackingSettingsManager: SettingsViewManager {
 			cell.textLabel?.text = NSLocalizedString("block social media widgets setting title", comment: "title of block social media widgets setting")
 			uiSwitch.isOn = bool(for: blockSocialMediaWidgetsKey)
 			uiSwitch.addTarget(self, action: #selector(toggleBlockSocialMediaWidgets(_:)), for: .valueChanged)
-			if #available(iOS 11, *) {
-				// obviouly don't show the notice
-			} else {
-				cell.detailTextLabel?.text = NSLocalizedString("social media widget blocking requires ios 11 notice", comment: "notice displayed on iOS 10 and lower devices to indicate that social media widget blocking requires ios 11 or newer")
-			}
-		} else {
+		} else if indexPath.row == 6 {
 			cell.textLabel?.text = NSLocalizedString("apply hide only rules setting title", comment: "title of apply hide only rules setting")
 			uiSwitch.isOn = bool(for: applyHideOnlyBlockRulesKey)
 			uiSwitch.addTarget(self, action: #selector(toggleApplyHideOnly(_:)), for: .valueChanged)
-			if #available(iOS 11, *) {
-				// obviouly don't show the notice
-			} else {
-				cell.detailTextLabel?.text = NSLocalizedString("apply hide only rules requires ios 11 notice", comment: "notice displayed on iOS 10 and lower devices to indicate that applying hide only rules requires ios 11 or newer")
-			}
+		} else {
+			cell.textLabel?.text = NSLocalizedString("skip redirects setting title", comment: "title of skip redirects setting")
+			uiSwitch.isOn = bool(for: skipRedirectsKey)
+			uiSwitch.addTarget(self, action: #selector(toggleSkipRedirectsOnly(_:)), for: .valueChanged)
 		}
 		cell.accessoryView = uiSwitch
 		return cell
 	}
 
 	override func numberOfRows(inSection section: Int) -> Int {
-		return 7
+		return 8
 	}
 
 	@objc private func toggleBlockReferrer(_ sender: UISwitch) {
@@ -99,6 +94,11 @@ class TrackingSettingsManager: SettingsViewManager {
 
 	@objc private func toggleApplyHideOnly(_ sender: UISwitch) {
 		set(sender.isOn, for: applyHideOnlyBlockRulesKey)
+		updateHeaderColor(animated: true)
+	}
+
+	@objc private func toggleSkipRedirectsOnly(_ sender: UISwitch) {
+		set(sender.isOn, for: skipRedirectsKey)
 		updateHeaderColor(animated: true)
 	}
 }

@@ -2,11 +2,12 @@
 //  SuggestionViewController.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 private let rowHeight: CGFloat = 44
 
@@ -129,15 +130,22 @@ class SuggestionViewController: UITableViewController {
 		var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: reuseID)
 		if cell == nil {
 			cell = UITableViewCell(style: .subtitle, reuseIdentifier: reuseID)
-			UIFont.setSnowHazeFont(on: cell.textLabel!)
-			UIFont.setSnowHazeFont(on: cell.detailTextLabel!)
 		}
 		let suggestion = suggestions[indexPath.row]
+		var image: UIImage? = nil
+		if let unsized = suggestion.image {
+			let length: CGFloat = 40
+			let size = CGSize(width: length, height: length)
+			UIGraphicsBeginImageContext(size)
+			unsized.draw(in: CGRect(origin: .zero, size: size))
+			image = UIGraphicsGetImageFromCurrentImageContext()
+			UIGraphicsEndImageContext()
+		}
 		cell.textLabel?.text = suggestion.title
 		cell.textLabel?.textColor = titleColor
 		cell.detailTextLabel?.text = suggestion.subtitle
 		cell.detailTextLabel?.textColor = subtitleColor
-		cell.imageView?.image = suggestion.image
+		cell.imageView?.image = image
 		cell.backgroundColor = tableView.backgroundColor
 		if let selectionColor = selectionColor {
 			cell.selectedBackgroundView = UIView()

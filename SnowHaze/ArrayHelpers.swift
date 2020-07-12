@@ -2,7 +2,7 @@
 //  ArrayHelpers.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -264,5 +264,33 @@ extension Array where Element: Comparable {
 	mutating func binaryInsert(element: Element) {
 		let position = binarySearchPosition(needle: element)
 		insert(element, at: position)
+	}
+}
+
+public extension Array {
+	private class Indirect<T> {
+		var value: T?
+	}
+
+	func concurrentMap<T>(_ map: (Element) -> T) -> [T] {
+		concurrentMap { _, element -> T in map(element) }
+	}
+	func concurrentMap<T>(_ map: (Int, Element) -> T) -> [T] {
+		let result = [Indirect<T>]((0..<count).map { _ in Indirect<T>() })
+		DispatchQueue.concurrentPerform(iterations: count) { index in
+			result[index].value = map(index, self[index])
+		}
+		return result.map { $0.value! }
+	}
+
+	func concurrentCompactMap<T>(_ map: (Element) -> T?) -> [T] {
+		concurrentCompactMap { _, element -> T? in map(element) }
+	}
+	func concurrentCompactMap<T>(_ map: (Int, Element) -> T?) -> [T] {
+		let result = [Indirect<T>]((0..<count).map { _ in Indirect<T>() })
+		DispatchQueue.concurrentPerform(iterations: count) { index in
+			result[index].value = map(index, self[index])
+		}
+		return result.compactMap { $0.value }
 	}
 }

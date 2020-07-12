@@ -2,11 +2,12 @@
 //  HistorySuggestionSource.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 private let maxCount = 3
 
@@ -61,7 +62,8 @@ class HistorySuggestionSource: SuggestionSource {
 		let center: CGFloat = 4
 		let dateString = dateFormatter.string(from: date)
 		let timeString = timeFormatter.string(from: date)
-		let attributes = [NSAttributedString.Key.foregroundColor: UIColor.title, NSAttributedString.Key.font: UIFont.snowHazeFont(size: 12)]
+		typealias Keys = NSAttributedString.Key
+		let attributes = [Keys.foregroundColor: UIColor.title, Keys.font: UIFont.systemFont(ofSize: 12)]
 		let dateSize = dateString.size(withAttributes: attributes)
 		let timeSize = timeString.size(withAttributes: attributes)
 		UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), false, 0)

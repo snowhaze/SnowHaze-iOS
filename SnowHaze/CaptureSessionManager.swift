@@ -2,12 +2,13 @@
 //  CaptureSessionManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import AVFoundation
+import UIKit
 
 protocol CaptureSessionManagerDelegate: class {
 	func sessionManager(_ manger: CaptureSessionManager, didScanBarCode code: String, withCorners corners: [CGPoint])
@@ -218,11 +219,10 @@ class CaptureSessionManager: NSObject {
 
 		NotificationCenter.default.addObserver(self, selector: #selector(captureSessionNotification(_:)), name: nil, object: internalCaptureSession)
 
-		/* Video */
-		if #available(iOS 10, *), useFrontCamera {
-			videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .front)
+		if useFrontCamera {
+			videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
 		} else {
-			videoDevice = AVCaptureDevice.default(for: AVMediaType.video)
+			videoDevice = AVCaptureDevice.default(for: .video)
 		}
 		videoInput = try? AVCaptureDeviceInput(device: videoDevice!)
 		if let input = videoInput, internalCaptureSession!.canAddInput(input) {
@@ -296,7 +296,7 @@ class CaptureSessionManager: NSObject {
 
 extension CaptureSessionManager: AVCaptureMetadataOutputObjectsDelegate {
 	func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-		let metadata = metadataObjects 
+		let metadata = metadataObjects
 		synchronized(self) {
 			for object in metadata {
 				guard let code = object as? AVMetadataMachineReadableCodeObject else {

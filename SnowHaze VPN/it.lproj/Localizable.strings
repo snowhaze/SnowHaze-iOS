@@ -23,6 +23,9 @@
 /* indication that poland is selected as ipsec vpn location */
 "poland ipsec location name" = "Polonia";
 
+/* indication that norway is selected as ipsec vpn location */
+"norway ipsec location name" = "Norvegia";
+
 /* indication that singapore is selected as ipsec vpn location */
 "singapore ipsec location name" = "Singapore";
 

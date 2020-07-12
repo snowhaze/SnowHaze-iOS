@@ -5,7 +5,7 @@
 	var addEventListener = window.addEventListener;
 	var getAttribute = Element.prototype.getAttribute;
 	var removeAttribute = Element.prototype.removeAttribute;
-		
+
 	var originalWindow = window;
 	window.webkitAudioContext = undefined;
 	window.AudioContext = undefined;
@@ -19,7 +19,7 @@
 			addEventListener.apply(this, arguments);
 		}
 	}
-	
+
 	var observer = new window.MutationObserver(function (changes) {
 		Function.prototype.call = call;
 		for (var index = 0; index < changes.length; index++) {

@@ -2,7 +2,7 @@
 //  SQLite.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -321,6 +321,14 @@ public class SQLite {
 		}
 	}
 
+	@discardableResult public func softHeapLimit(_ limit: Int64) -> Int64 {
+		return sqlite3_soft_heap_limit64(limit)
+	}
+
+	@discardableResult public func hardHeapLimit(_ limit: Int64) -> Int64 {
+		return sqlite3_hard_heap_limit64(limit)
+	}
+
 	public func progressHandler(_ steps: Int, callback: (() -> Bool)?) {
 		guard let callback = callback else {
 			sqlite3_progress_handler(connection, steps.clampedTo32Bit, nil, nil)
@@ -414,6 +422,9 @@ public class SQLite {
 
 		/// enable, disable or query status of view
 		case views(Bool?)
+
+		/// enable, disable or query status of trusted schema
+		case trustedSchema(Bool?)
 	}
 
 	public enum BindingKey: Hashable {
@@ -905,7 +916,7 @@ public class SQLite {
 			self.rawValue = rawValue
 		}
 
-		public static let none						= SetupOptions(rawValue: 0x00000)
+		public static let none: SetupOptions		= []
 		public static let defensive					= SetupOptions(rawValue: 0x00001)
 		public static let cellSizeCheck				= SetupOptions(rawValue: 0x00002)
 		public static let disableMemMap				= SetupOptions(rawValue: 0x00004)
@@ -923,7 +934,8 @@ public class SQLite {
 		public static let nonwritableSchema			= SetupOptions(rawValue: 0x04000)
 		public static let disableViews				= SetupOptions(rawValue: 0x08000)
 		public static let disableTriggers			= SetupOptions(rawValue: 0x10000)
-		public static let secure: SetupOptions		= [defensive, cellSizeCheck, disableMemMap, limitLength, limitSqlLength, limitColumn, limitExprDepth, limitCompoundSelect, limitVdbeOp, limitFunctionArg, limitAttached, limitLikePatternLength, limitVariableNumber, limitTriggerDepth, nonwritableSchema, disableViews, disableTriggers]
+		public static let disableTrustedSchema		= SetupOptions(rawValue: 0x20000)
+		public static let secure: SetupOptions		= [defensive, cellSizeCheck, disableMemMap, limitLength, limitSqlLength, limitColumn, limitExprDepth, limitCompoundSelect, limitVdbeOp, limitFunctionArg, limitAttached, limitLikePatternLength, limitVariableNumber, limitTriggerDepth, nonwritableSchema, disableViews, disableTriggers, disableTrustedSchema]
 
 		var setupOptions: [FinalSetupOptions] {
 			var result = [FinalSetupOptions]()
@@ -939,8 +951,11 @@ public class SQLite {
 			if contains(SetupOptions.disableViews) {
 				result.append(.config(.views(false)))
 			}
-			if contains(SetupOptions.disableViews) {
+			if contains(SetupOptions.disableTriggers) {
 				result.append(.config(.trigger(false)))
+			}
+			if contains(SetupOptions.disableTrustedSchema) {
+				result.append(.config(.trustedSchema(false)))
 			}
 			if contains(SetupOptions.cellSizeCheck) {
 				result.append(.statement("PRAGMA cell_size_check = ON"))
@@ -1268,6 +1283,9 @@ public class SQLite {
 				case .views(let e):
 					enable = e
 					verb = SQLITE_DBCONFIG_ENABLE_VIEW
+				case .trustedSchema(let e):
+					enable = e
+					verb = SQLITE_DBCONFIG_TRUSTED_SCHEMA
 			}
 			let set: Int32
 			if let enable = enable {
@@ -1374,13 +1392,25 @@ public extension SQLite {
 	private typealias FunctionContext = ContextWrapper<([Data], (Int, Any) -> Void, (Int) -> Any?) throws -> Data>
 	private typealias ObjWrapper = ContextWrapper<Any?>
 
-	func register(name: String, nArgs: Int = 1, deterministic: Bool = true, function: @escaping ([Data]) throws -> Data) throws {
-		let fn: ([Data], (Int, Any) -> Void, (Int) -> Any?) throws -> Data = { data, _, _ in return try function(data) }
-		try register(name: name, nArgs: nArgs, deterministic: deterministic, function: fn)
+	struct FunctionOptions: OptionSet {
+		public let rawValue: Int32
+
+		public init(rawValue: Int32) {
+			self.rawValue = rawValue
+		}
+
+		public static let deterministic = FunctionOptions(rawValue: SQLITE_DETERMINISTIC)
+		public static let directonly = FunctionOptions(rawValue: SQLITE_DIRECTONLY)
+		public static let innocuous = FunctionOptions(rawValue: SQLITE_INNOCUOUS)
 	}
 
-	func register<T>(name: String, nArgs: Int = 1, deterministic: Bool = true, function: @escaping ([Data], (Int, T) -> Void, (Int) -> T?) throws -> Data) throws {
-		let encoding = deterministic ? SQLITE_UTF8 | SQLITE_DETERMINISTIC : SQLITE_UTF8
+	func register(name: String, nArgs: Int = 1, options: FunctionOptions = .directonly, function: @escaping ([Data]) throws -> Data) throws {
+		let fn: ([Data], (Int, Any) -> Void, (Int) -> Any?) throws -> Data = { data, _, _ in return try function(data) }
+		try register(name: name, nArgs: nArgs, options: options, function: fn)
+	}
+
+	func register<T>(name: String, nArgs: Int = 1, options: FunctionOptions = .directonly, function: @escaping ([Data], (Int, T) -> Void, (Int) -> T?) throws -> Data) throws {
+		let encoding = SQLITE_UTF8 | options.rawValue
 		let cFunction: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
 			let context = FunctionContext.fromC(sqlite3_user_data(sqliteContext)!)
 			var swiftParams = [Data]()
@@ -1405,10 +1435,90 @@ public extension SQLite {
 			try check(sqlite3_create_function_v2(connection, $0, nArgs.clampedTo32Bit, encoding, cContext, cFunction, nil, nil, { FunctionContext.releaseC($0) }))
 		}
 	}
-	func register<T>(name: String, nArgs: Int = 1, deterministic: Bool = true, step: @escaping ([Data], T?) throws -> T, final: @escaping (T?) throws -> Data) throws {
+
+	func register<T>(name: String, nArgs: Int = 1, options: FunctionOptions = .directonly, step: @escaping ([Data], T?) throws -> T, final: @escaping (T?) throws -> Data, value: @escaping (T?) throws -> Data, inverse: @escaping ([Data], T?) throws -> T) throws {
+		typealias WindowContext = ContextWrapper<(step: ([Data], Any?) throws -> Any, final: (Any?) throws -> Data, value: (Any?) throws -> Data, inverse: ([Data], Any?) throws -> Any)>
+
+		let encoding = SQLITE_UTF8 | options.rawValue
+
+		let cStep: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
+			let context = WindowContext.fromC(sqlite3_user_data(sqliteContext)!)
+			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
+			let cAccumulator = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
+			let accumulator: ObjWrapper
+			if let ptr = cAccumulator {
+				accumulator = ObjWrapper.fromC(ptr)
+			} else {
+				accumulator = ObjWrapper(data: nil)
+				UnsafeMutablePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee = accumulator.toC
+			}
+			var swiftParams = [Data]()
+			swiftParams.reserveCapacity(Int(count))
+			for index in 0 ..< count {
+				swiftParams.append(SQLite.value(from: params!, index: index))
+			}
+			SQLite.perform(inContext: sqliteContext) {
+				let result = try context.data.step(swiftParams, accumulator.data)
+				accumulator.data = result
+			}
+		}
+
+		let cFinal: @convention(c) (OpaquePointer?) -> Void = { sqliteContext in
+			let context = WindowContext.fromC(sqlite3_user_data(sqliteContext)!)
+			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
+			let ptr = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
+			SQLite.perform(inContext: sqliteContext) {
+				let result = try context.data.final(ObjWrapper.fromC(ptr)?.data)
+				ObjWrapper.releaseC(ptr)
+				SQLite.set(result, context: sqliteContext)
+			}
+		}
+
+		let cValue: @convention(c) (OpaquePointer?) -> Void = { sqliteContext in
+			let context = WindowContext.fromC(sqlite3_user_data(sqliteContext)!)
+			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
+			let ptr = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
+			SQLite.perform(inContext: sqliteContext) {
+				let result = try context.data.value(ObjWrapper.fromC(ptr)?.data)
+				ObjWrapper.releaseC(ptr)
+				SQLite.set(result, context: sqliteContext)
+			}
+		}
+
+		let cInverse: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
+			let context = WindowContext.fromC(sqlite3_user_data(sqliteContext)!)
+			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
+			let cAccumulator = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
+			let accumulator: ObjWrapper
+			if let ptr = cAccumulator {
+				accumulator = ObjWrapper.fromC(ptr)
+			} else {
+				accumulator = ObjWrapper(data: nil)
+				UnsafeMutablePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee = accumulator.toC
+			}
+			var swiftParams = [Data]()
+			swiftParams.reserveCapacity(Int(count))
+			for index in 0 ..< count {
+				swiftParams.append(SQLite.value(from: params!, index: index))
+			}
+			SQLite.perform(inContext: sqliteContext) {
+				let result = try context.data.inverse(swiftParams, accumulator.data)
+				accumulator.data = result
+			}
+		}
+
+		let contextObj = WindowContext(data: (step: { try step($0, $1 as! T?) }, final: { try final($0 as! T?) }, value: { try value($0 as! T?) }, inverse: { try inverse($0, $1 as! T?) }))
+		let cContext = contextObj.toC
+
+		try name.withCUTF8 {
+			try check(sqlite3_create_window_function(connection, $0, nArgs.clampedTo32Bit, encoding, cContext, cStep, cFinal, cValue, cInverse, { FunctionContext.releaseC($0) }))
+		}
+	}
+
+	func register<T>(name: String, nArgs: Int = 1, options: FunctionOptions = .directonly, step: @escaping ([Data], T?) throws -> T, final: @escaping (T?) throws -> Data) throws {
 		typealias AggregateContext = ContextWrapper<(step: ([Data], Any?) throws -> Any, final: (Any?) throws -> Data)>
 
-		let encoding = deterministic ? SQLITE_UTF8 | SQLITE_DETERMINISTIC : SQLITE_UTF8
+		let encoding = SQLITE_UTF8 | options.rawValue
 
 		let cStep: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
 			let context = AggregateContext.fromC(sqlite3_user_data(sqliteContext)!)
@@ -1459,7 +1569,7 @@ public extension SQLite {
 
 	func register(name: String, collation: @escaping (String, String) -> ComparisonResult) throws {
 		typealias CollationContext = ContextWrapper<(String, String) -> ComparisonResult>
-		
+
 		let context = CollationContext(data: collation)
 		let cmp: @convention(c) (UnsafeMutableRawPointer?, Int32, UnsafeRawPointer?, Int32, UnsafeRawPointer?) -> Int32 = { ptr, l1, b1, l2, b2 in
 			let collation = CollationContext.fromC(ptr!).data

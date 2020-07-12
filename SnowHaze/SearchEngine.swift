@@ -2,7 +2,7 @@
 //	SearchEngine.swift
 //	SnowHaze
 //
-
+//
 //	Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -19,6 +19,7 @@ enum SearchEngineType: Int64 {
 	case startpage
 	case swisscows
 	case duckDuckGo
+	case qwant			= 12
 }
 
 class SearchEngine {
@@ -82,6 +83,7 @@ class SearchEngine {
 			case .startpage:	return URL(string: "https://www.startpage.com/do/dsearch?language=\(NSLocalizedString("localized startpage language", comment: "language for startpage in the language used by the user"))&query=" + escapedSearch)
 			case .swisscows:	return URL(string: "https://swisscows.com/?query=" + escapedSearch)
 			case .duckDuckGo:	return URL(string: "https://duckduckgo.com/?q=" + escapedSearch)
+			case .qwant:		return URL(string: "https://www.qwant.com/?q=\(escapedSearch)")
 			case .none:			return nil
 		}
 	}

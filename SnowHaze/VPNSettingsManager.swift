@@ -2,12 +2,13 @@
 //  VPNSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import NetworkExtension
+import UIKit
 
 private let listSection = 1
 
@@ -17,6 +18,32 @@ private let profileURL: URL = {
 }()
 
 class VPNSettingsManager: SettingsViewManager {
+	private enum IPAddressStatus {
+		case unknown
+		case unavailable
+		case value(String)
+
+		var format: String {
+			switch self {
+				case .unknown:		return NSLocalizedString("unknown ip address placeholder", comment: "placeholder displayed when the client's ip address is unknown")
+				case .unavailable:	return NSLocalizedString("unavailable ip address placeholder", comment: "placeholder displayed when the client's ip address is unavailable")
+				case .value(let v):	return v
+			}
+		}
+
+		func matches(_ other: IPAddressStatus) -> Bool {
+			switch (self, other) {
+				case (.value(let a), .value(let b)):	return a == b
+				default:								return false
+			}
+		}
+	}
+
+	private static var ipv4Address = IPAddressStatus.unknown
+	private static var ipv6Address = IPAddressStatus.unknown
+	private static var defaultIpAddress = IPAddressStatus.unknown
+	private static var ipCheckDate = Date()
+
 	override func html() -> String {
 		return NSLocalizedString("vpn settings explanation", comment: "explanations of the vpn settings tab")
 	}
@@ -26,6 +53,10 @@ class VPNSettingsManager: SettingsViewManager {
 	}
 
 	private var controlSection: Int {
+		return showList ? 3 : 2
+	}
+
+	private var ipSection: Int {
 		return showList ? 2 : 1
 	}
 
@@ -36,6 +67,8 @@ class VPNSettingsManager: SettingsViewManager {
 
 	private static var docController: UIDocumentInteractionController?
 	private static var sendingFile = false
+
+	private let session = SnowHazeURLSession()
 
 	private static let dateFormatter: DateFormatter = {
 		var formatter = DateFormatter()
@@ -60,23 +93,44 @@ class VPNSettingsManager: SettingsViewManager {
 		let name = NSNotification.Name.NEVPNStatusDidChange
 		observer = NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
 			DispatchQueue.main.async {
-				guard let me = self else {
+				guard let self = self else {
 					return
 				}
-				me.updateHeaderColor(animated: true)
-				if me.isIPSec && me.showList {
+				self.updateHeaderColor(animated: true)
+				if self.isIPSec && self.showList {
 					if case NEVPNManager.shared().connection.status = NEVPNStatus.invalid {
 						let section = IndexSet(integer: listSection)
-						me.controller.tableView.reloadSections(section, with: .none)
+						self.controller.tableView.reloadSections(section, with: .none)
 					} else {
 						let indexPath = IndexPath(row: 0, section: listSection)
-						me.controller.tableView.reloadRows(at: [indexPath], with: .none)
+						self.controller.tableView.reloadRows(at: [indexPath], with: .none)
 					}
 				}
 			}
 		}
 		if !VPNManager.shared.ipsecManagerLoaded {
 			VPNManager.shared.withLoadedManager { _ in }
+		}
+
+		ipDataUpdated(reloadUI: false)
+	}
+
+	private func ipDataUpdated(reloadUI: Bool) {
+		let time = VPNSettingsManager.ipCheckDate.timeIntervalSinceNow + 5 * 60
+		if time < 0 {
+			VPNSettingsManager.ipv4Address = .unknown
+			VPNSettingsManager.ipv6Address = .unknown
+			VPNSettingsManager.defaultIpAddress = .unknown
+		} else {
+			DispatchQueue.main.asyncAfter(deadline: .now() + time + 0.1) { [weak self] in
+				guard let self = self else {
+					return
+				}
+				self.ipDataUpdated(reloadUI: true)
+			}
+		}
+		if reloadUI {
+			controller.tableView.reloadSections(IndexSet(integer: ipSection), with: .fade)
 		}
 	}
 
@@ -106,23 +160,27 @@ class VPNSettingsManager: SettingsViewManager {
 			return
 		}
 		let pinger = Pinger(host: hosts.randomElement) { [weak self] pinger, _, _ in
-			guard let me = self else {
+			guard let self = self else {
 				pinger.stop()
 				return
 			}
 			guard let time = pinger.averagePing, let rate = pinger.averageDropRate else {
 				return
 			}
-			me.pingStats[id] = (time, rate)
-			if me.isIPSec {
+			self.pingStats[id] = (time, rate)
+			if self.isIPSec {
 				if let index = VPNManager.shared.ipsecProfiles.firstIndex(where: { $0.id == id }) {
 					let indexPath = IndexPath(row: index + 1, section: listSection)
-					me.controller?.tableView.reloadRows(at: [indexPath], with: .none)
+					UIView.performWithoutAnimation {
+						self.controller?.tableView.reloadRows(at: [indexPath], with: .fade)
+					}
 				}
 			} else {
 				if let index = VPNManager.shared.ovpnProfiles.firstIndex(where: { $0.id == id }) {
 					let indexPath = IndexPath(row: index + 1, section: listSection)
-					me.controller?.tableView.reloadRows(at: [indexPath], with: .none)
+					UIView.performWithoutAnimation {
+						self.controller?.tableView.reloadRows(at: [indexPath], with: .fade)
+					}
 				}
 			}
 		}
@@ -159,9 +217,28 @@ class VPNSettingsManager: SettingsViewManager {
 				button.addTarget(self, action: #selector(showVPNTutorial(_:)), for: .touchUpInside)
 				button.setTitle(title, for: [])
 			}
+		} else if indexPath.section == ipSection {
+			let ipv4 = VPNSettingsManager.ipv4Address
+			let ipv6 = VPNSettingsManager.ipv6Address
+			let defaultIp = VPNSettingsManager.defaultIpAddress
+			let defaultIndicator = NSLocalizedString("client ip address title default indicator suffic", comment: "suffix of the client's ip address title to indicate that this is the device's prefered network type")
+			if indexPath.row == 0 {
+				let title = NSLocalizedString("client ipv4 title", comment: "title of cell that displays the client's ipv4 address")
+				cell.textLabel?.text = title + (ipv4.matches(defaultIp) ? defaultIndicator : "")
+				cell.detailTextLabel?.text = ipv4.format
+			} else if indexPath.row == 1 {
+				let title = NSLocalizedString("client ipv6 title", comment: "title of cell that displays the client's ipv6 address")
+				cell.textLabel?.text = title + (ipv6.matches(defaultIp) ? defaultIndicator : "")
+				cell.detailTextLabel?.text = ipv6.format
+			} else {
+				let button = makeButton(for: cell)
+				button.addTarget(self, action: #selector(checkIp(_:)), for: .touchUpInside)
+				let title = NSLocalizedString("check ip addresses button title", comment: "title of button to check the client's ip addresses")
+				button.setTitle(title, for: [])
+			}
 		} else if indexPath.section == listSection && indexPath.row == 0 {
 			if isIPSec {
-				if SubscriptionManager.shared.hasSubscription {
+				if SubscriptionManager.status.confirmed {
 					if let _ = VPNManager.shared.ipsecProfiles.first(where: { $0.id == selectedProfile && $0.hasProfile }) {
 						switch NEVPNManager.shared().connection.status {
 							case .connected:
@@ -172,7 +249,13 @@ class VPNSettingsManager: SettingsViewManager {
 								cell.accessoryView = onoff
 							case .connecting:
 								cell.textLabel?.text = NSLocalizedString("connecting ipsec vpn state title", comment: "indication that the ipsec vpn is connecting")
-								let spinner = UIActivityIndicatorView(style: .white)
+								let spinner: UIActivityIndicatorView
+								if #available(iOS 13, *) {
+									spinner = UIActivityIndicatorView(style: .medium)
+									spinner.color = .white
+								} else {
+									spinner = UIActivityIndicatorView(style: .white)
+								}
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 							case .disconnected:
@@ -183,12 +266,24 @@ class VPNSettingsManager: SettingsViewManager {
 								cell.accessoryView = onoff
 							case .disconnecting:
 								cell.textLabel?.text = NSLocalizedString("disconnecting ipsec vpn state title", comment: "indication that the ipsec vpn is disconnecting")
-								let spinner = UIActivityIndicatorView(style: .white)
+								let spinner: UIActivityIndicatorView
+								if #available(iOS 13, *) {
+									spinner = UIActivityIndicatorView(style: .medium)
+									spinner.color = .white
+								} else {
+									spinner = UIActivityIndicatorView(style: .white)
+								}
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 							case .invalid:
 								cell.textLabel?.text = NSLocalizedString("invalid ipsec vpn state title", comment: "indication that the ipsec vpn profile is currently invalid")
-								let spinner = UIActivityIndicatorView(style: .white)
+								let spinner: UIActivityIndicatorView
+								if #available(iOS 13, *) {
+									spinner = UIActivityIndicatorView(style: .medium)
+									spinner.color = .white
+								} else {
+									spinner = UIActivityIndicatorView(style: .white)
+								}
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 								if VPNManager.shared.ipsecManagerLoaded {
@@ -196,12 +291,24 @@ class VPNSettingsManager: SettingsViewManager {
 								}
 							case .reasserting:
 								cell.textLabel?.text = NSLocalizedString("reasserting ipsec vpn state title", comment: "indication that the ipsec vpn is reasserting")
-								let spinner = UIActivityIndicatorView(style: .white)
+								let spinner: UIActivityIndicatorView
+								if #available(iOS 13, *) {
+									spinner = UIActivityIndicatorView(style: .medium)
+									spinner.color = .white
+								} else {
+									spinner = UIActivityIndicatorView(style: .white)
+								}
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 							@unknown default:
 								cell.textLabel?.text = NSLocalizedString("unknown ipsec vpn state title", comment: "indication that the ipsec vpn is in a state which was added to ios after compilation of the app")
-								let spinner = UIActivityIndicatorView(style: .white)
+								let spinner: UIActivityIndicatorView
+								if #available(iOS 13, *) {
+									spinner = UIActivityIndicatorView(style: .medium)
+									spinner.color = .white
+								} else {
+									spinner = UIActivityIndicatorView(style: .white)
+								}
 								spinner.startAnimating()
 								cell.accessoryView = spinner
 						}
@@ -271,12 +378,18 @@ class VPNSettingsManager: SettingsViewManager {
 					cell.detailTextLabel?.text = profileState
 				}
 			}
-			if !SubscriptionManager.shared.hasSubscription {
+			if !SubscriptionManager.status.confirmed {
 				cell.accessoryView = UIImageView(image: #imageLiteral(resourceName: "blocked"))
 				let format = NSLocalizedString("vpn profile missing subscription accessibility label format", comment: "format of the accessibility label of the vpn profile cell when user is not subscribed to snowhaze premium")
 				cell.accessibilityLabel = String(format: format, profileName)
 			} else if downloading.contains(profile.id) {
-				let activity = UIActivityIndicatorView(style: .white)
+				let activity: UIActivityIndicatorView
+				if #available(iOS 13, *) {
+					activity = UIActivityIndicatorView(style: .medium)
+					activity.color = .white
+				} else {
+					activity = UIActivityIndicatorView(style: .white)
+				}
 				cell.accessoryView = activity
 				activity.startAnimating()
 				let format = NSLocalizedString("vpn profile downloading accessibility label format", comment: "format of the accessibility label of the vpn profile cell when the profile is being downloaded")
@@ -324,7 +437,7 @@ class VPNSettingsManager: SettingsViewManager {
 	}
 
 	override var numberOfSections: Int {
-		return showList ? 3 : 2
+		return showList ? 4 : 3
 	}
 
 	override func numberOfRows(inSection section: Int) -> Int {
@@ -332,6 +445,8 @@ class VPNSettingsManager: SettingsViewManager {
 			return 0
 		} else if section == controlSection {
 			return 4
+		} else if section == ipSection {
+			return 3
 		} else {
 			assert(section == listSection)
 			return isIPSec ? VPNManager.shared.ipsecProfiles.count + 2 : VPNManager.shared.ovpnProfiles.count + 1
@@ -340,12 +455,12 @@ class VPNSettingsManager: SettingsViewManager {
 
 	override func didSelectRow(atIndexPath indexPath: IndexPath, tableView: UITableView) {
 		if showList && indexPath.section == listSection && indexPath.row == 0 && isIPSec {
-			if SubscriptionManager.shared.hasSubscription {
+			if SubscriptionManager.status.confirmed {
 				super.didSelectRow(atIndexPath: indexPath, tableView: tableView)
 			} else {
 				controller.switchToSubscriptionSettings()
 			}
-		} else if indexPath.section == controlSection || indexPath.row == 0 {
+		} else if indexPath.section == controlSection || indexPath.row == 0 || indexPath.section == ipSection {
 			super.didSelectRow(atIndexPath: indexPath, tableView: tableView)
 		} else if showList && indexPath.section == listSection && indexPath.row == VPNManager.shared.ipsecProfiles.count + 1 && isIPSec {
 			super.didSelectRow(atIndexPath: indexPath, tableView: tableView)
@@ -355,7 +470,7 @@ class VPNSettingsManager: SettingsViewManager {
 				return
 			}
 			let index = indexPath.row - 1
-			if SubscriptionManager.shared.hasSubscription {
+			if SubscriptionManager.status.confirmed {
 				let profile: VPNProfile
 				if isIPSec {
 					profile = VPNManager.shared.ipsecProfiles[index]
@@ -387,20 +502,20 @@ class VPNSettingsManager: SettingsViewManager {
 						guard let index = VPNSettingsManager.listIndex(for: profile) else {
 							return
 						}
-						let indexPath = IndexPath(row: index, section: listSection)
+						let indexPath = IndexPath(row: index + 1, section: listSection)
 						let correctProfiles: [VPNProfile]
 						if profile is IPSecProfile {
 							correctProfiles = VPNManager.shared.ipsecProfiles
 						} else if profile is OVPNProfile {
 							correctProfiles = VPNManager.shared.ovpnProfiles
 						} else {
-							fatalError("A VPNProfile should be eigther a OVPNProfile or a IPSec profile")
+							fatalError("A VPNProfile should be eigther an OVPNProfile or an IPSecProfile")
 						}
 						let profile = correctProfiles[index]
 						if success && profile.hasProfile {
-							if let profile = profile as? IPSecProfile, let me = self {
+							if let profile = profile as? IPSecProfile, let self = self {
 								var reload = [indexPath]
-								if let oldSelectedIndex = me.selectedProfileIndex {
+								if let oldSelectedIndex = self.selectedProfileIndex {
 									reload.append(IndexPath(row: oldSelectedIndex + 1, section: listSection))
 								} else {
 									reload.append(IndexPath(row: 0, section: listSection))
@@ -410,19 +525,22 @@ class VPNSettingsManager: SettingsViewManager {
 								} else {
 									VPNManager.shared.save(profile)
 								}
-								me.controller.tableView.reloadRows(at: reload, with: .none)
+								self.controller.tableView.reloadRows(at: reload, with: .none)
 							} else if let profile = profile as? OVPNProfile {
 								self?.install(profile, for: cell)
 							}
 						} else {
 							self?.downloadErrors.insert(profile.id)
 							DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [weak self] in
-								self?.downloadErrors.remove(profile.id)
+								guard let self = self else {
+									return
+								}
+								self.downloadErrors.remove(profile.id)
 								guard let index = VPNSettingsManager.listIndex(for: profile) else {
 									return
 								}
-								let indexPath = IndexPath(row: index, section: listSection)
-								tableView.reloadRows(at: [indexPath], with: .none)
+								let indexPath = IndexPath(row: index + 1, section: listSection)
+								self.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
 							}
 						}
 						tableView.reloadRows(at: [indexPath], with: .none)
@@ -434,24 +552,57 @@ class VPNSettingsManager: SettingsViewManager {
 		}
 	}
 
+	private func getIp(prefix: String, callback rawCallback: @escaping (IPAddressStatus) -> Void) {
+		let callback = { result in
+			DispatchQueue.main.async {
+				rawCallback(result)
+			}
+		}
+		var request = URLRequest(url: URL(string: "https://\(prefix)api.snowhaze.com/index.php")!)
+		request.setFormEncoded(data: ["v": "3", "action": "get_client_ip"])
+		session.performDataTask(with: request) { data, response, error in
+			if let data = data, let obj = try? JSONSerialization.jsonObject(with: data) as? [String: String] {
+				guard let ip = obj["ip"] else {
+					callback(.unknown)
+					return
+				}
+				callback(.value(ip))
+				return
+			}
+			if let error = error as NSError?, error.domain == NSURLErrorDomain && error.code == -1003 {
+				callback(.unavailable)
+				return
+			}
+			callback(.unknown)
+		}
+	}
+
+	@objc private func checkIp(_ sender: UIButton) {
+		VPNSettingsManager.ipCheckDate = Date()
+		getIp(prefix: "") { [weak self] status in
+			VPNSettingsManager.defaultIpAddress = status
+			self?.ipDataUpdated(reloadUI: true)
+		}
+		getIp(prefix: "ipv4.") { [weak self] status in
+			VPNSettingsManager.ipv4Address = status
+			self?.ipDataUpdated(reloadUI: true)
+		}
+		getIp(prefix: "ipv6.") { [weak self] status in
+			VPNSettingsManager.ipv6Address = status
+			self?.ipDataUpdated(reloadUI: true)
+		}
+	}
+
 	@objc private func openOpenVPN(_ sender: UIButton) {
 		if UIApplication.shared.canOpenURL(URL(string: "openvpn://")!) {
-			if #available(iOS 10, *) {
-				UIApplication.shared.open(URL(string: "openvpn://")!)
-			} else {
-				UIApplication.shared.openURL(URL(string: "openvpn://")!)
-			}
+			UIApplication.shared.open(URL(string: "openvpn://")!)
 		} else {
 			let title = NSLocalizedString("opening openvpn connect requires installing alert title", comment: "title of alert to point out that opening openvpn connect requires it being installed")
 			let message = NSLocalizedString("opening openvpn connect requires installing alert message", comment: "message of alert to point out that opening openvpn connect requires it being installed")
 			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 			let okTitle = NSLocalizedString("install openvpn connect app prompt ok button title", comment: "title of ok button of prompt to ask users if they want to install the openvpn connect app")
 			let okAction = UIAlertAction(title: okTitle, style: .default) { _ in
-				if #available(iOS 10, *) {
-					UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id590379981")!)
-				} else {
-					UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id590379981")!)
-				}
+				UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id590379981")!)
 			}
 			alert.addAction(okAction)
 
@@ -467,11 +618,9 @@ class VPNSettingsManager: SettingsViewManager {
 	}
 
 	@objc private func showVPNTutorial(_ sender: NSObject) {
-		let mainVC = MainViewController.controller
-		mainVC?.popToVisible(animated: true)
 		let language = PolicyManager.globalManager().threeLanguageCode
 		let site = "https://snowhaze.com/\(language)/support.html#tutorial"
-		mainVC?.loadInFreshTab(input: site, type: .url)
+		open(site)
 	}
 
 	@objc private func toggleUpdateVPNList(_ sender: UISwitch) {
@@ -533,7 +682,11 @@ class VPNSettingsManager: SettingsViewManager {
 			let loc = NSLocalizedString("localization code", comment: "code used to identify the current locale")
 			let name = profile.names[loc] ?? profile.names["en"] ?? profile.hosts.first ?? "?"
 			let forebidden = CharacterSet.profileForebidden
-			let sanitized = name.components(separatedBy: forebidden).joined()
+			var sanitized = name.components(separatedBy: forebidden).joined()
+			let safeFlag = (profile.flagChar ?? "").components(separatedBy: forebidden).joined()
+			if !safeFlag.isEmpty  {
+				sanitized = safeFlag + " " + sanitized
+			}
 			let profileString = profile.profile! + "\nsetenv FRIENDLY_NAME \"\(sanitized)\""
 			let data = profileString.data(using: .utf8)!
 			try! data.write(to: profileURL, options: .atomic)
@@ -547,11 +700,7 @@ class VPNSettingsManager: SettingsViewManager {
 			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 			let okTitle = NSLocalizedString("install openvpn connect app prompt ok button title", comment: "title of ok button of prompt to ask users if they want to install the openvpn connect app")
 			let okAction = UIAlertAction(title: okTitle, style: .default) { _ in
-				if #available(iOS 10, *) {
-					UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id590379981")!)
-				} else {
-					UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id590379981")!)
-				}
+				UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id590379981")!)
 			}
 			alert.addAction(okAction)
 

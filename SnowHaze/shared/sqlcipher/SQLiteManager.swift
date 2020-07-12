@@ -2,7 +2,7 @@
 //  SQLiteManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -82,7 +82,7 @@ class SQLiteManager {
 	private let id: UInt64
 	private var threads = Set<Thread>()
 	private let lock = NSRecursiveLock()
-	
+
 	private let cacheSize: UInt
 
 	private(set) var version: UInt64 = 1
@@ -173,7 +173,7 @@ class SQLiteManager {
 
 		let connection = dbSetup(thread)
 		lock.unlock()
-		
+
 		let statementCache = connection == nil ? nil : SQliteStatementCache(connection: connection!, size: cacheSize)
 
 		var observer: NSObjectProtocol? = nil
@@ -207,7 +207,7 @@ class SQLiteManager {
 		thread.threadDictionary.setValue(data, forKey: key)
 		return data
 	}
-	
+
 	public var connection: SQLite! {
 		return threadData.connection
 	}
@@ -260,7 +260,7 @@ class SQLiteManager {
 		}
 		lock.unlock()
 	}
-	
+
 	public func statement(for code: String) throws -> SQLite.Statement? {
 		return try threadData.cache?.statement(for: code)
 	}
@@ -276,27 +276,27 @@ class SQLiteManager {
 		let statement = try fullStatement(for: query)
 		try statement.execute(callback: callback)
 	}
-	
+
 	@discardableResult public func execute(_ query: String) throws -> [SQLite.Row] {
 		let statement = try fullStatement(for: query)
 		return try statement.execute()
 	}
-	
+
 	@discardableResult public func execute(_ query: String, with bindings: [SQLite.BindingKey: SQLite.Data]) throws -> [SQLite.Row] {
 		let statement = try fullStatement(for: query)
 		return try statement.execute(with: bindings)
 	}
-	
+
 	@discardableResult public func execute(_ query: String, with bindings: [SQLite.Data]) throws -> [SQLite.Row] {
 		let statement = try fullStatement(for: query)
 		return try statement.execute(with: bindings)
 	}
-	
+
 	@discardableResult public func execute(_ query: String, with bindings: [Int: SQLite.Data]) throws -> [SQLite.Row] {
 		let statement = try fullStatement(for: query)
 		return try statement.execute(with: bindings)
 	}
-	
+
 	@discardableResult public func execute(_ query: String, with bindings: [String: SQLite.Data]) throws -> [SQLite.Row] {
 		let statement = try fullStatement(for: query)
 		return try statement.execute(with: bindings)
@@ -305,7 +305,7 @@ class SQLiteManager {
 	public func has(table: String) -> Bool? {
 		return connection?.has(table: table)
 	}
-	
+
 	public var lastInsertRowId: Int64! {
 		return connection?.lastInsertRowId
 	}

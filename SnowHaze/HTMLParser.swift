@@ -2,11 +2,12 @@
 //  HTMLParser.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 /**
  *	Primitive HTML parser. Should only be used on controlled input (e.g. to format localized strings).
@@ -47,10 +48,11 @@ class HTMLParser {
 		}
 		tmp = tmp.replace(modRx, template: "$2")
 		let tmpAttrString = NSMutableAttributedString(string: tmp)
+		typealias Keys = NSAttributedString.Key
 		for (mod, range) in mods {
 			switch mod {
-				case .Underline:	tmpAttrString.addAttribute(NSAttributedString.Key.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
-				case .Strong:		tmpAttrString.addAttribute(NSAttributedString.Key.font, value: boldFont, range: range)
+				case .Underline:	tmpAttrString.addAttribute(Keys.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+				case .Strong:		tmpAttrString.addAttribute(Keys.font, value: boldFont, range: range)
 			}
 		}
 		attributedString = NSAttributedString(attributedString: tmpAttrString)

@@ -2,7 +2,7 @@
 //  Pinger.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -137,7 +137,7 @@ class Pinger: NSObject, SimplePingDelegate {
 
 	func simplePing(_ pinger: SimplePing, didStartWithAddress address: Data) {
 		queue.async { [weak self] in
-			guard let me = self else {
+			guard let self = self else {
 				return
 			}
 			var hostStr = [Int8](repeating: 0, count: Int(NI_MAXHOST))
@@ -152,16 +152,16 @@ class Pinger: NSObject, SimplePingDelegate {
 				NI_NUMERICHOST
 				) == 0
 			if success {
-				me.hostAddress = String(cString: hostStr)
+				self.hostAddress = String(cString: hostStr)
 			} else {
-				me.hostAddress = "?"
+				self.hostAddress = "?"
 			}
 
-			switch me.state {
+			switch self.state {
 				case .unresolved, .resolving(false), .failed:
-					me.state = .resolved(nil)
+					self.state = .resolved(nil)
 				case .resolving(true):
-					me.startTimer()
+					self.startTimer()
 				default:
 					break
 			}
@@ -170,16 +170,16 @@ class Pinger: NSObject, SimplePingDelegate {
 
 	func simplePing(_ pinger: SimplePing, didFailWithError error: Error) {
 		queue.async { [weak self] in
-			guard let me = self else {
+			guard let self = self else {
 				return
 			}
-			if case .resolved(let arg) = me.state, let timer = arg {
+			if case .resolved(let arg) = self.state, let timer = arg {
 				DispatchQueue.main.async {
 					timer.invalidate()
 				}
 			}
-			me.state = .failed
-			me.notify(time: nil, error: error)
+			self.state = .failed
+			self.notify(time: nil, error: error)
 		}
 	}
 
@@ -187,14 +187,14 @@ class Pinger: NSObject, SimplePingDelegate {
 
 	func simplePing(_ pinger: SimplePing, didSendPacket packet: Data, sequenceNumber: UInt16) {
 		queue.async { [weak self] in
-			guard let me = self else {
+			guard let self = self else {
 				return
 			}
-			me.sentDates.append(Date())
-			me.sentDates.removeFirst()
-			me.lastSent = sequenceNumber
-			if me.diff(sequenceNumber, me.lastReport ?? 0) > 120 {
-				me.notify(time: nil, error: NSError(domain: "PingErrorDomain", code: -1, userInfo: nil))
+			self.sentDates.append(Date())
+			self.sentDates.removeFirst()
+			self.lastSent = sequenceNumber
+			if self.diff(sequenceNumber, self.lastReport ?? 0) > 120 {
+				self.notify(time: nil, error: NSError(domain: "PingErrorDomain", code: -1, userInfo: nil))
 			}
 		}
 	}
@@ -225,10 +225,10 @@ class Pinger: NSObject, SimplePingDelegate {
 
 	func simplePing(_ pinger: SimplePing, didReceivePingResponsePacket packet: Data, sequenceNumber: UInt16) {
 		queue.async { [weak self] in
-			if let me = self, let index = me.index(of: sequenceNumber) {
-				me.updateReport(seq: sequenceNumber)
-				if let sent = me.sentDates[index] {
-					me.notify(time: -sent.timeIntervalSinceNow, error: nil)
+			if let self = self, let index = self.index(of: sequenceNumber) {
+				self.updateReport(seq: sequenceNumber)
+				if let sent = self.sentDates[index] {
+					self.notify(time: -sent.timeIntervalSinceNow, error: nil)
 				}
 			}
 		}
@@ -236,9 +236,9 @@ class Pinger: NSObject, SimplePingDelegate {
 
 	func simplePing(_ pinger: SimplePing, didFailToSendPacket packet: Data?, sequenceNumber: UInt16, error: Error) {
 		queue.async { [weak self] in
-			if let me = self {
-				me.updateReport(seq: sequenceNumber)
-				me.notify(time: nil, error: error)
+			if let self = self {
+				self.updateReport(seq: sequenceNumber)
+				self.notify(time: nil, error: error)
 			}
 		}
 	}

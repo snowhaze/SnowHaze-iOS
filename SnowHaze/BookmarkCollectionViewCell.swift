@@ -2,11 +2,12 @@
 //  BookmarkCollectionViewCell.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 protocol BookmarkCollectionViewCellDelegate: class {
 	func bookmarkCell(_ cell: BookmarkCollectionViewCell, didRequestDeleteBookmark bookmark: Bookmark)
@@ -94,7 +95,6 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
 			titleLabel.textColor = .title
 			titleLabel.numberOfLines = 2
 			titleLabel.textAlignment = .center
-			UIFont.setSnowHazeFont(on: titleLabel)
 			contentView.addSubview(titleLabel)
 		}
 		if deleteButton == nil {
@@ -104,7 +104,6 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
 			deleteButton.frame = CGRect(x: 0, y: 0, width: 100, height: 33)
 			deleteButton.addTarget(self, action: #selector(deleteBookmark(_:)), for: .touchUpInside)
 			deleteButton.isHidden = true
-			UIFont.setSnowHazeFont(on: deleteButton)
 			contentView.addSubview(deleteButton)
 		}
 		if refreshButton == nil {
@@ -114,7 +113,6 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
 			refreshButton.frame = CGRect(x: 0, y: 33, width: 100, height: 33)
 			refreshButton.addTarget(self, action: #selector(refreshBookmark(_:)), for: .touchUpInside)
 			refreshButton.isHidden = true
-			UIFont.setSnowHazeFont(on: refreshButton)
 			contentView.addSubview(refreshButton)
 		}
 		if renameButton == nil {
@@ -125,7 +123,6 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
 			renameButton.addTarget(self, action: #selector(renameBookmark(_:)), for: .touchUpInside)
 			renameButton.isHidden = true
 			renameButton.titleLabel?.adjustsFontSizeToFitWidth = true
-			UIFont.setSnowHazeFont(on: renameButton)
 			contentView.addSubview(renameButton)
 		}
 		if pressRecognizer == nil {

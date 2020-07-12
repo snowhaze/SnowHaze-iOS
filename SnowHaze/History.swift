@@ -2,7 +2,7 @@
 //  HistoryStore.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -180,7 +180,7 @@ class HistoryStore {
 			while itemIndex > 0 {
 				itemIndex -= 1
 				let item = dayItems[dayIndex][itemIndex]
-				if item.url.host?.lowercased() == host && item.timestamp >= oldest {
+				if item.url.normalizedHost == host && item.timestamp >= oldest {
 					if keep {
 						removeItem(at: IndexPath(item: itemIndex, section: dayIndex))
 					}
@@ -229,7 +229,7 @@ class HistoryStore {
 
 		let fts = components.joined(separator: " OR ")
 		let query = "SELECT \(tableName).id, \(tableName).url, \(tableName).title, \(tableName).timestamp FROM \(tableName), \(HistoryStore.ftsName) WHERE \(tableName).id = \(HistoryStore.ftsName).rowid AND \(HistoryStore.ftsName) MATCH :query ORDER BY rank * (3600 + strftime('%s','now') - timestamp)"
-		
+
 		let rows = (try? database.execute(query, with: [":query": .text(fts)])) ?? []
 		let items = try? rows.map() { (row) -> HistoryItem in
 			guard let item = HistoryItem(row: row) else {

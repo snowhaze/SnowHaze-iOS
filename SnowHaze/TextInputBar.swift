@@ -2,11 +2,12 @@
 //  TextInputBar.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 protocol TextInputBarDelegate: class {
 	func textInputBar(_ bar: TextInputBar, willUpdateText newText: String)
@@ -27,7 +28,6 @@ class TextInputBar: UIView, UITextFieldDelegate {
 		textField.backgroundColor = UIColor.white.withAlphaComponent(0.1)
 		textField.textAlignment = .center
 		textField.delegate = self
-		UIFont.setSnowHazeFont(on: textField)
 		doneButton.frame = CGRect(x: frame.maxX - 80, y: frame.minY, width: 80, height: frame.height)
 		textField.frame = CGRect(x: 80, y: frame.minY + 8, width: frame.width - 160, height: frame.height - 16)
 		doneButton.autoresizingMask = .flexibleLeftMargin
@@ -48,6 +48,14 @@ class TextInputBar: UIView, UITextFieldDelegate {
 	}
 
 	@objc private func doneButtonPressed(_ sender: UIButton) {
+		finish()
+	}
+
+	func cancel() {
+		finish()
+	}
+
+	func finish() {
 		delegate?.textInputBarDidDismiss(self)
 	}
 
@@ -65,15 +73,8 @@ class TextInputBar: UIView, UITextFieldDelegate {
 
 	override func layoutSubviews() {
 		super.layoutSubviews()
-		let usableWidth: CGFloat
-		let doneX: CGFloat
-		if #available(iOS 11, *) {
-			usableWidth = bounds.width - 2 * max(safeAreaInsets.left, safeAreaInsets.right)
-			doneX = bounds.maxX - 80 - safeAreaInsets.right
-		} else {
-			usableWidth = bounds.width
-			doneX = bounds.maxX - 80
-		}
+		let usableWidth = bounds.width - 2 * max(safeAreaInsets.left, safeAreaInsets.right)
+		let doneX = bounds.maxX - 80 - safeAreaInsets.right
 		let width = min(usableWidth / 2, usableWidth - 160)
 		textField.frame.size.width = width
 		textField.frame.origin.x = bounds.midX - width / 2

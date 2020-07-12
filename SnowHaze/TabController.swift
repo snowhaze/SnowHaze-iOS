@@ -2,11 +2,12 @@
 //  TabController.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import WebKit
 
 private let alertCountLimit = 3
 private let alertCountMonitoringLimit = 100
@@ -21,6 +22,7 @@ enum TabUIEventType {
 	case jsPrompt(question: String, defaultText: String?, frameInfo: WKFrameInfo, completionHandler: (String?) -> Void)
 	case alert(alert: UIAlertController, domain: String?, fallbackHandler: () -> Void)
 	case tabCreation(request: URLRequest)
+	case download(url: URL, file: String?, cookies: [HTTPCookie])
 }
 
 protocol TabControllerUIDelegate: class {
@@ -31,6 +33,8 @@ protocol TabControllerUIDelegate: class {
 	func tabController(_ controller: TabController, displayAlert alert: UIAlertController, forDomain domain: String?, fallbackHandler: @escaping () -> Void) -> Bool
 
 	func tabController(_ controller: TabController, createTabForRequest request: URLRequest)
+
+	func tabController(_ controller: TabController, download: URL, file: String?, cookies: [HTTPCookie], download: @escaping () -> Void) -> Bool
 }
 
 protocol TabControllerNavigationDelegate: class {
@@ -53,19 +57,13 @@ private extension WKWebView {
 	}
 
 	func getSnapshot(callback: @escaping (UIImage?) -> Void) {
-		if #available(iOS 11, *) {
-			let config = WKSnapshotConfiguration()
-			config.rect = snapshotBounds
-			takeSnapshot(with: config) { image, error in
-				if let error = error {
-					print(error)
-				}
-				callback(image)
+		let config = WKSnapshotConfiguration()
+		config.rect = snapshotBounds
+		takeSnapshot(with: config) { image, error in
+			if let error = error {
+				print(error)
 			}
-		} else {
-			DispatchQueue.main.async { [weak self] in
-				callback(self?.snapshot)
-			}
+			callback(image)
 		}
 	}
 
@@ -98,6 +96,7 @@ class TabController: NSObject, WebViewManager {
 
 	private var internalUserAgent: String?
 	private var internalDataStore: (WKWebsiteDataStore, WKProcessPool)?
+	private var internalSafebrowsingStorage: SafebrowsingStorage?
 
 	var userAgent: String {
 		if let userAgent = internalUserAgent {
@@ -105,6 +104,14 @@ class TabController: NSObject, WebViewManager {
 		}
 		internalUserAgent = PolicyManager.manager(for: tab).userAgent
 		return internalUserAgent!
+	}
+
+	var safebrowsingStorage: SafebrowsingStorage {
+		if let safebrowsingStorage = internalSafebrowsingStorage {
+			return safebrowsingStorage
+		}
+		internalSafebrowsingStorage = PolicyManager.manager(for: tab).safebrowsingStorage
+		return internalSafebrowsingStorage!
 	}
 
 	var dataStore: (WKWebsiteDataStore, WKProcessPool) {
@@ -130,6 +137,13 @@ class TabController: NSObject, WebViewManager {
 		internalDataStore = dataStore
 	}
 
+	func set(safebrowsingStorage: SafebrowsingStorage) throws {
+		guard internalSafebrowsingStorage == nil && !webViewLoaded else {
+			throw TabControllerError.valueAlreadySet
+		}
+		internalSafebrowsingStorage = safebrowsingStorage
+	}
+
 	private(set) var webViewLoaded = false
 
 	private var observer: NSObjectProtocol?
@@ -137,10 +151,10 @@ class TabController: NSObject, WebViewManager {
 	weak var UIDelegate: TabControllerUIDelegate? {
 		didSet {
 			DispatchQueue.main.async { [weak self] in
-				if let me = self, let _ = me.UIDelegate {
-					let localEvents = me.queuedUIEvents
-					me.queuedUIEvents.removeAll()
-					localEvents.forEach { me.post(event: $0) }
+				if let self = self, let _ = self.UIDelegate {
+					let localEvents = self.queuedUIEvents
+					self.queuedUIEvents.removeAll()
+					localEvents.forEach { self.post(event: $0) }
 				}
 			}
 		}
@@ -172,57 +186,43 @@ class TabController: NSObject, WebViewManager {
 		return webViewLoaded ? webView : nil
 	}
 
+	let securityCookie: String = String.secureRandom()
+
 	private(set) lazy var webView: WKWebView = {
 		let policy = PolicyManager.manager(for: self.tab)
-		let config = policy.webViewConfiguration
+		let config = policy.webViewConfiguration(for: self)
 		(config.websiteDataStore, config.processPool) = self.dataStore
-		let ret = WKWebView(frame: CGRect.zero, configuration: config)
+		let ret = WKWebView(frame: .zero, configuration: config)
 		ret.backgroundColor = .background
 		ret.scrollView.backgroundColor = .background
 		ret.customUserAgent = self.userAgent
 		ret.navigationDelegate = self
 		ret.uiDelegate = self
-
-		if #available(iOS 10, *) {
-			ret.allowsLinkPreview = true
-		} else {
-			ret.allowsLinkPreview = false
-		}
+		ret.allowsLinkPreview = true
 
 		DispatchQueue.main.async {
-			self.observations.insert(ret.observe(\.url, options: .initial, changeHandler: { [weak self] webView, _ in
-				if let me = self {
-					me.navigationDelegate?.tabController(me, isLoading: webView.url)
-				}
-				if let url = webView.url {
-					self?.pushTabHistory(url)
-				}
-			}))
-
 			self.observations.insert(ret.observe(\.title, options: .initial, changeHandler: { [weak self] webView, _ in
 				if !webView.isLoading || !(webView.title?.isEmpty ?? true) {
 					self?.tab.title = webView.title
 				}
-				if let me = self {
-					me.navigationDelegate?.tabController(me, didLoadTitle: webView.title)
+				if let self = self {
+					self.navigationDelegate?.tabController(self, didLoadTitle: webView.title)
 				}
 			}))
 
-			if #available(iOS 10, *) {
-				self.observations.insert(ret.observe(\.serverTrust, options: .initial, changeHandler: { [weak self] webView, _ in
-					if let me = self {
-						me.navigationDelegate?.tabController(me, serverTrustDidChange: webView.serverTrust)
-					}
-				}))
-			}
+			self.observations.insert(ret.observe(\.serverTrust, options: .initial, changeHandler: { [weak self] webView, _ in
+				if let self = self {
+					self.navigationDelegate?.tabController(self, serverTrustDidChange: webView.serverTrust)
+				}
+			}))
 
 			self.observations.insert(ret.observe(\.isLoading, options: .initial, changeHandler: { [weak self] webView, _ in
 				if !webView.isLoading {
 					self?.tab.title = webView.title
 				}
-				if let me = self {
-					me.navigationDelegate?.tabController(me, didLoadTitle: webView.title)
-					me.navigationDelegate?.tabController(me, estimatedProgress: me.progress)
+				if let self = self {
+					self.navigationDelegate?.tabController(self, didLoadTitle: webView.title)
+					self.navigationDelegate?.tabController(self, estimatedProgress: self.progress)
 				}
 				if webView.isLoading {
 					self?.dec = InUseCounter.network.inc()
@@ -233,39 +233,53 @@ class TabController: NSObject, WebViewManager {
 			}))
 
 			self.observations.insert(ret.observe(\.canGoBack, options: .initial, changeHandler: { [weak self] webView, _ in
-				if let me = self {
-					me.navigationDelegate?.tabControllerCanGoForwardBackwardUpdate(me)
+				if let self = self {
+					self.navigationDelegate?.tabControllerCanGoForwardBackwardUpdate(self)
 				}
 			}))
 
 			self.observations.insert(ret.observe(\.canGoForward, options: .initial, changeHandler: { [weak self] webView, _ in
-				if let me = self {
-					me.navigationDelegate?.tabControllerCanGoForwardBackwardUpdate(me)
+				if let self = self {
+					self.navigationDelegate?.tabControllerCanGoForwardBackwardUpdate(self)
 				}
 			}))
 
 			self.observations.insert(ret.observe(\.estimatedProgress, options: .initial, changeHandler: { [weak self] webView, _ in
-				if let me = self {
-					me.navigationDelegate?.tabController(me, estimatedProgress: me.progress)
+				if let self = self {
+					self.navigationDelegate?.tabController(self, estimatedProgress: self.progress)
 				}
 			}))
 
 			self.observations.insert(ret.observe(\.hasOnlySecureContent, options: .initial, changeHandler: { [weak self] webView, _ in
-				if let me = self {
-					me.navigationDelegate?.tabController(me, didLoadTitle: webView.title)
+				if let self = self {
+					self.navigationDelegate?.tabController(self, didLoadTitle: webView.title)
 				}
 			}))
 		}
 
-		self.observations.insert(ret.observe(\.url, options: .initial, changeHandler: { [weak self] webView, _ in
+		self.observations.insert(ret.observe(\.url, options: [.initial, .new, .old], changeHandler: { [weak self] webView, change in
+			guard change.oldValue != change.newValue else {
+				return
+			}
+			guard !(self?.tab.deleted ?? false) else {
+				self?.stopLoading()
+				return
+			}
+			assert(change.newValue == webView.url)
 			self?.updatePolicy(for: webView.url, webView: webView)
+			if let self = self {
+				self.navigationDelegate?.tabController(self, isLoading: webView.url)
+			}
+			if let url = webView.url {
+				self?.pushTabHistory(url)
+			}
 		}))
 
 		if !self.tab.history.isEmpty {
 			let url = self.tab.history.last! as URL
 			let request = URLRequest(url: url)
 			self.updatePolicy(for: url, webView: ret)
-			ret.load(request)
+			rawLoad(request, in: ret)
 		}
 		self.webViewLoaded = true
 		return ret
@@ -309,6 +323,12 @@ class TabController: NSObject, WebViewManager {
 			case .tabCreation(request: let request):
 				UIDelegate.tabController(self, createTabForRequest: request)
 				success = true
+			case .download(url: let url, file: let file, cookies: let cookies):
+				success = UIDelegate.tabController(self, download: url, file: file, cookies: cookies) { [weak tab] in
+					if let tab = tab {
+						FileDownload.start(for: url, cookies: cookies, tab: tab)
+					}
+				}
 		}
 		if success {
 			queuedUIEvents.removeFirst()
@@ -332,6 +352,7 @@ class TabController: NSObject, WebViewManager {
 				case .jsPrompt(_, _, _, let handler):				handler(nil)
 				case .alert(_, _, let handler):						handler()
 				case .tabCreation(_):								break
+				case .download(_, _, _):							break
 			}
 		}
 	}
@@ -371,7 +392,15 @@ extension TabController {
 	}
 
 	var url: URL? {
-		return webViewIfLoaded?.url
+		return webViewIfLoaded?.url?.detorified
+	}
+
+	var backList: [WKBackForwardListItem]? {
+		return webViewIfLoaded?.backForwardList.backList
+	}
+
+	var forwardList: [WKBackForwardListItem]? {
+		return webViewIfLoaded?.backForwardList.forwardList
 	}
 
 	var hasOnlySecureContent: Bool? {
@@ -386,33 +415,40 @@ extension TabController {
 		return webViewIfLoaded?.configuration.websiteDataStore
 	}
 
-	var evOrganization: String? {
-		if #available(iOS 10, *) {
-			guard let trust = webViewIfLoaded?.serverTrust else {
-				return nil
-			}
-			guard let result = SecTrustCopyResult(trust) as NSDictionary? else {
-				return nil
-			}
-			if result[kSecTrustExtendedValidation] as? Bool == true {
-				return result[kSecTrustOrganizationName] as? String
-			}
-			return nil
-		} else {
+	var certCount: Int? {
+		guard let trust = webViewIfLoaded?.serverTrust else {
 			return nil
 		}
+		return SecTrustGetCertificateCount(trust)
+	}
+
+	var serverTrust: ServerTrust? {
+		guard let trust =  webViewIfLoaded?.serverTrust else {
+			return nil
+		}
+		return ServerTrust(trust: trust)
+	}
+
+	var torProxyCredentials: (String, String)? {
+		guard let handler = webViewIfLoaded?.configuration.urlSchemeHandler(forURLScheme: "tor") else {
+			return nil
+		}
+		guard let torHandler = handler as? TorSchemeHandler else {
+			return nil
+		}
+		return (torHandler.user, torHandler.password)
 	}
 }
 
 // MARK: peek & pop
-@available(iOS 10, *)
 extension TabController {
 	func webView(_ webView: WKWebView, shouldPreviewElement elementInfo: WKPreviewElementInfo) -> Bool {
 		return elementInfo.linkURL != nil
 	}
 
 	func webView(_ webView: WKWebView, previewingViewControllerForElement elementInfo: WKPreviewElementInfo, defaultActions previewActions: [WKPreviewActionItem]) -> UIViewController? {
-		let pageVC = PagePreviewController(url: elementInfo.linkURL!, tab: tab)
+		let openingPolicy = PolicyManager.manager(for: elementInfo.linkURL, in: tab)
+		let pageVC = PagePreviewController(url: elementInfo.linkURL!, tab: tab, delay: openingPolicy.previewDelay)
 		let openAction = previewActions.first { $0.identifier == WKPreviewActionItemIdentifierOpen }
 		let copyAction = previewActions.first { $0.identifier == WKPreviewActionItemIdentifierCopy }
 		let shareAction = previewActions.first { $0.identifier == WKPreviewActionItemIdentifierShare }
@@ -442,9 +478,7 @@ extension TabController {
 
 	func webView(_ webView: WKWebView, commitPreviewingViewController previewingViewController: UIViewController) {
 		if let pageVC = previewingViewController as? PagePreviewController {
-			if let url = pageVC.manager.webView.url {
-				load(request: URLRequest(url: url))
-			}
+			load(pageVC.commitLoad)
 		}
 	}
 }
@@ -458,19 +492,25 @@ extension TabController: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
 		if navigationResponse.isForMainFrame && !navigationResponse.canShowMIMEType {
 			decisionHandler(.cancel)
-			let errorpagegen = BrowserPageGenerator(type: .pageError)
-			let title = NSLocalizedString("unknown file type errorpage title", comment: "title of the unknown file type errorpage")
-			errorpagegen.title = title
-			errorpagegen.message = NSLocalizedString("unknown file type errorpage message", comment: "errormessage of the unknown file type errorpage")
 			if let url = navigationResponse.response.url {
-				pushTabHistory(url)
-				pushHistory(withTitle: title, url: url)
-				errorpagegen.url = url
+				webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { [weak self] cookies in
+					self?.post(event: .download(url: url, file: navigationResponse.response.suggestedFilename, cookies: cookies))
+				}
+			} else {
+				let errorpagegen = BrowserPageGenerator(type: .pageError)
+				let title = NSLocalizedString("unknown file type errorpage title", comment: "title of the unknown file type errorpage")
+				errorpagegen.title = title
+				errorpagegen.message = NSLocalizedString("unknown file type errorpage message", comment: "errormessage of the unknown file type errorpage")
+				if let url = navigationResponse.response.url {
+					pushTabHistory(url)
+					pushHistory(withTitle: title, url: url)
+					errorpagegen.url = url.detorified
+				}
+				errorpagegen.file = navigationResponse.response.suggestedFilename
+				errorpagegen.mimeType = navigationResponse.response.mimeType
+				let html = errorpagegen.getHTML()
+				webView.loadHTMLString(html, baseURL: nil)
 			}
-			errorpagegen.file = navigationResponse.response.suggestedFilename
-			errorpagegen.mimeType = navigationResponse.response.mimeType
-			let html = errorpagegen.getHTML()
-			webView.loadHTMLString(html, baseURL: nil)
 			return
 		}
 		decisionHandler(.allow)
@@ -495,7 +535,7 @@ extension TabController: WKNavigationDelegate {
 		errorpagegen.errorReason = error.localizedFailureReason
 		errorpagegen.description = error.localizedDescription
 		errorpagegen.title = NSLocalizedString("network error errorpage title", comment: "title of the network error errorpage")
-		errorpagegen.url = url
+		errorpagegen.url = url?.detorified
 		errorpagegen.message = NSLocalizedString("network error errormessage format", comment: "errormessage format of the network error errorpage")
 		let html = errorpagegen.getHTML()
 		webView.loadHTMLString(html, baseURL: nil)
@@ -519,13 +559,16 @@ extension TabController: WKNavigationDelegate {
 		errorpagegen.errorReason = error.localizedFailureReason
 		errorpagegen.description = error.localizedDescription
 		errorpagegen.title = NSLocalizedString("website error errorpage title", comment: "title of the website error errorpage")
-		errorpagegen.url = url
+		errorpagegen.url = url?.detorified
 		errorpagegen.message = NSLocalizedString("website error errormessage format", comment: "errormessage format of the website error errorpage")
 		let html = errorpagegen.getHTML()
 		webView.loadHTMLString(html, baseURL: nil)
 	}
 
 	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+		guard !tab.deleted else {
+			return
+		}
 		if let title = webView.title, let url = webView.url {
 			pushHistory(withTitle: title, url: url)
 		}
@@ -537,23 +580,23 @@ extension TabController: WKNavigationDelegate {
 	}
 
 	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+		guard !tab.deleted else {
+			decisionHandler(.cancel)
+			return
+		}
 		// When decisionHandler(.cancel) is called asynchronously for redirects, the page is loaded anyway.
 		// If possible cancel those request immediately and then load them again in order to prevent this from happening.
-		// Since navigationAction.sourceFrame is mostly uninitiallized in many cases where this function is called,
-		// navigationAction.sourceFrame.webView seems to be the only safe way of detecting if the request is a redirect.
-		if #available(iOS 11, *) {
-			if case .other = navigationAction.navigationType, let _ = navigationAction.sourceFrame.webView, navigationAction.targetFrame?.isMainFrame ?? false {
-				if navigationAction.request.url?.scheme?.lowercased() == "about" {
-					decisionHandler(.cancel)
-					return
-				}
-				// WKWebView has a quirk where it can unexpectedly undo redirects with huge timeout intervals. Try not to force it to do otherwise.
-				if navigationAction.request.isHTTPGet && navigationAction.request != reloadedRequest && navigationAction.request.timeoutInterval <= 120 {
-					reloadedRequest = navigationAction.request
-					decisionHandler(.cancel)
-					load(request: navigationAction.request)
-					return
-				}
+		if case .other = navigationAction.navigationType, let _ = navigationAction.realSourceFrame, navigationAction.targetFrame?.isMainFrame ?? false {
+			if navigationAction.request.url?.normalizedScheme == "about" {
+				decisionHandler(.cancel)
+				return
+			}
+			// WKWebView has a quirk where it can unexpectedly undo redirects with huge timeout intervals. Try not to force it to do otherwise.
+			if navigationAction.request.isHTTPGet && navigationAction.request != reloadedRequest && navigationAction.request.timeoutInterval <= 120 {
+				reloadedRequest = navigationAction.request
+				decisionHandler(.cancel)
+				load(request: navigationAction.request)
+				return
 			}
 		}
 		// 'activated' links can cause universal links to be opened in other apps. To prevent this massive privacy violation, we cancel them and load the request directly.
@@ -568,25 +611,27 @@ extension TabController: WKNavigationDelegate {
 			return
 		}
 		reloadedRequest = nil
-		
-		let actionURL = navigationAction.request.url
-		let requestingDomain = navigationAction.sourceFrame.securityOrigin.host
-		
+
+		let actionURL = navigationAction.request.url?.detorified ?? navigationAction.request.url
+		let requestingDomain = navigationAction.realSourceFrame?.securityOrigin.host
+
+		let policy = PolicyManager.manager(for: actionURL, in: tab)
+		if navigationAction.request.isHTTPGet && navigationAction.targetFrame?.isMainFrame ?? true, let url = policy.torifyIfNecessary(for: tab, url: navigationAction.request.url) {
+			decisionHandler(.cancel)
+			load(url: url)
+			return
+		}
+
 		let finalDecision: (Bool) -> Void = { decision in
 			if !decision {
 				decisionHandler(.cancel)
-			} else if #available(iOS 11, *) {
+			} else {
 				ContentBlockerManager.shared.load {
 					if navigationAction.targetFrame?.isMainFrame ?? false {
 						self.updatePolicy(for: actionURL)
 					}
 					decisionHandler(.allow)
 				}
-			} else {
-				if navigationAction.targetFrame?.isMainFrame ?? false {
-					self.updatePolicy(for: actionURL)
-				}
-				decisionHandler(.allow)
 			}
 		}
 
@@ -603,21 +648,23 @@ extension TabController: WKNavigationDelegate {
 		}
 
 		let formHandler: () -> Void = { [weak self] in
+			guard let self = self, !self.tab.deleted else {
+				finalDecision(false)
+				return
+			}
 			if navigationAction.navigationType != .formResubmitted {
 				finalDecision(true)
-			} else if let me = self {
-				me.promptResubmitOK(url: actionURL, decisionHandler: finalDecision)
 			} else {
-				finalDecision(false)
+				self.promptResubmitOK(url: actionURL, decisionHandler: finalDecision)
 			}
 		}
 
 		let externalHandler: (Bool) -> Void = { [weak self] cont in
-			guard cont else {
+			guard let self = self, cont, !self.tab.deleted else {
 				finalDecision(false)
 				return
 			}
-			if let postCancel = self?.afterCancel(for: actionURL, for: requestingDomain) {
+			if let postCancel = self.afterCancel(for: actionURL, for: requestingDomain) {
 				finalDecision(false)
 				postCancel()
 				return
@@ -626,38 +673,61 @@ extension TabController: WKNavigationDelegate {
 		}
 
 		let paramHandler: (Bool) -> Void = { [weak self] cont in
-			if cont, let me = self {
-				me.promptForParamStripAndRedirect(for: navigationAction) { cont, url in
-					externalHandler(cont)
-					guard let url = url, let me = self else {
-						return
-					}
-					assert(!cont)
-					me.load(request: navigationAction.request.with(url: url))
-				}
-			} else {
+			guard let self = self, cont, !self.tab.deleted else {
 				finalDecision(false)
+				return
+			}
+			self.promptForParamStripAndRedirect(for: navigationAction) { [weak self] cont, url in
+				externalHandler(cont)
+				guard let url = url, let self = self else {
+					return
+				}
+				assert(!cont)
+				self.load(request: navigationAction.request.with(url: url))
 			}
 		}
 
 		let xssHandler: (Bool) -> Void = { [weak self] cont in
-			guard let me = self, cont else {
+			guard let self = self, cont, !self.tab.deleted else {
 				finalDecision(false)
 				return
 			}
-			let policy = PolicyManager.manager(for: webView.url, in: me.tab)
+			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
 			if policy.preventXSS, actionURL?.potentialXSS ?? false {
-				me.xssPrompt(host: actionURL?.host, completion: paramHandler)
+				self.xssPrompt(host: actionURL?.host, completion: paramHandler)
 			} else {
 				paramHandler(true)
 			}
 		}
 
-		let policy = PolicyManager.manager(for: webView.url, in: tab)
-		if policy.shouldBlockLoad(of: actionURL) {
-			finalDecision(false)
-		} else if !promptForDangers(on: actionURL, conformingTo: policy, decisionHandler: xssHandler) {
-			xssHandler(true)
+		let frameHandler: (Bool) -> Void = { [weak self] cont in
+			guard let self = self, cont, !self.tab.deleted else {
+				finalDecision(false)
+				return
+			}
+			guard let target = navigationAction.targetFrame, let source = navigationAction.realSourceFrame else {
+				xssHandler(true)
+				return
+			}
+			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
+			if policy.warnCrossFrameNavigation, source != target, navigationAction.navigationType != .other {
+				self.crossFrameNavigationPrompt(src: source, target: target, url: webView.url, action: navigationAction.request, completion: xssHandler)
+			} else {
+				xssHandler(true)
+			}
+		}
+
+		policy.awaitTorIfNecessary(for: tab) { [weak self] _ in
+			guard let self = self, !self.tab.deleted else {
+				finalDecision(false)
+				return
+			}
+			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
+			if policy.shouldBlockLoad(of: actionURL) {
+				finalDecision(false)
+			} else {
+				self.promptForDangers(on: actionURL, conformingTo: policy, decisionHandler: frameHandler)
+			}
 		}
 	}
 
@@ -735,16 +805,22 @@ private extension TabController {
 	}
 
 	func pushTabHistory(_ url: URL) {
-		if url != tab.history.last && WebViewURLSchemes.contains(url.scheme?.lowercased() ?? ":arbitrary-non-webview-scheme:") {
+		guard let url = url.detorified else {
+			return
+		}
+		if url != tab.history.last && WebViewURLSchemes.contains(url.normalizedScheme ?? ":arbitrary-non-webview-scheme:") {
 			tab.history.append(url)
 		}
 	}
 
 	func pushHistory(withTitle title: String, url: URL) {
+		guard let url = url.detorified else {
+			return
+		}
 		let time: Int64 = 60 * 30
 		let hasRecent = historyStore.hasRecent(with: url, seconds: time)
 		let saveHistory = PolicyManager.manager(for: url, in: tab).shouldAddToHistory
-		if !hasRecent && saveHistory && WebViewURLSchemes.contains(url.scheme!.lowercased()) {
+		if !hasRecent && saveHistory && WebViewURLSchemes.contains(url.normalizedScheme!) {
 			historyStore.addItem(title: title, atURL: url)
 		}
 	}
@@ -778,6 +854,8 @@ private extension TabController {
 				data = (domain, fallbackHandler)
 			case .tabCreation(request: _):
 				return nil
+			case .download(url: _, file: _, cookies: _):
+				return nil
 		}
 		if let domain = data.domain, blockedAlertDomains.contains(domain) {
 			return data.handler
@@ -788,7 +866,7 @@ private extension TabController {
 
 	func createTab(for navigationAction: WKNavigationAction, originatingWebView webView: WKWebView) {
 		let policy = PolicyManager.manager(for: webView.url, in: tab)
-		let isBlank = PolicyManager.isAboutBlank(navigationAction.request.url)
+		let isBlank = PolicyDomain.isAboutBlank(navigationAction.request.url)
 		if policy.allowsPopover(for: navigationAction.navigationType) && !isBlank {
 			post(event: .tabCreation(request: navigationAction.request))
 		}
@@ -797,43 +875,31 @@ private extension TabController {
 
 // MARK: scheme handling
 private extension TabController {
-	func afterCancel(for url: URL?, for domain: String) -> (() -> Void)? {
-		class Callguard {
-			var called = false
-			init() {
-				DispatchQueue.main.async {
-					self.check()
-				}
-			}
-			func check() {
-				if !called {
-					fatalError("after cancel calling was deffered for too long")
-				}
-			}
-		}
+	func afterCancel(for url: URL?, for domain: String?) -> (() -> Void)? {
 		let scheme = SchemeType(url)
 		switch scheme {
 			case .unknown:
 				return nil
 			case .http:
 				return nil
-			case .call(let recipient):
-				if let recipient = recipient {
-					promptFor(call: url!, to: recipient, by: domain)
+			case .call(let recipient, let facetime) where recipient != nil:
+				assert(scheme.needsCheck)
+				if UIApplication.shared.canOpenURL(url!) {
+					promptFor(call: url!, to: recipient!, facetime: facetime, by: domain)
 				}
 				return { }
 			case .intent(let fallback):
 				if let fallback = fallback {
-					let callguard = Callguard()
+					let callguard = SyncBlockCallGuard()
 					return {
-						callguard.called = true
-						self.load([.load(fallback, false)])
+						callguard.called()
+						self.load([.load(fallback, upgraded: false)])
 					}
 				}
 				return { }
 			default:
-				let uiApp = UIApplication.shared
-				if let app = scheme.appName, !scheme.needsCheck || uiApp.canOpenURL(url!) {
+				let canOpen = !scheme.needsCheck || UIApplication.shared.canOpenURL(url!)
+				if let app = scheme.appName, canOpen {
 					promptFor(app: app, toOpen: url!, by: domain)
 				}
 				return { }
@@ -843,20 +909,18 @@ private extension TabController {
 
 // MARK: prompts
 private extension TabController {
-	func promptFor(call: URL, to recipient: String, by domain: String) {
-		let title = NSLocalizedString("confirm call dialog title", comment: "title of dialog used to confirm the user wants to initiate a call")
-		let format = NSLocalizedString("confirm call dialog message format", comment: "format for message of dialog used to confirm the user wants to initiate a call")
+	func promptFor(call: URL, to recipient: String, facetime: Bool, by domain: String?) {
+		let titlePhone = NSLocalizedString("confirm phone call dialog title", comment: "title of dialog used to confirm the user wants to initiate a phone call")
+		let formatPhone = NSLocalizedString("confirm phone call dialog message format", comment: "format for message of dialog used to confirm the user wants to initiate a phone call")
+		let titleFacetime = NSLocalizedString("confirm facetime call dialog title", comment: "title of dialog used to confirm the user wants to initiate a facetime call")
+		let formatFacetime = NSLocalizedString("confirm facetime call dialog message format", comment: "format for message of dialog used to confirm the user wants to initiate a facetime call")
 		let confirmTitle = NSLocalizedString("confirm call dialog confirm button title", comment: "title of confirm button of dialog used to confirm the user wants to initiate a call")
 		let cancelTitle = NSLocalizedString("cancel call dialog confirm button title", comment: "title of cancel button of dialog used to confirm the user wants to initiate a call")
+		let title = facetime ? titleFacetime : titlePhone
+		let format = facetime ? formatFacetime : formatPhone
 		let message = String(format: format, recipient)
 		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in
-			if #available(iOS 10, *) {
-				UIApplication.shared.open(call)
-			} else {
-				UIApplication.shared.openURL(call)
-			}
-		}
+		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in UIApplication.shared.open(call) }
 		alert.addAction(confirm)
 
 		let decline = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
@@ -865,20 +929,14 @@ private extension TabController {
 		post(event: .alert(alert: alert, domain: domain, fallbackHandler: { }))
 	}
 
-	func promptFor(app: String, toOpen url: URL, by domain: String) {
+	func promptFor(app: String, toOpen url: URL, by domain: String?) {
 		let promptFormat = NSLocalizedString("open url in app prompt format", comment: "format string used to ask users if they want to open another app")
 		let prompt = String(format: promptFormat, app)
 		let title = NSLocalizedString("open url in app prompt title", comment: "title of prompt to ask users if they want to open another app")
 		let confirmTitle = NSLocalizedString("open url in app prompt confirm button title", comment: "title of confirm button of prompt to ask users if they want to open another app")
 		let cancelTitle = NSLocalizedString("open url in app prompt cancel button title", comment: "title of cancel button of prompt to ask users if they want to open another app")
 		let alert = UIAlertController(title: title, message: prompt, preferredStyle: .alert)
-		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in
-			if #available(iOS 10, *) {
-				UIApplication.shared.open(url)
-			} else {
-				UIApplication.shared.openURL(url)
-			}
-		}
+		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in UIApplication.shared.open(url) }
 		alert.addAction(confirm)
 
 		let decline = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
@@ -927,8 +985,46 @@ private extension TabController {
 		post(event: .alert(alert: alert, domain: nil, fallbackHandler: { completion(false) }))
 	}
 
+	func crossFrameNavigationPrompt(src: WKFrameInfo, target: WKFrameInfo, url: URL?, action: URLRequest, completion: @escaping (Bool) -> Void) {
+		func fmt(_ frame: WKFrameInfo, source: Bool) -> String {
+			let fmt: String
+			switch (frame.isMainFrame, source) {
+				case (true, true):		fmt = NSLocalizedString("cross frame navigation warning main frame source format", comment: "format of descripiton of a main frame in the cross frame navigation warning alert when it is the source of the navigation")
+				case (true, false):		fmt = NSLocalizedString("cross frame navigation warning main frame target format", comment: "format of descripiton of a main frame in the cross frame navigation warning alert when it is the target of the navigation")
+				case (false, true):		fmt = NSLocalizedString("cross frame navigation warning frame source format", comment: "format of descripiton of a non-main frame in the cross frame navigation warning alert when it is the source of the navigation")
+				case (false, false):	fmt = NSLocalizedString("cross frame navigation warning frame target format", comment: "format of descripiton of a non-main frame in the cross frame navigation warning alert when it is the target of the navigation")
+			}
+			let origin: String
+			let secOrigin = frame.securityOrigin
+			if secOrigin.port == 0 {
+				origin = "\(secOrigin.protocol)://\(secOrigin.host)"
+			} else {
+				origin = "\(secOrigin.protocol)://\(secOrigin.host):\(secOrigin.port)"
+			}
+			return String(format: fmt, origin)
+		}
+		let title = NSLocalizedString("cross frame navigation warning title", comment: "title of the cross frame navigation warning alert")
+		let format = NSLocalizedString("cross frame navigation warning message format", comment: "format of message of the cross frame navigation warning alert")
+		let noURLPlaceholder = NSLocalizedString("cross frame navigation warning no url palcehoder", comment: "placeholder for missing urls in the cross frame navigation warning alert")
+		let noTargetPlaceholder = NSLocalizedString("cross frame navigation warning no navigation destination palcehoder", comment: "placeholder for missing navigation destination in the cross frame navigation warning alert")
+		let blockTitle = NSLocalizedString("cross frame navigation warning block button title", comment: "title of the block button in the cross frame navigation warning alert")
+		let allowTitle = NSLocalizedString("cross frame navigation warning allow button title", comment: "title of the allow button in the cross frame navigation warning alert")
+		let dst = action.url?.absoluteString ?? noTargetPlaceholder
+		let srcURL = src.realRequest?.url?.absoluteString ?? noURLPlaceholder
+		let targetURL = target.realRequest?.url?.absoluteString ?? noURLPlaceholder
+		let pageURL = url?.absoluteString ?? noURLPlaceholder
+		let msg = String(format: format, fmt(src, source: true), fmt(target, source: false), dst, srcURL, targetURL, pageURL)
+		let alert = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+		let blockAction = UIAlertAction(title: blockTitle, style: .cancel) { _ in completion(false) }
+		let loadAction = UIAlertAction(title: allowTitle, style: .default) { _ in completion(true) }
+		alert.addAction(blockAction)
+		alert.addAction(loadAction)
+		post(event: .alert(alert: alert, domain: url?.normalizedHost, fallbackHandler: { completion(false) }))
+	}
+
 	func promptForParamStripAndRedirect(for navigationAction: WKNavigationAction, completion: @escaping (Bool, URL?) -> Void) {
-		guard let url = navigationAction.request.url, navigationAction.targetFrame?.isMainFrame ?? false else {
+		let rawURL = navigationAction.request.url
+		guard let url = rawURL?.detorified ?? rawURL, navigationAction.targetFrame?.isMainFrame ?? false else {
 			completion(true, nil)
 			return
 		}
@@ -938,8 +1034,8 @@ private extension TabController {
 		}
 		let policy = PolicyManager.manager(for: url, in: tab)
 		let redirect: (URL) -> URL? = { [weak self] original in
-			if let me = self {
-				let policy = PolicyManager.manager(for: original, in: me.tab)
+			if let self = self {
+				let policy = PolicyManager.manager(for: original, in: self.tab)
 				return policy.skipRedirects ? Redirector.shared.redirect(original) : nil
 			} else {
 				return nil
@@ -1002,54 +1098,70 @@ private extension TabController {
 		post(event: .alert(alert: alert, domain: nil, fallbackHandler: { completion(false, nil) }))
 	}
 
-	func promptForDangers(on url: URL?, conformingTo policy: PolicyManager, decisionHandler: @escaping (Bool) -> Void) -> Bool {
-		var dangerSet = policy.dangerReasons(for: url)
-		guard !dangerSet.isEmpty else {
-			return false
-		}
-		if dangerSet.contains(.phishGoogle) {
-			dangerSet.remove(.phish)
-		}
-		let dangers = Array(dangerSet).sorted(by: { $0.rawValue < $1.rawValue })
-		let title = NSLocalizedString("dangerous site warning alert title", comment: "title of alert to warn users of dangerous sites")
-		var safebrowsing = false
-		let warnings = dangers.map { danger -> String in
-			switch danger {
-				case .malicious:
-					return NSLocalizedString("malicious site warning reason", comment: "explanation that the site might have malicious content")
-				case .phish:
-					return NSLocalizedString("phishing site warning reason", comment: "explanation that the site might be a phishing site")
-				case .phishGoogle:
-					safebrowsing = true
-					return NSLocalizedString("phishing site warning reason", comment: "explanation that the site might be a phishing site")
-				case .malware:
-					safebrowsing = true
-					return NSLocalizedString("malware site warning reason", comment: "explanation that the site might contain malware")
-				case .harmfulApplication:
-					safebrowsing = true
-					return NSLocalizedString("harmful application site warning reason", comment: "explanation that the site might contain harmful applications")
-				case .unwantedSoftware:
-					safebrowsing = true
-					return NSLocalizedString("unwanted software site warning reason", comment: "explanation that the site might contain unwanted software")
+	func promptForDangers(on url: URL?, conformingTo policy: PolicyManager, decisionHandler: @escaping (Bool) -> Void) {
+		policy.dangerReasons(for: url, in: self) { [weak self] dangerSet in
+			var dangerSet = dangerSet
+			guard !dangerSet.isEmpty, let me = self else {
+				decisionHandler(dangerSet.isEmpty)
+				return
 			}
+			if dangerSet.contains(.phishGoogle) {
+				dangerSet.remove(.phish)
+			}
+			let dangers = Array(dangerSet).sorted(by: { $0.rawValue < $1.rawValue })
+			let title = NSLocalizedString("dangerous site warning alert title", comment: "title of alert to warn users of dangerous sites")
+			let safebrowsing = dangers.contains { $0.hasSafebrowsingSource }
+			let warnings = dangers.sorted(by: { $0.order < $1.order }).map { danger -> String in
+				switch danger {
+					case .fingerprinting:
+						return NSLocalizedString("fingerprinting site warning reason", comment: "explanation that the site is likely targeted by google safebrowsing fingerprinting")
+					case .unspecified:
+						return NSLocalizedString("unspecified site warning reason", comment: "explanation that the site might have unspecified dangerous content")
+					case .malicious:
+						return NSLocalizedString("malicious site warning reason", comment: "explanation that the site might have malicious content")
+					case .phish:
+						return NSLocalizedString("phishing site warning reason", comment: "explanation that the site might be a phishing site")
+					case .phishGoogle:
+						return NSLocalizedString("phishing site warning reason", comment: "explanation that the site might be a phishing site")
+					case .malware:
+						return NSLocalizedString("malware site warning reason", comment: "explanation that the site might contain malware")
+					case .harmfulApplication:
+						return NSLocalizedString("harmful application site warning reason", comment: "explanation that the site might contain harmful applications")
+					case .unwantedSoftware:
+						return NSLocalizedString("unwanted software site warning reason", comment: "explanation that the site might contain unwanted software")
+					case .networkIssue:
+						return NSLocalizedString("network issue site warning reason", comment: "explanation that the site was not checked against the current safebrosing list due to a network issue")
+					case .offlineOnly:
+						return NSLocalizedString("offline only site warning reason", comment: "explanation that the site was not checked against the current safebrosing list because other issues were already discovered")
+					case .noSubscription:
+						return NSLocalizedString("no subscription site warning reason", comment: "explanation that the site was not checked against the current safebrosing list due to the user not having a current subscription")
+
+				}
+			}
+			let mainSeparator = NSLocalizedString("dangerous site warning reason list main separator", comment: "the separator used to separator most items in a (long) list of reasons a site might be dangerous. e.g. ', ' in 'a, b, c and d'")
+			let finalSeparator = NSLocalizedString("dangerous site warning reason list final separator", comment: "the separator used to separator the last 2 items in a list of reasons a site might be dangerous. e.g. ' and ' in 'a, b, c and d'")
+			let domain = url?.host ?? NSLocalizedString("dangerous site warning unknown domain name replacement", comment: "used instead of the domain name in the dangerous site warning if the domain is unknown")
+			let format: String
+			if !safebrowsing {
+				format = NSLocalizedString("dangerous site warning alert message format", comment: "format string for the message of the dangerous site warning alert")
+			} else if dangerSet.contains(.offlineOnly) {
+				format = NSLocalizedString("offline safebrowsing dangerous site warning alert message format", comment: "format string for the message of the dangerous site warning alert when at least part of the warnings was generated by local google safebrowsing data")
+			} else {
+				format = NSLocalizedString("online safebrowsing dangerous site warning alert message format", comment: "format string for the message of the dangerous site warning alert when at least part of the warnings was generated by online google safebrowsing data")
+			}
+			let reasonList = warnings.sentenceJoined(mainSeparator: mainSeparator, finalSeparator: finalSeparator)
+			let prompt = String(format: format, reasonList, domain)
+			let confirmTitle = NSLocalizedString("dangerous site warning alert continue button title", comment: "title of the continue button of the alert to warn users of dangerous sites")
+			let cancelTitle = NSLocalizedString("dangerous site warning alert cancel button title", comment: "title of the cancel button of the alert to warn users of dangerous sites")
+			let alert = UIAlertController(title: title, message: prompt, preferredStyle: .alert)
+			let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in decisionHandler(true) }
+			alert.addAction(confirm)
+
+			let decline = UIAlertAction(title: cancelTitle, style: .cancel) { _ in decisionHandler(false) }
+			alert.addAction(decline)
+
+			me.post(event: .alert(alert: alert, domain: nil, fallbackHandler: { decisionHandler(false) }))
 		}
-		let mainSeparator = NSLocalizedString("dangerous site warning reason list main separator", comment: "the separator used to separator most items in a (long) list of reasons a site might be dangerous. e.g. ', ' in 'a, b, c and d'")
-		let finalSeparator = NSLocalizedString("dangerous site warning reason list final separator", comment: "the separator used to separator the last 2 items in a list of reasons a site might be dangerous. e.g. ' and ' in 'a, b, c and d'")
-		let domain = url?.host ?? NSLocalizedString("dangerous site warning unknown domain name replacement", comment: "used instead of the domain name in the dangerous site warning if the domain is unknown")
-		let format = safebrowsing ? NSLocalizedString("safebrowsing dangerous site warning alert message format", comment: "format string for the message of the dangerous site warning alert when at least part of the warnings was generated by google safebrowsing data") : NSLocalizedString("dangerous site warning alert message format", comment: "format string for the message of the dangerous site warning alert")
-		let reasonList = warnings.sentenceJoined(mainSeparator: mainSeparator, finalSeparator: finalSeparator)
-		let prompt = String(format: format, reasonList, domain)
-		let confirmTitle = NSLocalizedString("dangerous site warning alert continue button title", comment: "title of the continue button of the alert to warn users of dangerous sites")
-		let cancelTitle = NSLocalizedString("dangerous site warning alert cancel button title", comment: "title of the cancel button of the alert to warn users of dangerous sites")
-		let alert = UIAlertController(title: title, message: prompt, preferredStyle: .alert)
-		let confirm = UIAlertAction(title: confirmTitle, style: .default) { _ in decisionHandler(true) }
-		alert.addAction(confirm)
-
-		let decline = UIAlertAction(title: cancelTitle, style: .cancel) { _ in decisionHandler(false) }
-		alert.addAction(decline)
-
-		post(event: .alert(alert: alert, domain: nil, fallbackHandler: { decisionHandler(false) }))
-		return true
 	}
 }
 
@@ -1063,13 +1175,17 @@ extension TabController {
 		webView.goBack()
 	}
 
+	func go(to item: WKBackForwardListItem) {
+		webView.go(to: item)
+	}
+
 	func localReload() {
 		webView.reload()
 	}
 
 	func reload() {
 		updatePolicy(for: webView.url)
-		if PolicyManager.isAboutBlank(webView.url) || webView.url == nil {
+		if PolicyDomain.isAboutBlank(webView.url) || webView.url == nil {
 			if let url = tab.history.last {
 				load(request: URLRequest(url: url as URL))
 			}
@@ -1083,23 +1199,27 @@ extension TabController {
 	}
 
 	func load(userInput input: String) {
-		loadFromInput { $0.actionList(for: input) }
+		loadFromInput { $0.actionList(for: input, in: tab) }
 	}
 
 	func load(request: URLRequest) {
 		navigationDelegate?.tabControllerWillStartLoading(self)
 		updatePolicy(for: request.url)
-		webView.load(request)
+		rawLoad(request, in: webView)
 	}
 
 	func load(url: URL?) {
 		if let url = url {
-			loadFromInput { _ in return [.load(url, false)] }
+			loadFromInput { _ in return [.load(url, upgraded: false)] }
 		}
 	}
 
-	func clearMediaInfo() {
-		_ = webViewIfLoaded?.load(URLRequest(url: URL(string: "about:clear")!))
+	func cleanup() {
+		rawLoad(URLRequest(url: URL(string: "about:clear")!), in: webViewIfLoaded)
+		let insecureHandler = webViewIfLoaded?.configuration.urlSchemeHandler(forURLScheme: "tor") as? TorSchemeHandler
+		insecureHandler?.cleanup()
+		let secureHandler = webViewIfLoaded?.configuration.urlSchemeHandler(forURLScheme: "tors") as? TorSchemeHandler
+		secureHandler?.cleanup()
 	}
 
 	func blockAlerts(from domain: String) {
@@ -1111,8 +1231,9 @@ extension TabController {
 		let cnt = (alertCounts[domain] ?? 0) + 1
 		alertCounts[domain] = cnt
 		totalAlertCount += 1
-		if totalAlertCount > alertCountMonitoringLimit {
-			let remove = random(totalAlertCount)
+		while totalAlertCount > alertCountMonitoringLimit {
+			let remove = random(UInt32(totalAlertCount))
+			totalAlertCount -= 1
 			var total = 0
 			for (domain, count) in alertCounts {
 				total += count
@@ -1152,18 +1273,18 @@ extension TabController {
 		let url = self.url
 		weak var tab = self.tab
 		policyEvaluator.evaluate(sslValidationExeptions[domain] ?? .strict) { [weak self] _ in
-			guard let me = self else {
+			guard let self = self else {
 				completionHandler(.cancelAuthenticationChallenge, nil)
 				return
 			}
 			var optDialog: UIAlertController? = nil
-			let retest = {(exeption: SecChallengeHandlerPolicy) in
-				guard let me = self else {
+			let retest = { [weak self] (exeption: SecChallengeHandlerPolicy) in
+				guard let self = self else {
 					completionHandler(.cancelAuthenticationChallenge, nil)
 					return
 				}
-				me.sslValidationExeptions[domain] = exeption
-				me.accept(trust, for: domain) { result in
+				self.sslValidationExeptions[domain] = exeption
+				self.accept(trust, for: domain) { result in
 					if result {
 						completionHandler(.useCredential, URLCredential(trust: trust))
 					} else {
@@ -1173,7 +1294,7 @@ extension TabController {
 			}
 			switch policyEvaluator.issue {
 				case .none:
-					me.accept(trust, for: domain) { result in
+					self.accept(trust, for: domain) { result in
 						if result {
 							completionHandler(.useCredential, URLCredential(trust: trust))
 						} else {
@@ -1219,7 +1340,7 @@ extension TabController {
 					let fallbackHandler = { completionHandler(.cancelAuthenticationChallenge, nil) }
 					let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel) { _ in fallbackHandler() }
 					dialog.addAction(cancelAction)
-					self?.post(event: .alert(alert: dialog, domain: domain, fallbackHandler: fallbackHandler))
+					self.post(event: .alert(alert: dialog, domain: domain, fallbackHandler: fallbackHandler))
 				} else {
 					completionHandler(.cancelAuthenticationChallenge, nil)
 				}
@@ -1273,34 +1394,6 @@ extension TabController {
 		}
 		dialog.addAction(continueAction)
 
-		if canUsePWManager, OnePasswordExtension.shared().isAppExtensionAvailable() {
-			let onePWTitle = NSLocalizedString("http authentication 1password button title", comment: "title of button of http authentication prompt to retrieve credentials from 1password")
-			let onePWAction = UIAlertAction(title: onePWTitle, style: .default) { [weak self] _ in
-				let urlString = (secure ? "https://" : "http://") + domain
-				guard let sender = MainViewController.controller.representingView(for: self?.tab) else {
-					self?.handleLoginPrompt(suggestion: suggestion, failCount: failCount, secure: secure, forDomain: domain, realm: realm, canUsePWManager: false, completionHandler: completionHandler)
-					return
-				}
- 				OnePasswordExtension.shared().findLogin(forURLString: urlString, for: MainViewController.controller, sender: sender) { loginDict, error in
-					guard let loginDict = loginDict else {
-						self?.handleLoginPrompt(suggestion: suggestion, failCount: failCount, secure: secure, forDomain: domain, realm: realm, completionHandler: completionHandler)
-						return
-					}
-					let user = loginDict[AppExtensionUsernameKey] as? String ?? ""
-					let password = loginDict[AppExtensionPasswordKey] as? String ?? ""
-					let credentials = URLCredential(user: user, password: password, persistence: .forSession)
-					if user.isEmpty && password.isEmpty {
-						self?.handleLoginPrompt(suggestion: suggestion, failCount: failCount, secure: secure, forDomain: domain, realm: realm, completionHandler: completionHandler)
-					} else if user.isEmpty || password.isEmpty {
-						self?.handleLoginPrompt(suggestion: credentials, failCount: failCount + 1, secure: secure, forDomain: domain, realm: realm, completionHandler: completionHandler)
-					} else {
-						completionHandler(.useCredential, credentials)
-					}
-				}
-			}
-			dialog.addAction(onePWAction)
-		}
-
 		let cancelTitle = NSLocalizedString("http authentication prompt cancel button title", comment: "title of cancel button of http authentication prompt")
 		let fallbackHandler = { completionHandler(.cancelAuthenticationChallenge, nil) }
 		let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel) { _ in fallbackHandler() }
@@ -1313,5 +1406,11 @@ extension TabController {
 		policyEvaluator.evaluate(sslValidationExeptions[host] ?? .strict) { result in
 			completionHandler(result && (!PinningSessionDelegate.pinnedHosts.contains(host) || policyEvaluator.pin(with: .certs(PinningSessionDelegate.pinnedCerts))))
 		}
+	}
+}
+
+extension TabController {
+	func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+		didReceive(scriptMessage: message, from: userContentController)
 	}
 }

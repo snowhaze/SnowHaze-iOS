@@ -2,7 +2,7 @@
 //  URLBar.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -12,11 +12,14 @@ private let tabSelectionMaxHeight: CGFloat = 45
 private let tabSelectionShinkage: CGFloat = 8
 
 protocol URLBarDelegate: class {
-	func prevButtonPressed(for urlBar: URLBar)
-	func nextButtonPressed(for urlBar: URLBar)
+	func prevButtonTapped(for urlBar: URLBar)
+	func nextButtonTapped(for urlBar: URLBar)
+	func prevButtonHeld(for urlBar: URLBar)
+	func nextButtonHeld(for urlBar: URLBar)
 	func shareButtonPressed(for urlBar: URLBar, sender: NSObject)
 	func plusButtonPressed(for urlBar: URLBar)
 	func tabsButtonPressed(for urlBar: URLBar)
+	func tabsButtonHeld(for urlBar: URLBar)
 	func settingsButtonPressed(for urlBar: URLBar)
 	func reloadButtonPressed(for urlBar: URLBar)
 	func securityDetailButtonPressed(for urlBar: URLBar)
@@ -32,7 +35,8 @@ protocol URLBarDelegate: class {
 @IBDesignable
 class URLBar: UIView {
 	private let containerView = UIView()
-	let urlField = UITextField()
+	private let urlField = UITextField()
+	private let titleLabel = UILabel()
 	private let securityButton = UIButton()
 	private let loadBar = LoadBar()
 	private let prevButton = UIButton()
@@ -47,7 +51,6 @@ class URLBar: UIView {
 	private var startEditingRecognizer: UITapGestureRecognizer?
 	private var rawDragInteraction: Any?
 
-	@available(iOS 11, *)
 	private var dragInteraction: UIDragInteraction? {
 		get {
 			return rawDragInteraction as? UIDragInteraction
@@ -57,7 +60,7 @@ class URLBar: UIView {
 		}
 	}
 
-	private let tabSelectionView = TabSelectionView()
+	private let tabSelectionView = TabSelectionView(frame: .zero)
 
 	var tabTitleURLs: [(NSAttributedString, URL?)] {
 		set {
@@ -79,16 +82,14 @@ class URLBar: UIView {
 
 	var attributedTitle: NSAttributedString? {
 		didSet {
-			if !urlField.isFirstResponder {
-				urlField.attributedText = attributedTitle
-			}
+			titleLabel.attributedText = attributedTitle
 		}
 	}
 
 	var url: URL? {
 		didSet {
 			if urlField.isFirstResponder {
-				urlField.attributedText = NSAttributedString(string: url?.absoluteString ?? "")
+				urlField.text = url?.absoluteString ?? ""
 			}
 		}
 	}
@@ -235,7 +236,6 @@ class URLBar: UIView {
 		return CGSize(width: UIView.noIntrinsicMetric, height: height(for: scale))
 	}
 
-	@available(iOS 11, *)
 	override func safeAreaInsetsDidChange() {
 		super.safeAreaInsetsDidChange()
 		layoutContentView()
@@ -291,7 +291,7 @@ class URLBar: UIView {
 		set {
 			loadBar.progress = newValue
 			loadBar.setNeedsDisplay()
-			showsCancelButton = (newValue > 0 && newValue < 1) || urlField.isFirstResponder
+			showsCancelButton = (newValue > 0 && newValue < 1) || isEditing
 		}
 		get {
 			return loadBar.progress
@@ -300,6 +300,38 @@ class URLBar: UIView {
 
 	func securityButtonFrame(in view: UIView) -> CGRect {
 		return containerView.convert(securityButton.frame, to: view)
+	}
+
+	func nextButtonFrame(in view: UIView) -> CGRect? {
+		if constrainedWidth {
+			return nil
+		} else {
+			return nextButton.convert(nextButton.bounds, to: view)
+		}
+	}
+
+	func prevButtonFrame(in view: UIView) -> CGRect? {
+		if constrainedWidth {
+			return nil
+		} else {
+			return prevButton.convert(prevButton.bounds, to: view)
+		}
+	}
+
+	func tabsButtonFrame(in view: UIView) -> CGRect? {
+		if constrainedWidth {
+			return nil
+		} else {
+			return tabsButton.convert(tabsButton.bounds, to: view)
+		}
+	}
+
+	func shareButtonFrame(in view: UIView) -> CGRect? {
+		if constrainedWidth {
+			return nil
+		} else {
+			return shareButton.convert(shareButton.bounds, to: view)
+		}
 	}
 
 	private func setupAccessibility() {
@@ -390,11 +422,11 @@ class URLBar: UIView {
 		containerView.addSubview(reloadButton)
 		containerView.addSubview(cancelButton)
 
-		prevButton.addTarget(self, action: #selector(prevButtonPressed(_:)), for: .touchUpInside)
-		nextButton.addTarget(self, action: #selector(nextButtonPressed(_:)), for: .touchUpInside)
+		prevButton.addTarget(self, action: #selector(prevButtonPressed(_:by:)), for: .touchUpInside)
+		nextButton.addTarget(self, action: #selector(nextButtonPressed(_:by:)), for: .touchUpInside)
 		shareButton.addTarget(self, action: #selector(shareButtonPressed(_:)), for: .touchUpInside)
 		plusButton.addTarget(self, action: #selector(plusButtonPressed(_:)), for: .touchUpInside)
-		tabsButton.addTarget(self, action: #selector(tabsButtonPressed(_:)), for: .touchUpInside)
+		tabsButton.addTarget(self, action: #selector(tabsButtonPressed(_:by:)), for: .touchUpInside)
 		settingsButton.addTarget(self, action: #selector(settingsButtonPressed(_:)), for: .touchUpInside)
 		securityButton.addTarget(self, action: #selector(securityDetailButtonPressed(_:)), for: .touchUpInside)
 
@@ -407,11 +439,7 @@ class URLBar: UIView {
 		layer.shadowOpacity = 0.15
 		layer.shadowOffset = CGSize(width: 0, height: 1)
 		layer.shadowRadius = 2
-		if #available(iOS 11, *) {
-			containerView.layer.cornerRadius = 10
-		} else {
-			containerView.layer.cornerRadius = 4
-		}
+		containerView.layer.cornerRadius = 10
 		containerView.clipsToBounds = true
 		containerView.frame = CGRect(x: 12, y: 27, width: 105, height: 35)
 		containerView.autoresizingMask = .flexibleWidth
@@ -425,7 +453,6 @@ class URLBar: UIView {
 		containerView.addSubview(securityButton)
 
 		urlField.frame = CGRect(x: 35, y: 0, width: 35, height: 35)
-		urlField.autoresizingMask = .flexibleWidth
 		urlField.textAlignment = .center
 		urlField.textColor = .title
 		urlField.keyboardType = .webSearch
@@ -434,33 +461,35 @@ class URLBar: UIView {
 		urlField.autocorrectionType = .no
 		urlField.tintColor = .button
 		urlField.delegate = self
-		if #available(iOS 10, *) {
-			urlField.textContentType = .URL
-		}
-		UIFont.setSnowHazeFont(on: urlField)
+		urlField.textContentType = .URL
+		urlField.translatesAutoresizingMaskIntoConstraints = false
 
 		clipsToBounds = true
 
-		if #available(iOS 11, *) {
-			for interaction in urlField.interactions {
-				if interaction is UIDragInteraction || interaction is UIDropInteraction {
-					urlField.removeInteraction(interaction)
-				}
+		for interaction in urlField.interactions {
+			if interaction is UIDragInteraction || interaction is UIDropInteraction {
+				urlField.removeInteraction(interaction)
 			}
-
-			dragInteraction = UIDragInteraction(delegate: self)
-			dragInteraction!.isEnabled = true
-			urlField.addInteraction(dragInteraction!)
-
-			startEditingRecognizer = UITapGestureRecognizer()
-			startEditingRecognizer?.addTarget(self, action: #selector(startEditing(_:)))
-			startEditingRecognizer?.isEnabled = true
-			urlField.addGestureRecognizer(startEditingRecognizer!)
-
-			let dropInteraction = UIDropInteraction(delegate: self)
-			dropInteraction.allowsSimultaneousDropSessions = false
-			urlField.addInteraction(dropInteraction)
 		}
+
+		dragInteraction = UIDragInteraction(delegate: self)
+		dragInteraction!.isEnabled = true
+		urlField.addInteraction(dragInteraction!)
+
+		startEditingRecognizer = UITapGestureRecognizer()
+		startEditingRecognizer?.addTarget(self, action: #selector(startEditing(_:)))
+		startEditingRecognizer?.isEnabled = true
+		urlField.addGestureRecognizer(startEditingRecognizer!)
+
+		let dropInteraction = UIDropInteraction(delegate: self)
+		dropInteraction.allowsSimultaneousDropSessions = false
+		urlField.addInteraction(dropInteraction)
+
+		titleLabel.frame = urlField.frame
+		titleLabel.textColor = .title
+		titleLabel.textAlignment = .center
+		titleLabel.translatesAutoresizingMaskIntoConstraints = false
+		containerView.addSubview(titleLabel)
 
 		let flexibleTopWidth: UIView.AutoresizingMask = [.flexibleWidth, .flexibleTopMargin]
 		containerView.autoresizingMask = flexibleTopWidth
@@ -472,11 +501,22 @@ class URLBar: UIView {
 		loadBar.autoresizingMask = flexibleTopWidth
 		tabSelectionView.frame = CGRect(x: bounds.minX, y: bounds.maxY - tabSelectionHeight, width: bounds.width, height: tabSelectionMaxHeight)
 		tabSelectionView.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
-		tabSelectionView.delegate = self
+		tabSelectionView.tabDelegate = self
 		addSubview(tabSelectionView)
 		addSubview(loadBar)
 		setupButtons()
 		setupAccessibility()
+
+		let layoutH = "H:|-40-[view]-35-|"
+		let layoutV = "V:|-0-[view]-0-|"
+		containerView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: layoutH, metrics: nil, views: ["view": urlField]))
+		containerView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: layoutH, metrics: nil, views: ["view": titleLabel]))
+		containerView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: layoutV, metrics: nil, views: ["view": urlField]))
+		containerView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: layoutV, metrics: nil, views: ["view": titleLabel]))
+
+		let pasteAndGo = NSLocalizedString("paste and go menu option title", comment: "title of the option to paste & go in the contexxt menu of the url bar")
+		let item = UIMenuItem(title: pasteAndGo, action: #selector(URLBar.pasteAndGo(_:)))
+		UIMenuController.shared.menuItems = [item]
 	}
 
 	override init(frame: CGRect) {
@@ -489,24 +529,52 @@ class URLBar: UIView {
 		setup()
 	}
 
-	@IBAction func prevButtonPressed(_ sender: AnyObject) {
-		delegate?.prevButtonPressed(for: self)
+	@IBAction func prevButtonPressed(_ sender: AnyObject, by event: UIEvent) {
+		if event.allTouches?.count == 1 && event.allTouches?.randomElement()?.tapCount == 0 {
+			delegate?.prevButtonHeld(for: self)
+		} else {
+			delegate?.prevButtonTapped(for: self)
+		}
 	}
 
-	@IBAction func nextButtonPressed(_ sender: AnyObject) {
-		delegate?.nextButtonPressed(for: self)
+	@IBAction func nextButtonPressed(_ sender: AnyObject, by event: UIEvent) {
+		if event.allTouches?.count == 1 && event.allTouches?.randomElement()?.tapCount == 0 {
+			delegate?.nextButtonHeld(for: self)
+		} else {
+			delegate?.nextButtonTapped(for: self)
+		}
 	}
 
 	@IBAction func shareButtonPressed(_ sender: NSObject) {
 		delegate?.shareButtonPressed(for: self, sender: sender)
 	}
 
-	@objc private func plusButtonPressed(_ sender: AnyObject) {
-		delegate?.plusButtonPressed(for: self)
+	@IBAction func tabsButtonPressed(_ sender: AnyObject, by event: UIEvent) {
+		if event.allTouches?.count == 1 && event.allTouches?.randomElement()?.tapCount == 0 {
+			delegate?.tabsButtonHeld(for: self)
+		} else {
+			delegate?.tabsButtonPressed(for: self)
+		}
 	}
 
-	@objc private func tabsButtonPressed(_ sender: AnyObject) {
-		delegate?.tabsButtonPressed(for: self)
+	override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+		if action == #selector(URLBar.pasteAndGo(_:)) && sender as? UIMenuController == UIMenuController.shared {
+			return isEditing && UIPasteboard.general.string != nil
+		} else {
+			return super.canPerformAction(action, withSender: sender)
+		}
+	}
+
+	@objc private func pasteAndGo(_ sender: UIMenuController) {
+		guard isEditing, let input = UIPasteboard.general.string else {
+			return
+		}
+		stopInput()
+		delegate?.urlbar(self, selectedInput: input)
+	}
+
+	@objc private func plusButtonPressed(_ sender: AnyObject) {
+		delegate?.plusButtonPressed(for: self)
 	}
 
 	@objc private func settingsButtonPressed(_ sender: AnyObject) {
@@ -519,7 +587,7 @@ class URLBar: UIView {
 
 	@objc private func reloadButtonPressed(_ sender: AnyObject) {
 		delegate?.reloadButtonPressed(for: self)
-		
+
 		if reloadCounter.inc() {
 			reloadCounter.reset()
 			UIView.animate(withDuration: .pi / 16, delay: 0, options: .curveEaseIn, animations: {
@@ -570,7 +638,6 @@ class URLBar: UIView {
 	}
 }
 
-
 // MARK: public
 extension URLBar {
 	func representingViewForTab(at index: Int, isCurrent: Bool) -> UIView? {
@@ -609,10 +676,9 @@ extension URLBar: UITextFieldDelegate {
 	}
 
 	func textFieldDidBeginEditing(_ textField: UITextField) {
-		textField.attributedText = NSAttributedString(string: url?.absoluteString ?? "")
-		if #available(iOS 11, *) {
-			dragInteraction?.isEnabled = false
-		}
+		textField.text = url?.absoluteString ?? ""
+		titleLabel.isHidden = true
+		dragInteraction?.isEnabled = false
 		textField.selectedTextRange = textField.textRange(from: textField.beginningOfDocument, to: textField.endOfDocument)
 		if #available(iOS 13, *) {
 			UIMenuController.shared.showMenu(from: self, rect: textField.convert(textField.bounds, to: self))
@@ -624,10 +690,9 @@ extension URLBar: UITextFieldDelegate {
 	}
 
 	func textFieldDidEndEditing(_ textField: UITextField) {
-		textField.attributedText = attributedTitle
-		if #available(iOS 11, *) {
-			dragInteraction?.isEnabled = true
-		}
+		textField.text = ""
+		titleLabel.isHidden = false
+		dragInteraction?.isEnabled = true
 		delegate?.inputEnded(for: self)
 		stopInput()
 	}
@@ -654,14 +719,13 @@ extension URLBar: TabSelectionViewDelegate {
 	}
 }
 
-@available(iOS 11, *)
 extension URLBar: UIDragInteractionDelegate {
 	func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
 		if let url = url {
 			let dragItem = UIDragItem(itemProvider: NSItemProvider(object: url as NSURL))
-			let sanitizedTitle = Tab.sanitize(title: attributedTitle?.string)
-			dragItem.localObject = (url, sanitizedTitle)
-			dragItem.previewProvider = { UIDragPreview(for: url, title: sanitizedTitle) }
+			let plainTitle = attributedTitle?.string
+			dragItem.localObject = (url, plainTitle)
+			dragItem.previewProvider = { UIDragPreview(for: url, title: plainTitle) }
 			return [dragItem]
 		} else {
 			return []
@@ -683,30 +747,19 @@ extension URLBar: UIDragInteractionDelegate {
 // internals
 private extension URLBar {
 	func layoutContentView() {
-		let margin: CGFloat
-		if #available(iOS 11, *) {
-			margin = max(safeAreaInsets.left, safeAreaInsets.right) + (constrainedWidth ? 12 : 180)
-		} else {
-			margin = constrainedWidth ? 12 : 180
-		}
+		let margin = max(safeAreaInsets.left, safeAreaInsets.right) + (constrainedWidth ? 12 : 180)
 		containerView.frame.origin.x = margin
 		containerView.frame.size.width = bounds.width - 2 * margin
 	}
 
 	func height(for scale: CGFloat) -> CGFloat {
-		let height: CGFloat
 		let scalableHeight: CGFloat = (constrainedHeight ? 56 : 68 - 20) - loadBarHeight
 		let scaledHeight = scalableHeight * scale
-		if #available(iOS 11, *) {
-			height = scaledHeight + loadBarHeight
-		} else {
-			height = (constrainedHeight ? scaledHeight : scaledHeight + 20) + loadBarHeight
-		}
+		let height = scaledHeight + loadBarHeight
 		return height + 45 + tabSelectionHeight - (showTabSelection ? tabSelectionShinkage : 0)
 	}
 }
 
-@available(iOS 11, *)
 extension URLBar: UIDropInteractionDelegate {
 	func dropInteraction(_ interaction: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
 		return 	(session.canLoadObjects(ofClass: String.self) || session.canLoadObjects(ofClass: URL.self))

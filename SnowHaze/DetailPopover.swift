@@ -2,7 +2,7 @@
 //	DetailPopover.swift
 //	SnowHaze
 //
-
+//
 //	Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -25,9 +25,9 @@ class DetailPopover {
 	private var isDisplayed = false
 	private let arrowView: DetailPopoverArrowView
 	private var dismissView: DetailPopoverDismissView? = nil
-	private let arrowTipSource: () -> CGPoint
+	private let arrowTipSource: (DetailPopover) -> CGPoint
 
-	init(contentView: UIView, arrowPosition: DetailPopoverArrowPosition, arrowTip: @escaping () -> CGPoint) {
+	init(contentView: UIView, arrowPosition: DetailPopoverArrowPosition, arrowTip: @escaping (DetailPopover) -> CGPoint) {
 		contentSize = contentView.bounds.size
 		self.contentView = contentView
 		contentView.frame.origin = CGPoint(x: borderWidth, y: borderWidth)
@@ -45,6 +45,7 @@ class DetailPopover {
 		isDisplayed = true
 
 		dismissView = DetailPopoverDismissView(view: view, popover: self)
+		dismissView?.backgroundColor = .popoverDismiss
 
 		containerView.backgroundColor = .popover
 		containerView.clipsToBounds = true
@@ -69,7 +70,10 @@ class DetailPopover {
 	}
 
 	fileprivate func layout() {
-		let arrowTip = arrowTipSource()
+		guard isDisplayed else {
+			return
+		}
+		let arrowTip = arrowTipSource(self)
 		let dist: CGFloat
 		switch arrowPosition {
 			case .top(_):		dist = arrowTip.y

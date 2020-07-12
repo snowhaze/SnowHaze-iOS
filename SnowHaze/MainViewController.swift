@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -10,15 +10,17 @@ import UIKit
 import WebKit
 import AVFoundation
 
-enum InputType {
-	case plainInput
-	case url
-}
-
 private let crashCountKey = "ch.illotros.snowhaze.crashCount"
 
 private let animationDuration = 0.3
 private let tabControllerEdgeOffset: CGFloat = 5
+
+private extension UIKeyCommand {
+	convenience init(input: String, modifierFlags: UIKeyModifierFlags, action: Selector, title: String) {
+		self.init(input: input, modifierFlags: modifierFlags, action: action)
+		self.discoverabilityTitle = title
+	}
+}
 
 class MainViewController: UIViewController {
 	private(set) static var controller: MainViewController!
@@ -101,16 +103,17 @@ class MainViewController: UIViewController {
 			return []
 		}
 		let newTabTitle = NSLocalizedString("new tab key command title", comment: "discoverability title of key command to make a new tab")
-		let newTab = UIKeyCommand(input: "N", modifierFlags: .command, action: #selector(makeNewTab(_:)), discoverabilityTitle: newTabTitle)
+		let newTab = UIKeyCommand(input: "T", modifierFlags: .command, action: #selector(makeNewTab(_:)), title: newTabTitle)
+		var commands = [newTab]
 		if showingSuggestionVC {
 			let cancelTitle = NSLocalizedString("cancel key command title", comment: "discoverability title of key command to cancel user input")
 			let nextTitle = NSLocalizedString("next suggestion key command title", comment: "discoverability title of key command to select next suggestion")
 			let previousTitle = NSLocalizedString("previous suggestion key command title", comment: "discoverability title of key command to select previous suggestion")
 			let selectTitle = NSLocalizedString("open key command title", comment: "discoverability title of key command to open selected suggestion")
-			let endInput = UIKeyCommand(input: UIKeyCommand.inputEscape, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(endURLEntry(_:)), discoverabilityTitle: cancelTitle)
-			let next = UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .command, action: #selector(selectNextSuggestion(_:)), discoverabilityTitle: nextTitle)
-			let previous = UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .command, action: #selector(selectPreviousSuggestion(_:)), discoverabilityTitle: previousTitle)
-			let select = UIKeyCommand(input: "O", modifierFlags: .command, action: #selector(selectSuggestion(_:)), discoverabilityTitle: selectTitle)
+			let endInput = UIKeyCommand(input: UIKeyCommand.inputEscape, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(endURLEntry(_:)), title: cancelTitle)
+			let next = UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: .command, action: #selector(selectNextSuggestion(_:)), title: nextTitle)
+			let previous = UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: .command, action: #selector(selectPreviousSuggestion(_:)), title: previousTitle)
+			let select = UIKeyCommand(input: "\r", modifierFlags: .command, action: #selector(selectSuggestion(_:)), title: selectTitle)
 			var commands = [endInput]
 			if suggestionVC.canSelectNext {
 				commands.append(next)
@@ -121,12 +124,56 @@ class MainViewController: UIViewController {
 			if suggestionVC.hasSelection {
 				commands.append(select)
 			}
-			commands.append(newTab)
+			return commands
+		} else if let _ = textInputBar {
+			let endTitle = NSLocalizedString("end text input key command title", comment: "discoverability title of key command to cancel text input in text bar")
+			let endInput = UIKeyCommand(input: UIKeyCommand.inputEscape, modifierFlags: UIKeyModifierFlags(rawValue: 0), action: #selector(endTextEntry(_:)), title: endTitle)
+			commands.append(endInput)
+		}
+		if !isShowingTabsView {
+			let searchTitle = NSLocalizedString("search key command title", comment: "discoverability title of key command to start search input")
+			let startInput = UIKeyCommand(input: "L", modifierFlags: .command, action: #selector(startURLEntry(_:)), title: searchTitle)
+
+			let closeTitle = NSLocalizedString("close tab key command title", comment: "discoverability title of key command to close a tab")
+			let close = UIKeyCommand(input: "W", modifierFlags: .command, action: #selector(closeTab(_:)), title: closeTitle)
+			commands += [startInput, close]
+			if tabVC?.tab?.controller?.canGoBack ?? false {
+				let backTitle = NSLocalizedString("go back in history key command title", comment: "discoverability title of key command to go back in history")
+				let back = UIKeyCommand(input: "[", modifierFlags: .command, action: #selector(historyBack(_:)), title: backTitle)
+				commands.append(back)
+			}
+			if tabVC?.tab?.controller?.canGoForward ?? false {
+				let forwardTitle = NSLocalizedString("go forward in history key command title", comment: "discoverability title of key command to go forward in history")
+				let forward = UIKeyCommand(input: "]", modifierFlags: .command, action: #selector(historyForward(_:)), title: forwardTitle)
+				commands.append(forward)
+			}
+			if tabVC?.tab?.controller?.webViewLoaded ?? false, let _ = tabVC?.tab?.controller?.url {
+				let searchTitle = NSLocalizedString("search on page key command title", comment: "discoverability title of key command to search for text on a page")
+				let search = UIKeyCommand(input: "F", modifierFlags: .command, action: #selector(searchOnPage(_:)), title: searchTitle)
+				commands.append(search)
+
+				let reloadTitle = NSLocalizedString("reload page key command title", comment: "discoverability title of key command to reload a page")
+				let reload = UIKeyCommand(input: "R", modifierFlags: .command, action: #selector(reloadPage(_:)), title: reloadTitle)
+				commands.append(reload)
+				if tabVC?.tab?.controller?.isLoading ?? false {
+					let stopTitle = NSLocalizedString("stop page load key command title", comment: "discoverability title of key command to stop the loading of a page")
+					let stop = UIKeyCommand(input: ",", modifierFlags: .command, action: #selector(stopLoadingPage(_:)), title: stopTitle)
+					commands.append(stop)
+				}
+			}
+			if tabs.count > 1 {
+				let previousTitle = NSLocalizedString("previous tab key command title", comment: "discoverability title of key command to switch to previous tab")
+				let previous = UIKeyCommand(input: "[", modifierFlags: [.command, .shift], action: #selector(previousTab(_:)), title: previousTitle)
+
+				let nextTitle = NSLocalizedString("next tab key command title", comment: "discoverability title of key command to switch to next tab")
+				let next = UIKeyCommand(input: "]", modifierFlags: [.command, .shift], action: #selector(nextTab(_:)), title: nextTitle)
+				commands.append(previous)
+				commands.append(next)
+			}
+			return commands
+		} else {
 			return commands
 		}
-		let searchTitle = NSLocalizedString("search key command title", comment: "discoverability title of key command to start search input")
-		let startInput = UIKeyCommand(input: "F", modifierFlags: .command, action: #selector(startURLEntry(_:)), discoverabilityTitle: searchTitle)
-		return [startInput, newTab]
 	}
 
 	override var canBecomeFirstResponder : Bool {
@@ -146,6 +193,7 @@ class MainViewController: UIViewController {
 
 		let policy = PolicyManager.globalManager()
 		policy.updateOpenedVersion()
+		policy.performLaunchOperations()
 		MainViewController.controller = self
 		let tasks = MainViewController.openTasks
 		MainViewController.openTasks = []
@@ -154,20 +202,20 @@ class MainViewController: UIViewController {
 			MainViewController.perform(task, completionHandler: completion)
 		}
 		tabCollectionView.register(TabCollectionViewCell.self, forCellWithReuseIdentifier: "TabCell")
+		tabCollectionView.contentInset = view.safeAreaInsets
 
-		if #available(iOS 11.0, *) {
-			tabCollectionView.contentInset = view.safeAreaInsets
+		let tab: Tab
+		if crashCount != 2 {
+			tab = policy.hasHomePage ? tabStore.add()! : currentTab
+		} else {
+			tab = tabStore.add(loadHomepage: false)!
 		}
-
-		navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont.snowHazeFont(size: 20)]
-
-		let tab = crashCount != 2 ? currentTab : tabStore.addEmptyItem()!
 		let tabPolicy = PolicyManager.manager(for: tab)
 		dimmer.set(dimmed: tabPolicy.isInNightMode)
 		setupSuggestionVC()
-		set(tab: tab, animated: false)
 
 		urlBar.tabTitleURLs = tabTitleURLs(masked: false)
+		set(tab: tab, animated: false)
 
 		NotificationCenter.default.addObserver(self, selector: #selector(tabListDidChange(_:)), name: TAB_LIST_CHANGED_NOTIFICATION, object: tabStore)
 		NotificationCenter.default.addObserver(self, selector: #selector(tabDidChange(_:)), name: TAB_CHANGED_NOTIFICATION, object: tabStore)
@@ -177,8 +225,6 @@ class MainViewController: UIViewController {
 
 		urlBar.delegate = self
 
-		// since the subviews aren't properly layed out yet, failing to to call view.layoutIfNeeded() can result in an oversized url field on iPad
-		view.layoutIfNeeded()
 		urlBar.constrainedWidth = traitCollection.horizontalSizeClass == .compact
 		urlBar.constrainedHeight = traitCollection.verticalSizeClass == .compact
 
@@ -192,12 +238,10 @@ class MainViewController: UIViewController {
 			present(tutorial, animated: true, completion: nil)
 		}
 
-		if policy.displayUpdateTutorial {
-			let tutorial = UpdateTutorialViewController()
-			present(tutorial, animated: true, completion: nil)
-		}
-
 		DownloadManager.shared.start()
+
+		// start compiling, since this might take a while
+		ContentBlockerManager.shared.load(completionHandler: nil)
 	}
 
 	override func viewWillAppear(_ animated: Bool) {
@@ -208,6 +252,7 @@ class MainViewController: UIViewController {
 		if let navigationController = navigationController {
 			navigationController.setNavigationBarHidden(true, animated: animated)
 			tabVC?.updateSecAssessment()
+			tabVC?.updateContentScale()
 			for cell in tabCollectionView.visibleCells {
 				let tabCell = cell as! TabCollectionViewCell
 				tabCell.updateSecAssessment()
@@ -223,11 +268,7 @@ class MainViewController: UIViewController {
 			let message = String(format: messageFormat, versionDescription)
 			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 			let okAction = UIAlertAction(title: updateTitle, style: .default) { _ in
-				if #available(iOS 10, *) {
-					UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id1121026941")!)
-				} else {
-					UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id1121026941")!)
-				}
+				UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id1121026941")!)
 				policy.updateEOLWarningVersion()
 			}
 			alert.addAction(okAction)
@@ -251,7 +292,6 @@ class MainViewController: UIViewController {
 		return .lightContent
 	}
 
-	@available(iOS 11, *)
 	override func viewSafeAreaInsetsDidChange() {
 		super.viewSafeAreaInsetsDidChange()
 		tabCollectionView.contentInset = view.safeAreaInsets
@@ -283,6 +323,22 @@ private extension MainViewController {
 		}
 	}
 
+	func closeAllTabs() {
+		tabStore.remove(tabs.map({ tab -> (Tab, TimeInterval) in
+			Stats.shared.updateCookieCount(for: tab)
+			let url = tab.controller?.url
+			let policy = PolicyManager.manager(for: url, in: tab)
+			return (tab, policy.tabClosingUndoTimeLimit)
+		}))
+
+		ReviewPrompt.allTabsClosed()
+
+		tabVC.tab = nil
+		if !isShowingTabsView {
+			set(tab: self.tabStore.add()!, animated: true)
+		}
+	}
+
 	var isShowingTabsView: Bool {
 		return !tabCollectionView.isHidden
 	}
@@ -303,7 +359,7 @@ private extension MainViewController {
 		for tab in tabs.reversed() where tab.isActive {
 			return tab
 		}
-		return tabs.last ?? tabStore.addEmptyItem()!
+		return tabs.last ?? tabStore.add()!
 	}
 
 	@discardableResult func scroll(to tab: Tab, animated: Bool = true) -> IndexPath {
@@ -346,6 +402,18 @@ private extension MainViewController {
 		let width = min(view.bounds.width, 500)
 		suggestionContainer.frame.size.width = width
 		suggestionContainer.frame.origin.x = (view.bounds.width - width) / 2
+	}
+
+	func startSearch(tab: Tab, activity: UIActivity?) {
+		let bar = SearchBar()
+		if self.set(inputBar: bar) {
+			bar.search = Search(tab: tab)
+			bar.search.listener = self
+			bar.searchBarDelegate = self
+			bar.activity = activity
+		} else {
+			activity?.activityDidFinish(false)
+		}
 	}
 
 	func set(tab: Tab, animated: Bool) {
@@ -394,117 +462,6 @@ private extension MainViewController {
 		}
 	}
 
-	func showActivityController(with extensionItem: NSExtensionItem?, webView: WKWebView?, tab: Tab?, sender: NSObject, initialHost opwHost: String?, policy: PolicyManager?) {
-		var items = [AnyObject]()
-		if let extensionItem = extensionItem, let _ = opwHost {
-			items.append(extensionItem)
-		}
-		let dlHost: String?
-		if let wv = webView, let h = wv.url?.host, let p = policy, p.allowPWManager, p.allowApplicationJS {
-			if let extensionItem = DashlaneHelper.shared.extensionItem(for: wv) {
-				items.append(extensionItem)
-				dlHost = h
-			} else {
-				dlHost = nil
-			}
-		} else {
-			dlHost = nil
-		}
-		if let webView = webView {
-			if let title = webView.title {
-				items.append((title + " ") as AnyObject)
-			}
-			if let url = webView.url {
-				items.append(url as AnyObject)
-			}
-			items.append(PagePrintRenderer(webView: webView))
-			items.append(webView)
-			let info = UIPrintInfo(dictionary: nil)
-			let untitledName = NSLocalizedString("untitled document name", comment: "name of document that has not been given a name")
-			info.jobName = webView.title ?? webView.url?.absoluteString ?? untitledName
-			info.outputType = .general
-			items.append(info)
-		}
-		if let tab = tab {
-			items.append(tab)
-		}
-		let scanActivity = ScanCodeActivity()
-		scanActivity.source = sender
-		scanActivity.delegate = self
-		let readerActivity = StartReaderActivity() { [weak self] activity in
-			guard let me = self, let tab = activity.tab, let url = tab.displayURL else {
-				activity.activityDidFinish(false)
-				return
-			}
-			let customization: (Tab) -> Void = { newtab in
-				let settings = Settings.settings(for: PolicyDomain(url: url), in: newtab)
-				settings.set(.true, for: readerModeKey)
-			}
-			guard let newtab = me.tabStore.addEmptyItem(with: URLRequest(url: url), copySettingsFromParent: tab, customization: customization) else {
-				activity.activityDidFinish(false)
-				return
-			}
-			me.set(tab: newtab, animated: true)
-			activity.activityDidFinish(true)
-		}
-		let searchActivity = FindOnPageActivity() { activity in
-			let bar = SearchBar()
-			if self.set(inputBar: bar) {
-				bar.search = Search(tab: activity.tab)
-				bar.search.listener = self
-				bar.searchBarDelegate = self
-				bar.activity = activity
-			} else {
-				activity.activityDidFinish(false)
-			}
-		}
-		var activities = [AddBookmarkActivity(), readerActivity, searchActivity]
-		if scanActivity.available {
-			activities.append(scanActivity)
-		}
-		let controller = UIActivityViewController(activityItems: items, applicationActivities: activities)
-		controller.excludedActivityTypes = [UIActivity.ActivityType.addToReadingList]
-		// TODO: set an upper limit once bug is patched
-		if #available(iOS 11, *) {
-			// work arround a bug where iOS 11 tries to generate a file name from the title and fails if it is empty
-			if let wv = webView, (wv.title ?? "").isEmpty {
-				controller.excludedActivityTypes = (controller.excludedActivityTypes ?? []) + [UIActivity.ActivityType.markupAsPDF]
-			}
-		}
-		controller.completionWithItemsHandler = { [weak self] activityType, completed, returnedItems, error in
-			self?.updateNightMode() // TODO: find way to display activity controller in night mode
-			guard completed, let type = activityType, let p = policy, p.allowPWManager else {
-				return
-			}
-			if let h = dlHost, webView?.url?.host == h {
-				if DashlaneHelper.shared.isDashlaneResponse(type: type) {
-					if let controller = tab?.controller {
-						DashlaneHelper.shared.fill(controller, with: returnedItems, completion: nil)
-					}
-					return
-				}
-			}
-			if let h = opwHost, webView?.url?.host == h {
-				if OnePasswordExtension.shared().isOnePasswordExtensionActivityType(type.rawValue) || type.rawValue == "com.lastpass.ilastpass.LastPassExt" {
-					if let webView = webView, let callback = tab?.controller?.enableJS() {
-						OnePasswordExtension.shared().fillReturnedItems(returnedItems, intoWebView: webView) { _, _  in
-							callback()
-						}
-					}
-				}
-			}
-		}
-		if sender.isKind(of: UIBarButtonItem.self) {
-			controller.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
-		} else if sender.isKind(of: UIView.self) {
-			let view = sender as? UIView
-			controller.popoverPresentationController?.sourceView = view?.superview;
-			controller.popoverPresentationController?.sourceRect = view?.frame ?? CGRect.zero
-		}
-		dimmer.set(dimmed: false, animated: true) // TODO: find way to display activity controller in night mode
-		present(controller, animated: true, completion: nil)
-	}
-
 	func showSettings() {
 		performSegue(withIdentifier: "showSettings", sender: urlBar)
 	}
@@ -514,16 +471,13 @@ private extension MainViewController {
 extension MainViewController {
 	func loadInFreshTab(input: String, type: InputType) {
 		if !(tabVC.tab?.controller?.unused ?? false) {
-			guard let tab = tabStore.addEmptyItem() else {
+			guard let tab = tabStore.add(loadHomepage: false) else {
 				return
 			}
 			set(tab: tab, animated: true)
 		}
 		hideTabsView(nil)
-		switch type {
-			case .url:			tabVC.tab?.controller?.load(url: URL(string: input))
-			case .plainInput:	tabVC.tab?.controller?.load(userInput: input)
-		}
+		tabVC.tab?.controller?.load(input: input, type: type)
 	}
 
 	func representingView(for tab: Tab?) -> UIView? {
@@ -564,17 +518,13 @@ extension MainViewController {
 		let wrapper = SettingsDefaultWrapper.wrapGlobalSettings()
 		let controller = TabSettingsController(wrapper: wrapper)
 		let contentView = LocalSettingsView(controller: controller)
-		let popover = DetailPopover(contentView: contentView, arrowPosition: .bottom(offset: 20)) {
-			if #available(iOS 11, *) {
-				let insets = self.view.safeAreaInsets
-				return CGPoint(x: 30 + insets.left, y: self.view.bounds.height - 33 - insets.bottom)
-			} else {
-				return CGPoint(x: 30, y: self.view.bounds.height - 33)
-			}
+		let popover = DetailPopover(contentView: contentView, arrowPosition: .bottom(offset: 20)) { _ in
+			let insets = self.view.safeAreaInsets
+			return CGPoint(x: 30 + insets.left, y: self.view.bounds.height - 33 - insets.bottom)
 		}
 		controller.callback = { [weak popover] values, temporary in
 			assert(!temporary)
-			guard let tab = self.tabStore.addEmptyItem(withSettings: values) else {
+			guard let tab = self.tabStore.add(withSettings: values) else {
 				return
 			}
 			self.scroll(to: tab)
@@ -587,7 +537,7 @@ extension MainViewController {
 		}
 	}
 
-	@IBAction func showTabsView(_ sender: AnyObject) {
+	private func showTabsView() {
 		tabVC.stopInput()
 		tabToolBar.isHidden = false
 		tabCollectionView.isHidden = false
@@ -626,7 +576,7 @@ extension MainViewController {
 	}
 
 	@IBAction func addEmptyTab(_ sender: AnyObject) {
-		let tab = tabStore.addEmptyItem()!
+		let tab = tabStore.add()!
 		scroll(to: tab)
 		set(tab: tab, animated: false) // hideTabsView will animate change
 		hideTabsView(sender)
@@ -648,7 +598,7 @@ extension MainViewController {
 			lastTab = tabs.last
 		}
 		if lastTab == nil {
-			lastTab = tabStore.addEmptyItem()
+			lastTab = tabStore.add()
 		}
 		set(tab: lastTab!, animated: false)
 
@@ -692,6 +642,10 @@ extension MainViewController {
 		tabVC.stopInput()
 	}
 
+	@objc private func endTextEntry(_ sender: UIKeyCommand) {
+		textInputBar?.cancel()
+	}
+
 	@objc private func startURLEntry(_ sender: UIKeyCommand) {
 		tabVC?.showControls()
 		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
@@ -712,7 +666,54 @@ extension MainViewController {
 	}
 
 	@objc private func makeNewTab(_ sender: UIKeyCommand) {
-		set(tab: tabStore.addEmptyItem()!, animated: true)
+		set(tab: tabStore.add()!, animated: true)
+	}
+
+	@objc private func closeTab(_ sender: UIKeyCommand) {
+		guard let tab = tabVC?.tab else {
+			return
+		}
+		close(tab)
+	}
+
+	@objc private func historyBack(_ sender: UIKeyCommand) {
+		tabVC?.tab?.controller?.goBack()
+	}
+
+	@objc private func historyForward(_ sender: UIKeyCommand) {
+		tabVC?.tab?.controller?.goForward()
+	}
+
+	@objc private func searchOnPage(_: UIKeyCommand) {
+		if let tab = tabVC?.tab, tab.controller?.webViewLoaded ?? false, let _ = tab.controller?.url {
+			startSearch(tab: tab, activity: nil)
+		}
+	}
+
+	@objc private func reloadPage(_: UIKeyCommand) {
+		tabVC?.tab?.controller?.reload()
+	}
+
+	@objc private func stopLoadingPage(_: UIKeyCommand) {
+		tabVC?.tab?.controller?.stopLoading()
+	}
+
+	@objc private func previousTab(_: UIKeyCommand) {
+		guard let tab = tabVC?.tab, let index = tabs.firstIndex(of: tab) else {
+			return
+		}
+		let newIndex = (index + tabs.count - 1) % tabs.count
+		let newTab = tabs[newIndex]
+		set(tab: newTab, animated: true)
+	}
+
+	@objc private func nextTab(_: UIKeyCommand) {
+		guard let tab = tabVC?.tab, let index = tabs.firstIndex(of: tab) else {
+			return
+		}
+		let newIndex = (index + 1) % tabs.count
+		let newTab = tabs[newIndex]
+		set(tab: newTab, animated: true)
 	}
 
 	func updateNightMode() {
@@ -761,7 +762,7 @@ extension MainViewController: TabCollectionViewCellDelegate {
 
 	override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
 		if motion == .motionShake && isShowingTabsView {
-			if let tab = tabStore.undoDeletion() {
+			if let tab = tabStore.undoDeletion().last {
 				scroll(to: tab)
 			}
 		}
@@ -769,41 +770,215 @@ extension MainViewController: TabCollectionViewCellDelegate {
 	}
 }
 
+// MARK: Tab History
+private extension MainViewController {
+	enum TabHistoryViewType {
+		case forward
+		case backward
+
+		func placement(in view: UIView, with urlBar: URLBar, oldArrowDirection: DetailPopoverArrowPosition?) -> (CGPoint, DetailPopoverArrowPosition)? {
+			let rect: CGRect?
+			switch self {
+				case .forward:	rect = urlBar.nextButtonFrame(in: view)
+				case .backward:	rect = urlBar.prevButtonFrame(in: view)
+			}
+			if let rect = rect {
+				if let arrow = oldArrowDirection, case .bottom(_) = arrow {
+					return nil
+				}
+				let offset: CGFloat
+				switch self {
+					case .forward:	offset = 40
+					case .backward:	offset = 20
+				}
+				return (CGPoint(x: rect.midX, y: rect.maxY), .top(offset: offset))
+			} else {
+				if let arrow = oldArrowDirection, case .top(_) = arrow {
+					return nil
+				}
+				let scale: CGFloat
+				switch self {
+					case .forward:	scale = 0.25
+					case .backward:	scale = 0.02
+				}
+				let x = view.bounds.minX + 25 + (view.bounds.width - 50) * scale
+				let point = CGPoint(x: x, y: view.bounds.maxY - 40)
+				let offset: CGFloat
+				switch self {
+					case .forward:	offset = 90
+					case .backward:	offset = 25
+				}
+				return (point, .bottom(offset: offset))
+			}
+		}
+
+		func list(from controller: TabController) -> [WKBackForwardListItem]? {
+			switch self {
+				case .forward:	return controller.forwardList
+				case .backward:	return controller.backList
+			}
+		}
+
+		var title: String {
+			switch self {
+				case .forward:	return NSLocalizedString("forward tab history title", comment: "title of popover to go forward in tab history")
+				case .backward:	return NSLocalizedString("back tab history title", comment: "title of popover to go back in tab history")
+			}
+		}
+	}
+	private func showTabHistoryView(ofType type: TabHistoryViewType) {
+		guard let controller = tabVC.tab?.controller, let history = type.list(from: controller) else {
+			return
+		}
+		let historyView = TabHistoryView(history: history, title: type.title)
+		let placement = type.placement(in: view, with: urlBar, oldArrowDirection: nil)!
+		let oldArrowDirection = placement.1
+		let popover = DetailPopover(contentView: historyView, arrowPosition: oldArrowDirection) { [weak self] popover -> CGPoint in
+			guard let self = self else {
+				return .zero
+			}
+			guard let placement = type.placement(in: self.view, with: self.urlBar, oldArrowDirection: oldArrowDirection) else {
+				popover.dismiss(animated: true)
+				self.showTabHistoryView(ofType: type)
+				return .zero
+			}
+			return placement.0
+		}
+		historyView.load = { [weak controller, weak popover] item in
+			controller?.go(to: item)
+			popover?.dismiss(animated: true)
+		}
+		popover.show(in: view, animated: true)
+	}
+}
+
 // MARK: URL Bar Delegate
 extension MainViewController: URLBarDelegate {
-	func prevButtonPressed(for urlBar: URLBar) {
+	func prevButtonTapped(for urlBar: URLBar) {
 		tabVC.tab?.controller?.goBack()
 	}
 
-	func nextButtonPressed(for urlBar: URLBar) {
+	func prevButtonHeld(for urlBar: URLBar) {
+		showTabHistoryView(ofType: .backward)
+	}
+
+	func nextButtonTapped(for urlBar: URLBar) {
 		tabVC.tab?.controller?.goForward()
+	}
+
+	func nextButtonHeld(for urlBar: URLBar) {
+		showTabHistoryView(ofType: .forward)
 	}
 
 	func shareButtonPressed(for urlBar: URLBar, sender: NSObject) {
 		let webView = tabVC.webViewForShareAction()
-		if let url = webView?.url, let tab = tabVC.tab, let host = url.host {
-			let policy = PolicyManager.manager(for: url, in: tab)
-			if policy.allowPWManager {
-				let onePwExtension = OnePasswordExtension.shared()
-				let opwAvailable = onePwExtension.isAppExtensionAvailable()
-				if opwAvailable, let callback = tab.controller?.enableJS() {
-					onePwExtension.createExtensionItem(forWebView: webView!) { (extentionItem, error) -> Void in
-						callback()
-						self.showActivityController(with: extentionItem, webView: webView, tab: tab, sender: sender, initialHost: host, policy: policy)
-					}
-					return
-				}
+		var items = [AnyObject]()
+		if let webView = webView {
+			if let title = webView.title {
+				items.append((title + " ") as AnyObject)
+			}
+			if let url = webView.url {
+				items.append(url as AnyObject)
+			}
+			items.append(PagePrintRenderer(webView: webView))
+			items.append(webView)
+			let info = UIPrintInfo(dictionary: nil)
+			let untitledName = NSLocalizedString("untitled document name", comment: "name of document that has not been given a name")
+			info.jobName = webView.title ?? webView.url?.absoluteString ?? untitledName
+			info.outputType = .general
+			items.append(info)
+		}
+		if let tab = tabVC.tab {
+			items.append(tab)
+		}
+		let scanActivity = ScanCodeActivity()
+		scanActivity.source = sender
+		scanActivity.delegate = self
+		let readerActivity = StartReaderActivity() { [weak self] activity in
+			guard let self = self, let tab = activity.tab, let url = tab.displayURL else {
+				activity.activityDidFinish(false)
+				return
+			}
+			let customization: (Tab) -> Void = { newtab in
+				let settings = Settings.settings(for: PolicyDomain(url: url), in: newtab)
+				settings.set(.true, for: readerModeKey)
+			}
+			guard let newtab = self.tabStore.add(with: URLRequest(url: url), copySettingsFromParent: tab, customization: customization) else {
+				activity.activityDidFinish(false)
+				return
+			}
+			self.set(tab: newtab, animated: true)
+			activity.activityDidFinish(true)
+		}
+		let searchActivity = FindOnPageActivity() { [weak self] activity in
+			if let tab = activity.tab {
+				self?.startSearch(tab: tab, activity: activity)
 			}
 		}
-		showActivityController(with: nil, webView: webView, tab: tabVC.tab, sender: sender, initialHost: nil, policy: nil)
+		var activities = [AddBookmarkActivity(), ShowDownloadsActivity(), readerActivity, searchActivity]
+		if scanActivity.available {
+			activities.append(scanActivity)
+		}
+		let controller = UIActivityViewController(activityItems: items, applicationActivities: activities)
+		controller.excludedActivityTypes = [UIActivity.ActivityType.addToReadingList]
+		// TODO: remove once bug is patched
+		// work arround a bug where iOS 11 tries to generate a file name from the title and fails if it is empty
+		if let wv = webView, (wv.title ?? "").isEmpty {
+			controller.excludedActivityTypes = (controller.excludedActivityTypes ?? []) + [UIActivity.ActivityType.markupAsPDF]
+		}
+		// TODO: find way to display activity controller in night mode
+		controller.completionWithItemsHandler = { [weak self] _, _, _, _ in self?.updateNightMode() }
+		if sender.isKind(of: UIBarButtonItem.self) {
+			controller.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
+		} else if sender.isKind(of: UIView.self) {
+			let view = sender as? UIView
+			controller.popoverPresentationController?.sourceView = view?.superview;
+			controller.popoverPresentationController?.sourceRect = view?.frame ?? .zero
+		}
+		dimmer.set(dimmed: false, animated: true) // TODO: find way to display activity controller in night mode
+		present(controller, animated: true, completion: nil)
 	}
 
 	func plusButtonPressed(for urlBar: URLBar) {
-		set(tab: tabStore.addEmptyItem()!, animated: true)
+		set(tab: tabStore.add()!, animated: true)
 	}
 
 	func tabsButtonPressed(for urlBar: URLBar) {
-		showTabsView(urlBar)
+		showTabsView()
+	}
+
+	func tabsButtonHeld(for urlBar: URLBar) {
+		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+		if let tab = tabVC.tab {
+			let closeTitle = NSLocalizedString("close tab tab menu option title", comment: "title of option in the tab menu to close the current tab")
+			let close = UIAlertAction(title: closeTitle, style: .destructive) { [weak self, weak tab]_ in
+				if let tab = tab {
+					self?.close(tab)
+				}
+			}
+			alert.addAction(close)
+		}
+		if !tabs.isEmpty && PolicyManager.globalManager().allowCloseAllTabs {
+			let closeAllTitle = NSLocalizedString("close all tabs tab menu option title", comment: "title of option in the tab menu to close all tabs")
+			let new = UIAlertAction(title: closeAllTitle, style: .destructive) { [weak self]_ in
+				self?.closeAllTabs()
+			}
+			alert.addAction(new)
+		}
+		let newTitle = NSLocalizedString("new tab tab menu option title", comment: "title of option in the tab menu to create a new tab")
+		let new = UIAlertAction(title: newTitle, style: .default) { [weak self]_ in
+			guard let self = self else {
+				return
+			}
+			self.set(tab: self.tabStore.add()!, animated: true)
+		}
+		alert.addAction(new)
+		let cancelTitle = NSLocalizedString("cancel tab menu option title", comment: "title of option in the tab menu to close the menu")
+		let cancel = UIAlertAction(title: cancelTitle, style: .cancel) { _ in }
+		alert.addAction(cancel)
+		alert.popoverPresentationController?.sourceView = view
+		alert.popoverPresentationController?.sourceRect = urlBar.tabsButtonFrame(in: view) ?? .zero
+		present(alert, animated: true, completion: nil)
 	}
 
 	func settingsButtonPressed(for urlBar: URLBar) {
@@ -819,14 +994,13 @@ extension MainViewController: URLBarDelegate {
 	}
 
 	func securityDetailButtonPressed(for urlBar: URLBar) {
-		guard let tab = tabVC.tab, let url = tab.controller?.url else {
+		guard let tab = tabVC.tab, let url = tab.displayURL else {
 			let contentView = UILabel(frame: CGRect(x: 0, y: 0, width: 250, height: 100))
 			contentView.text = NSLocalizedString("local page settings unavailable notice", comment: "is displayed when the user presses the page security icon without having loaded a page first")
 			contentView.numberOfLines = 3
 			contentView.textAlignment = .center
 			contentView.textColor = .localSettingsTitle
-			UIFont.setSnowHazeFont(on: contentView)
-			let popover = DetailPopover(contentView: contentView, arrowPosition: .top(offset: 20)) {
+			let popover = DetailPopover(contentView: contentView, arrowPosition: .top(offset: 20)) { _ in
 				let buttonFrame = urlBar.securityButtonFrame(in: self.view)
 				let x = buttonFrame.midX
 				let y = buttonFrame.maxY - 2
@@ -835,18 +1009,15 @@ extension MainViewController: URLBarDelegate {
 			popover.show(in: view, animated: true)
 			return
 		}
-		let policy = PolicyManager.manager(for: url, in: tab)
-		let controller = PageSettingsController(wrapper: policy.settingsWrapper)
-		controller.url = url
-		let domain = PolicyDomain(url: url)
-		let contentView = LocalSettingsView(controller: controller)
-		let popover = DetailPopover(contentView: contentView, arrowPosition: .top(offset: 20)) {
+		let pageInfo = PageInformationView(url: url, tab: tab)
+		let popover = DetailPopover(contentView: pageInfo, arrowPosition: .top(offset: 20)) { _ in
 			let buttonFrame = urlBar.securityButtonFrame(in: self.view)
 			let x = buttonFrame.midX
 			let y = buttonFrame.maxY - 2
 			return CGPoint(x: x, y: y)
 		}
-		controller.callback = { [weak popover] values, temporary in
+		let domain = PolicyDomain(url: url)
+		pageInfo.callback = { [weak popover] values, temporary in
 			Settings.atomically {
 				let tmpSettings = Settings.settings(for: domain, in: tab)
 				for (key, _) in values {
@@ -868,9 +1039,7 @@ extension MainViewController: URLBarDelegate {
 				tab.controller?.reload()
 			}
 		}
-		popover.show(in: view, animated: true) { _ in
-			contentView.flashScrollIndicator()
-		}
+		popover.show(in: view, animated: true)
 	}
 
 	func inputStringUpdated(for urlBar: URLBar, input: String) {
@@ -910,7 +1079,7 @@ extension MainViewController: URLBarDelegate {
 // MARK: Tab View Controller Delegate
 extension MainViewController: TabViewControllerDelegate {
 	func tabViewController(_ controller: TabViewController, openTabForRequest request: URLRequest) {
-		guard let tab = tabStore.addEmptyItem(with: request, copySettingsFromParent: controller.tab!) else {
+		guard let tab = tabStore.add(with: request, copySettingsFromParent: controller.tab!) else {
 			return
 		}
 		set(tab: tab, animated: true)
@@ -921,7 +1090,7 @@ extension MainViewController: TabViewControllerDelegate {
 			return
 		}
 		let policy = PolicyManager.manager(for: tab)
-		suggestionVC.sources = policy.searchSuggestionSources(for: tab)
+		suggestionVC.sources = policy.suggestionSources(for: tab)
 
 		suggestionVC.baseString = searchString
 		suggestionContainer.isHidden = suggestionVC.sources.isEmpty
@@ -960,6 +1129,15 @@ extension MainViewController: TabViewControllerDelegate {
 
 	func boundingViews() -> (top: UIView?, bottom: UIView?) {
 		return (urlBar, navigationToolBarContainer)
+	}
+
+	func showDownloads() {
+		if !(tabVC?.tab?.controller?.unused ?? false) {
+			set(tab: tabStore.add(loadHomepage: false)!, animated: true)
+			tabVC.showHistory(animated: false)
+		} else {
+			tabVC.showHistory(animated: true)
+		}
 	}
 }
 
@@ -1035,7 +1213,7 @@ extension MainViewController {
 		let curveValue = info[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber ?? NSNumber(value: 0 as Int32)
 		let curve = UIView.AnimationOptions(rawValue: curveValue.uintValue)
 		let endValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue
-		let endRect = endValue?.cgRectValue ?? CGRect.zero
+		let endRect = endValue?.cgRectValue ?? .zero
 		let viewRect = view.convert(endRect, from: view.window)
 		windowMargin = viewRect.size.height
 		var searchBarY: CGFloat
@@ -1045,9 +1223,7 @@ extension MainViewController {
 		} else {
 			searchBarY = viewRect.minY - searchBarHeight
 		}
-		if #available(iOS 11, *) {
-			searchBarY = min(view.bounds.maxY - searchBarHeight - view.safeAreaInsets.bottom, searchBarY)
-		}
+		searchBarY = min(view.bounds.maxY - searchBarHeight - view.safeAreaInsets.bottom, searchBarY)
 		UIView.animate(withDuration: duration.doubleValue, delay: 0, options: curve, animations: {
 			self.updateSuggestionVCHeight()
 			self.textInputBar?.frame.origin.y = searchBarY
@@ -1113,11 +1289,7 @@ extension MainViewController: SearchBarDelegate, SearchListener {
 		bar.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
 		self.view.addSubview(bar)
 		UIView.animate(withDuration: animationDuration, animations: {
-			if #available(iOS 11, *) {
-				bar.frame.origin.y = self.view.bounds.maxY - bar.frame.height - self.view.safeAreaInsets.bottom
-			} else {
-				bar.frame.origin.y = self.view.bounds.maxY - bar.frame.height
-			}
+			bar.frame.origin.y = self.view.bounds.maxY - bar.frame.height - self.view.safeAreaInsets.bottom
 		})
 		bar.textField.becomeFirstResponder()
 		return true

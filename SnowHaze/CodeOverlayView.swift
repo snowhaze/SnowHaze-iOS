@@ -2,7 +2,7 @@
 //  CodeOverlayView.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -52,6 +52,16 @@ class CodeOverlayView: UIView {
 
 				let buttonSize = cancelButton.titleLabel!.font.pointSize
 				let buttonFont = UIFont(name: name, size: buttonSize)
+				cancelButton.titleLabel?.font = buttonFont
+				doneButton.titleLabel?.font = buttonFont
+				previewButton.titleLabel?.font = buttonFont
+			} else {
+				let codeSize = codeLabel.font.pointSize
+				let codeFont = UIFont.systemFont(ofSize: codeSize)
+				codeLabel.font = codeFont
+
+				let buttonSize = cancelButton.titleLabel!.font.pointSize
+				let buttonFont = UIFont.systemFont(ofSize: buttonSize)
 				cancelButton.titleLabel?.font = buttonFont
 				doneButton.titleLabel?.font = buttonFont
 				previewButton.titleLabel?.font = buttonFont
@@ -176,18 +186,10 @@ class CodeOverlayView: UIView {
 	}
 
 	override func layoutSubviews() {
-		let leftMargin: CGFloat
-		let rightMargin: CGFloat
-		let bottomMargin: CGFloat
-		if #available(iOS 11, *) {
-			leftMargin = safeAreaInsets.left
-			rightMargin = safeAreaInsets.right
-			bottomMargin = safeAreaInsets.bottom
-		} else {
-			leftMargin = 0
-			rightMargin = 0
-			bottomMargin = 0
-		}
+		let leftMargin = safeAreaInsets.left
+		let rightMargin = safeAreaInsets.right
+		let bottomMargin = safeAreaInsets.bottom
+
 		codeBackgroundView.frame = CGRect(x: bounds.minX, y: bounds.midY - labelHeight / 2 - bottomMargin, width: bounds.width, height: labelHeight)
 		codeLabel.frame = CGRect(x: max(leftMargin, 8), y: 0, width: bounds.width - max(leftMargin + rightMargin, 2 * 8), height: labelHeight)
 

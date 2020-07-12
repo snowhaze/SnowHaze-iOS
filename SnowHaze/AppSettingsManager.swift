@@ -2,18 +2,19 @@
 //  AppSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
-let updateSiteListsSection = 1
-let updateSiteListsRow = 0
+private let updateSiteListsSection = 1
+private let updateSiteListsRow = 0
 
-let tabMaskingSection = 3
+private let tabMaskingSection = 3
 
-class AppSettingsManager: SettingsViewManager {
+class AppSettingsManager: SettingsViewManager, UITextFieldDelegate {
 	private let labelWidth: CGFloat = 65
 	private let margin: CGFloat = 10
 
@@ -27,28 +28,43 @@ class AppSettingsManager: SettingsViewManager {
 		return PolicyAssessor(wrapper: settings).assess([.application]).color
 	}
 
-	private lazy var label: UILabel = {
-		let label = UILabel(frame: CGRect(x: 0, y: 0, width: self.labelWidth, height: self.stepper.frame.height))
-		label.textColor = .subtitle
-		UIFont.setSnowHazeFont(on: label)
-		label.textAlignment = .right
-		return label
+	private lazy var labels: (undo: UILabel, preview: UILabel) = {
+		let undoLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.labelWidth, height: self.steppers.undo.frame.height))
+		undoLabel.textColor = .subtitle
+		undoLabel.textAlignment = .right
+
+		let previewLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.labelWidth, height: self.steppers.preview.frame.height))
+		previewLabel.textColor = .subtitle
+		previewLabel.textAlignment = .right
+		return (undoLabel, previewLabel)
 	}()
 
-	private lazy var stepper: UIStepper = {
-		let stepper = UIStepper()
-		stepper.minimumValue = 0
-		stepper.maximumValue = 9
-		stepper.stepValue = 1
-		stepper.tintColor = .switchOn
-		stepper.addTarget(self, action: #selector(stepperValueChanged(_:)), for: .valueChanged)
-		stepper.value = self.stepperValueFor(time: self.settings.value(for: tabClosingUndoTimeLimitKey).floatValue!)
+	private lazy var steppers: (undo: UIStepper, preview: UIStepper) = {
+		let undoStepper = UIStepper()
+		undoStepper.minimumValue = 0
+		undoStepper.maximumValue = 9
+		undoStepper.stepValue = 1
+		undoStepper.tintColor = .switchOn
+		undoStepper.addTarget(self, action: #selector(undoStepperValueChanged(_:)), for: .valueChanged)
+		undoStepper.value = self.stepperValueFor(time: self.settings.value(for: tabClosingUndoTimeLimitKey).floatValue!)
 
 		// workaround for iOS 13 "feature"
-		stepper.setIncrementImage(stepper.incrementImage(for: .normal), for: .normal)
-		stepper.setDecrementImage(stepper.decrementImage(for: .normal), for: .normal)
-		
-		return stepper
+		undoStepper.setIncrementImage(undoStepper.incrementImage(for: .normal), for: .normal)
+		undoStepper.setDecrementImage(undoStepper.decrementImage(for: .normal), for: .normal)
+
+		let previewStepper = UIStepper()
+		previewStepper.minimumValue = 0
+		previewStepper.maximumValue = 9
+		previewStepper.stepValue = 1
+		previewStepper.tintColor = .switchOn
+		previewStepper.addTarget(self, action: #selector(previewStepperValueChanged(_:)), for: .valueChanged)
+		previewStepper.value = self.stepperValueFor(time: self.settings.value(for: previewDelayKey).floatValue!)
+
+		// workaround for iOS 13 "feature"
+		previewStepper.setIncrementImage(previewStepper.incrementImage(for: .normal), for: .normal)
+		previewStepper.setDecrementImage(previewStepper.decrementImage(for: .normal), for: .normal)
+
+		return (undoStepper, previewStepper)
 	}()
 
 	override func setup() {
@@ -75,12 +91,30 @@ class AppSettingsManager: SettingsViewManager {
 				uiSwitch.isOn = bool(for: showLocalSiteSuggestionsKey)
 				uiSwitch.addTarget(self, action: #selector(toggleShowLocalSiteSuggestions(_:)), for: .valueChanged)
 				cell.accessoryView = uiSwitch
-			} else {
+			} else if indexPath.row == 1 {
 				let uiSwitch = makeSwitch()
 				cell.textLabel?.text = NSLocalizedString("suggest private sites setting title", comment: "title of suggest private sites setting")
 				uiSwitch.isOn = bool(for: suggestPrivateSitesKey)
 				uiSwitch.addTarget(self, action: #selector(toggleSuggestPrivate(_:)), for: .valueChanged)
 				cell.accessoryView = uiSwitch
+			} else if indexPath.row == 2 {
+				cell.textLabel?.text = NSLocalizedString("preview wait setting title", comment: "title of setting to delay the loading of a page preview for a few secconds")
+				steppers.preview.frame.origin.x = labelWidth + margin
+				let view = UIView(frame: CGRect(x: 0, y: 0, width: labelWidth + steppers.preview.frame.width + margin, height: steppers.preview.frame.height))
+				view.addSubview(labels.preview)
+				view.addSubview(steppers.preview)
+				cell.accessoryView = view
+				updateLabelForPreviewStepper()
+			} else {
+				let textField = makeTextField(for: cell)
+				textField.placeholder = NSLocalizedString("home page url setting title", comment: "title of home page url setting")
+				textField.text = settings.value(for: homepageURLKey).text
+				textField.delegate = self
+				textField.keyboardType = .URL
+				textField.autocorrectionType = .no
+				textField.autocapitalizationType = .none
+				textField.textContentType = .URL
+				updatedBorder(of: textField, for: settings.value(for: homepageURLKey).text ?? "")
 			}
 		} else if indexPath.section == updateSiteListsSection {
 			if indexPath.row == updateSiteListsRow {
@@ -110,12 +144,12 @@ class AppSettingsManager: SettingsViewManager {
 		} else if indexPath.section == 2 {
 			if indexPath.row == 0 {
 				cell.textLabel?.text = NSLocalizedString("allow tab closing undo duration settings title", comment: "title of setting for the duration during which closing a tab can be undone")
-				stepper.frame.origin.x = labelWidth + margin
-				let view = UIView(frame: CGRect(x: 0, y: 0, width: labelWidth + stepper.frame.width + margin, height: stepper.frame.height))
-				view.addSubview(label)
-				view.addSubview(stepper)
+				steppers.undo.frame.origin.x = labelWidth + margin
+				let view = UIView(frame: CGRect(x: 0, y: 0, width: labelWidth + steppers.undo.frame.width + margin, height: steppers.undo.frame.height))
+				view.addSubview(labels.undo)
+				view.addSubview(steppers.undo)
 				cell.accessoryView = view
-				updateLabelForStepper()
+				updateLabelForUndoStepper()
 			} else {
 				let uiSwitch = makeSwitch()
 				cell.textLabel?.text = NSLocalizedString("allow tab closing undo for all tabs settings title", comment: "title of setting to allow tab closing to be undone for all tabs")
@@ -151,7 +185,7 @@ class AppSettingsManager: SettingsViewManager {
 	override func heightForFooter(inSection section: Int) -> CGFloat {
 		if section == tabMaskingSection {
 			return super.heightForFooter(inSection: section)
-		} else if section == updateSiteListsSection && !SubscriptionManager.shared.hasSubscription {
+		} else if section == updateSiteListsSection && !SubscriptionManager.status.possible {
 			return 30
 		} else {
 			return 0
@@ -179,8 +213,8 @@ class AppSettingsManager: SettingsViewManager {
 	}
 
 	override func titleForFooter(inSection section: Int) -> String? {
-		if section == updateSiteListsSection && !SubscriptionManager.shared.hasSubscription {
-			return NSLocalizedString("subscribe to premium for daily site lists update notice", comment: "indication that subscribing to premium gives access to frequent site lists updates")
+		if section == updateSiteListsSection && !SubscriptionManager.status.possible {
+			return NSLocalizedString("subscribe to premium for frequent site lists update notice", comment: "indication that subscribing to premium gives access to frequent site lists updates")
 		} else {
 			return nil
 		}
@@ -194,7 +228,7 @@ class AppSettingsManager: SettingsViewManager {
 		assert(tabMaskingSection == 3)
 		assert(updateSiteListsSection == 1)
 		switch section {
-			case 0:		return 2
+			case 0:		return 4
 			case 1:		return 2
 			case 2:		return 2
 			case 3:		return 3
@@ -209,16 +243,10 @@ class AppSettingsManager: SettingsViewManager {
 	}
 
 	@objc private func toggleUpdateSiteLists(_ sender: UISwitch) {
-		set(sender.isOn, for: updateSiteListsKey)
+		DomainList.set(updating: sender.isOn)
 		updateHeaderColor(animated: true)
-		if sender.isOn {
-			DownloadManager.shared.triggerSiteListsUpdate()
-		} else {
-			DownloadManager.shared.stopSiteListsUpdate()
-			// Also is done in DefaultsSettingsManager on Settings Reset
-			try? FileManager.default.removeItem(atPath: DomainList.dbLocation)
+		if !sender.isOn {
 			let indexPath = IndexPath(row: updateSiteListsRow, section: updateSiteListsSection)
-			NotificationCenter.default.post(name: DomainList.dbFileChangedNotification, object: nil)
 			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3) { [weak self] in
 				self?.controller.tableView.reloadRows(at: [indexPath], with: .fade)
 			}
@@ -283,23 +311,41 @@ class AppSettingsManager: SettingsViewManager {
 		}
 	}
 
-	@objc private func stepperValueChanged(_ sender: UIStepper) {
+	@objc private func undoStepperValueChanged(_ sender: UIStepper) {
 		settings.set(.float(timeFor(stepperValue: sender.value)), for: tabClosingUndoTimeLimitKey)
-		updateLabelForStepper()
+		updateLabelForUndoStepper()
 		updateHeaderColor(animated: true)
 	}
 
+	@objc private func previewStepperValueChanged(_ sender: UIStepper) {
+		settings.set(.float(timeFor(stepperValue: sender.value)), for: previewDelayKey)
+		updateLabelForPreviewStepper()
+		updateHeaderColor(animated: true)
+	}
 
-	private func updateLabelForStepper() {
-		let value = Int(timeFor(stepperValue: stepper.value))
+	private func updateLabelForUndoStepper() {
+		let value = Int(timeFor(stepperValue: steppers.undo.value))
 		switch value {
 			case 0:
-				label.text = NSLocalizedString("tab closing undo time limit 0 seconds time", comment: "string used to indicate that tab closing cannot be undone")
+				labels.undo.text = NSLocalizedString("tab closing undo time limit 0 seconds time", comment: "string used to indicate that tab closing cannot be undone")
 			case 1:
-				label.text = NSLocalizedString("tab closing undo time limit 1 second time", comment: "string used to indicate that tab closing can be undone for 1 second")
+				labels.undo.text = NSLocalizedString("tab closing undo time limit 1 second time", comment: "string used to indicate that tab closing can be undone for 1 second")
 			default:
 				let format = NSLocalizedString("tab closing undo time limit many seconds time format", comment: "format string used to indicate how long tab closing can be undone")
-				label.text = String(format: format, "\(value)")
+				labels.undo.text = String(format: format, "\(value)")
+		}
+	}
+
+	private func updateLabelForPreviewStepper() {
+		let value = Int(timeFor(stepperValue: steppers.preview.value))
+		switch value {
+			case 0:
+				labels.preview.text = NSLocalizedString("preview delay 0 seconds time", comment: "string used to indicate that page preview loads are not delayed")
+			case 1:
+				labels.preview.text = NSLocalizedString("preview delay 1 second time", comment: "string used to indicate that page preview loads are delayed for 1 second")
+			default:
+				let format = NSLocalizedString("preview delay many seconds time format", comment: "format string used to indicate for how long page preview loads are delayed")
+				labels.preview.text = String(format: format, "\(value)")
 		}
 	}
 
@@ -318,5 +364,47 @@ class AppSettingsManager: SettingsViewManager {
 			}
 		}
 		updateHeaderColor(animated: true)
+	}
+
+	private func isValid(_ text: String) -> Bool {
+		if !text.isEmpty, let url = URL(string: text), let host = url.host, ["http", "https"].contains(url.normalizedScheme) {
+			return host.contains(".") && !host.contains(" ")
+		}
+		return false
+	}
+
+	private func updatedBorder(of textField: UITextField, for text: String) {
+		if text.isEmpty {
+			textField.layer.borderColor = UIColor.black.cgColor
+		} else if isValid(text) {
+			textField.layer.borderColor = UIColor.veryGoodPrivacy.cgColor
+		} else {
+			textField.layer.borderColor = UIColor.veryBadPrivacy.cgColor
+		}
+	}
+
+	private func update(url text: String?) {
+		if let text = text, isValid(text) {
+			settings.set(.text(text), for: homepageURLKey)
+		} else {
+			settings.set(.null, for: homepageURLKey)
+		}
+		updateHeaderColor(animated: true)
+	}
+
+	func textFieldDidEndEditing(_ textField: UITextField) {
+		update(url: textField.text)
+	}
+
+	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+		let text = (textField.text ?? "") as NSString
+		let new = text.replacingCharacters(in: range, with: string)
+		updatedBorder(of: textField, for: new)
+		return true
+	}
+
+	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+		textField.resignFirstResponder()
+		return true
 	}
 }

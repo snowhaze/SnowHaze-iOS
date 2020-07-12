@@ -2,12 +2,13 @@
 //  DomainList.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import CommonCrypto
+import UIKit
 
 enum DomainListType {
 	case trackingScripts
@@ -113,11 +114,10 @@ class DomainList {
 			let setupOptions = SQLite.SetupOptions.secure.subtracting([.limitLikePatternLength, .limitLength, .limitVariableNumber])
 			let updatedDB = SQLCipher(path: DomainList.dbLocation, key: DomainList.dbKey, flags: .readonly, cipherOptions: .compatibility(3), setupOptions: setupOptions)
 			try! updatedDB?.execute("PRAGMA query_only=true")
-			let result = (try? updatedDB?.execute(dbVerificationQuery, with: [.text(BlockerID.adBlocker1), .text(BlockerID.hstsPreloadUpgrader1)])) ?? nil
+			let result = (try? updatedDB?.execute(dbVerificationQuery, with: BlockerID.checkBlockers.map { .text($0) })) ?? nil
 			let tblCnt = result?[0].integer ?? 0
-			let clOK1 = result?[1].boolValue ?? false
-			let clOK2 = result?[2].boolValue ?? false
-			let ok = tblCnt == 10 && clOK1 && clOK2
+			let blockerCount = result?[1].integer ?? -1
+			let ok = tblCnt == 10 && blockerCount == Int64(BlockerID.checkBlockers.count)
 
 			let bundlePath = Bundle.main.path(forResource: "lists", ofType: "db")!
 			let options = SQLCipher.CipherOptions.v4Defaults
@@ -177,7 +177,7 @@ class DomainList {
 		}
 		let query = [String](repeating: "(?)", count: bindings.count).joined(separator: ",")
 		let result = try! db.execute("SELECT trackers FROM \(type.table) WHERE domain IN (VALUES \(query)) AND trackers IS NOT NULL ORDER BY length(domain) DESC LIMIT 1", with: bindings)
-		return result.first?.integerValue! ?? 15
+		return result.first?.integerValue! ?? 14
 	}
 
 	func search(top: Int64, matching: String) -> [(Int64, String)] {
@@ -204,195 +204,13 @@ class DomainList {
 		return result.map { $0["type"]!.integer! }
 	}
 
-	private func sha256(_ string: String) -> SQLite.Data {
-		var hash = [UInt8](repeating: 0,  count: Int(CC_SHA256_DIGEST_LENGTH))
-		let data = string.data(using: .utf8)!
-		_ = data.withUnsafeBytes { CC_SHA256($0.baseAddress, CC_LONG($0.count), &hash) }
-		return .blob(Data(hash))
-	}
-
-	private let IPv4Rx = Regex(pattern: "^([0-9]+|0[xX][0-9a-fA-F]*)(?:.([0-9]+|0[xX][0-9a-fA-F]*)){0,3}$")
-	private let numRx = Regex(pattern: "[0-9]+|0[xX][0-9a-fA-F]*")
-
-	private func parseIP(_ host: String) -> String? {
-		if host.matches(IPv4Rx) {
-			let components = host.matchData(numRx)
-			var num: UInt32 = 0
-			var multiplier: UInt32 = 256 * 256 * 256
-			for (i, component) in components.enumerated() {
-				var compstr = component.match()!
-				let radix: Int
-				if compstr.hasPrefix("0x") || compstr.hasPrefix("0X") {
-					compstr.remove(at: compstr.index(after: compstr.startIndex))
-					radix = 16
-				} else if compstr.hasPrefix("0") {
-					radix = 8
-				} else {
-					radix = 10
-				}
-				guard let comp = UInt32(compstr, radix: radix) else {
-					return nil
-				}
-				if i == components.count - 1 {
-					multiplier = 1
-				} else if comp >= 256 {
-					return nil
-				}
-				let add = multiplier * comp
-				multiplier /= 256
-				let (newNum, overflow) = num.addingReportingOverflow(add)
-				guard !overflow else {
-					return nil
-				}
-				num = newNum
-			}
-			return "\(num / (256 * 256 * 256)).\((num / (256 * 256)) % 256).\((num / 256) % 256).\(num % 256)"
-		} else {
-			return nil
-		}
-	}
-
-	private func canonicalizeHost(_ string: String?) -> String? {
-		guard var host = string else {
-			return nil
-		}
-		while host.hasPrefix(".") {
-			host = String(host[host.index(after: host.startIndex)...])
-		}
-		while host.hasSuffix(".") {
-			host = String(host[..<host.index(before: host.endIndex)])
-		}
-		while host.contains("..") {
-			host = host.replacingOccurrences(of: "..", with: ".")
-		}
-		host = parseIP(host) ?? host
-		return host.lowercased()
-	}
-
-	private func canonicalizePath(_ string: String?, finalSlash: Bool) -> String {
-		var path = string ?? "/"
-		var reducedComponents = [String]()
-		let pathComps = (path as NSString).pathComponents
-		for comp in pathComps {
-			if "." == comp {
-				continue
-			} else if ".." == comp {
-				if !reducedComponents.isEmpty {
-					reducedComponents.removeLast()
-				}
-			} else {
-				reducedComponents.append(comp)
-			}
-		}
-		path = NSString.path(withComponents: reducedComponents)
-		if path.isEmpty || reducedComponents.last == "/" {
-			path += "/"
-		}
-		while path.contains("//") {
-			path = path.replacingOccurrences(of: "//", with: "/")
-		}
-		if finalSlash && !path.hasSuffix("/") {
-			path += "/"
-		}
-		return path
-	}
-
-	private func unescape(_ string: String?) -> String? {
-		guard var string = string else {
-			return nil
-		}
-		var old: String
-		repeat {
-			old = string
-			string = string.replace(rx, template: "%25")
-			string = string.removingPercentEncoding ?? old
-		} while old != string
-		return string
-	}
-
-	private let rx = Regex(pattern: "%(?![a-fA-F0-9]{2})")
-	private let finalSlashRx = Regex(pattern: "//[^/]+/[^?#]*/(?:$|\\?|#)")
-	private let fragRx = Regex(pattern: "#.*")
-
-	private func canonicalize(_ paramURL: URL) -> (String, String, String?) {
-		var url = paramURL.absoluteString.replacingOccurrences(of: "\t", with: "")
-		url = url.replacingOccurrences(of: "\n", with: "")
-		url = url.replacingOccurrences(of: "\r", with: "")
-		url = url.replace(fragRx, template: "")
-		url = url.replace(rx, template: "%25")
-		guard let realURL = URL(string: url) else {
-			return ("", "", nil)
-		}
-		guard var host = canonicalizeHost(unescape(realURL.host)) else {
-			return ("", "", nil)
-		}
-		var path = canonicalizePath(unescape(realURL.path), finalSlash: url.matches(finalSlashRx))
-		if path.isEmpty {
-			path = "/"
-		}
-		var query = realURL.query
-		let allowedChars = CharacterSet.safebrowsingAllowedCharacters
-		host = host.addingPercentEncoding(withAllowedCharacters: allowedChars) ?? host
-		path = path.addingPercentEncoding(withAllowedCharacters: allowedChars) ?? path
-		query = query?.addingPercentEncoding(withAllowedCharacters: allowedChars) ?? query
-		return (host, path, query)
-	}
-
-	private func hostQueries(_ host: String) -> [String] {
-		var result = [host]
-		if let _ = parseIP(host) {
-			return result
-		}
-		let components = host.components(separatedBy: ".")
-		for i in 2 ... 5 {
-			if components.count > i {
-				let comps = components[components.count - i ... components.count - 1]
-				let domain = comps.joined(separator: ".")
-				result.append(domain)
-			}
-		}
-		return result
-	}
-
-	private func pathQueries(_ path: String, query: String?) -> [String] {
-		var result = [path]
-		if let query = query {
-			result.append(path + "?" + query)
-		}
-		let components = (path as NSString).pathComponents.filter { $0 != "/" }
-		for i in 0 ... 3 {
-			if components.count > i {
-				let comps = Array(components[0 ..< i])
-				var path = "/" + NSString.path(withComponents: comps)
-				if !path.hasSuffix("/") {
-					path += "/"
-				}
-				result.append(path)
-			}
-		}
-		return result
-	}
-
-	private func hashQueries(for url: URL) -> [SQLite.Data] {
-		let (host, path, query) = canonicalize(url)
-		let hosts = hostQueries(host)
-		let paths = pathQueries(path, query: query)
-		var hashes: [SQLite.Data] = []
-		for host in hosts {
-			for path in paths {
-				hashes.append(sha256(host + path))
-			}
-		}
-		return hashes
-	}
-
-	func types(forURL url: URL) -> [Int64] {
+	func types(for hashes: Set<Data>) -> [Int64] {
 		switch type {
 			case .dangerHash, .empty: break
 			default: fatalError("top search is only supported for danger and empty domain list types")
 		}
-		let queryBlobs = hashQueries(for: url)
-		let values = Array<String>(repeating: "(?)", count: queryBlobs.count).joined(separator: ", ")
+		let queryBlobs = hashes.map { SQLite.Data.blob($0) }
+		let values = [String](repeating: "(?)", count: queryBlobs.count).joined(separator: ", ")
 		let query = "SELECT DISTINCT type FROM \(type.table) WHERE hash IN (VALUES \(values))"
 		let result = try! db.execute(query, with: queryBlobs)
 		return result.map { $0["type"]!.integer! }
@@ -423,6 +241,21 @@ class DomainList {
 	static func contentBlockerSource(for id: String) -> (Int64, String) {
 		let result = try! dbManager.execute("SELECT version, source FROM content_blocker WHERE id = ?", with: [.text(id)])
 		return (result[0]["version"]!.integer!, result[0]["source"]!.text!)
+	}
+
+	static func set(updating: Bool) {
+		let oldUpdating = PolicyManager.globalManager().updateSiteLists
+		guard oldUpdating != updating else {
+			return
+		}
+		Settings.globalSettings().set(SQLite.Data(updating), for: updateSiteListsKey)
+		if updating {
+			DownloadManager.shared.triggerSiteListsUpdate()
+		} else {
+			DownloadManager.shared.stopSiteListsUpdate()
+			try? FileManager.default.removeItem(atPath: DomainList.dbLocation)
+			NotificationCenter.default.post(name: DomainList.dbFileChangedNotification, object: nil)
+		}
 	}
 }
 
@@ -456,30 +289,17 @@ FROM
 		UNION ALL
 			SELECT
 				1,
-				EXISTS
-					(
-						SELECT
-							*
-						FROM
-							content_blocker
-						WHERE
-							id = ?
-					)
+				(
+					SELECT
+						COUNT(DISTINCT id)
+					FROM
+						content_blocker
+					WHERE
+						id IN (?, ?, ?, ?)
+				)
 		UNION ALL
 			SELECT
 				2,
-				EXISTS
-					(
-						SELECT
-							*
-						FROM
-							content_blocker
-						WHERE
-							id = ?
-					)
-		UNION ALL
-			SELECT
-				3,
 				*
 			FROM
 				(

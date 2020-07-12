@@ -2,11 +2,12 @@
 //  WorkerWebViewManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import WebKit
 
 protocol WorkerWebViewManagerDelegate: class {
 	func webViewManagerDidFailLoad(_ manager: WorkerWebViewManager)
@@ -26,6 +27,8 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 	let tab: Tab
 	weak var delegate: WorkerWebViewManagerDelegate?
 
+	private var isLocalOnly = false
+
 	private var dec: (() -> Void)?
 	private var observer: NSObjectProtocol?
 
@@ -39,16 +42,18 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 
 	private var observations = Set<NSKeyValueObservation>()
 
+	let securityCookie: String = String.secureRandom()
+
 	private(set) lazy var webView: WKWebView = {
 		let policy = PolicyManager.manager(for: self.tab)
-		let config = policy.webViewConfiguration
+		let config = policy.webViewConfiguration(for: self)
 		if let store = self.tab.controller?.dataStore {
 			(config.websiteDataStore, config.processPool) = store
 		} else {
 			let store = policy.dataStore
 			(config.websiteDataStore, config.processPool) = (store.store, store.pool ?? WKProcessPool())
 		}
-		let ret = WKWebView(frame: CGRect.zero, configuration: config)
+		let ret = WKWebView(frame: .zero, configuration: config)
 		ret.allowsLinkPreview = false
 		ret.customUserAgent = self.tab.controller?.userAgent ?? policy.userAgent
 		ret.navigationDelegate = self
@@ -56,13 +61,13 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 
 		DispatchQueue.main.async {
 			self.observations.insert(ret.observe(\.estimatedProgress, options: .initial, changeHandler: { [weak self] webView, _ in
-				if let me = self {
-					me.delegate?.webViewManager(me, didMakeProgress: webView.estimatedProgress)
+				if let self = self {
+					self.delegate?.webViewManager(self, didMakeProgress: webView.estimatedProgress)
 				}
 			}))
 
 			self.observations.insert(ret.observe(\.isLoading, options: .initial, changeHandler: { [weak self] webView, _ in
-				if webView.isLoading {
+				if webView.isLoading, !(self?.isLocalOnly ?? false) {
 					self?.dec = InUseCounter.network.inc()
 				} else {
 					self?.dec?()
@@ -71,9 +76,9 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 			}))
 		}
 		self.observations.insert(ret.observe(\.url, options: .initial, changeHandler: { [weak self] webView, _ in
-			if let me = self {
-				me.update(for: webView.url, webView: webView)
-				me.delegate?.webViewManaget(me, isLoading: webView.url)
+			if let self = self {
+				self.update(for: webView.url, webView: webView)
+				self.delegate?.webViewManaget(self, isLoading: webView.url)
 			}
 		}))
 		return ret
@@ -81,18 +86,24 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 
 	func load(userInput input: String) {
 		let policy = PolicyManager.manager(for: tab)
-		load(policy.actionList(for: input))
+		load(policy.actionList(for: input, in: tab))
 	}
 
 	func load(url: URL?) {
 		if let url = url {
-			load([.load(url, false)])
+			load([.load(url, upgraded: false)])
 		}
 	}
 
-	func load(request: URLRequest) {
+	func loadLocal(html: String) {
+		isLocalOnly = true
+		webView.loadHTMLString(html, baseURL: nil)
+	}
+
+	private func load(request: URLRequest) {
+		isLocalOnly = false
 		update(for: request.url, webView: webView)
-		webView.load(request)
+		rawLoad(request, in: webView)
 	}
 
 	private func load(_ list: [PolicyManager.Action]) {
@@ -118,6 +129,10 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 		if let observer = observer {
 			NotificationCenter.default.removeObserver(observer)
 		}
+		let insecureHandler = webView.configuration.urlSchemeHandler(forURLScheme: "tor") as? TorSchemeHandler
+		insecureHandler?.cleanup()
+		let secureHandler = webView.configuration.urlSchemeHandler(forURLScheme: "tors") as? TorSchemeHandler
+		secureHandler?.cleanup()
 		webView.stopLoading()
 		dec?()
 	}
@@ -150,7 +165,7 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 
 	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 		lastUpgrade.dec()
-		let actionURL = navigationAction.request.url
+		let actionURL = navigationAction.request.url?.detorified ?? navigationAction.request.url
 		let isHTTPGet = navigationAction.request.isHTTPGet
 		if actionURL != lastUpgrade.url, let url = upgradeURL(for: actionURL, navigationAction: navigationAction) {
 			delegate?.webViewManaget(self, didUpgradeLoadOf: url)
@@ -174,6 +189,11 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 			delegate?.webViewManagerDidFailLoad(self)
 			return
 		}
+		if navigationAction.request.isHTTPGet && navigationAction.targetFrame?.isMainFrame ?? true, let url = policy.torifyIfNecessary(for: tab, url: navigationAction.request.url) {
+			decisionHandler(.cancel)
+			load(url: url)
+			return
+		}
 		if policy.stripTrackingURLParameters && isHTTPGet, let original = actionURL {
 			let db = DomainList.dbManager
 			let table = "parameter_stripping"
@@ -189,12 +209,24 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 			load(url: url)
 			return
 		}
-		if let url = actionURL, !policy.dangerReasons(for: url).isEmpty {
-			decisionHandler(.cancel)
-			delegate?.webViewManagerDidFailLoad(self)
-			return
+		if let url = actionURL {
+			guard let controller = tab.controller else {
+				decisionHandler(.cancel)
+				return
+			}
+			policy.dangerReasons(for: url, in: controller) { [weak self] dangers in
+				if dangers.isEmpty {
+					decisionHandler(.allow)
+				} else {
+					decisionHandler(.cancel)
+					if let me = self {
+						me.delegate?.webViewManagerDidFailLoad(me)
+					}
+				}
+			}
+		} else {
+			decisionHandler(.allow)
 		}
-		decisionHandler(.allow)
 	}
 
 	func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -216,7 +248,8 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 /// internals
 private extension WorkerWebViewManager {
 	func strippedURL(for navigationAction: WKNavigationAction) -> URL? {
-		guard let url = navigationAction.request.url, navigationAction.targetFrame?.isMainFrame ?? false else {
+		let rawURL = navigationAction.request.url
+		guard let url = rawURL?.detorified ?? rawURL, navigationAction.targetFrame?.isMainFrame ?? false else {
 			return nil
 		}
 		guard navigationAction.request.isHTTPGet else {
@@ -233,5 +266,11 @@ private extension WorkerWebViewManager {
 	func update(for url: URL?, webView: WKWebView) {
 		let policy = PolicyManager.manager(for: url, in: tab)
 		update(policy: policy, webView: webView)
+	}
+}
+
+extension WorkerWebViewManager {
+	func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+		didReceive(scriptMessage: message, from: userContentController)
 	}
 }

@@ -2,7 +2,7 @@
 //	HistoryTableViewSectionHeader.swift
 //	SnowHaze
 //
-
+//
 //	Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -51,7 +51,6 @@ class HistoryTableViewSectionHeader: UIView {
 		titleLabel.frame.origin.x += startOffset
 		titleLabel.autoresizingMask = flexibleSize
 		titleLabel.textColor = .title
-		UIFont.setSnowHazeFont(on: titleLabel)
 		addSubview(titleLabel)
 
 		deleteButton.addTarget(self, action: #selector(deleteButtonTaped(_:)), for: .touchUpInside)
@@ -59,7 +58,6 @@ class HistoryTableViewSectionHeader: UIView {
 		deleteButton.setTitleColor(.title, for: [])
 		let inset: CGFloat = 5
 		deleteButton.contentEdgeInsets = UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
-		UIFont.setSnowHazeFont(on: deleteButton)
 		deleteButton.tintColor = .title
 		deleteButton.clipsToBounds = true
 		deleteButton.layer.cornerRadius = 10

@@ -2,7 +2,7 @@
 //  ContactSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -80,17 +80,13 @@ class ContactSettingsManager: SettingsViewManager, MFMailComposeViewControllerDe
 	}
 
 	@objc private func visitWebsite(_ sender: UIButton) {
-		let mainVC = MainViewController.controller
-		mainVC?.popToVisible(animated: true)
 		let site = "https://snowhaze.com/"
-		mainVC?.loadInFreshTab(input: site, type: .url)
+		open(site)
 	}
 
 	@objc private func showSource(_ sender: UIButton) {
-		let mainVC = MainViewController.controller
-		mainVC?.popToVisible(animated: true)
 		let site = "https://snowhaze.com/opensource"
-		mainVC?.loadInFreshTab(input: site, type: .url)
+		open(site)
 	}
 
 	@objc private func shareSnowHaze(_ sender: UIButton) {
@@ -101,10 +97,6 @@ class ContactSettingsManager: SettingsViewManager, MFMailComposeViewControllerDe
 	}
 
 	@objc private func rateSnowHaze(_ sender: UIButton) {
-		if #available(iOS 10, *) {
-			UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id1121026941?action=write-review")!)
-		} else {
-			UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/app/id1121026941?action=write-review")!)
-		}
+		UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id1121026941?action=write-review")!)
 	}
 }

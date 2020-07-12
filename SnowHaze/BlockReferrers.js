@@ -6,11 +6,11 @@
 	var removeAttribute = Element.prototype.removeAttribute;
 	var contains = Node.prototype.contains;
 	var appendChild = Node.prototype.appendChild;
-	
+
 	var element = document.createElement("meta");
 	element.setAttribute("name", "referrer");
 	element.setAttribute("content", "no-referrer");
-	
+
 	var elementObserver = new window.MutationObserver(function (changes) {
 		Function.prototype.call = call;
 		if (getAttribute.call(element, "name") != "referrer") {
@@ -21,8 +21,7 @@
 		}
 	});
 	elementObserver.observe(element, {attributes: true, attributeFilter: ["name", "content"]});
-	
-	
+
 	var head = null;
 	var observer = new window.MutationObserver(function (changes) {
 		Function.prototype.call = call;
@@ -43,7 +42,7 @@
 					if (!head && node.nodeName == "HEAD") {
 						head = node;
 						appendChild.call(head, element);
-						
+
 						var headObserver = new window.MutationObserver(function (changes) {
 							if (!contains.call(head, element)) {
 								appendChild.call(head, element);

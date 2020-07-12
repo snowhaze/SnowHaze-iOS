@@ -54,12 +54,73 @@
 	<true/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>org-appextension-feature-password-management</string>
 		<string>whatsapp</string>
 		<string>workflow</string>
 		<string>openvpn</string>
-		<string>dashlane-ext</string>
 		<string>itms-beta</string>
+		<string>tel</string>
+		<string>facetime</string>
+		<string>facetime-audio</string>
+		<string>itmss</string>
+		<string>mailto</string>
+		<string>map</string>
+		<string>webcal</string>
+		<string>calshow</string>
+		<string>ibooks</string>
+		<string>music</string>
+		<string>http</string>
+		<string>https</string>
+		<string>music</string>
+		<string>videos</string>
+		<string>imovie</string>
+		<string>googleearth</string>
+		<string>comgoogleearth</string>
+		<string>duolingo</string>
+		<string>evernote</string>
+		<string>fb</string>
+		<string>fb-messenger</string>
+		<string>fitbit</string>
+		<string>flickr</string>
+		<string>googlecalendar</string>
+		<string>googledocs</string>
+		<string>googledrive</string>
+		<string>googlegmail</string>
+		<string>googlehome</string>
+		<string>chromecast</string>
+		<string>googlemaps</string>
+		<string>googlephotos</string>
+		<string>googlesheets</string>
+		<string>googletranslate</string>
+		<string>googlevoice</string>
+		<string>hulu</string>
+		<string>imdb</string>
+		<string>instagram</string>
+		<string>lastpass</string>
+		<string>nflx</string>
+		<string>paypal</string>
+		<string>photoscan</string>
+		<string>pinterest</string>
+		<string>planner</string>
+		<string>podcast</string>
+		<string>feed</string>
+		<string>powerpoint</string>
+		<string>protonmail</string>
+		<string>sgnl</string>
+		<string>shazam</string>
+		<string>skype</string>
+		<string>slack</string>
+		<string>snapchat</string>
+		<string>speedtest</string>
+		<string>spotify</string>
+		<string>tg</string>
+		<string>tgapp</string>
+		<string>trello</string>
+		<string>twitter</string>
+		<string>udemy</string>
+		<string>waze</string>
+		<string>word</string>
+		<string>youtube</string>
+		<string>zuludesk</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -76,11 +137,6 @@
 	<string>SnowHaze needs library access to save images</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>SnowHaze needs library access to save images</string>
-	<key>UIAppFonts</key>
-	<array>
-		<string>texgyreadventor-regular.otf</string>
-		<string>texgyreadventor-bold.otf</string>
-	</array>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>

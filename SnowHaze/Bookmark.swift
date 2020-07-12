@@ -2,11 +2,12 @@
 //  Bookmark.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 private let weightMalus = 0.998
 private let weightBonus = 1.0
@@ -91,8 +92,10 @@ class Bookmark: Equatable, WorkerWebViewManagerDelegate {
 		}
 		let character = String(name[..<name.index(after: name.startIndex)])
 		let font = UIFont.systemFont(ofSize: 100)
-		let attributes = [NSAttributedString.Key.foregroundColor: UIColor.title, NSAttributedString.Key.font: font]
-		character.draw(in: CGRect(origin: CGPoint(x: 5, y: 0), size: size), withAttributes: attributes)
+		typealias Keys = NSAttributedString.Key
+		let attributes = [Keys.foregroundColor: UIColor.title, Keys.font: font]
+		let bounds = CGRect(origin: CGPoint(x: 5, y: 0), size: size)
+		character.draw(in: bounds, withAttributes: attributes)
 		let image = UIGraphicsGetImageFromCurrentImageContext()
 		UIGraphicsEndImageContext()
 		return image!

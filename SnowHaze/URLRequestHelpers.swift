@@ -2,7 +2,7 @@
 //  URLRequestHelpers.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -25,6 +25,14 @@ extension URLRequest {
 		httpMethod = "POST"
 		httpBody = data
 		setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
+		setValue("\(data.count)", forHTTPHeaderField: "Content-Length")
+	}
+
+	mutating func setJSON(_ data: Any) throws {
+		let data = try JSONSerialization.data(withJSONObject: data)
+		httpMethod = "POST"
+		httpBody = data
+		setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 		setValue("\(data.count)", forHTTPHeaderField: "Content-Length")
 	}
 

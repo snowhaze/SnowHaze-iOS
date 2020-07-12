@@ -2,13 +2,43 @@
 //  SettingsViewManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 class SettingsViewManager: NSObject {
+	class OneWaySwitch: UIView {
+		private let uiSwitch: UISwitch
+		init(manager: SettingsViewManager, action: Selector) {
+			let imageSize: CGFloat = 25
+			let flexible: UIView.AutoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
+			uiSwitch = manager.makeSwitch()
+			uiSwitch.isOn = true
+			uiSwitch.addTarget(manager, action: action, for: .valueChanged)
+			uiSwitch.autoresizingMask = flexible
+			let blocked = UIImageView(image: #imageLiteral(resourceName: "blocked"))
+			blocked.frame = CGRect(x: 0, y: 0, width: imageSize, height: imageSize)
+			blocked.autoresizingMask = flexible
+			uiSwitch.center = CGPoint(x: 0, y: imageSize / 2)
+			uiSwitch.frame.origin.x = imageSize + 10
+			super.init(frame: CGRect(x: 0, y: 0, width: uiSwitch.frame.width + imageSize + 10, height: imageSize))
+			addSubview(uiSwitch)
+			addSubview(blocked)
+		}
+
+		required init?(coder: NSCoder) {
+			fatalError("init(coder:) has not been implemented")
+		}
+
+		func trigger() {
+			uiSwitch.setOn(false, animated: true)
+			uiSwitch.sendActions(for: UIControl.Event.valueChanged)
+		}
+	}
+
 	let settings = SettingsDefaultWrapper.wrapGlobalSettings()
 
 	weak var controller: SettingsDetailViewController!
@@ -24,7 +54,7 @@ class SettingsViewManager: NSObject {
 	private(set) lazy var header: SettingsDetailTableViewHeader = {
 		let header = SettingsDetailTableViewHeader(reuseIdentifier: "header")
 		let color = UIColor.title.hex
-		let bold = UIFont(name: BoldSnowHazeFontName, size: header.size)!
+		let bold = UIFont.boldSystemFont(ofSize: header.size)
 		header.sectionDescription = HTMLParser(html: self.html(), boldFont: bold).attributedString
 		return header
 	}()
@@ -36,6 +66,15 @@ class SettingsViewManager: NSObject {
 			})
 		} else {
 			header.color = assessmentResultColor
+		}
+	}
+
+	var rightBarButtonItem: UIBarButtonItem? {
+		get {
+			return controller?.rightBarButtonItem
+		}
+		set {
+			controller?.rightBarButtonItem = newValue
 		}
 	}
 
@@ -61,19 +100,60 @@ class SettingsViewManager: NSObject {
 		return uiSwitch
 	}
 
-	private class SettingsButton: UIButton { }
+	func makeProgressView(for cell: UITableViewCell) -> UIProgressView {
+		let progress = UIProgressView(frame: cell.bounds)
+		progress.frame.size.width -= 40
+		progress.center = CGPoint(x: cell.bounds.midX, y: cell.bounds.midY)
+		progress.progressTintColor = .button
+		progress.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleWidth]
+		cell.addSubview(progress)
+		return progress
+	}
+
 	func makeButton(for cell: UITableViewCell) -> UIButton {
 		let button = SettingsButton(frame: cell.bounds)
 		button.setTitleColor(.darkTitle, for: .disabled)
 		cell.textLabel?.text = ""
-		UIFont.setSnowHazeFont(on: button)
 		button.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 		cell.addSubview(button)
 		return button
 	}
 
+	private class SettingsButton: UIButton { }
+	func makeTextField(for cell: UITableViewCell) -> UITextField {
+		let frame = CGRect(x: cell.bounds.minX + 20, y: cell.bounds.midY - 20, width: cell.bounds.maxX - 40, height: 40)
+		let textField = UITextField(frame: frame)
+		textField.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin, .flexibleTopMargin]
+		textField.layer.cornerRadius = 20
+		textField.clipsToBounds = true
+		textField.backgroundColor = .white
+		textField.layer.borderColor = UIColor.black.cgColor
+		textField.layer.borderWidth = 2
+		textField.textAlignment = .center
+		textField.tintColor = .button
+		cell.addSubview(textField)
+		return textField
+	}
+
+	private class ContainerView: UIView { }
+	func containerView(with frame: CGRect) -> UIView {
+		return ContainerView(frame: frame)
+	}
+
+	func open(_ site: String) {
+		let mainVC = MainViewController.controller
+		mainVC?.popToVisible(animated: true)
+		mainVC?.loadInFreshTab(input: site, type: .url)
+	}
+
 	func makeActivity(for cell: UITableViewCell) -> UIActivityIndicatorView {
-		let activity = UIActivityIndicatorView(style: .white)
+		let activity: UIActivityIndicatorView
+		if #available(iOS 13, *) {
+			activity = UIActivityIndicatorView(style: .medium)
+			activity.color = .white
+		} else {
+			activity = UIActivityIndicatorView(style: .white)
+		}
 		activity.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleRightMargin, .flexibleBottomMargin]
 		activity.center = CGPoint(x: cell.bounds.midX, y: cell.bounds.midY)
 		activity.startAnimating()
@@ -85,7 +165,17 @@ class SettingsViewManager: NSObject {
 		let id = "cell"
 		if let cell = tableView.dequeueReusableCell(withIdentifier: id) {
 			for subview in cell.subviews {
-				if subview is SettingsButton || subview is UIActivityIndicatorView {
+				if subview is UILabel && subview != cell.textLabel && subview != cell.detailTextLabel {
+					subview.removeFromSuperview()
+				} else if subview is SettingsButton || subview is UIActivityIndicatorView {
+					subview.removeFromSuperview()
+				} else if subview is UISegmentedControl || subview is UITextField {
+					subview.removeFromSuperview()
+				} else if subview is UIProgressView {
+					subview.removeFromSuperview()
+				} else if subview is ContainerView {
+					subview.removeFromSuperview()
+				} else if subview is UISwitch {
 					subview.removeFromSuperview()
 				}
 			}
@@ -95,15 +185,19 @@ class SettingsViewManager: NSObject {
 			cell.detailTextLabel?.text = ""
 			cell.accessibilityLabel = nil
 			cell.imageView?.image = nil
+
+			// UIKit sometimes resets the labels, making them loose their color
+			cell.textLabel?.textColor = .title
+			cell.detailTextLabel?.textColor = .subtitle
+
 			return cell
 		}
 		let cell = UITableViewCell(style: .subtitle, reuseIdentifier: id)
-		cell.backgroundColor = .clear
+		cell.backgroundColor = UIColor(white: 1, alpha: 0.1)
 		cell.textLabel?.textColor = .title
 		cell.detailTextLabel?.textColor = .subtitle
 		cell.selectionStyle = .none
 		cell.tintColor = .title
-		UIFont.setSnowHazeFont(on: cell.textLabel!)
 		return cell
 	}
 
@@ -132,7 +226,6 @@ class SettingsViewManager: NSObject {
 			return nil
 		}
 		let label = UILabel()
-		UIFont.setSnowHazeFont(on: label)
 		label.text = title
 		label.textColor = .title
 		let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
@@ -149,7 +242,6 @@ class SettingsViewManager: NSObject {
 			return nil
 		}
 		let label = UILabel()
-		UIFont.setSnowHazeFont(on: label)
 		label.text = title
 		label.textColor = .title
 		let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
@@ -185,6 +277,10 @@ class SettingsViewManager: NSObject {
 
 	func didSelectRow(atIndexPath indexPath: IndexPath, tableView: UITableView) {
 		guard let cell = tableView.cellForRow(at: indexPath) else {
+			return
+		}
+		if let uiSwitch = cell.accessoryView as? OneWaySwitch {
+			uiSwitch.trigger()
 			return
 		}
 		guard let uiSwitch = cell.accessoryView as? UISwitch else {

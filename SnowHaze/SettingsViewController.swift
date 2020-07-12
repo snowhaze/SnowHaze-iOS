@@ -2,7 +2,7 @@
 //	SettingsViewController.swift
 //	SnowHaze
 //
-
+//
 //	Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -123,7 +123,6 @@ class SettingsViewController: UIViewController, SettingsDetailViewControllerDele
 		}
 	}
 
-	@available (iOS 11, *)
 	override func viewSafeAreaInsetsDidChange() {
 		super.viewSafeAreaInsetsDidChange()
 		tableView.reloadData()
@@ -139,10 +138,11 @@ extension SettingsViewController: UITableViewDataSource {
 		assert(premiumSection == 0)
 		switch section {
 			case 0:		return 2
-			case 1:		return 9
-			case 2:		return 6
-			case 3:		return 1
-			case 4:		return 2
+			case 1:		return 6
+			case 2:		return 4
+			case 3:		return 7
+			case 4:		return 1
+			case 5:		return 2
 			default:	return 0
 		}
 	}
@@ -150,7 +150,6 @@ extension SettingsViewController: UITableViewDataSource {
 	func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 		let title = self.tableView(tableView, titleForHeaderInSection: section)!;
 		let label = UILabel()
-		UIFont.setSnowHazeFont(on: label)
 		label.text = title
 		label.textColor = .button
 		let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
@@ -171,15 +170,16 @@ extension SettingsViewController: UITableViewDataSource {
 		switch section {
 			case 0:		return NSLocalizedString("premium settings title", comment: "title for premium settings section")
 			case 1:		return NSLocalizedString("general settings title", comment: "title for general settings section")
-			case 2:		return NSLocalizedString("privacy settings title", comment: "title for privacy settings section")
-			case 3:		return NSLocalizedString("default settings title", comment: "title for default settings section")
-			case 4:		return NSLocalizedString("about settings title", comment: "title for about settings section")
+			case 2:		return NSLocalizedString("security settings title", comment: "title for security settings section")
+			case 3:		return NSLocalizedString("privacy settings title", comment: "title for privacy settings section")
+			case 4:		return NSLocalizedString("default settings title", comment: "title for default settings section")
+			case 5:		return NSLocalizedString("about settings title", comment: "title for about settings section")
 			default:	return nil
 		}
 	}
 
 	func numberOfSections(in tableView: UITableView) -> Int {
-		return 5
+		return 6
 	}
 
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -199,8 +199,7 @@ extension SettingsViewController: UITableViewDataSource {
 		let image = scaledImage!.withRenderingMode(.alwaysTemplate)
 		cell.imageView?.image = image
 		cell.imageView?.contentMode = .scaleAspectFit
-		cell.imageView?.tintColor = .tabCellBackground
-		UIFont.setSnowHazeFont(on: cell.textLabel!)
+		cell.imageView?.tintColor = .settingsIcon
 		cell.selectedBackgroundView = UIView()
 		cell.selectedBackgroundView?.backgroundColor = UIColor(white: 1, alpha: 0.2)
 		cell.accessoryView = UIImageView(image: #imageLiteral(resourceName: "chevron"))
@@ -251,23 +250,26 @@ extension SettingsViewController {
 			case (1, 1):	return NSLocalizedString("javascript settings title", comment: "title for javascript settings")
 			case (1, 2):	return NSLocalizedString("search engine settings title", comment: "title for search engine settings")
 			case (1, 3):	return NSLocalizedString("media playback settings title", comment: "title for media playback settings")
-			case (1, 4):	return NSLocalizedString("https settings title", comment: "title for https settings")
-			case (1, 5):	return NSLocalizedString("appearance settings title", comment: "title for appearance settings")
-			case (1, 6):	return NSLocalizedString("popover settings title", comment: "title for popover settings")
-			case (1, 7):	return NSLocalizedString("warnings settings title", comment: "title for warnings settings")
-			case (1, 8):	return NSLocalizedString("passcode settings title", comment: "title for passcode settings")
+			case (1, 4):	return NSLocalizedString("appearance settings title", comment: "title for appearance settings")
+			case (1, 5):	return NSLocalizedString("popover settings title", comment: "title for popover settings")
 
-			case (2, 0):	return NSLocalizedString("website data settings title", comment: "title for website data settings")
-			case (2, 1):	return NSLocalizedString("user agent settings title", comment: "title for user agent settings")
-			case (2, 2):	return NSLocalizedString("history settings title", comment: "title for history settings")
-			case (2, 3):	return NSLocalizedString("tracking protection settings title", comment: "title for tracking protection settings")
-			case (2, 4):	return NSLocalizedString("external bookmarks settings title", comment: "title for external bookmarks settings")
-			case (2, 5):	return NSLocalizedString("content type blockers settings title", comment: "title for content type blockers settings")
+			case (2, 0):	return NSLocalizedString("https settings title", comment: "title for https settings")
+			case (2, 1):	return NSLocalizedString("warnings settings title", comment: "title for warnings settings")
+			case (2, 2):	return NSLocalizedString("passcode settings title", comment: "title for passcode settings")
+			case (2, 3):	return NSLocalizedString("safebrowsing settings title", comment: "title for safebrowsing settings")
 
-			case (3, 0):	return NSLocalizedString("defaults settings title", comment: "title for defaults settings")
+			case (3, 0):	return NSLocalizedString("website data settings title", comment: "title for website data settings")
+			case (3, 1):	return NSLocalizedString("user agent settings title", comment: "title for user agent settings")
+			case (3, 2):	return NSLocalizedString("history settings title", comment: "title for history settings")
+			case (3, 3):	return NSLocalizedString("tracking protection settings title", comment: "title for tracking protection settings")
+			case (3, 4):	return NSLocalizedString("external bookmarks settings title", comment: "title for external bookmarks settings")
+			case (3, 5):	return NSLocalizedString("content type blockers settings title", comment: "title for content type blockers settings")
+			case (3, 6):	return NSLocalizedString("tor settings title", comment: "title for tor settings")
 
-			case (4, 0):	return NSLocalizedString("contact settings title", comment: "title for contact section")
-			case (4, 1):	return NSLocalizedString("acknowledgements settings title", comment: "title for acknowledgements")
+			case (4, 0):	return NSLocalizedString("defaults settings title", comment: "title for defaults settings")
+
+			case (5, 0):	return NSLocalizedString("contact settings title", comment: "title for contact section")
+			case (5, 1):	return NSLocalizedString("acknowledgements settings title", comment: "title for acknowledgements")
 
 			default:		fatalError("invalid index path")
 		}
@@ -285,23 +287,26 @@ extension SettingsViewController {
 			case (1, 1):	return JavaScriptSettingsManager()
 			case (1, 2):	return SearchEngineSettingsManager()
 			case (1, 3):	return MediaPlaybackSettingsManager()
-			case (1, 4):	return HTTPSSettingsManager()
-			case (1, 5):	return AppearanceSettingsManager()
-			case (1, 6):	return PopoverSettingsManager()
-			case (1, 7):	return WarningsSettingsManager()
-			case (1, 8):	return PasscodeSettingsManager()
+			case (1, 4):	return AppearanceSettingsManager()
+			case (1, 5):	return PopoverSettingsManager()
 
-			case (2, 0):	return WebsiteDataSettingsManager()
-			case (2, 1):	return UserAgentSettingsManager()
-			case (2, 2):	return HistorySettingsManager()
-			case (2, 3):	return TrackingSettingsManager()
-			case (2, 4):	return ExternalBookmarksSettingsManager()
-			case (2, 5):	return ContentTypeBlockerSettingsManager()
+			case (2, 0):	return HTTPSSettingsManager()
+			case (2, 1):	return WarningsSettingsManager()
+			case (2, 2):	return PasscodeSettingsManager()
+			case (2, 3):	return SafebrowsingSettingsManager()
 
-			case (3, 0):	return DefaultsSettingsManager()
+			case (3, 0):	return WebsiteDataSettingsManager()
+			case (3, 1):	return UserAgentSettingsManager()
+			case (3, 2):	return HistorySettingsManager()
+			case (3, 3):	return TrackingSettingsManager()
+			case (3, 4):	return ExternalBookmarksSettingsManager()
+			case (3, 5):	return ContentBlockerSettingsManager()
+			case (3, 6):	return TorSettingsManager()
 
-			case (4, 0):	return ContactSettingsManager()
-			case (4, 1):	return AcknowledgementsSettingsManager()
+			case (4, 0):	return DefaultsSettingsManager()
+
+			case (5, 0):	return ContactSettingsManager()
+			case (5, 1):	return AcknowledgementsSettingsManager()
 
 			default:		fatalError("invalid index path")
 		}
@@ -319,23 +324,26 @@ extension SettingsViewController {
 			case (1, 1):	return "javascript"
 			case (1, 2):	return "searchengine"
 			case (1, 3):	return "mediaplayback"
-			case (1, 4):	return "https"
-			case (1, 5):	return "appearance"
-			case (1, 6):	return "popovers"
-			case (1, 7):	return "warning"
-			case (1, 8):	return "fingerprint"
+			case (1, 4):	return "appearance"
+			case (1, 5):	return "popovers"
 
-			case (2, 0):	return "weabsitedata"
-			case (2, 1):	return "useragent"
-			case (2, 2):	return "history"
-			case (2, 3):	return "trackingprotection"
-			case (2, 4):	return "bookmark"
-			case (2, 5):	return "contentblocker"
+			case (2, 0):	return "https"
+			case (2, 1):	return "warning"
+			case (2, 2):	return "fingerprint"
+			case (2, 3):	return "safebrowsing"
 
-			case (3, 0):	return "defaults"
+			case (3, 0):	return "weabsitedata"
+			case (3, 1):	return "useragent"
+			case (3, 2):	return "history"
+			case (3, 3):	return "trackingprotection"
+			case (3, 4):	return "bookmark"
+			case (3, 5):	return "contentblocker"
+			case (3, 6):	return "tor"
 
-			case (4, 0):	return "contact"
-			case (4, 1):	return "acknowledgements"
+			case (4, 0):	return "defaults"
+
+			case (5, 0):	return "contact"
+			case (5, 1):	return "acknowledgements"
 
 			default:		fatalError("invalid index path")
 		}
@@ -383,19 +391,9 @@ extension SettingsViewController {
 				path.close()
 				return path
 			case (1, 4):
-				let path = UIBezierPath()
-				path.move(to: CGPoint(x: -18, y: 18))
-				path.addLine(to: CGPoint(x: -20, y: 17))
-				path.addLine(to: CGPoint(x: 5, y: -20))
-				path.addLine(to: CGPoint(x: 16, y: -16))
-				path.addLine(to: CGPoint(x: 20, y: -3))
-				path.addLine(to: CGPoint(x: -17, y: 20))
-				path.close()
-				return path
-			case (1, 5):
 				let rect = CGRect(x: -10, y: -18, width: 20, height: 36)
 				return UIBezierPath(rect: rect)
-			case (1, 6):
+			case (1, 5):
 				let path = UIBezierPath()
 				path.move(to: CGPoint(x: 0, y: -16))
 				path.addLine(to: CGPoint(x: 9, y: -16))
@@ -406,20 +404,39 @@ extension SettingsViewController {
 				path.addLine(to: CGPoint(x: -9, y: -16))
 				path.close()
 				return path
-			case (1, 7):
-				let rect = CGRect(x: -18, y: -18, width: 36, height: 36)
-				return UIBezierPath(ovalIn: rect)
-			case (1, 8):
-				let rect = CGRect(x: -19, y: -19, width: 38, height: 38)
-				return UIBezierPath(ovalIn: rect)
 
 			case (2, 0):
-				let rect = CGRect(x: -17, y: -17, width: 34, height: 34)
-				return UIBezierPath(ovalIn: rect)
+				let path = UIBezierPath()
+				path.move(to: CGPoint(x: -18, y: 18))
+				path.addLine(to: CGPoint(x: -20, y: 17))
+				path.addLine(to: CGPoint(x: 5, y: -20))
+				path.addLine(to: CGPoint(x: 16, y: -16))
+				path.addLine(to: CGPoint(x: 20, y: -3))
+				path.addLine(to: CGPoint(x: -17, y: 20))
+				path.close()
+				return path
 			case (2, 1):
 				let rect = CGRect(x: -18, y: -18, width: 36, height: 36)
 				return UIBezierPath(ovalIn: rect)
 			case (2, 2):
+				let rect = CGRect(x: -19, y: -19, width: 38, height: 38)
+				return UIBezierPath(ovalIn: rect)
+			case (2, 3):
+				let path = UIBezierPath()
+				path.move(to: CGPoint(x: 18, y: 0))
+				path.addArc(withCenter: CGPoint(x: -1, y: -2), radius: 19, startAngle: 0, endAngle: .pi / 2, clockwise: false)
+				path.addLine(to: CGPoint(x: 0, y: 20))
+				path.addLine(to: CGPoint(x: 18, y: 20))
+				path.close()
+				return path
+
+			case (3, 0):
+				let rect = CGRect(x: -17, y: -17, width: 34, height: 34)
+				return UIBezierPath(ovalIn: rect)
+			case (3, 1):
+				let rect = CGRect(x: -18, y: -18, width: 36, height: 36)
+				return UIBezierPath(ovalIn: rect)
+			case (3, 2):
 				let path = UIBezierPath()
 				path.move(to: CGPoint(x: -15,y: 18))
 				path.addLine(to: CGPoint(x: -15,y: -17))
@@ -429,10 +446,10 @@ extension SettingsViewController {
 				path.addLine(to: CGPoint(x: 11,y: 18))
 				path.close()
 				return path
-			case (2, 3):
+			case (3, 3):
 				let rect = CGRect(x: -20, y: -13, width: 40, height: 27)
 				return UIBezierPath(ovalIn: rect)
-			case (2, 4):
+			case (3, 4):
 				let path = UIBezierPath()
 				path.move(to: CGPoint(x: -10,y: -15))
 				path.addLine(to: CGPoint(x: 10,y: -15))
@@ -441,11 +458,21 @@ extension SettingsViewController {
 				path.addLine(to: CGPoint(x: -10,y: 16))
 				path.close()
 				return path
-			case (2, 5):
+			case (3, 5):
 				let rect = CGRect(x: -18, y: -16, width: 36, height: 32)
 				return UIBezierPath(rect: rect)
+			case (3, 6):
+				let path = UIBezierPath()
+				path.move(to: CGPoint(x: 15, y: 5))
+				path.addArc(withCenter: CGPoint(x: 0, y: 5), radius: 15, startAngle: 0, endAngle: .pi, clockwise: true)
+				path.addLine(to: CGPoint(x: -4, y: -10))
+				path.addLine(to: CGPoint(x: -8, y: -18))
+				path.addLine(to: CGPoint(x: 8, y: -18))
+				path.addLine(to: CGPoint(x: 4, y: -10))
+				path.close()
+				return path
 
-			case (3, 0):
+			case (4, 0):
 				let path = UIBezierPath()
 				path.move(to: CGPoint(x: 15,y: 20))
 				path.addLine(to: CGPoint(x: 18, y: -5))
@@ -456,7 +483,7 @@ extension SettingsViewController {
 				path.close()
 				return path
 
-			case (4, 0):
+			case (5, 0):
 				let path = UIBezierPath()
 				path.move(to: CGPoint(x: -18, y: 1))
 				path.addLine(to: CGPoint(x: 15, y: -15))
@@ -464,7 +491,7 @@ extension SettingsViewController {
 				path.addLine(to: CGPoint(x: -4, y: 16))
 				path.close()
 				return path
-			case (4, 1):
+			case (5, 1):
 				let path = UIBezierPath()
 				path.move(to: CGPoint(x: 0,y: 9))
 				path.addLine(to: CGPoint(x: -10.6,y: 14.6))

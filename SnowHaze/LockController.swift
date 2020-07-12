@@ -2,11 +2,12 @@
 //  LockController.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 let snowhazeUILockWillDisengageNotification = Notification.Name(rawValue: "snowhazeUILockWillDisengageNotification")
 let snowhazeUILockDidDisengageNotification = Notification.Name(rawValue: "snowhazeUILockDidDisengageNotification")
@@ -257,6 +258,6 @@ class LockPresenterController: UIViewController {
 	}
 
 	override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-		return UI_USER_INTERFACE_IDIOM() == .pad ? .all : .portrait
+		return UIDevice.current.userInterfaceIdiom == .pad ? .all : .portrait
 	}
 }

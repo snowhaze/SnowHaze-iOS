@@ -2,11 +2,12 @@
 //  SearchEngineSuggestionSource.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
+import UIKit
 
 private enum SearchEngineSuggestionError: Error {
 	case contentError
@@ -36,15 +37,16 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				}
 			}
 			switch self.engine.type {
-				case .bing:			self.bingSuggestion(for: base, callback: callback)
-				case .google:		self.googleSuggestion(for: base, callback: callback)
-				case .yahoo:		self.yahooSuggestion(for: base, callback: callback)
-				case .wikipedia:	self.wikipediaSuggestion(for: base, callback: callback)
-				case .wolframAlpha:	self.wolframAlphaSuggestion(for: base, callback: callback)
-				case .ecosia:		self.ecosiaSuggestion(for: base, callback: callback)
-				case .startpage:	self.startpageSuggestion(for: base, callback: callback)
-				case .swisscows:	self.swisscowsSuggestion(for: base, callback: callback)
-				case .duckDuckGo:	self.duckDuckGoSuggestion(for: base, callback: callback)
+				case .bing:			self.bingSuggestions(for: base, callback: callback)
+				case .google:		self.googleSuggestions(for: base, callback: callback)
+				case .yahoo:		self.yahooSuggestions(for: base, callback: callback)
+				case .wikipedia:	self.wikipediaSuggestions(for: base, callback: callback)
+				case .wolframAlpha:	self.wolframAlphaSuggestions(for: base, callback: callback)
+				case .ecosia:		self.ecosiaSuggestions(for: base, callback: callback)
+				case .startpage:	self.startpageSuggestions(for: base, callback: callback)
+				case .swisscows:	self.swisscowsSuggestions(for: base, callback: callback)
+				case .duckDuckGo:	self.duckDuckGoSuggestions(for: base, callback: callback)
+				case .qwant:		self.qwantSuggestions(for: base, callback: callback)
 				case .none:			return
 			}
 		}
@@ -54,7 +56,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		return 55 - 5 * Double(index)
 	}
 
-	func bingSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func bingSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
 			return
 		}
@@ -86,7 +88,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func googleSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func googleSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -119,7 +121,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func yahooSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func yahooSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -160,7 +162,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func wikipediaSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func wikipediaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -199,7 +201,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func wolframAlphaSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func wolframAlphaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -234,7 +236,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func ecosiaSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func ecosiaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -266,7 +268,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func startpageSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func startpageSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -298,7 +300,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func swisscowsSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func swisscowsSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -326,7 +328,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func duckDuckGoSuggestion(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func duckDuckGoSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
 		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
 			return
 		}
@@ -348,6 +350,41 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				}
 				let subtitle = NSLocalizedString("duckduckgo search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from duckduckgo")
 				let image = #imageLiteral(resourceName: "duckduckgo")
+				let priority = self.priority(for: index + 1)
+				let suggestion = Suggestion(title: title, subtitle: subtitle, url: url, image: image, priority: priority)
+				suggestions.append(suggestion)
+			}
+			if !suggestions.isEmpty {
+				callback(suggestions, "duckduckgo")
+			}
+		}
+	}
+
+	func qwantSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
+			return
+		}
+		guard let url = URL(string: "https://api.qwant.com/api/suggest?q=" + queryString) else {
+			return
+		}
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+			guard let result = json as? [String: Any], let data = result["data"] as? [String: [Any]] else {
+				return
+			}
+			guard let items = data["items"] as? [[String: Any]] else {
+				return
+			}
+			let phrases = items.prefix(maxCount)
+			var suggestions = [Suggestion]()
+			for (index, item) in phrases.enumerated() {
+				guard let title = item["value"] as? String else {
+					return
+				}
+				guard let url = self.engine.url(for: title) else {
+					return
+				}
+				let subtitle = NSLocalizedString("qwant search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from qwant")
+				let image = #imageLiteral(resourceName: "qwant")
 				let priority = self.priority(for: index + 1)
 				let suggestion = Suggestion(title: title, subtitle: subtitle, url: url, image: image, priority: priority)
 				suggestions.append(suggestion)

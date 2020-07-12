@@ -2,8 +2,8 @@
 //  TodayViewController.swift
 //  SnowHaze VPN
 //
-
-//  Copyright © 2018 Benjamin Andris Suter-Dörig. All rights reserved.
+//
+//  Copyright © 2018 Illotros GmbH. All rights reserved.
 //
 
 import UIKit
@@ -19,10 +19,81 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 	@IBOutlet weak var switchButton: UIButton!
 	@IBOutlet weak var rotateButton: UIButton!
 	@IBOutlet weak var infoButton: UIButton!
-	
+
 	private var observer: NSObjectProtocol?
 	private var vpnManagerLoaded = false
 	private var performWithLoadedVPNManager: [() -> Void]?
+
+	enum Country: String {
+		case australia = "au"
+		case canada = "ca"
+		case switzerland = "ch"
+		case germany = "de"
+		case france = "fr"
+		case norway = "no"
+		case poland = "pl"
+		case singapore = "sg"
+		case unitedKingdom = "uk"
+		case unitedStates = "us"
+
+		case unknown
+		case none
+
+		static let all: [Country] = [.australia, .canada, .switzerland, .germany, .france, .poland, .norway, .singapore, .unitedKingdom, .unitedStates]
+
+		init(domain: String?) {
+			guard let domain = domain else {
+				self = .none
+				return
+			}
+			for country in Country.all {
+				let isoCode = country.rawValue
+				let pattern = Regex.escapedPattern(for: isoCode) + "[0-9]+\\.shvpn\\.ch"
+				let rx = Regex(pattern: pattern)
+				if domain.matches(rx) {
+					self = country
+					return
+				}
+			}
+			self = .unknown
+		}
+
+		var localizedName: String {
+			switch self {
+				case .australia:		return NSLocalizedString("australia ipsec location name", comment: "indication that australia is selected as ipsec vpn location")
+				case .canada:			return NSLocalizedString("canada ipsec location name", comment: "indication that canada is selected as ipsec vpn location")
+				case .switzerland:		return NSLocalizedString("switzerland ipsec location name", comment: "indication that switzerland is selected as ipsec vpn location")
+				case .germany:			return NSLocalizedString("germany ipsec location name", comment: "indication that germany is selected as ipsec vpn location")
+				case .france:			return NSLocalizedString("france ipsec location name", comment: "indication that france is selected as ipsec vpn location")
+				case .poland:			return NSLocalizedString("poland ipsec location name", comment: "indication that poland is selected as ipsec vpn location")
+				case .norway:			return NSLocalizedString("norway ipsec location name", comment: "indication that norway is selected as ipsec vpn location")
+				case .singapore:		return NSLocalizedString("singapore ipsec location name", comment: "indication that singapore is selected as ipsec vpn location")
+				case .unitedKingdom:	return NSLocalizedString("uk ipsec location name", comment: "indication that uk is selected as ipsec vpn location")
+				case .unitedStates:		return NSLocalizedString("us ipsec location name", comment: "indication that us is selected as ipsec vpn location")
+
+				case .unknown:			return NSLocalizedString("unknown ipsec location name", comment: "indication that the selected ipsec vpn location is unknown")
+				case .none:				return NSLocalizedString("none ipsec location name", comment: "indication that no vpn location is selected")
+			}
+		}
+
+		var flag: UIImage {
+			switch self {
+				case .australia:		return #imageLiteral(resourceName: "australia_flag")
+				case .canada:			return #imageLiteral(resourceName: "canadian_flag")
+				case .switzerland:		return #imageLiteral(resourceName: "swiss_flag")
+				case .germany:			return #imageLiteral(resourceName: "german_flag")
+				case .france:			return #imageLiteral(resourceName: "french_flag")
+				case .poland:			return #imageLiteral(resourceName: "poland_flag")
+				case .norway:			return #imageLiteral(resourceName: "norway_flag")
+				case .singapore:		return #imageLiteral(resourceName: "singapore_flag")
+				case .unitedKingdom:	return #imageLiteral(resourceName: "uk_flag")
+				case .unitedStates:		return #imageLiteral(resourceName: "usa_flag")
+
+				case .unknown:			return #imageLiteral(resourceName: "unknown_location")
+				case .none:				return #imageLiteral(resourceName: "invalid_flag")
+			}
+		}
+	}
 
 	private var timer: Timer?
 
@@ -66,14 +137,15 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 	}
 
 	@objc private func updateStatus() {
+		let country = Country(domain: NEVPNManager.shared().protocolConfiguration?.serverAddress)
 		connectSwitch.isOn = connected
 		connectionStatusLabel.text = connectionStatus
-		locationLabel.text = location
+		locationLabel.text = country.localizedName
 		connectSwitch.isEnabled = enabled
 		connectSwitch.alpha = enabled ? 1 : 0.5
-		flagImageView.image = flag
+		flagImageView.image = country.flag
 		let format = NSLocalizedString("flag accessibbility label format", comment: "format of the accessibbility label for the ipsec location flag")
-		flagImageView.accessibilityLabel = String(format: format, location)
+		flagImageView.accessibilityLabel = String(format: format, country.localizedName)
 		flagImageView.isAccessibilityElement = true
 		if fullyConnected && timer == nil {
 			timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(TodayViewController.updateStatus), userInfo: nil, repeats: true)
@@ -85,24 +157,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 			activityIndicator.startAnimating()
 		} else {
 			activityIndicator.stopAnimating()
-		}
-	}
-
-	private var location: String {
-		guard let config = NEVPNManager.shared().protocolConfiguration else {
-			return NSLocalizedString("none ipsec location name", comment: "indication that no vpn location is selected")
-		}
-		switch config.serverAddress {
-			case "au1.shvpn.ch":	return NSLocalizedString("australia ipsec location name", comment: "indication that australia is selected as ipsec vpn location")
-			case "ca1.shvpn.ch":	return NSLocalizedString("canada ipsec location name", comment: "indication that canada is selected as ipsec vpn location")
-			case "ch1.shvpn.ch":	return NSLocalizedString("switzerland ipsec location name", comment: "indication that switzerland is selected as ipsec vpn location")
-			case "de1.shvpn.ch":	return NSLocalizedString("germany ipsec location name", comment: "indication that germany is selected as ipsec vpn location")
-			case "fr1.shvpn.ch":	return NSLocalizedString("france ipsec location name", comment: "indication that france is selected as ipsec vpn location")
-			case "pl1.shvpn.ch":	return NSLocalizedString("poland ipsec location name", comment: "indication that poland is selected as ipsec vpn location")
-			case "sg1.shvpn.ch":	return NSLocalizedString("singapore ipsec location name", comment: "indication that singapore is selected as ipsec vpn location")
-			case "uk1.shvpn.ch":	return NSLocalizedString("uk ipsec location name", comment: "indication that uk is selected as ipsec vpn location")
-			case "us1.shvpn.ch":	return NSLocalizedString("us ipsec location name", comment: "indication that us is selected as ipsec vpn location")
-			default:				return NSLocalizedString("unknown ipsec location name", comment: "indication that the selected ipsec vpn location is unknown")
 		}
 	}
 
@@ -126,24 +180,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 			case .invalid:			return NSLocalizedString("invalid ipsec status", comment: "label for the invalid ipsec status")
 			case .reasserting:		return NSLocalizedString("reasserting ipsec status", comment: "label for the reasserting ipsec status")
 			@unknown default:		return NSLocalizedString("unknown ipsec status", comment: "label for when the ipsec vpn is in a state added to ios after the compilation of the extension")
-		}
-	}
-
-	private var flag: UIImage {
-		guard let config = NEVPNManager.shared().protocolConfiguration, !(config.serverAddress?.isEmpty ?? true) else {
-			return #imageLiteral(resourceName: "invalid_flag")
-		}
-		switch config.serverAddress {
-			case "au1.shvpn.ch":	return #imageLiteral(resourceName: "australia_flag")
-			case "ca1.shvpn.ch":	return #imageLiteral(resourceName: "canadian_flag")
-			case "ch1.shvpn.ch":	return #imageLiteral(resourceName: "swiss_flag")
-			case "de1.shvpn.ch":	return #imageLiteral(resourceName: "german_flag")
-			case "fr1.shvpn.ch":	return #imageLiteral(resourceName: "french_flag")
-			case "pl1.shvpn.ch":	return #imageLiteral(resourceName: "poland_flag")
-			case "sg1.shvpn.ch":	return #imageLiteral(resourceName: "singapore_flag")
-			case "uk1.shvpn.ch":	return #imageLiteral(resourceName: "uk_flag")
-			case "us1.shvpn.ch":	return #imageLiteral(resourceName: "usa_flag")
-			default:				return #imageLiteral(resourceName: "unknown_location")
 		}
 	}
 
@@ -231,9 +267,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 				ike.childSecurityAssociationParameters.diffieHellmanGroup = .group16
 			}
 
-			if #available(iOS 11.0, *) {
-				ike.minimumTLSVersion = .version1_2
-			}
+			ike.minimumTLSVersion = .version1_2
 
 			ike.disconnectOnSleep = false
 			ike.authenticationMethod = .sharedSecret

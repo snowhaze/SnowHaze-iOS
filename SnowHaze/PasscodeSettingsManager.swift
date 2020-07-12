@@ -2,12 +2,13 @@
 //  PasscodeSettingsManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
 import Foundation
 import LocalAuthentication
+import UIKit
 
 private let modeSection = 1
 private let typeSection = 2
@@ -30,7 +31,6 @@ class PasscodeSettingsManager: SettingsViewManager {
 	private lazy var label: UILabel = {
 		let label = UILabel(frame: CGRect(x: 0, y: 0, width: self.labelWidth, height: self.stepper.frame.height))
 		label.textColor = .subtitle
-		UIFont.setSnowHazeFont(on: label)
 		label.textAlignment = .right
 		return label
 	}()
@@ -47,7 +47,7 @@ class PasscodeSettingsManager: SettingsViewManager {
 		// workaround for iOS 13 "feature"
 		stepper.setIncrementImage(stepper.incrementImage(for: .normal), for: .normal)
 		stepper.setDecrementImage(stepper.decrementImage(for: .normal), for: .normal)
-		
+
 		return stepper
 	}()
 
@@ -311,11 +311,11 @@ extension PasscodeSettingsManager: PasscodeControllerDelegate {
 	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> Void) {
 		assert(modeAfterSetup == nil)
 		PasscodeManager.shared.verify(code: code) { [weak self] success in
-			if success, let me = self, let newMode = me.modeAfterVerify {
-				assert(controller == me.modeAfterController)
+			if success, let self = self, let newMode = self.modeAfterVerify {
+				assert(controller == self.modeAfterController)
 				let oldMode = PasscodeManager.shared.mode
-				let oldIndex = me.index(for: oldMode)
-				let newIndex = me.index(for: newMode)
+				let oldIndex = self.index(for: oldMode)
+				let newIndex = self.index(for: newMode)
 				assert(oldIndex != newIndex)
 				let newPath = IndexPath(row: newIndex, section: modeSection)
 				let oldPath = IndexPath(row: oldIndex, section: modeSection)
@@ -323,18 +323,18 @@ extension PasscodeSettingsManager: PasscodeControllerDelegate {
 				let lockPath = IndexPath(row: lockRow, section: changeLockSection)
 				switch newMode {
 					case .off:
-						PasscodeManager.shared.clearKey { success in
-							if let me = self {
-								me.controller?.tableView.reloadRows(at: [oldPath, newPath, changePath, lockPath], with: .none)
-								me.updateHeaderColor(animated: true)
+						PasscodeManager.shared.clearKey { [weak self] success in
+							if let self = self {
+								self.controller?.tableView.reloadRows(at: [oldPath, newPath, changePath, lockPath], with: .none)
+								self.updateHeaderColor(animated: true)
 							}
 							completionHandler(success)
 						}
 					default:
-						PasscodeManager.shared.set(mode: newMode, withKey: code) { success in
-							if let me = self {
-								me.controller?.tableView.reloadRows(at: [oldPath, newPath, changePath, lockPath], with: .none)
-								me.updateHeaderColor(animated: true)
+						PasscodeManager.shared.set(mode: newMode, withKey: code) { [weak self] success in
+							if let self = self {
+								self.controller?.tableView.reloadRows(at: [oldPath, newPath, changePath, lockPath], with: .none)
+								self.updateHeaderColor(animated: true)
 							}
 							completionHandler(success)
 						}

@@ -2,7 +2,7 @@
 //  KeyManager.swift
 //  SnowHaze
 //
-
+//
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
@@ -41,7 +41,7 @@ public class KeyManager {
 		if let key = try keyIfExists() {
 			return key
 		}
-		let key = generateKey()
+		let key = String.secureRandom()
 		set(key: key)
 		return key
 	}
@@ -83,17 +83,6 @@ public class KeyManager {
 		} else {
 			fatalError("unexpected keychain error while loading key: \(keychainErr)")
 		}
-	}
-
-	private func generateKey() -> String {
-		let size = 256 / 8
-		let buffer = OpaquePointer(malloc(size))!
-		let uintBuffer = UnsafeMutablePointer<UInt8>(buffer)!
-		let res = SecRandomCopyBytes(kSecRandomDefault, size, uintBuffer)
-		assert(res == 0)
-		let data = Data(bytes: UnsafePointer<UInt8>(buffer), count: size)
-		free(UnsafeMutablePointer(buffer))
-		return data.base64EncodedString()
 	}
 
 	var persistentReference: Data? {
