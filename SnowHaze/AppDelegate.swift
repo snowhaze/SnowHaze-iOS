@@ -72,6 +72,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				isControl = false
 			case "shc", "snowhaze-control":
 				isControl = true
+			case "http", "https":
+				isControl = false
 			default:
 				return false
 		}
@@ -128,7 +130,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
-		DownloadManager.shared.handleBackgroundTaskEvent(completionHandler: completionHandler)
+		DownloadManager.shared.handleBackgroundTaskEvent(identifier: identifier, completionHandler: completionHandler)
 	}
 }
 

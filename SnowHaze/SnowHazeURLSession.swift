@@ -145,11 +145,13 @@ public class SnowHazeURLSession {
 		}
 	}
 
-	public func loadSessions(failure: @escaping () -> Void) {
+	public func loadSessions(includingTor: Bool, failure: @escaping () -> Void) {
 		_ = nonTorSession
-		withTorSession { session in
-			if session == nil {
-				failure()
+		if includingTor {
+			withTorSession { session in
+				if session == nil {
+					failure()
+				}
 			}
 		}
 	}

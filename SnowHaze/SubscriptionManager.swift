@@ -199,7 +199,9 @@ class SubscriptionManager: NSObject {
 		}
 	}
 
-	func clearAuthTokens() {
+	func clearSubscriptionInfoTokens() {
+		subscriptionRenews = false
+		expirationDate = nil
 		authorizationTokenUpdateDate = nil
 		authorizationTokens = nil
 		set(verificationBlob: nil)

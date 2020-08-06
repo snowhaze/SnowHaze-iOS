@@ -622,11 +622,15 @@ extension TabController: WKNavigationDelegate {
 			return
 		}
 
-		let finalDecision: (Bool) -> Void = { decision in
+		let finalDecision: (Bool) -> Void = { [weak self] decision in
 			if !decision {
 				decisionHandler(.cancel)
 			} else {
 				ContentBlockerManager.shared.load {
+					guard let self = self, !self.tab.deleted else {
+						decisionHandler(.cancel)
+						return
+					}
 					if navigationAction.targetFrame?.isMainFrame ?? false {
 						self.updatePolicy(for: actionURL)
 					}

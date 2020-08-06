@@ -1305,7 +1305,7 @@
 "content blocker font content type" = "フォント";
 
 /* title of setting to block raw content from being loaded */
-"content blocker raw content type" = "Raw";
+"content blocker raw content type" = "Raw / XHR";
 
 /* title of setting to block media content from being loaded */
 "content blocker media content type" = "メディア";
@@ -1569,13 +1569,13 @@
 "unwanted software site warning reason" = "には不要なソフトウェアが含まれる可能性があります。";
 
 /* explanation that the site was not checked against the current safebrosing list due to a network issue */
-"network issue site warning reason" = "ネットワークの問題でセーフブラウジングリストにチェックできませんでした。";
+"network issue site warning reason" = "ネットワークの問題でSafebrowsingリストにチェックできませんでした。";
 
 /* explanation that the site was not checked against the current safebrosing list because other issues were already discovered */
 "offline only site warning reason" = "おそらくもっと";
 
 /* explanation that the site was not checked against the current safebrosing list due to the user not having a current subscription */
-"no subscription site warning reason" = "サブスクリプションの有効期限が切れました";
+"no subscription site warning reason" = "サブスクリプションの有効期限が切れたため、Safebrowsingリストをチェックできませんでした。";
 
 /* the separator used to separator most items in a (long) list of reasons a site might be dangerous. e.g. ', ' in 'a, b, c and d' */
 "dangerous site warning reason list main separator" = "、";
@@ -1956,7 +1956,7 @@
 "application settings explanation" = "<p>SnowHazeの基本設定を管理できます。</p><p><strong>ローカルサイトのサジェスト</strong>検索バーを使った検索の際、ローカルリスト中のポピュラーサイトを予測候補に含めるかどうかを設定できます。</p><p><strong>検索サジェストプライベートサイト:</strong> 検索サジェスト機能とは、SnowHazeで検索した文字列に関連の深い語句を逐次予測して表示する機能です。SnowHazeでは、検索サジェスト機能により検索候補としてあげられるコンテンツの一部を制限することができます。オン（有効）の場合、成人向けコンテンツ（プライベートサイト）も検索サジェストの対象となります。オフ（無効）の場合、プライベートサイトは検索サジェストには含まれません。プライベートサイトの表示を望まない場合は、本設定を無効の上ご利用下さい。（例：未成年の方がご利用する場合、公共のパソコンで本ブラウザを利用する場合など）</p><p><strong>プレビュー遅延:</strong>リンクのプレビューを読み込むまでの待ち時間を選択します。</p><p><strong>ホーム ページ URL:</strong>新しいタブを開いたときに読み込むカスタム ページを定義します。</p><p><strong>サイトリストの自動更新 / Wi-Fi接続時のみ</strong>各サイトリスト（トラッキング、広告、フィッシング、悪質サイトリスト）の自動更新設定が出来ます。自動更新が Wi-Fi接続時にのみ行われるように設定することも可能です。SnowHaze VPNの購読登録をすることで、サイトリストの自動更新が頻繁に行われるようになります。（未購読時はSnowHaze ブラウザのアップデート時のみの更新となります。）自動アップデートを無効にすると、サイトリストは自動的に削除されます。</p><p><strong>閉じたタブの復元：</strong> シェイクすることで一度閉じたタブを復元する機能です。本機能を有効にする時間帯を設定できます。また、復元の対象となるタブの種類を選択できます。全てを選択した場合、プライベートタブを含む全てのタブが復元対象となります。</p><p><strong>タブのマスキング：</strong> 現在閲覧していないタブの見出しを非表示にする機能です。タブのマスキングを有効にする条件を設定できます。</p><p><strong>使用統計：</strong>アプリのブックマークセクションに統計を表示します。</p><p>HTTPSの\nアップグレード：SnowHaze固有の機能により、HTTPではなくHTTPSがロードされたサイトの数</p><p>ブロックされたトラッカー：ブロックされたトラッカーの数</p> <p>削除されたCookie：削除されたCookieの数</p>VPN保護：SnowHaze VPNに接続中のロードされたサイトの数";
 
 /* explanations of the javascript settings */
-"javascript settings explanation" = "<p>まずはどのようにしてSnowHazeがJavaScriptの内容を把握しているかについてです。JavaScriptはプログラミング言語で、多くのウェブサイトに使用されており、ほとんどのブラウザでサポートされています。JavaScriptはほとんどのウェブサイトの画面表示や 機能を得るのに役立っています。そのため、多くの対話式コンテンツや動的なコンテンツに貢献しています。</p><p><strong>JavaScriptを許可する:</strong> この選択肢をオンにすることで、 JavaScriptのコンテンツを使用することができます。 プライバシー保護のため、オフにしておきたい方もいらっしゃると思いますが、一部のウェブサイトはJavaScriptが無効だとうまく表示されないことがあるということにご注意ください。 <u>ただし:</u>一部のサイトではJavaScript が無効になっていると、適切に表示されない場合があるのでご注意下さい。</p><p><strong>アプリケーションスクリプト:</strong> アプリケーションスクリプトはSnowHazeで動作するJavaScriptの要素で、検索やトラッキング保護などの役立つ機能を可能にします。</p><strong>パスワードマネージャ:</strong> パスワードマネージャの統合をオフにします。";
+"javascript settings explanation" = "<p>まずはどのようにしてSnowHazeがJavaScriptの内容を把握しているかについてです。JavaScriptはプログラミング言語で、多くのウェブサイトに使用されており、ほとんどのブラウザでサポートされています。JavaScriptはほとんどのウェブサイトの画面表示や 機能を得るのに役立っています。そのため、多くの対話式コンテンツや動的なコンテンツに貢献しています。</p><p><strong>JavaScriptを許可する:</strong> この選択肢をオンにすることで、 JavaScriptのコンテンツを使用することができます。 プライバシー保護のため、オフにしておきたい方もいらっしゃると思いますが、一部のウェブサイトはJavaScriptが無効だとうまく表示されないことがあるということにご注意ください。 <u>ただし:</u>一部のサイトではJavaScript が無効になっていると、適切に表示されない場合があるのでご注意下さい。</p><p><strong>アプリケーションスクリプト:</strong> アプリケーションスクリプトはSnowHazeで動作するJavaScriptの要素で、検索やトラッキング保護などの役立つ機能を可能にします。</p><p><strong>パスワードマネージャ:</strong> パスワードマネージャの統合をオフにします。</p><strong>JS URLを許可:</strong> JavaScript URIの実行を許可します。";
 
 /* explanations of the website data settings */
 "website data settings explanation" = "<p>ウェブサイトデータの管理　ウェブサイトデータは、キャッシュ、cookie、その他のデータを保持しています。</p><p>キャッシュは訪れたウェブサイトの一時的なコピーのセットです。同じページを訪れた際、再度ダウンロードされるのではなく、キャッシュからデータが取り出されます。</p><p>Cookieは訪れたウェブサイトからの情報の一部のデータです。Cookieを使ったウェブサイトを訪れた際、 ウェブサイトのデータはデバイスに保存されます。再度、そのサイトを訪れると、そのデータはウェブサイトに送り返されます。Cookieはあなたの興味やブラウジング行動から得られたパターンを認識するのに使われます。</p><p><strong>ウェブサイトのデータを保存する:</strong> キャッシュやcookieなどのウェブサイトのデータを保存します。</p><p><strong>Cookieをブロック：</strong>常に許可、サード パーティー（第三者）Cookieのみ許可 、常にブロックから選択してください。</p><p><strong>すべてのサイトのデータを削除する:</strong> すべてのウェブサイトのデータをを削除します。</p><p><strong>キャッシュを削除する:</strong> すべてのキャッシュのデータを削除します。</p><p><strong>Cookieを削除する:</strong> すべてのCookieのデータを削除します。</p><p><strong>すべてのデータを削除する:</strong> ウェブサイトでのすべてのデータを削除します。</p><strong>トラッキングCookieの削除：</strong>トラッキ ングを目的としたウェブサイトのCookieを削除します。";
@@ -1983,7 +1983,7 @@
 "tracking protection settings explanation" = "<p>ウェブサイトでのトラッキング（追跡）を拒否する。 ウェブサイトは様々な方法で訪問者の情報を集めています。この情報は、例えば、興味、ブラウジング行動や 訪問したサイトを含みます。一部のウェブサイトは、そのウェブサイトをすでに見ていない場合でも、追跡することができます。</p><p><strong>HTTP リファラをブロックする:</strong> ウェブサイトの管理人は、この設定がオンの場合、そのウェブサイトを訪問する以前に訪問したサイトに関する情報を得ることはできません。</p><p><strong>トラッキングコードをブロックする:</strong> トラッキングコードをブロックすることは、JavaScriptのコンテンツを変更し、あなたをウェブサイト上で追跡することをブロックします。</p><p><strong>広告ブロック機能：</strong> ウェブサイト上の広告を非表示にします。ただし、一部のサイトでは広告が表示されることがあります。</p><p><strong>Canvas Fingerprintを拒否する:</strong> Canvas Fingerprinting は、cookieを使わずにユーザーを認識する方法です。ブロックすることで、認識やトラッキングを拒否することができます。</p><p><strong>フィンガープリント対策：</strong>この機能を有効にすることで、フィンガープリントを利用したユーザー追跡を防ぐ可能性を高めることができます。</p><p><strong>シェアボタンをブロック：</strong>このオプションは 、Facebookのボタンやその他のウィ ジェット等をソーシャルメディアコンテンツ のウェブページ上から削除します。</p><p><strong>隠すルール：</strong> この機能は、ブロックしたいコンテンツを非表示にしますが、読み込みを停止することはできません。</p><strong>リダイレクトをスキップ:</strong>リンクをたどっているときに多くのサイトにリダイレクトされるのを避け、ターゲット サイトに直接アクセスしてください。<u>注意:</u>これもWebサイトのセキュリティ機能を迂回します。";
 
 /* explanations of the https settings */
-"https settings explanation" = "<p>安全なウェブサイト接続の設定を選択する。ウェブサイトへの接続には、HTTPとよばれるプロトコルが必要になります。安全なバージョンのHTTPはHTTPSです。鍵のマークが検索バーに現れたときは、安全な接続が確立されていることになります。</p><p><strong>初めにHTTPS Sitesで試す:</strong> 毎回、HTTPに戻って接続する前に、安全な接続を確立するよう試行します。<u>ただし、</u>この機能を使用すると、しばらくの間安全な接続を確立しようとするため、SnowHazeの速度が遅くなることに注意してください。</p><p><strong>既知のサイトでHTTPS を使う:</strong> HTTPS接続ができるとわかっているウェブサイトでのみ、この接続が確立されます。</p><p><strong>混在コンテンツのブロック：</strong> 一部のHTTPSウェブサイトでは、安全でないHTTPコンテンツを使用することができます。 あなたの情報を盗むために、このコンテンツを攻撃者に置き換えることができます。 このオプションがオンの場合、SnowHazeはこの混在したコンテンツを安全なWebサイトでブロックします。</p><strong>信頼済みサイトにHTTPSが必要:</strong>このオプションをオンにすると、信頼できるサイトが安全な HTTPS 接続をサポートしている場合にのみ接続できます。";
+"https settings explanation" = "<p>安全なウェブサイト接続の設定を選択する。ウェブサイトへの接続には、HTTPとよばれるプロトコルが必要になります。安全なバージョンのHTTPはHTTPSです。鍵のマークが検索バーに現れたときは、安全な接続が確立されていることになります。</p><p><strong>初めにHTTPS Sitesで試す:</strong> 毎回、HTTPに戻って接続する前に、安全な接続を確立するよう試行します。<u>ただし、</u>この機能を使用すると、しばらくの間安全な接続を確立しようとするため、SnowHazeの速度が遅くなることに注意してください。</p><p><strong>既知のサイトでHTTPS を使う:</strong> HTTPS接続ができるとわかっているウェブサイトでのみ、この接続が確立されます。</p><p><strong>混在コンテンツのブロック：</strong> 一部のHTTPSウェブサイトでは、安全でないHTTPコンテンツを使用することができます。 あなたの情報を盗むために、このコンテンツを攻撃者に置き換えることができます。 このオプションがオンの場合、SnowHazeはこの混在したコンテンツを安全なWebサイトでブロックします。</p><p><strong>信頼済みサイトにHTTPSが必要:</strong>このオプションをオンにすると、信頼できるサイトが安全な HTTPS 接続をサポートしている場合にのみ接続できます。</p><strong>すべてのHTTPのアップグレード:</strong>このオプションは、安全な接続を強制し、HTTPS 接続が確立できる場合にのみページをロードします。";
 
 /* explanations of the appearance settings */
 "appearance settings explanation" = "<p>SnowHazeでウェブサイトをどのように見たいかを選択する</p><p><strong>ナイトモード:</strong> ナイトモードでは、暗い中でも、画面が見やすいように色を変更します。</p><p><strong>最小フォントサイズ:</strong> 表示される文字の大きさを選択します。</p><p><strong>スケール内容:</strong>小さいスクリーンまたは大きいスクリーンに表示されるようにウェブサイトを表示するためのスケーリング ファクターを選択します。</p><strong>スケール制限を無視する：</strong>一部のウェブサイトで定義されている制限を無視し、好きなようにコンテンツのサイズを変更します。";
@@ -1995,7 +1995,7 @@
 "external bookmark settings explanation" = "<p>外部のブックマークの管理</p><p><strong>Spotlightのインデックス:</strong> この選択肢がオンの場合、ブックマークはSpotlightにおいてインデックス化されるため、簡単に検索することができるようになります。</p><strong>ホームスクリーンショートカット:</strong> これにより、ブックマークがデバイス上のホームスクリーンからアクセス可能になり、3DTouchをサポートします。";
 
 /* explanations of the content blockers settings */
-"content blockers settings explanation" = "<p>SnowHazeはウェブページのさまざまなコンテンツをブロックできます。<u>注意</u> コンテンツがブロックされていると、サイトが正しく表示されない場合があります。 ブロックするコンテンツの種類を選択します。</p><p>次のコンテンツはブロックできます：<strong>イメージ：</strong>画像、<strong>スタイルシート：</strong> CSSファイル、<strong>スクリプト</strong>同じ元のスクリプトとサードパーティのスクリプト、<strong>サードパーティースクリプト</strong>サードパーティのスクリプト、<strong>フォント：</strong>フォント定義、<strong>Raw：</strong> XMLHttpRequestなどのドキュメントやリクエストタイプ、<strong>メディア：</strong>音声や動画。</p><strong>DoH サーバーがブロック:</strong> DNS over HTTPS (DoH) サーバーへの HTTPS 要求をブロックします。";
+"content blockers settings explanation" = "<p>SnowHazeはウェブページのさまざまなコンテンツをブロックできます。<u>注意</u> コンテンツがブロックされていると、サイトが正しく表示されない場合があります。 ブロックするコンテンツの種類を選択します。</p><p>次のコンテンツはブロックできます：<strong>イメージ：</strong>画像、<strong>スタイルシート：</strong> CSSファイル、<strong>スクリプト</strong>同じ元のスクリプトとサードパーティのスクリプト、<strong>サードパーティースクリプト</strong>サードパーティのスクリプト、<strong>フォント：</strong>フォント定義、<strong>Raw：</strong> XMLHttpRequest のように、ページをリロードせずに内容を変更できるドキュメントやリクエストタイプをブロックします、<strong>メディア：</strong>音声や動画。</p><strong>DoH サーバーがブロック:</strong> DNS over HTTPS (DoH) サーバーへの HTTPS 要求をブロックします。";
 
 /* format for explanations of the acknowledgements settings tab */
 "acknowledgements settings explanation format" = "<p>SnowHazeバージョン %@</p>SnowHazeの開発は、第三者コードとオープンソースプロジェクトによって非常に簡易化されました。私たちは以下のプロジェクトの維持をしている方々がこれらを使用することを許可してくださったことに対し、感謝しています ; The Tor Project Inc for Tor, iCepa for Tor on iOS, phishtank.com for their phish verification database, Mozilla for Readability, Niels Provos and Nick Mathewson for libevent, The OpenSSL Project for OpenSSL,  Lasse Collin for liblzma, Zetetic LLC for SQLCipher, the EasyList authors (easylist.github.io) fanboy, MonztA, Famlam and Khrin for the EasyList, EasyPrivacy List and Fanboy's Social Blocking List, the libsodium contributors for libsodium, and Hwaci for SQLite. 使用されたオープンソースのライセンスや著作権表示は以下に表記しています。SnowHazeは、Googleが提供するSafebrowsing APIを使用して、フィッシングサイトやマルウェアや不要ソフトウェアが含まれている可能性のあるサイトのアドバイスを生成します。Googleへのリクエストは、設定でセーフブラウジングがオンになっている場合のみ行われます。Googleに直接接続しないようにするために、弊社のプロキシを使用することができます。Basestudioで作製されたデザイン。";

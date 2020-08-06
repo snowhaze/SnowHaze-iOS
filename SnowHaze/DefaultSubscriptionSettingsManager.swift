@@ -417,7 +417,7 @@ class DefaultSubscriptionSettingsManager: SettingsViewManager {
 				open("https://dashboard.snowhaze.com/\(language)")
 			} else if indexPath.row == tutorialsButtonRow {
 				let language = PolicyManager.globalManager().threeLanguageCode
-				open("https://snowhaze.ch/\(language)/support-tutorials.html")
+				open("https://snowhaze.com/\(language)/support-tutorials.html")
 			} else if indexPath.row == manageSubscriptionsButtonRow {
 				showSupscriptionManagment()
 			} else if indexPath.row == tosButtonRow {

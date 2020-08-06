@@ -113,14 +113,14 @@ public enum V3APIConnection {
 
 	static func set(masterSecret new: Bytes) {
 		assert(new.count == sodium.box.SecretKeyBytes)
-		SubscriptionManager.shared.clearAuthTokens()
+		SubscriptionManager.shared.clearSubscriptionInfoTokens()
 		masterSecret = new
 		NotificationCenter.default.post(name: masterSecretChangedNotification, object: nil)
 	}
 
 	static func clearMasterSecret() {
 		masterSecret = nil
-		SubscriptionManager.shared.clearAuthTokens()
+		SubscriptionManager.shared.clearSubscriptionInfoTokens()
 		invalidateReceipt()
 		NotificationCenter.default.post(name: masterSecretChangedNotification, object: nil)
 	}
@@ -508,8 +508,8 @@ public enum V3APIConnection {
 		}
 	}
 
-	private static func getData(for parameters: [String: String] = [:], command: String, addKey: Bool = true, masterSecret: Bytes? = nil, try tryCount: Int = 3, callback: @escaping (Int, [String: Any]) -> Void) {
-		var parameters = parameters
+	private static func getData(for originalParameters: [String: String] = [:], command: String, addKey: Bool = true, masterSecret: Bytes? = nil, try tryCount: Int = 3, callback: @escaping (Int, [String: Any]) -> Void) {
+		var parameters = originalParameters
 		parameters["action"] = command
 		let run: ([String: String]) -> Void = { parameters in
 			var request = URLRequest(url: URL(string: "https://api.snowhaze.com/index.php")!)
@@ -534,7 +534,7 @@ public enum V3APIConnection {
 					DispatchQueue.main.async {
 						uploadReceiptKey(try: 0) { success in
 							if success {
-								getData(for: parameters, command: command, addKey: addKey, masterSecret: masterSecret, try: tryCount - 1, callback: callback)
+								getData(for: originalParameters, command: command, addKey: addKey, masterSecret: masterSecret, try: tryCount - 1, callback: callback)
 							} else {
 								callback(423, [:])
 							}

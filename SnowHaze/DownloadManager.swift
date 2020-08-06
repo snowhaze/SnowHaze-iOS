@@ -24,7 +24,7 @@ class DownloadManager: PinningSessionDelegate {
 
 	private func sessionConfig(allowCellular: Bool = true, tor: Bool = false) -> URLSessionConfiguration {
 		var config: URLSessionConfiguration
-		config = URLSessionConfiguration.background(withIdentifier: "ch.illotros.snowhaze.backgrounddownload" + (allowCellular ? "" : ".wifi") + (tor ? "" : ".tor"))
+		config = URLSessionConfiguration.background(withIdentifier: "ch.illotros.snowhaze.backgrounddownload" + (allowCellular ? "" : ".wifi") + (tor ? ".tor" : ""))
 
 		config.allowsCellularAccess = allowCellular
 
@@ -150,11 +150,12 @@ extension DownloadManager: URLSessionDownloadDelegate {
 		}
 	}
 
-	func handleBackgroundTaskEvent(completionHandler: @escaping () -> Void) {
+	func handleBackgroundTaskEvent(identifier: String, completionHandler: @escaping () -> Void) {
 		assert(pendingCompletionHandler == nil)
 		pendingCompletionHandler = completionHandler
-		backgroundSession.loadSessions(failure: self.performPendingCompletionHandler)
-		backgroundWifiSession.loadSessions(failure: self.performPendingCompletionHandler)
+		let includingTor = identifier.hasSuffix(".tor")
+		backgroundSession.loadSessions(includingTor: includingTor, failure: self.performPendingCompletionHandler)
+		backgroundWifiSession.loadSessions(includingTor: includingTor, failure: self.performPendingCompletionHandler)
 	}
 
 	func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {

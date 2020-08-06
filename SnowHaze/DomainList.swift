@@ -177,7 +177,7 @@ class DomainList {
 		}
 		let query = [String](repeating: "(?)", count: bindings.count).joined(separator: ",")
 		let result = try! db.execute("SELECT trackers FROM \(type.table) WHERE domain IN (VALUES \(query)) AND trackers IS NOT NULL ORDER BY length(domain) DESC LIMIT 1", with: bindings)
-		return result.first?.integerValue! ?? 14
+		return result.first?.integerValue! ?? 13
 	}
 
 	func search(top: Int64, matching: String) -> [(Int64, String)] {
@@ -244,7 +244,7 @@ class DomainList {
 	}
 
 	static func set(updating: Bool) {
-		let oldUpdating = PolicyManager.globalManager().updateSiteLists
+		let oldUpdating = !PolicyManager.globalManager().deleteSiteLists
 		guard oldUpdating != updating else {
 			return
 		}
