@@ -72,7 +72,7 @@ class AppSettingsManager: SettingsViewManager, UITextFieldDelegate {
 		let center = NotificationCenter.default
 		observer = center.addObserver(forName: DomainList.dbFileChangedNotification, object: nil, queue: nil) { [weak self] _ in
 			let indexPath = IndexPath(row: updateSiteListsRow, section: updateSiteListsSection)
-			self?.controller.tableView.reloadRows(at: [indexPath], with: .fade)
+			self?.controller?.tableView?.reloadRows(at: [indexPath], with: .fade)
 		}
 	}
 
@@ -248,7 +248,7 @@ class AppSettingsManager: SettingsViewManager, UITextFieldDelegate {
 		if !sender.isOn {
 			let indexPath = IndexPath(row: updateSiteListsRow, section: updateSiteListsSection)
 			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3) { [weak self] in
-				self?.controller.tableView.reloadRows(at: [indexPath], with: .fade)
+				self?.controller?.tableView?.reloadRows(at: [indexPath], with: .fade)
 			}
 		}
 	}

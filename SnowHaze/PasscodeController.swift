@@ -99,6 +99,7 @@ public class PasscodeController: UIViewController {
 	public static var textFieldTintColor = UIColor.button
 	public static var errorMessageColor = UIColor.title
 	public static var errorButtonColor = UIColor.button
+	public static var fieldTextColor = UIColor.darkTitle
 
 	public static var entryTextfielFont = UIFont.systemFont(ofSize: 25)
 	public static var pinDisplayFont = UIFont.systemFont(ofSize: 30)
@@ -1047,6 +1048,7 @@ private class CodeDisplay: UIView, UITextFieldDelegate {
 		textField.clearButtonMode = .always
 		textField.rightViewMode = .always
 		textField.textContentType = .password
+		textField.textColor = PasscodeController.fieldTextColor
 		addSubview(textField)
 
 		label.frame = bounds

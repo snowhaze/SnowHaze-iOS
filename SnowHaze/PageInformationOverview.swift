@@ -165,12 +165,14 @@ class PageInformationOverview: UIView {
 		domain.textAlignment = .center
 		domain.text = host
 		domain.lineBreakMode = .byTruncatingHead
+		domain.textColor = .darkTitle
 		views.append((domain, 30))
 
 		icons.distribution = .fillEqually
 		views.append((icons, 40))
 
 		explainLabel.textAlignment = .center
+		explainLabel.textColor = .darkTitle
 		views.append((explainLabel, 30))
 
 		let detailsTitle = NSLocalizedString("page information view details button title", comment: "title of details button in page information view")

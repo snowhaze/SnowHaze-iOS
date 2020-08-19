@@ -110,19 +110,43 @@ class SettingsViewManager: NSObject {
 		return progress
 	}
 
+	private class SettingsButton: UIButton { }
 	func makeButton(for cell: UITableViewCell) -> UIButton {
 		let button = SettingsButton(frame: cell.bounds)
-		button.setTitleColor(.darkTitle, for: .disabled)
+		button.setTitleColor(.dimmedTitle, for: .disabled)
 		cell.textLabel?.text = ""
 		button.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 		cell.addSubview(button)
 		return button
 	}
 
-	private class SettingsButton: UIButton { }
+	private class SettigsTextField: UITextField {
+		override init(frame: CGRect) {
+			super.init(frame: frame)
+			textColor = .darkTitle
+		}
+		
+		required init?(coder: NSCoder) {
+			fatalError("init(coder:) has not been implemented")
+		}
+		
+		override var placeholder: String? {
+			get {
+				return attributedPlaceholder?.string
+			}
+			set {
+				if let newValue = newValue {
+					let attributes = [NSAttributedString.Key.foregroundColor : UIColor.dimmedTitle]
+					attributedPlaceholder = NSAttributedString(string: newValue, attributes: attributes)
+				} else {
+					attributedPlaceholder = nil
+				}
+			}
+		}
+	}
 	func makeTextField(for cell: UITableViewCell) -> UITextField {
 		let frame = CGRect(x: cell.bounds.minX + 20, y: cell.bounds.midY - 20, width: cell.bounds.maxX - 40, height: 40)
-		let textField = UITextField(frame: frame)
+		let textField = SettigsTextField(frame: frame)
 		textField.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin, .flexibleTopMargin]
 		textField.layer.cornerRadius = 20
 		textField.clipsToBounds = true

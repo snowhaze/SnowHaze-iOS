@@ -136,7 +136,7 @@ class TorSettingsManager: SettingsViewManager {
 		TorServer.shared.start { [weak self] error in
 			self?.connectButton?.isEnabled = error != nil
 			if case .noSubscription = error {
-				self?.controller.tableView?.reloadData()
+				self?.controller?.tableView?.reloadData()
 			}
 		}
 	}

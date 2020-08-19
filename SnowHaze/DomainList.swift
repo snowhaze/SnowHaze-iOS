@@ -101,7 +101,7 @@ class DomainList {
 
 			case (.read("ad", "domain"), "main", nil):					return .ok
 
-			case (.read("tracking", "domain"), "main", nil):					return .ok
+			case (.read("tracking", "domain"), "main", nil):			return .ok
 
 			default:													fatalError("unauthorized operation \((action, db, cause))")
 		}

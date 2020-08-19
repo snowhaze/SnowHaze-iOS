@@ -100,10 +100,10 @@ class VPNSettingsManager: SettingsViewManager {
 				if self.isIPSec && self.showList {
 					if case NEVPNManager.shared().connection.status = NEVPNStatus.invalid {
 						let section = IndexSet(integer: listSection)
-						self.controller.tableView.reloadSections(section, with: .none)
+						self.controller?.tableView?.reloadSections(section, with: .none)
 					} else {
 						let indexPath = IndexPath(row: 0, section: listSection)
-						self.controller.tableView.reloadRows(at: [indexPath], with: .none)
+						self.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
 					}
 				}
 			}
@@ -436,6 +436,20 @@ class VPNSettingsManager: SettingsViewManager {
 		return super.heightForHeader(inSection: section)
 	}
 
+	override func heightForFooter(inSection section: Int) -> CGFloat {
+		if section == ipSection && PolicyManager.globalManager().useTorForAPICalls {
+			return 45
+		}
+		return super.heightForFooter(inSection: section)
+	}
+
+	override func titleForFooter(inSection section: Int) -> String? {
+		if section == ipSection && PolicyManager.globalManager().useTorForAPICalls {
+			return NSLocalizedString("ip check tor api call notice", comment: "notice to inform users that the ip check is being routed through tor")
+		}
+		return super.titleForFooter(inSection: section)
+	}
+
 	override var numberOfSections: Int {
 		return showList ? 4 : 3
 	}
@@ -525,7 +539,7 @@ class VPNSettingsManager: SettingsViewManager {
 								} else {
 									VPNManager.shared.save(profile)
 								}
-								self.controller.tableView.reloadRows(at: reload, with: .none)
+								self.controller?.tableView?.reloadRows(at: reload, with: .none)
 							} else if let profile = profile as? OVPNProfile {
 								self?.install(profile, for: cell)
 							}
@@ -543,7 +557,7 @@ class VPNSettingsManager: SettingsViewManager {
 								self.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
 							}
 						}
-						tableView.reloadRows(at: [indexPath], with: .none)
+						self?.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
 					}
 				}
 			} else {

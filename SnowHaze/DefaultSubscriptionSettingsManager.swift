@@ -518,7 +518,7 @@ class DefaultSubscriptionSettingsManager: SettingsViewManager {
 				self.updateStatus = .failed(date)
 			}
 			let indexPath = IndexPath(row: loadOptionsButtonRow, section: settingsSection)
-			self.controller.tableView.reloadRows(at: [indexPath], with: .fade)
+			self.controller?.tableView?.reloadRows(at: [indexPath], with: .fade)
 			DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [weak self] in
 				guard let self = self else {
 					return
@@ -537,7 +537,7 @@ class DefaultSubscriptionSettingsManager: SettingsViewManager {
 				}
 				self.updateStatus = .none
 				let indexPath = IndexPath(row: loadOptionsButtonRow, section: settingsSection)
-				self.controller.tableView.reloadRows(at: [indexPath], with: .fade)
+				self.controller?.tableView?.reloadRows(at: [indexPath], with: .fade)
 			}
 		}
 	}
@@ -678,7 +678,7 @@ extension DefaultSubscriptionSettingsManager: SubscriptionManagerDelegate {
 			}
 			self.restoreStatus = .none
 			let indexPath = IndexPath(row: restorePurchasesButtonRow, section: settingsSection)
-			self.controller.tableView.reloadRows(at: [indexPath], with: .fade)
+			self.controller?.tableView?.reloadRows(at: [indexPath], with: .fade)
 		}
 	}
 

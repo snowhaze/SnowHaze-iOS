@@ -74,6 +74,9 @@ internal extension URL {
 	}
 
 	var potentialXSS: Bool {
+		guard normalizedScheme != "data" else {
+			return false
+		}
 		let components = URLComponents(url: self, resolvingAgainstBaseURL: true)!
 		if isDangerous(components.path) {
 			return true

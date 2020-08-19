@@ -1103,6 +1103,9 @@
 /* title of button to check the client's ip addresses */
 "check ip addresses button title" = "IPアドレスを表示";
 
+/* notice to inform users that the ip check is being routed through tor */
+"ip check tor api call notice" = "注意：これは、いくつかのTor出口リレーのIPアドレスを表示します。";
+
 /* placeholder displayed when the client's ip address is unknown */
 "unknown ip address placeholder" = "不明";
 
@@ -2148,7 +2151,7 @@
 "download fallback file name" = "不明";
 
 /* explanations of the vpn settings tab */
-"vpn settings explanation" = "<p>VPN (Virtual Private Network)は暗号化されたプライベートなネットワークです。ユーザーの使用する機器とインターネット間の全ての通信は、はじめに、VPNサーバーに送られます。VPNサーバーを介して情報を受けとった受信者には、ユーザー（送信者）のIPアドレスが通知されることはありません （VPNサーバーのIPアドレスが通知されます）。この機能はトラッキングの防止に役立ちます。</p><p>VPNの利用はインターネット活動をより安全で快適なものにします。例えば、VPNサーバーとの通信は暗号化されます。</p><p>異なるプロトコルを使用する2種類のVPNを提供しています。 1つはIPSecと呼ばれるプロトコルで、もう1つはOpenVPNです。 IPSecを使用したVPNはSnowHazeアプリ内で簡単に制御できますが、OpenVPNではOpenVPN Connectアプリを使用し、毎月プロファイルを更新する必要があります。 しかし、OpenVPNはIPSecよりも少し安全です。 これは、使いやすさ（IPSec）とセキュリティ（OpenVPN）の間の小さなトレードオフであり、私たちが安全にあなたに任せることができます。</p><p> SnowHaze VPNは絶対に何も記録せず、非識別認証を使用する唯一のVPNサービスです。</p><p>SnowHaze VPNの利用にはSnowHaze VPNの購読が必要です。VPNの設定についてはオンラインチュートリアルをご参考下さい。</p><p><strong>資格情報を自動的にローテーションする:</strong>VPNサーバーに接続している間、サーバーのログイン資格情報を自動的に変更します。 それ以外の場合は、各セッションの資格情報が変更されます。</p><p><strong>位置リストの自動更新：</strong>利用可能なVPNサーバーの位置情報を更新します。</p><p><strong>Pingの表示：</strong> 通信スピードを表示します。具体的には、 使用デバイス・サーバー間を往復するための所要時間が表示されます。</p><u>注：</u> iOS 13は、VPNを介したインターネットトラフィックの再ルーティングに失敗する場合があります。";
+"vpn settings explanation" = "<p>VPN (Virtual Private Network)は暗号化されたプライベートなネットワークです。ユーザーの使用する機器とインターネット間の全ての通信は、はじめに、VPNサーバーに送られます。VPNサーバーを介して情報を受けとった受信者には、ユーザー（送信者）のIPアドレスが通知されることはありません （VPNサーバーのIPアドレスが通知されます）。この機能はトラッキングの防止に役立ちます。</p><p>VPNの利用はインターネット活動をより安全で快適なものにします。例えば、VPNサーバーとの通信は暗号化されます。</p><p>異なるプロトコルを使用する2種類のVPNを提供しています。 1つはIPSecと呼ばれるプロトコルで、もう1つはOpenVPNです。 IPSecを使用したVPNはSnowHazeアプリ内で簡単に制御できますが、OpenVPNではOpenVPN Connectアプリを使用し、毎月プロファイルを更新する必要があります。 しかし、OpenVPNはIPSecよりも少し安全です。 これは、使いやすさ（IPSec）とセキュリティ（OpenVPN）の間の小さなトレードオフであり、私たちが安全にあなたに任せることができます。</p><p> SnowHaze VPNは絶対に何も記録せず、非識別認証を使用する唯一のVPNサービスです。</p><p>SnowHaze VPNの利用にはSnowHaze VPNの購読が必要です。VPNの設定についてはオンラインチュートリアルをご参考下さい。</p><p><strong>資格情報を自動的にローテーションする:</strong>VPNサーバーに接続している間、サーバーのログイン資格情報を自動的に変更します。 それ以外の場合は、各セッションの資格情報が変更されます。</p><p><strong>位置リストの自動更新：</strong>利用可能なVPNサーバーの位置情報を更新します。</p><strong>Pingの表示：</strong> 通信スピードを表示します。具体的には、 使用デバイス・サーバー間を往復するための所要時間が表示されます。";
 
 /* explanations of the tor settings tab */
 "tor settings explanation" = "<p>Tor は、ユーザーの場所や使用状況を隠すために、インターネット トラフィックを何度もリルートするネットワークです。Tor は、ユーザーのインターネット活動を追跡することをより困難にします。</p><p><strong>Tor を使用する:</strong>このオプションがオンになっている場合、すべての接続は Tor ネットワークを介してリルートされます。</p><p><strong>起動時に開始:</strong> SnowHazeを起動するとTorネットワークへの接続が開始されます。これにより、Torが使用可能な状態になり、待ち時間を回避することができます。</p><p><strong>\"追跡しない\"リクエストを送信する:</strong> ウェブサイトに追跡しないように依頼してください。これを尊重するのはウェブサイト次第です。</p><p><strong>APIコールにTorを使用:</strong>サイトリストのダウンロードやVPNプロファイルの更新など、SnowHazeサービスへのコールにTorを使用します。</p><p>下のボタンを使用して手動で接続してください。Tor は最初の接続を試みると自動的に接続します。</p><p><strong>新しいトークンの回転回路:</strong>API コールに新しいトークンが使用された場合、新しい Tor Circuitを使用します。</p><u>注意:</u>これはTorの実験版です。セキュリティ機能を含む一部の機能が正常に動作しない場合がありますので、ご注意の上ご利用ください。";

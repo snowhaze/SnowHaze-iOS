@@ -134,6 +134,7 @@ class PageInfoDetailsList: UIView {
 			super.init(frame: CGRect(x: 0, y: 0, width: width, height: 10000))
 			var height: CGFloat = 5
 			let titleLabel = UILabel()
+			titleLabel.textColor = .darkTitle
 			titleLabel.numberOfLines = 0
 			titleLabel.font = UIFont.boldSystemFont(ofSize: 3 * titleLabel.font!.pointSize / 4)
 			titleLabel.text = title
@@ -148,6 +149,7 @@ class PageInfoDetailsList: UIView {
 			height += labelSize.height
 			if let data = data {
 				let dataLabel = UILabel()
+				dataLabel.textColor = .darkTitle
 				dataLabel.numberOfLines = 0
 				dataLabel.text = data
 				let labelSize = dataLabel.sizeThatFits(boundingSize)
@@ -219,6 +221,7 @@ class PageInfoDetailsList: UIView {
 		error.textAlignment = .center
 		error.numberOfLines = 0
 		error.isHidden = true
+		error.textColor = .darkTitle
 		addSubview(error)
 		let recognizer = UITapGestureRecognizer(target: self, action: #selector(trigger(_:)))
 		recognizer.numberOfTapsRequired = 5

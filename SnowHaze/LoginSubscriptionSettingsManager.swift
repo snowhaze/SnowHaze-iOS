@@ -191,7 +191,7 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 			}
 		} else if !canLogin && (loginButton?.isEnabled ?? false) {
 			UIView.animate(withDuration: 0.2) { [weak self] in
-				self?.loginButton?.backgroundColor = .darkTitle
+				self?.loginButton?.backgroundColor = .dimmedTitle
 				self?.loginButton?.isEnabled = false
 			}
 		}

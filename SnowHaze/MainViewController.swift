@@ -1123,7 +1123,12 @@ extension MainViewController: TabViewControllerDelegate {
 		let bar = BookmarkRenameBar()
 		bar.callback = callback
 		bar.textField.text = prefill
-		bar.textField.placeholder = fallback
+		if let fallback = fallback {
+			let attributes = [NSAttributedString.Key.foregroundColor : UIColor.dimmedTitle]
+			bar.textField.attributedPlaceholder = NSAttributedString(string: fallback, attributes: attributes)
+		} else {
+			bar.textField.attributedPlaceholder = nil
+		}
 		set(inputBar: bar)
 	}
 

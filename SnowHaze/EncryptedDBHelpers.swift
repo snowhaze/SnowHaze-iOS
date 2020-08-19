@@ -9,9 +9,6 @@
 import Foundation
 import CommonCrypto
 
-private let settingsDB = "settings"
-private let browsingDB = "browsing"
-
 var dbAvailable: Bool {
 	return keyingData != nil
 }
@@ -143,10 +140,10 @@ let db: SQLiteManager = {
 				case (.insert("ch_illotros_snowhaze_browsing_tab"), "main", nil):						return .ok
 				case (.delete("ch_illotros_snowhaze_browsing_tab"), "main", nil):						return .ok
 
-				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):			return .ok
-				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):			return .ok
-				case (.read("ch_illotros_snowhaze_browsing_history", "url"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):			return .ok
-				case (.read("ch_illotros_snowhaze_browsing_history", "title"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "url"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history", "title"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
 				case (.read("ch_illotros_snowhaze_browsing_history", "id"), "main", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_browsing_history", "url"), "main", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_browsing_history", "title"), "main", nil):			return .ok
@@ -173,15 +170,15 @@ let db: SQLiteManager = {
 				case (.read("ch_illotros_snowhaze_browsing_bookmark", "weight"), "main", nil):			return .ok
 				case (.delete("ch_illotros_snowhaze_browsing_bookmark"), "main", nil):					return .ok
 
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):			return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):			return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):			return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):			return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):										return .ok
 
 				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts_content"), "main", nil):		return .ok
 				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts_content", "id"), "main", nil):	return .ok
@@ -216,17 +213,17 @@ let db: SQLiteManager = {
 				case (.read("ch_illotros_snowhaze_settings_global", "key"), "main", nil):				return .ok
 				case (.read("ch_illotros_snowhaze_settings_global", "value"), "main", nil):				return .ok
 
-				case (.read("ch_illotros_snowhaze_browsing_history_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_history_fts", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_history_fts", "url"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_history_fts", "title"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):		return .ok
-				case (.delete("ch_illotros_snowhaze_browsing_history_fts"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):			return .ok
-				case (.insert("ch_illotros_snowhaze_browsing_history_fts"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):			return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "id"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "url"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "title"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):									return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_history_fts"), "main", "ch_illotros_snowhaze_browsing_history_fts_delete"):										return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_history_fts"), "main", "ch_illotros_snowhaze_browsing_history_fts_insert"):										return .ok
 
 				case (.read("ch_illotros_snowhaze_browsing_history_fts", "ROWID"), "main", nil):		return .ok
 				case (.read("ch_illotros_snowhaze_browsing_history_fts", "rank"), "main", nil):			return .ok
 
-				case (.read("ch_illotros_snowhaze_browsing_history_fts", "ch_illotros_snowhaze_browsing_history_fts"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_history_fts", "ch_illotros_snowhaze_browsing_history_fts"), "main", nil):											return .ok
 
 				case (.insert("ch_illotros_snowhaze_browsing_history_fts_content"), "main", nil):		return .ok
 				case (.read("ch_illotros_snowhaze_browsing_history_fts_content", "id"), "main", nil):	return .ok
@@ -257,17 +254,17 @@ let db: SQLiteManager = {
 
 				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "rank"), "main", nil):		return .ok
 				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", nil):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ch_illotros_snowhaze_browsing_bookmark_fts"), "main", nil):				return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ch_illotros_snowhaze_browsing_bookmark_fts"), "main", nil):											return .ok
 
-				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):			return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
-				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
-				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
-				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
-				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):	return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):		return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):	return .ok
-				case (.delete("ch_illotros_snowhaze_browsing_bookmark_fts"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):			return .ok
+				case (.insert("ch_illotros_snowhaze_browsing_bookmark_fts"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):										return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):								return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):								return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):								return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):								return .ok
+				case (.update("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_update"):								return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark_fts", "ROWID"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):								return .ok
+				case (.delete("ch_illotros_snowhaze_browsing_bookmark_fts"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"):										return .ok
 
 				case (.read("sqlite_master", "ROWID"), "main", nil):									return .ok
 				case (.update("sqlite_master", "sql"), "main", nil):									return .ok
@@ -316,7 +313,7 @@ let db: SQLiteManager = {
 				case (.createTrigger("ch_illotros_snowhaze_browsing_bookmark", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"), "main", nil):								return .ok
 				case (.createTrigger("ch_illotros_snowhaze_browsing_bookmark", "ch_illotros_snowhaze_browsing_bookmark_fts_delete"), "main", nil):								return .ok
 				case (.read("ch_illotros_snowhaze_browsing_bookmark", "id"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):										return .ok
-				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):									return .ok
+				case (.read("ch_illotros_snowhaze_browsing_bookmark", "url"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):										return .ok
 				case (.read("ch_illotros_snowhaze_browsing_bookmark", "name"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):									return .ok
 				case (.read("ch_illotros_snowhaze_browsing_bookmark", "title"), "main", "ch_illotros_snowhaze_browsing_bookmark_fts_insert"):									return .ok
 
@@ -450,9 +447,8 @@ let db: SQLiteManager = {
 	SQLiteManager.freeSQLiteCachesOnMemoryWarning = true
 	_ = initSQLite
 	let manager = SQLiteManager(setup: { _ in
-		let alwaysExcludedOptions: SQLite.SetupOptions = [.limitVariableNumber, .limitLength, .disableTriggers]
-		let specificExcludedOptions: SQLite.SetupOptions = StaticData.setupComplete ? [] : [.limitAttached]
-		let setupOptions = SQLite.SetupOptions.secure.subtracting(alwaysExcludedOptions.union(specificExcludedOptions))
+		let excludedOptions: SQLite.SetupOptions = [.limitVariableNumber, .limitLength, .disableTriggers]
+		let setupOptions = SQLite.SetupOptions.secure.subtracting(excludedOptions)
 		let connection = SQLCipher(path: dbPath, key: keyingData, cipherOptions: .compatibility(3), setupOptions: setupOptions)!
 		try! connection.dropModules(except: ["fts5"])
 		try! connection.execute("PRAGMA secure_delete = on")
@@ -482,38 +478,14 @@ let db: SQLiteManager = {
 		}
 		return connection
 	})
-	let appSupportPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first! as NSString
-	let browsingPath = appSupportPath.appendingPathComponent("browsingdata.db")
-	let settingsPath = appSupportPath.appendingPathComponent("settingsdata.db")
-	let browsingKey = KeyManager(name: "browsingdata.db.passphrase")
-	let settingsKey = KeyManager(name: "settingsdata.db.passphrase")
-
-	if let key = try! browsingKey.keyIfExists() {
-		let attachBrowsing = "ATTACH DATABASE ? AS \(browsingDB) KEY ?"
-		_ = try? manager.execute(attachBrowsing, with: [.text(browsingPath), .text(key)])
-	}
-
-	if let key = try! settingsKey.keyIfExists() {
-		let attachSettings = "ATTACH DATABASE ? AS \(settingsDB) KEY ?"
-		_ = try? manager.execute(attachSettings, with: [.text(settingsPath), .text(key)])
-	}
 
 	manager.migrator = Migrator()
 	try! manager.migrate(toVersion: 2)
 
-	_ = try? manager.execute("DETACH \(settingsDB)")
-	_ = try? manager.execute("DETACH \(browsingDB)")
-
-	try? FileManager.default.removeItem(atPath: browsingPath)
-	try? FileManager.default.removeItem(atPath: settingsPath)
-
 	StaticData.setupComplete = true
 
 	try! manager.connection.set(authorizer: authorizer)
-	_ = manager.connection.limit(.attached, value: 0)
 
-	browsingKey.set(key: nil)
-	settingsKey.set(key: nil)
 	return manager
 }()
 
@@ -521,8 +493,6 @@ private struct Migrator: SQLiteMigrator {
 	func sqliteManager(_ manager: SQLiteManager, makeV1SetupForDatabase database: String, of connection: SQLite) throws {
 		try connection.execute("PRAGMA auto_vacuum = FULL")
 		try connection.execute("PRAGMA journal_mode = DELETE")
-
-		let dbres = try connection.execute("PRAGMA database_list")
 
 		// create tables
 		try connection.execute("CREATE TABLE \(BookmarkStore.tableName) (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, name TEXT, url TEXT NOT NULL, favicon BLOB, weight FLOAT NOT NULL)")
@@ -546,26 +516,10 @@ private struct Migrator: SQLiteMigrator {
 		try connection.execute("CREATE TRIGGER \(HistoryStore.ftsUpdateName) AFTER UPDATE ON \(HistoryStore.tableName) FOR EACH ROW WHEN NEW.id IS NOT OLD.id OR NEW.title IS NOT OLD.title OR NEW.url IS NOT OLD.url BEGIN UPDATE \(HistoryStore.ftsName) SET rowid = NEW.id, title = NEW.title, url = NEW.url WHERE rowid = OLD.id; END")
 		try connection.execute("CREATE TRIGGER \(HistoryStore.ftsInsertName) AFTER INSERT ON \(HistoryStore.tableName) FOR EACH ROW BEGIN INSERT INTO \(HistoryStore.ftsName) (rowid, title, url) VALUES (NEW.id, NEW.title, NEW.url); END")
 		try connection.execute("CREATE TRIGGER \(HistoryStore.ftsDeleteName) AFTER DELETE ON \(HistoryStore.tableName) FOR EACH ROW BEGIN DELETE FROM \(HistoryStore.ftsName) WHERE rowid = OLD.id; END")
-
-		// migrate old data
-		if dbres.contains(where: { $0[1]?.textValue == browsingDB }) {
-			_ = try? connection.execute("INSERT INTO \(BookmarkStore.tableName) (id, title, name, url, favicon, weight) SELECT id, title, name, url, favicon, weight FROM \(browsingDB).bookmark")
-			_ = try? connection.execute("INSERT INTO \(HistoryStore.tableName) (id, url, title, timestamp) SELECT id, url, title, timestamp FROM \(browsingDB).history")
-			_ = try? connection.execute("INSERT INTO \(TabStore.tableName) (id, root_id, title, history, snapshot, active) SELECT id, NULL, title, history, snapshot, active FROM \(browsingDB).tab")
-		}
-
-		if dbres.contains(where: { $0[1]?.textValue == settingsDB }) {
-			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = replace(domain, ':', '::') WHERE domain != ?", with: [.text(PolicyDomain.aboutBlankURL)])
-			_ = try? connection.execute("UPDATE \(settingsDB).\(Settings.pageTableName) SET domain = ? WHERE domain == ''", with: [.text(PolicyDomain.missingHostPseudoDomain)])
-			_ = try? connection.execute("INSERT INTO \(Settings.globalTableName) (key, value) SELECT key, value FROM \(settingsDB).\(Settings.globalTableName)")
-			_ = try? connection.execute("DELETE FROM \(settingsDB).\(Settings.tabTableName) WHERE tab_id NOT IN (SELECT id FROM \(TabStore.tableName))")
-			_ = try? connection.execute("INSERT INTO \(Settings.tabTableName) (tab_id, key, value) SELECT tab_id, key, value FROM \(settingsDB).\(Settings.tabTableName)")
-			_ = try? connection.execute("INSERT INTO \(Settings.pageTableName) (domain, key, value) SELECT domain, key, value FROM \(settingsDB).\(Settings.pageTableName)")
-		}
 	}
 
 	func sqliteManager(_ manager: SQLiteManager, incrementalyUpgradeDatabase database: String, of connection: SQLite, toVersion version: UInt64) throws {
-		assert(version == 2)
+		precondition(version == 2)
 		try connection.execute("ALTER TABLE \(TabStore.tableName) ADD COLUMN deleted INTEGER DEFAULT FALSE")
 		try connection.execute("DELETE FROM \(Settings.pageTableName) WHERE domain = ?", with: [.text(PolicyDomain.aboutBlankURL)])
 	}

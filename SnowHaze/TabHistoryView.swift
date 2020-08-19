@@ -54,6 +54,8 @@ class TabHistoryView: UIView, UITableViewDelegate, UITableViewDataSource {
 		let cell = UITableViewCell(style: .subtitle, reuseIdentifier: id)
 		cell.backgroundColor = .clear
 		cell.tintColor = .button
+		cell.textLabel?.textColor = .darkTitle
+		cell.detailTextLabel?.textColor = .darkTitle
 		return cell
 	}
 

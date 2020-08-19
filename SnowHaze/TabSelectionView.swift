@@ -31,7 +31,7 @@ private class TabView: UICollectionViewCell {
 
 	var tabSelected: Bool {
 		set {
-			let color: UIColor = newValue ? .white : .darkTitle
+			let color: UIColor = newValue ? .white : .dimmedTitle
 			closeButton.tintColor = color
 			titleButton.titleLabel?.textColor = color
 			titleButton.setTitleColor(color, for: [])
@@ -46,11 +46,11 @@ private class TabView: UICollectionViewCell {
 		self.title = title
 		self.url = url
 
-		closeButton.tintColor = .darkTitle
+		closeButton.tintColor = .dimmedTitle
 
 		titleButton.setAttributedTitle(title, for: [])
-		titleButton.titleLabel?.textColor = .darkTitle
-		titleButton.setTitleColor(.darkTitle, for: [])
+		titleButton.titleLabel?.textColor = .dimmedTitle
+		titleButton.setTitleColor(.dimmedTitle, for: [])
 
 		separator.isHidden = index == 0
 	}
@@ -69,7 +69,7 @@ private class TabView: UICollectionViewCell {
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)
-		separator.backgroundColor = .darkTitle
+		separator.backgroundColor = .dimmedTitle
 		backgroundColor = .bar
 		separator.clipsToBounds = true
 		separator.layer.cornerRadius = 0.5

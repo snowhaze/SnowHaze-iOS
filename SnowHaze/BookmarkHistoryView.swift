@@ -103,8 +103,8 @@ class BookmarkHistoryView: UIView {
 	var constrainedWidth: Bool = false {
 		didSet {
 			if constrainedWidth {
-				bookmarkButton.setTitleColor(.darkTitle, for: [])
-				historyBytton.setTitleColor(.darkTitle, for: [])
+				bookmarkButton.setTitleColor(.dimmedTitle, for: [])
+				historyBytton.setTitleColor(.dimmedTitle, for: [])
 				let historyX: CGFloat
 				let bookmarkX: CGFloat
 				if showingHistoryInSingleMode {
@@ -467,7 +467,7 @@ extension BookmarkHistoryView: UICollectionViewDataSource {
 		let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "bookmarkCell", for: indexPath) as! BookmarkCollectionViewCell
 		if !cell.previewRegistered, let vc = delegate?.viewControllerForPreviewing {
 			vc.registerForPreviewing(with: self, sourceView: cell)
-			cell.previewRegistered = false
+			cell.previewRegistered = true
 		}
 		cell.bookmark = bookmarks[indexPath.row]
 		cell.delegate = self

@@ -268,7 +268,7 @@ public class SQLite {
 	//	case getPcache2						/// not supported
 
 		/// set the callback for sqlite3_log(...). the callback function may not call SQLite functions and musst be threadsafe if multiple threads use SQLite
-		case log(((Int, String) -> Void)?)
+		case log(((Int, String) -> ())?)
 
 		/// enable or disable handling of file: URIs in sqlite3_open(...)
 		case uri(Bool)
@@ -545,7 +545,7 @@ public class SQLite {
 			self.statement = stmt
 		}
 
-		fileprivate func bind(pointer: UnsafeMutableRawPointer, ofType type: UnsafePointer<Int8>, to index: Int32, destuctor: (@convention(c) (UnsafeMutableRawPointer?) -> Void)? = nil) throws {
+		fileprivate func bind(pointer: UnsafeMutableRawPointer, ofType type: UnsafePointer<Int8>, to index: Int32, destuctor: (@convention(c) (UnsafeMutableRawPointer?) -> ())? = nil) throws {
 			try check(sqlite3_bind_pointer(statement, index, pointer, type, destuctor), connection: handle)
 		}
 
@@ -1175,7 +1175,7 @@ public class SQLite {
 				case .memStatus(let set):
 					return sqlite_option_one_int(SQLITE_CONFIG_MEMSTATUS, set ? 1 : 0)
 				case .log(let callback):
-					typealias LogFunction = ContextWrapper<(Int, String) -> Void>
+					typealias LogFunction = ContextWrapper<(Int, String) -> ()>
 					let context = LogFunction(data: callback)
 					return sqlite_option_context_context_int_string_fnpointer_int64(SQLITE_CONFIG_LOG, context?.toC) { cContext, code, cString in
 						let string = String(cUTF8: cString!)!
@@ -1199,7 +1199,7 @@ public class SQLite {
 	}
 
 	public func dropModules(except: [String] = []) throws {
-		func accumulate(pointers: [UnsafePointer<Int8>?], for names: [String], callback: ([UnsafePointer<Int8>?]) throws -> Void) rethrows {
+		func accumulate(pointers: [UnsafePointer<Int8>?], for names: [String], callback: ([UnsafePointer<Int8>?]) throws -> ()) rethrows {
 			guard !names.isEmpty else {
 				try callback(pointers + [nil])
 				return
@@ -1374,7 +1374,7 @@ public extension SQLite {
 		}
 	}
 
-	func inSavepointBlock(name: String? = nil, perform body: () throws -> Void) throws {
+	func inSavepointBlock(name: String? = nil, perform body: () throws -> ()) throws {
 		let savepointName = (name ?? "ch.illotros.sqlite.convenience.safepoint.name").sqliteEscaped
 		do {
 			try execute("SAVEPOINT \(savepointName)")
@@ -1389,7 +1389,7 @@ public extension SQLite {
 
 // custom functions, aggregates & collations
 public extension SQLite {
-	private typealias FunctionContext = ContextWrapper<([Data], (Int, Any) -> Void, (Int) -> Any?) throws -> Data>
+	private typealias FunctionContext = ContextWrapper<([Data], (Int, Any) -> (), (Int) -> Any?) throws -> Data>
 	private typealias ObjWrapper = ContextWrapper<Any?>
 
 	struct FunctionOptions: OptionSet {
@@ -1405,20 +1405,20 @@ public extension SQLite {
 	}
 
 	func register(name: String, nArgs: Int = 1, options: FunctionOptions = .directonly, function: @escaping ([Data]) throws -> Data) throws {
-		let fn: ([Data], (Int, Any) -> Void, (Int) -> Any?) throws -> Data = { data, _, _ in return try function(data) }
+		let fn: ([Data], (Int, Any) -> (), (Int) -> Any?) throws -> Data = { data, _, _ in return try function(data) }
 		try register(name: name, nArgs: nArgs, options: options, function: fn)
 	}
 
-	func register<T>(name: String, nArgs: Int = 1, options: FunctionOptions = .directonly, function: @escaping ([Data], (Int, T) -> Void, (Int) -> T?) throws -> Data) throws {
+	func register<T>(name: String, nArgs: Int = 1, options: FunctionOptions = .directonly, function: @escaping ([Data], (Int, T) -> (), (Int) -> T?) throws -> Data) throws {
 		let encoding = SQLITE_UTF8 | options.rawValue
-		let cFunction: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
+		let cFunction: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> () = { sqliteContext, count, params in
 			let context = FunctionContext.fromC(sqlite3_user_data(sqliteContext)!)
 			var swiftParams = [Data]()
 			swiftParams.reserveCapacity(Int(count))
 			for index in 0 ..< count {
 				swiftParams.append(SQLite.value(from: params!, index: index))
 			}
-			let setter: (Int, Any) -> Void = {
+			let setter: (Int, Any) -> () = {
 				sqlite3_set_auxdata(sqliteContext, $0.clampedTo32Bit, ObjWrapper(data: $1).toC, { ObjWrapper.releaseC($0) })
 			}
 			let getter: (Int) -> Any? = { ObjWrapper.fromC(sqlite3_get_auxdata(sqliteContext, $0.clampedTo32Bit))?.data! }
@@ -1441,7 +1441,7 @@ public extension SQLite {
 
 		let encoding = SQLITE_UTF8 | options.rawValue
 
-		let cStep: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
+		let cStep: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> () = { sqliteContext, count, params in
 			let context = WindowContext.fromC(sqlite3_user_data(sqliteContext)!)
 			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
 			let cAccumulator = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
@@ -1463,7 +1463,7 @@ public extension SQLite {
 			}
 		}
 
-		let cFinal: @convention(c) (OpaquePointer?) -> Void = { sqliteContext in
+		let cFinal: @convention(c) (OpaquePointer?) -> () = { sqliteContext in
 			let context = WindowContext.fromC(sqlite3_user_data(sqliteContext)!)
 			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
 			let ptr = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
@@ -1474,7 +1474,7 @@ public extension SQLite {
 			}
 		}
 
-		let cValue: @convention(c) (OpaquePointer?) -> Void = { sqliteContext in
+		let cValue: @convention(c) (OpaquePointer?) -> () = { sqliteContext in
 			let context = WindowContext.fromC(sqlite3_user_data(sqliteContext)!)
 			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
 			let ptr = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
@@ -1485,7 +1485,7 @@ public extension SQLite {
 			}
 		}
 
-		let cInverse: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
+		let cInverse: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> () = { sqliteContext, count, params in
 			let context = WindowContext.fromC(sqlite3_user_data(sqliteContext)!)
 			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
 			let cAccumulator = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
@@ -1520,7 +1520,7 @@ public extension SQLite {
 
 		let encoding = SQLITE_UTF8 | options.rawValue
 
-		let cStep: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> Void = { sqliteContext, count, params in
+		let cStep: @convention(c) (OpaquePointer?, Int32, UnsafeMutablePointer<OpaquePointer?>?) -> () = { sqliteContext, count, params in
 			let context = AggregateContext.fromC(sqlite3_user_data(sqliteContext)!)
 			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
 			let cAccumulator = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
@@ -1542,7 +1542,7 @@ public extension SQLite {
 			}
 		}
 
-		let cFinal: @convention(c) (OpaquePointer?) -> Void = { sqliteContext in
+		let cFinal: @convention(c) (OpaquePointer?) -> () = { sqliteContext in
 			let context = AggregateContext.fromC(sqlite3_user_data(sqliteContext)!)
 			let allocated = sqlite3_aggregate_context(sqliteContext, Int32(MemoryLayout<OpaquePointer>.size))!
 			let ptr = UnsafePointer<UnsafeMutableRawPointer?>(OpaquePointer(allocated)).pointee
@@ -1626,7 +1626,7 @@ public extension SQLite {
 		}
 	}
 
-	private static func perform(inContext: OpaquePointer?, applicationFunction: () throws -> Void) {
+	private static func perform(inContext: OpaquePointer?, applicationFunction: () throws -> ()) {
 		do {
 			try applicationFunction()
 		} catch Error.other(let message, let code) {

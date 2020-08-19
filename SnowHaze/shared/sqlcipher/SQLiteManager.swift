@@ -252,7 +252,7 @@ class SQLiteManager {
 		return try connection.inTransaction(ofType: type, perform: body)
 	}
 
-	public func withUniqueBackgroundConnection(qos: DispatchQoS.QoSClass, work: @escaping (SQLite?) -> Void) {
+	public func withUniqueBackgroundConnection(qos: DispatchQoS.QoSClass, work: @escaping (SQLite?) -> ()) {
 		lock.lock()
 		reload()
 		DispatchQueue.global(qos: qos).sync {

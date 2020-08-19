@@ -38,7 +38,8 @@ extension UIColor {
 	static let vpnStats					= UIColor(red: 160 / 255.0, green:  44 / 255.0, blue:  90 / 255.0, alpha: 1   )
 
 	static let title					= UIColor(white: 0.98 , alpha: 1  )
-	static let darkTitle				= UIColor(white: 0.665, alpha: 1  )
+	static let dimmedTitle				= UIColor(white: 0.665, alpha: 1  )
+	static let darkTitle				= UIColor(white: 0    , alpha: 1  )
 	static let popover					= UIColor(white: 0.91 , alpha: 1  )
 	static let popoverDismiss			= UIColor(white: 0    , alpha: 0.3)
 	static let subtitle					= UIColor(white: 0.75 , alpha: 1  )

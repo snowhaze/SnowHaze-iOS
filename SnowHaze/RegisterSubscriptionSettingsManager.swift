@@ -149,7 +149,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 			registerButton.frame = CGRect(x: cell.bounds.midX + 20, y: 345, width: cell.bounds.width / 2 - 40, height: 40)
 			registerButton.layer.cornerRadius = 20
 			registerButton.clipsToBounds = true
-			registerButton.backgroundColor = self.registerButton?.backgroundColor ?? .darkTitle
+			registerButton.backgroundColor = self.registerButton?.backgroundColor ?? .dimmedTitle
 			registerButton.isEnabled = self.registerButton?.isEnabled ?? false
 			self.registerButton = registerButton
 			let registerTitle = NSLocalizedString("zka2 submit registration button title", comment: "title of button to submit the content of the zka2 registration form")
@@ -276,7 +276,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 		PasswordValidator.simpleMedium.validate(password) { assert($0) }
 		assert(password == passwordConfirm)
 		assert(email == emailConfirm)
-		registerButton?.backgroundColor = .darkTitle
+		registerButton?.backgroundColor = .dimmedTitle
 		let svc = controller!.splitMergeController!
 		V3APIConnection.register { [weak self] error in
 			if let error = error {
@@ -417,7 +417,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 			}
 		} else if loading && (copyKeyButton?.isEnabled ?? false) {
 			UIView.animate(withDuration: 0.2) { [weak self] in
-				self?.copyKeyButton?.backgroundColor = .darkTitle
+				self?.copyKeyButton?.backgroundColor = .dimmedTitle
 				self?.copyKeyButton?.isEnabled = false
 			}
 		}
@@ -432,7 +432,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 			}
 		} else if !allOK && (registerButton?.isEnabled ?? false) {
 			UIView.animate(withDuration: 0.2) { [weak self] in
-				self?.registerButton?.backgroundColor = .darkTitle
+				self?.registerButton?.backgroundColor = .dimmedTitle
 				self?.registerButton?.isEnabled = false
 			}
 		}

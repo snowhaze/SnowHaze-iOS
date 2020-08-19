@@ -139,7 +139,7 @@ class SubscriptionSettingsManager: SettingsViewManager {
 	}
 
 	private func reloadData(with animation: UITableView.RowAnimation, change: () -> Void) {
-		guard let tableView = self.controller.tableView else {
+		guard let tableView = self.controller?.tableView else {
 			return
 		}
 		let oldSectionCount = manager.numberOfSections

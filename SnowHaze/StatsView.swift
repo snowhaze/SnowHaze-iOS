@@ -84,7 +84,7 @@ class StatsView: UICollectionReusableView {
 
 			number.textAlignment = .center
 			number.autoresizingMask = .flexibleWidth
-			number.textColor = dimmed ? .darkTitle : delegate.colorForStat(i, in: self)
+			number.textColor = dimmed ? .dimmedTitle : delegate.colorForStat(i, in: self)
 			number.adjustsFontSizeToFitWidth = true
 			number.font = UIFont.systemFont(ofSize: 40)
 			number.text = fmt(count)
@@ -94,7 +94,7 @@ class StatsView: UICollectionReusableView {
 			category.autoresizingMask = .flexibleWidth
 			category.numberOfLines = 2
 			category.font = UIFont.systemFont(ofSize: 11)
-			category.textColor = dimmed ? .darkTitle : .title
+			category.textColor = dimmed ? .dimmedTitle : .title
 			category.text = categoryTitle
 
 			container.addSubview(number)

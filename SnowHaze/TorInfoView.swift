@@ -34,7 +34,7 @@ class TorInfoView: PageInfoDetailsList {
 			if filtered.count > 1 {
 				let title = NSLocalizedString("page information tor details circuit selection field title", comment: "title of the circuit selection field for the tor information in the page information view")
 				let fmt = NSLocalizedString("page information tor details circuit selection field format", comment: "format of the circuit selection field for the tor information in the page information view")
-				data.append(.data(title, String(format: fmt, index, filtered.count)))
+				data.append(.data(title, String(format: fmt, index + 1, filtered.count)))
 			}
 			if let id = circuit.id {
 				let title = NSLocalizedString("page information tor details circuit id field title", comment: "title of the circuit id field for the tor information in the page information view")
