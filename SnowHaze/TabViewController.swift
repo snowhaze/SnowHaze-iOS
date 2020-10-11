@@ -10,12 +10,12 @@ import UIKit
 import WebKit
 
 protocol TabViewControllerDelegate: class {
-	func tabViewController(_ controller: TabViewController, openTabForRequest request: URLRequest)
+	func tabViewController(_ controller: TabViewController, openTabForRequest request: URLRequest, inForeground: Bool)
 	func showSuggestions(searchString: String)
 	func stopShowingSuggestions()
 	func showToolBar(degree: CGFloat)
 	func stopShowingOverlays()
-	func showRenameBar(fallback: String?, prefill: String?, callback: @escaping (String?) -> Void)
+	func showRenameBar(fallback: String?, prefill: String?, callback: @escaping (String?) -> ())
 	func boundingViews() -> (top: UIView?, bottom: UIView?)
 	func showDownloads()
 }
@@ -25,7 +25,7 @@ class TabViewController: UIViewController {
 	private let historyStore = HistoryStore.store
 	private let bookmarkStore = BookmarkStore.store
 	private var lastScrollPosition: CGFloat?
-	private var lastScrollUp: Bool?
+	private var scrollDirectionStrength = 0
 
 	private static var docController: UIDocumentInteractionController?
 	private static var sendingFile = false
@@ -217,51 +217,12 @@ private extension TabViewController {
 				if newValue < 1 {
 					stopInput()
 				}
-				if !isIntermediate(scale: newValue) {
-					webView?.scrollView.showsHorizontalScrollIndicator = false
-					webView?.scrollView.showsVerticalScrollIndicator = false
-				}
 				adjustWebviewSize(isIntemediate: isIntermediate(scale: newValue))
-				if !isIntermediate(scale: newValue) {
-					webView?.scrollView.showsHorizontalScrollIndicator = true
-					webView?.scrollView.showsVerticalScrollIndicator = true
-				}
 			}
 		}
 		get {
 			return urlBar?.scale ?? 1
 		}
-	}
-
-	func display(_ alert: UIAlertController, domain: String?, fallbackHandler: @escaping () -> Void) -> Bool {
-		guard !TabAlertTransitioningDelegate.shared.isBusy else {
-			if let controller = tab?.controller {
-				TabAlertTransitioningDelegate.shared.notify(controller: controller)
-			} else {
-				fallbackHandler()
-			}
-			return false
-		}
-		guard presentedViewController == nil else {
-			if let controller = tab?.controller {
-				TabAlertTransitioningDelegate.shared.additionalNotify(controller: controller)
-			} else {
-				fallbackHandler()
-			}
-			return false
-		}
-		if let domain = domain, !domain.isEmpty, tab?.controller?.shouldAllowIgnoreForIncedAlertCount(for: domain) ?? false {
-			let ignoreTitle = NSLocalizedString("ignore alerts from this site alert button title", comment: "title of button to ignore further alerts by this site")
-			let ignoreAction = UIAlertAction(title: ignoreTitle, style: .default) { _ in
-				self.tab?.controller?.blockAlerts(from: domain)
-				fallbackHandler()
-			}
-			alert.addAction(ignoreAction)
-		}
-		TabAlertTransitioningDelegate.shared.setup(delegate: alert.transitioningDelegate)
-		alert.transitioningDelegate = TabAlertTransitioningDelegate.shared
-		present(alert, animated: true, completion: nil)
-		return true
 	}
 
 	private func adjustWebviewSize(isIntemediate: Bool) {
@@ -377,65 +338,43 @@ extension TabViewController {
 
 // MARK: Tab Controller UI Delegate
 extension TabViewController: TabControllerUIDelegate {
-	func tabController(_ controller: TabController, createTabForRequest request: URLRequest) {
-		delegate?.tabViewController(self, openTabForRequest: request)
+	func tabController(_ controller: TabController, createTabForRequest request: URLRequest, inForeground: Bool) {
+		delegate?.tabViewController(self, openTabForRequest: request, inForeground: inForeground)
 	}
 
-	func tabController(_ controller: TabController, displayJSAlert alert: String, withFrameInfo frameInfo: WKFrameInfo, completionHandler: @escaping () -> Void) -> Bool {
-		let alertController = UIAlertController(title: frameInfo.securityOrigin.host, message: alert, preferredStyle: .alert)
-		let okText = NSLocalizedString("js alert panel confirmation button title", comment: "Used to confirm message")
-		let confirmAction = UIAlertAction(title: okText, style: .default) { _ in completionHandler() }
-		alertController.addAction(confirmAction)
-		return display(alertController, domain: frameInfo.securityOrigin.host, fallbackHandler: completionHandler)
-	}
-
-	func tabController(_ controller: TabController, displayJSConfirmDialogWithQuestion question: String, frameInfo: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) -> Bool {
-		let alertController = UIAlertController(title: frameInfo.securityOrigin.host, message: question, preferredStyle: .alert)
-		let okText = NSLocalizedString("js confirm panel confirm button title", comment: "Used to accept message")
-		let cancelText = NSLocalizedString("js confirm panel cancel button title", comment: "Used to decline message")
-		let cancelAction = UIAlertAction(title: cancelText, style: .cancel) { _ in completionHandler(false) }
-		alertController.addAction(cancelAction)
-		let confirmAction = UIAlertAction(title: okText, style: .default) { _ in completionHandler(true) }
-		alertController.addAction(confirmAction)
-		return display(alertController, domain: frameInfo.securityOrigin.host, fallbackHandler: { completionHandler(false) })
-	}
-
-	func tabController(_ controller: TabController, displayJSPromptWithQuestion question: String, defaultText: String?, frameInfo: WKFrameInfo, completionHandler: @escaping (String?) -> Void) -> Bool {
-		let alertController = UIAlertController(title: frameInfo.securityOrigin.host, message: question, preferredStyle: .alert)
-		alertController.addTextField { textField in
-			textField.placeholder = defaultText
-			textField.autocapitalizationType = .words
-			textField.autocorrectionType = .yes
+	func tabController(_ controller: TabController, displayAlert type: AlertType, forDomain domain: String?, fallbackHandler: @escaping () -> ()) -> Bool {
+		guard !TabAlertTransitioningDelegate.shared.isBusy, presentedViewController == nil else {
+			if let controller = tab?.controller {
+				if TabAlertTransitioningDelegate.shared.isBusy {
+					TabAlertTransitioningDelegate.shared.notify(controller: controller)
+				} else {
+					TabAlertTransitioningDelegate.shared.additionalNotify(controller: controller)
+				}
+			} else {
+				fallbackHandler()
+			}
+			return false
 		}
-		let okText = NSLocalizedString("js text prompt confirm button title", comment: "Used to enter text")
-		let cancelText = NSLocalizedString("js text prompt cancel button title", comment: "Used to not enter text")
-		let cancelAction = UIAlertAction(title: cancelText, style: .cancel) { _ in completionHandler(nil) }
-		alertController.addAction(cancelAction)
-		let confirmAction = UIAlertAction(title: okText, style: .default) { _ in completionHandler(alertController.textFields?.first?.text ?? "") }
-		alertController.addAction(confirmAction)
-		return display(alertController, domain: frameInfo.securityOrigin.host, fallbackHandler: { completionHandler(nil) })
-	}
-
-	func tabController(_ controller: TabController, displayAlert alert: UIAlertController, forDomain domain: String?, fallbackHandler: @escaping () -> Void) -> Bool {
-		return display(alert, domain: domain, fallbackHandler: fallbackHandler)
-	}
-
-	func tabController(_ controller: TabController, download url: URL, file: String?, cookies: [HTTPCookie], download: @escaping () -> Void) -> Bool {
-		let title = NSLocalizedString("file download confirmation prompt title", comment: "title of alert to confirm a file download")
-		let fmt = NSLocalizedString("file download confirmation prompt message format", comment: "format of message of alert to confirm a file download")
-		let message = String(format: fmt, file ?? url.lastPathComponent, url.absoluteString)
-		let alertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-		let okText = NSLocalizedString("file download confirmation prompt download button title", comment: "title of download button of alert to confirm a file download")
-		let cancelText = NSLocalizedString("file download confirmation prompt cancel button title", comment: "title of cancel button of alert to confirm a file download")
-		let cancelAction = UIAlertAction(title: cancelText, style: .cancel)
-		let downloadAction = UIAlertAction(title: okText, style: .default) { _ in download() }
-		alertController.addAction(cancelAction)
-		alertController.addAction(downloadAction)
+		let alert: UIAlertController
+		if let domain = domain, !domain.isEmpty, tab?.controller?.shouldAllowIgnoreForIncedAlertCount(for: domain) ?? false {
+			let ignoreTitle = NSLocalizedString("ignore alerts from this site alert button title", comment: "title of button to ignore further alerts by this site")
+			let ignoreAction = UIAlertAction(title: ignoreTitle, style: .default) { [weak self] _ in
+				self?.tab?.controller?.blockAlerts(from: domain)
+				fallbackHandler()
+			}
+			alert = type.build(with: ignoreAction, at: -2)
+		} else {
+			alert = type.build()
+		}
 		if let urlBar = urlBar {
-			alertController.popoverPresentationController?.sourceView = urlBar
-			alertController.popoverPresentationController?.sourceRect = urlBar.shareButtonFrame(in: urlBar) ?? urlBar.bounds
+			alert.popoverPresentationController?.sourceView = urlBar
+			alert.popoverPresentationController?.sourceRect = urlBar.shareButtonFrame(in: urlBar) ?? urlBar.bounds
 		}
-		return display(alertController, domain: nil) { }
+
+		TabAlertTransitioningDelegate.shared.setup(delegate: alert.transitioningDelegate)
+		alert.transitioningDelegate = TabAlertTransitioningDelegate.shared
+		present(alert, animated: true, completion: nil)
+		return true
 	}
 }
 
@@ -493,6 +432,10 @@ extension TabViewController: TabControllerNavigationDelegate {
 
 // MARK: Bookmark History Delegate
 extension TabViewController: BookmarkHistoryDelegate {
+	var viewControllerForSharing: UIViewController {
+		return self
+	}
+
 	var viewControllerForPreviewing: UIViewController {
 		return self
 	}
@@ -701,18 +644,16 @@ extension TabViewController: UIScrollViewDelegate {
 		if let newPosition = newScrollPosition, let oldPosition = lastScrollPosition {
 			let delta = oldPosition - newPosition
 			let scrollUp = delta < 0
-			if scrollUp == lastScrollUp {
+			if (scrollUp && scrollDirectionStrength > 0) || (!scrollUp && scrollDirectionStrength < 0) {
 				let allowScaling = scrollView.contentSize.height - scrollView.bounds.height > 2.5 * hideLength || scale < 1
 				if allowScaling && abs(delta) < hideLength {
 					let diff = delta / hideLength
 					finalScale = min(1,max(0,scale + diff))
 					finalScale = min(1,max(finalScale, 3 - (yOffset) / 50))
 				}
-				lastScrollUp = scrollUp
-			} else if let _ = lastScrollUp {
-				lastScrollUp = nil
+				scrollDirectionStrength = scrollUp ? 8 : -8
 			} else {
-				lastScrollUp = scrollUp
+				scrollDirectionStrength += scrollUp ? 1 : -1
 			}
 		}
 		finalScale = min(1,max(finalScale, 1 - yOffset / 50))
@@ -723,13 +664,24 @@ extension TabViewController: UIScrollViewDelegate {
 	}
 
 	private func collapse() {
+		guard isIntermediate(scale: scale) else {
+			return
+		}
+		webView?.scrollView.showsHorizontalScrollIndicator = false
+		webView?.scrollView.showsVerticalScrollIndicator = false
 		if scale < 0.67 {
-			UIView.animate(withDuration: 0.2) {
+			UIView.animate(withDuration: 0.2, animations: {
 				self.scale = 0
+			}) { [weak self] _ in
+				self?.webView?.scrollView.showsHorizontalScrollIndicator = true
+				self?.webView?.scrollView.showsVerticalScrollIndicator = true
 			}
 		} else {
-			UIView.animate(withDuration: 0.2) {
+			UIView.animate(withDuration: 0.2, animations: {
 				self.scale = 1
+			}) { [weak self] _ in
+				self?.webView?.scrollView.showsHorizontalScrollIndicator = true
+				self?.webView?.scrollView.showsVerticalScrollIndicator = true
 			}
 		}
 	}

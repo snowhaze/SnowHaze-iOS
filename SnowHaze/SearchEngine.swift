@@ -63,7 +63,7 @@ class SearchEngine {
 	}
 
 	static func decode(_ string: String) -> [SearchEngineType] {
-		let data = string.data(using: String.Encoding.utf8)!
+		let data = string.data(using: .utf8)!
 		let numbers = try! JSONSerialization.jsonObject(with: data) as! [NSNumber]
 		return numbers.map { SearchEngineType(rawValue: $0.int64Value) ?? .none }
 	}

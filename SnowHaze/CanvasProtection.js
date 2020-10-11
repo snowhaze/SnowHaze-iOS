@@ -20,6 +20,7 @@
 	var gl1_VENDOR = WebGLRenderingContext.prototype.VENDOR;
 	var gl1_RENDERER = WebGLRenderingContext.prototype.RENDERER;
 	var gl1_VERSION = WebGLRenderingContext.prototype.VERSION;
+	var gl1_SL_VERSION = WebGLRenderingContext.prototype.SHADING_LANGUAGE_VERSION;
 
 	var randomData = new Uint8Array(65536);
 	var randIndex = 65536;
@@ -96,6 +97,8 @@
 		}
 		if (name == gl1_VERSION) {
 			return "WebGL 1.0";
+		} else if (name == gl1_SL_VERSION) {
+			return "WebGL GLSL ES 1.0 (1.0)";
 		}
 		return getParam1.apply(this, arguments);
 	};
@@ -137,6 +140,7 @@
 	var gl2_VENDOR = WebGL2RenderingContext.prototype.VENDOR;
 	var gl2_RENDERER = WebGL2RenderingContext.prototype.RENDERER;
 	var gl2_VERSION = WebGL2RenderingContext.prototype.VERSION;
+	var gl2_SL_VERSION = WebGL2RenderingContext.prototype.SHADING_LANGUAGE_VERSION;
 
 	WebGL2RenderingContext.prototype.readPixels = function (x, y, width, height, format, type, pixels) {
 		Function.prototype.apply = apply;
@@ -176,6 +180,8 @@
 			}
 		}
 		if (name == gl2_VERSION) {
+			return "WebGL 2.0";
+		} else if (name == gl2_SL_VERSION) {
 			return "WebGL 2.0 (OpenGL ES 2.0 Metal - 39.9)";
 		}
 		Function.prototype.apply = apply;

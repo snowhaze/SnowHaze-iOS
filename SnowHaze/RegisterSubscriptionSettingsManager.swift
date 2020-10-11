@@ -154,7 +154,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 			self.registerButton = registerButton
 			let registerTitle = NSLocalizedString("zka2 submit registration button title", comment: "title of button to submit the content of the zka2 registration form")
 			registerButton.setTitle(registerTitle, for: [])
-			registerButton.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
+			registerButton.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleBottomMargin]
 
 			let loginButton = makeButton(for: cell)
 			loginButton.setTitleColor(.button, for: [])
@@ -162,7 +162,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 			loginButton.frame = CGRect(x: cell.bounds.minX + 20, y: 345, width: cell.bounds.width / 2 - 40, height: 40)
 			let loginTitle = NSLocalizedString("zka2 switch to login button title", comment: "title of button to cancel registration and switch to login form")
 			loginButton.setTitle(loginTitle, for: [])
-			loginButton.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
+			loginButton.autoresizingMask = [.flexibleWidth, .flexibleRightMargin, .flexibleBottomMargin]
 
 			updateUIState()
 		} else {

@@ -29,10 +29,10 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		self.tab = tab
 	}
 
-	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> Void) {
-		DispatchQueue.main.async { () -> Void in
-			let callback: ([Suggestion], String) -> Void = { suggestions, id in
-				DispatchQueue.main.async { () -> Void in
+	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ()) {
+		DispatchQueue.main.async { () -> () in
+			let callback: ([Suggestion], String) -> () = { suggestions, id in
+				DispatchQueue.main.async { () -> () in
 					callback(suggestions, "search_engine." + id)
 				}
 			}
@@ -56,14 +56,14 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		return 55 - 5 * Double(index)
 	}
 
-	func bingSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func bingSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
 			return
 		}
 		guard let url = URL(string: "https://api.bing.com/osjson.aspx?query=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [AnyObject] else {
 				return
 			}
@@ -88,7 +88,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func googleSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func googleSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -96,7 +96,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		guard let url = URL(string: "https://suggestqueries.google.com/complete/search?output=firefox&q=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [AnyObject] else {
 				return
 			}
@@ -121,7 +121,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func yahooSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func yahooSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -129,7 +129,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		guard let url = URL(string: "https://sugg.search.yahoo.net/sg/?output=json&nresults=\(maxCount)&command=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [String: AnyObject] else {
 				return
 			}
@@ -162,7 +162,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func wikipediaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func wikipediaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -171,7 +171,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		guard let url = URL(string: "https://\(wikipediaDomain)/w/api.php?action=opensearch&limit=\(maxCount)&search=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [AnyObject] , result.count == 4 else {
 				return
 			}
@@ -201,7 +201,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func wolframAlphaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func wolframAlphaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -209,7 +209,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		guard let url = URL(string: "https://www.wolframalpha.com/input/autocomplete.jsp?i=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [String: AnyObject] else {
 				return
 			}
@@ -236,7 +236,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func ecosiaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func ecosiaSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -244,7 +244,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		guard let url = URL(string: "https://ac.ecosia.org/autocomplete?q=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [String: AnyObject] else {
 				return
 			}
@@ -268,7 +268,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func startpageSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func startpageSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -277,7 +277,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		guard let url = URL(string: "https://www.startpage.com/do/suggest?limit=\(maxCount)&lang=\(language)&format=json&query=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [AnyObject], result.count == 2 else {
 				return
 			}
@@ -300,7 +300,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func swisscowsSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func swisscowsSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let convertedString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed)
 		guard let queryString = convertedString, !queryString.isEmpty else {
 			return
@@ -308,7 +308,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		guard let url = URL(string: "https://suggest.hulbee.com/suggest?count=\(maxCount)&culture=browser&bucket=Web&query=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [String] else {
 				return
 			}
@@ -328,14 +328,14 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func duckDuckGoSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func duckDuckGoSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
 			return
 		}
 		guard let url = URL(string: "https://ac.duckduckgo.com/ac/?q=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let array = json as? [[String: String]] else {
 				return
 			}
@@ -360,14 +360,14 @@ class SearchEngineSuggestionSource: SuggestionSource {
 		}
 	}
 
-	func qwantSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func qwantSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
 			return
 		}
 		guard let url = URL(string: "https://api.qwant.com/api/suggest?q=" + queryString) else {
 			return
 		}
-		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> Void in
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
 			guard let result = json as? [String: Any], let data = result["data"] as? [String: [Any]] else {
 				return
 			}

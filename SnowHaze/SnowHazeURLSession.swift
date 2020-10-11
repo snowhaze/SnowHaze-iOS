@@ -19,7 +19,7 @@ public class SnowHazeURLSession {
 
 	private lazy var nonTorSession = URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
 	private var torSession: URLSession?
-	private var torSessionCallbacks = [(URLSession?) -> Void]()
+	private var torSessionCallbacks = [(URLSession?) -> ()]()
 
 	private var user = String.secureRandom()
 	private var password = String.secureRandom()
@@ -47,7 +47,7 @@ public class SnowHazeURLSession {
 		}
 	}
 
-	private func withTorSession(callback: @escaping (URLSession?) -> Void) {
+	private func withTorSession(callback: @escaping (URLSession?) -> ()) {
 		syncToMainThread {
 			if let session = torSession {
 				callback(session)
@@ -77,7 +77,7 @@ public class SnowHazeURLSession {
 		}
 	}
 
-	private func withProperSession(callback: @escaping (URLSession?) -> Void) {
+	private func withProperSession(callback: @escaping (URLSession?) -> ()) {
 		if PolicyManager.globalManager().useTorForAPICalls {
 			withTorSession(callback: callback)
 		} else {
@@ -109,7 +109,7 @@ public class SnowHazeURLSession {
 		config = configuration
 	}
 
-	public func performDataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Swift.Error?) -> Void) {
+	public func performDataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Swift.Error?) -> ()) {
 		withProperSession { session in
 			guard let session = session else {
 				completionHandler(nil, nil, Error.torSetupError)
@@ -119,11 +119,11 @@ public class SnowHazeURLSession {
 		}
 	}
 
-	public func performDataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Swift.Error?) -> Void) {
+	public func performDataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Swift.Error?) -> ()) {
 		performDataTask(with: URLRequest(url: url), completionHandler: completionHandler)
 	}
 
-	public func performDownloadTask(with request: URLRequest, torFailure: @escaping () -> Void) {
+	public func performDownloadTask(with request: URLRequest, torFailure: @escaping () -> ()) {
 		withProperSession { session in
 			guard let session = session else {
 				return torFailure()
@@ -145,7 +145,7 @@ public class SnowHazeURLSession {
 		}
 	}
 
-	public func loadSessions(includingTor: Bool, failure: @escaping () -> Void) {
+	public func loadSessions(includingTor: Bool, failure: @escaping () -> ()) {
 		_ = nonTorSession
 		if includingTor {
 			withTorSession { session in

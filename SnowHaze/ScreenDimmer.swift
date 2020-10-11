@@ -13,7 +13,7 @@ class ScreenDimmer {
 		dimming = initDimm
 		statusBarStyle = whiteStatusBar ? .lightContent : .default
 
-		let oldKeyWindow = UIApplication.shared.keyWindow
+		let oldKeyWindows = UIApplication.shared.windows.filter { $0.isKeyWindow }
 		overlayWindow = UIWindow(frame: UIScreen.main.bounds)
 		overlayWindow.windowLevel = UIWindow.Level.statusBar
 		overlayWindow.backgroundColor = .black
@@ -23,7 +23,7 @@ class ScreenDimmer {
 		overlayWindow.rootViewController = overlayVC
 		overlayWindow.makeKeyAndVisible()
 		overlayWindow.isUserInteractionEnabled = false
-		oldKeyWindow?.makeKey()
+		oldKeyWindows.forEach { $0.makeKey() }
 
 		overlayVC.statusBarStyle = statusBarStyle
 	}

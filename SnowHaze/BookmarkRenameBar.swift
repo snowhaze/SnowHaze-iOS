@@ -13,7 +13,7 @@ class BookmarkRenameBar: TextInputBar {
 	private let cancelButton = UIButton()
 	private(set) var wasCanceled = false
 
-	var callback: ((String?) -> Void)?
+	var callback: ((String?) -> ())?
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)

@@ -29,7 +29,7 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 
 	private var isLocalOnly = false
 
-	private var dec: (() -> Void)?
+	private var dec: (() -> ())?
 	private var observer: NSObjectProtocol?
 
 	var lastUpgrade = HTTPSUpgradeState()
@@ -45,9 +45,10 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 	let securityCookie: String = String.secureRandom()
 
 	private(set) lazy var webView: WKWebView = {
-		let policy = PolicyManager.manager(for: self.tab)
+		precondition(!tab.deleted)
+		let policy = PolicyManager.manager(for: tab)
 		let config = policy.webViewConfiguration(for: self)
-		if let store = self.tab.controller?.dataStore {
+		if let store = tab.controller?.dataStore {
 			(config.websiteDataStore, config.processPool) = store
 		} else {
 			let store = policy.dataStore
@@ -55,7 +56,7 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 		}
 		let ret = WKWebView(frame: .zero, configuration: config)
 		ret.allowsLinkPreview = false
-		ret.customUserAgent = self.tab.controller?.userAgent ?? policy.userAgent
+		ret.customUserAgent = tab.controller?.userAgent ?? policy.userAgent
 		ret.navigationDelegate = self
 		ret.backgroundColor = .background
 
@@ -75,7 +76,7 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 				}
 			}))
 		}
-		self.observations.insert(ret.observe(\.url, options: .initial, changeHandler: { [weak self] webView, _ in
+		observations.insert(ret.observe(\.url, options: .initial, changeHandler: { [weak self] webView, _ in
 			if let self = self {
 				self.update(for: webView.url, webView: webView)
 				self.delegate?.webViewManaget(self, isLoading: webView.url)
@@ -101,6 +102,10 @@ class WorkerWebViewManager: NSObject, WebViewManager {
 	}
 
 	private func load(request: URLRequest) {
+		guard !tab.deleted else {
+			tabDeletedAbort()
+			return
+		}
 		isLocalOnly = false
 		update(for: request.url, webView: webView)
 		rawLoad(request, in: webView)
@@ -163,8 +168,34 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 		}
 	}
 
-	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+	@available(iOS 13, *)
+	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> ()) {
+		self.webView(webView, decidePolicyFor: navigationAction) { [weak self] decision in
+			guard let self = self, !self.tab.deleted else {
+				if #available(iOS 14, *) {
+					preferences.allowsContentJavaScript = false
+				}
+				preferences.preferredContentMode = .recommended
+				decisionHandler(.cancel, preferences)
+				return
+			}
+			let actionURL = navigationAction.request.url?.detorified ?? navigationAction.request.url
+			let policy = PolicyManager.manager(for: actionURL, in: self.tab)
+			if #available(iOS 14, *) {
+				preferences.allowsContentJavaScript = policy.allowJS
+			}
+			preferences.preferredContentMode = policy.renderAsDesktopSite ? .desktop : .mobile
+			decisionHandler(decision, preferences)
+		}
+	}
+
+	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> ()) {
 		lastUpgrade.dec()
+		guard !tab.deleted || isLocalOnly else {
+			tabDeletedAbort()
+			decisionHandler(.cancel)
+			return
+		}
 		let actionURL = navigationAction.request.url?.detorified ?? navigationAction.request.url
 		let isHTTPGet = navigationAction.request.isHTTPGet
 		if actionURL != lastUpgrade.url, let url = upgradeURL(for: actionURL, navigationAction: navigationAction) {
@@ -215,33 +246,49 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 				return
 			}
 			policy.dangerReasons(for: url, in: controller) { [weak self] dangers in
+				guard let me = self, !me.tab.deleted else {
+					decisionHandler(.cancel)
+					self?.tabDeletedAbort()
+					return
+				}
 				if dangers.isEmpty {
+					me.update(for: actionURL, webView: webView)
 					decisionHandler(.allow)
 				} else {
 					decisionHandler(.cancel)
-					if let me = self {
-						me.delegate?.webViewManagerDidFailLoad(me)
-					}
+					me.delegate?.webViewManagerDidFailLoad(me)
 				}
 			}
 		} else {
+			update(for: actionURL, webView: webView)
 			decisionHandler(.allow)
 		}
 	}
 
-	func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+	func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()) {
 		let space = challenge.protectionSpace
 		guard space.authenticationMethod == NSURLAuthenticationMethodServerTrust else {
 			completionHandler(.performDefaultHandling, nil)
 			return
 		}
-		guard let controller = tab.controller else {
+		guard let controller = tab.controller, !tab.deleted else {
 			completionHandler(.cancelAuthenticationChallenge, nil)
 			return
 		}
 		controller.accept(space.serverTrust!, for: space.host) { result in
 			completionHandler(result ? .performDefaultHandling : .cancelAuthenticationChallenge, nil)
 		}
+	}
+
+	func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> ()) {
+		guard !tab.deleted else {
+			decisionHandler(false)
+			tabDeletedAbort()
+			return
+		}
+		let domain = PolicyDomain(host: challenge.protectionSpace.host)
+		let policy = PolicyManager.manager(for: domain, in: tab)
+		decisionHandler(!policy.blockDeprecatedTLS)
 	}
 }
 
@@ -266,6 +313,11 @@ private extension WorkerWebViewManager {
 	func update(for url: URL?, webView: WKWebView) {
 		let policy = PolicyManager.manager(for: url, in: tab)
 		update(policy: policy, webView: webView)
+	}
+
+	func tabDeletedAbort() {
+		isLocalOnly = true
+		loadLocal(html: BrowserPageGenerator(type: .tabDeleted).getHTML())
 	}
 }
 

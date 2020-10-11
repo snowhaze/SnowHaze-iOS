@@ -41,9 +41,9 @@ class DownloadManager: PinningSessionDelegate {
 	}
 
 	private var timer: Timer?
-	private var pendingCompletionHandler: (() -> Void)?
+	private var pendingCompletionHandler: (() -> ())?
 
-	var listUpdateDec: (() -> Void)?
+	var listUpdateDec: (() -> ())?
 
 	override private init() {
 		super.init()
@@ -106,7 +106,7 @@ class DownloadManager: PinningSessionDelegate {
 		updateVPNList()
 	}
 
-	func updateProductList(force: Bool = false, completionHandler: ((Bool) -> Void)? = nil) {
+	func updateProductList(force: Bool = false, completionHandler: ((Bool) -> ())? = nil) {
 		let dec = InUseCounter.network.inc()
 		SubscriptionManager.shared.updateProducts(force: force) { success in
 			DispatchQueue.main.async {
@@ -116,11 +116,11 @@ class DownloadManager: PinningSessionDelegate {
 		}
 	}
 
-	func updateAuthToken(completionHandler: ((Bool) -> Void)? = nil) {
+	func updateAuthToken(completionHandler: ((Bool) -> ())? = nil) {
 		SubscriptionManager.shared.updateAuthToken(completionHandler: completionHandler)
 	}
 
-	func updateVPNList(completionHandler: ((Bool) -> Void)? = nil) {
+	func updateVPNList(completionHandler: ((Bool) -> ())? = nil) {
 		VPNManager.shared.updateProfileList(withCompletionHandler: completionHandler)
 	}
 
@@ -150,7 +150,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
 		}
 	}
 
-	func handleBackgroundTaskEvent(identifier: String, completionHandler: @escaping () -> Void) {
+	func handleBackgroundTaskEvent(identifier: String, completionHandler: @escaping () -> ()) {
 		assert(pendingCompletionHandler == nil)
 		pendingCompletionHandler = completionHandler
 		let includingTor = identifier.hasSuffix(".tor")

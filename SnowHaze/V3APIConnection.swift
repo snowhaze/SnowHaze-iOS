@@ -188,7 +188,7 @@ public enum V3APIConnection {
 		return Data(msg + [crc.high, crc.low]).hex
 	}
 
-	static func register(secret: Bytes? = nil, callback: @escaping (Error?) -> Void) {
+	static func register(secret: Bytes? = nil, callback: @escaping (Error?) -> ()) {
 		guard secret == nil || validateCRCedMasterSecret(secret!) else {
 			callback(.invalidMasterSecret)
 			return
@@ -231,7 +231,7 @@ public enum V3APIConnection {
 		case german = "de"
 		case french = "fr"
 	}
-	static func addLogin(user: String, password: String, sendCleartextEmail: Bool, language: Language, callback: @escaping (Error?) -> Void) {
+	static func addLogin(user: String, password: String, sendCleartextEmail: Bool, language: Language, callback: @escaping (Error?) -> ()) {
 		guard let secret = masterSecret else {
 			callback(.missingMasterSecret)
 			return
@@ -276,7 +276,7 @@ public enum V3APIConnection {
 		}
 	}
 
-	static func getMasterSecret(user: String, password: String, callback: @escaping (Bytes?, Error?) -> Void) {
+	static func getMasterSecret(user: String, password: String, callback: @escaping (Bytes?, Error?) -> ()) {
 		let emailSecret = user.emailSecretHash
 		let key = masterSecretUploadKeys(for: emailSecret, password: password)
 		let parameters = ["email_hash": publicHashBase64(from: emailSecret), "password_key": key.id.base64EncodedString()]
@@ -308,7 +308,7 @@ public enum V3APIConnection {
 		}
 	}
 
-	static func getTokens(callback: @escaping ((tokens: [String], expiration: Timestamp, verificationBlob: Data)?, Error?) -> Void) {
+	static func getTokens(callback: @escaping ((tokens: [String], expiration: Timestamp, verificationBlob: Data)?, Error?) -> ()) {
 		guard let keys = self.keys else {
 			callback(nil, .missingMasterSecret)
 			return
@@ -353,7 +353,7 @@ public enum V3APIConnection {
 		}
 	}
 
-	static func withUploadedReceipt(callback: @escaping (Error?) -> Void) {
+	static func withUploadedReceipt(callback: @escaping (Error?) -> ()) {
 		guard !receiptUploaded else {
 			callback(nil)
 			return
@@ -371,7 +371,7 @@ public enum V3APIConnection {
 		}
 	}
 
-	static func registerSubscription(callback: @escaping (Error?) -> Void) {
+	static func registerSubscription(callback: @escaping (Error?) -> ()) {
 		guard let url = Bundle.main.appStoreReceiptURL else {
 			invalidateReceipt()
 			callback(.invalidReceipt)
@@ -403,7 +403,7 @@ public enum V3APIConnection {
 	}
 
 	// returns the date at which the next subscription will renew or (if none renews) the date at which the last will expire
-	static func getSubscriptionDuration(callback: @escaping ((expiration: Date, renews: Bool)?, Error?) -> Void) {
+	static func getSubscriptionDuration(callback: @escaping ((expiration: Date, renews: Bool)?, Error?) -> ()) {
 		getPayments { payments, error in
 			if let error = error {
 				callback(nil, error)
@@ -439,7 +439,7 @@ public enum V3APIConnection {
 		case active(Timestamp)
 		case suspended(UInt64)
 	}
-	private static func getPayments(callback: @escaping ([(type: [String: String], status: PaymentStatus, renews: Bool)]?, Error?) -> Void) {
+	private static func getPayments(callback: @escaping ([(type: [String: String], status: PaymentStatus, renews: Bool)]?, Error?) -> ()) {
 		getData(command: "get_payment_info") { statusCode, response in
 			guard statusCode == 200 else {
 				if statusCode == 403 {
@@ -484,7 +484,7 @@ public enum V3APIConnection {
 		}
 	}
 
-	private static func proofOfOwnership(callback: @escaping ((Data, String)?) -> Void) {
+	private static func proofOfOwnership(callback: @escaping ((Data, String)?) -> ()) {
 		getData(command: "get_server_token", addKey: false) { statusCode, response in
 			guard statusCode == 200, let keyBase64 = response["server_key"] as? String, let token = response["server_token"] as? String else {
 				callback(nil)
@@ -498,7 +498,7 @@ public enum V3APIConnection {
 		}
 	}
 
-	private static func uploadReceiptKey(try tryCount: Int, callback: @escaping (Bool) -> Void) {
+	private static func uploadReceiptKey(try tryCount: Int, callback: @escaping (Bool) -> ()) {
 		guard let key = receiptKey else {
 			callback(false)
 			return
@@ -508,10 +508,10 @@ public enum V3APIConnection {
 		}
 	}
 
-	private static func getData(for originalParameters: [String: String] = [:], command: String, addKey: Bool = true, masterSecret: Bytes? = nil, try tryCount: Int = 3, callback: @escaping (Int, [String: Any]) -> Void) {
+	private static func getData(for originalParameters: [String: String] = [:], command: String, addKey: Bool = true, masterSecret: Bytes? = nil, try tryCount: Int = 3, callback: @escaping (Int, [String: Any]) -> ()) {
 		var parameters = originalParameters
 		parameters["action"] = command
-		let run: ([String: String]) -> Void = { parameters in
+		let run: ([String: String]) -> () = { parameters in
 			var request = URLRequest(url: URL(string: "https://api.snowhaze.com/index.php")!)
 			var parameters = parameters
 			parameters["v"] = "3"

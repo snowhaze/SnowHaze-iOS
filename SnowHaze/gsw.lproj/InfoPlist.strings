@@ -6,7 +6,7 @@
 
 "NSCameraUsageDescription" = "D'Kamera wird nur füre Striichcode-Scanner brucht.";
 
-"NSPhotoLibraryUsageDescription" = "SnowHaze brucht Zuegriff uf dini Fotos zum Medie spichere oder ufelade.";
+"NSPhotoLibraryAddUsageDescription" = "SnowHaze brucht Zuegriff uf dini Fotos zum Medie spichere.";
 
 "open vpn settings application shortcut item title" = "VPN Iistellige";
 

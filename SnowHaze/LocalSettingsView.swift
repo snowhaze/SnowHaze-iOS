@@ -241,7 +241,7 @@ class LocalSettingsController {
 
 	private(set) var settings: [String: SQLite.Data] = [:]
 
-	var callback: (([String: SQLite.Data], Bool) -> Void)?
+	var callback: (([String: SQLite.Data], Bool) -> ())?
 
 	var numberOfSettings: Int {
 		fatalError("LocalSettingsViewController is an abstract superclass")

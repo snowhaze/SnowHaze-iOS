@@ -23,9 +23,9 @@ class PopularSitesSuggestionSource: SuggestionSource {
 		self.tab = tab
 	}
 
-	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ()) {
 		DispatchQueue.global(qos: .userInitiated).async {
-			guard let tab = self.tab else {
+			guard let tab = self.tab, !tab.deleted else {
 				return callback([], "popular_sites")
 			}
 			let sites = self.popularSites.search(top: Int64(maxCount), matching: base)

@@ -209,6 +209,10 @@ class PolicyAssessor {
 				case .firefoxLinux:		result *= 0.8
 			}
 		}
+		let isIPad = UIDevice.current.userInterfaceIdiom == .pad
+		if bool(for: renderAsDesktopSiteKey) != isIPad {
+			result += 0.1
+		}
 		return 1 - result
 	}
 
@@ -278,9 +282,10 @@ class PolicyAssessor {
 		let httpsOnly = bool(for: upgradeAllHTTPKey)
 		let httpsOnTrusted = bool(for: requireHTTPSForTrustedSitesKey)
 		let blockMixedContent = bool(for: blockMixedContentKey)
-		var result = httpsFirst ? 0.3 : 0
+		let blockDeprecatedTLS = bool(for: blockDeprecatedTLSKey)
+		var result = httpsFirst ? 0.25 : 0
 		if extendedHstsPreload {
-			result += 0.3
+			result += 0.25
 		}
 		if httpsOnTrusted {
 			result += 0.1
@@ -290,6 +295,9 @@ class PolicyAssessor {
 		}
 		if httpsOnly {
 			result += 0.2
+		}
+		if blockDeprecatedTLS {
+			result += 0.1
 		}
 		return result
 	}

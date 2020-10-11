@@ -23,21 +23,16 @@ class FileDownload {
 	private let request: URLRequest?
 	private let fetcher: DataFetcher?
 	private(set) var state = DataFetcher.DownloadEvent.progressUnknown
-	private init?(url: URL, cookieStore: HTTPCookieStorage, tab: Tab) {
+	private init?(url: URL, cookies: [HTTPCookie], tab: Tab) {
 		let url = url.detorified ?? url
 		guard ["http", "https", "data"].contains(url.scheme?.lowercased()) else {
 			return nil
 		}
-		let cookies = cookieStore.cookies(for: url) ?? []
-		let cookieHeaders = HTTPCookie.requestHeaderFields(with: cookies)
 		var request = URLRequest(url: url)
 		request.allHTTPHeaderFields = request.allHTTPHeaderFields ?? [:]
-		for (key, value) in cookieHeaders {
-			request.allHTTPHeaderFields![key] = value
-		}
 		request.allHTTPHeaderFields!["Accept"] = "*/*"
 		self.request = request
-		self.fetcher = DataFetcher(tab: tab)
+		self.fetcher = DataFetcher(tab: tab, cookies: cookies)
 	}
 
 	private init(fileUrl: URL) {
@@ -155,9 +150,7 @@ class FileDownload {
 	}
 
 	class func start(for url: URL, cookies: [HTTPCookie], tab: Tab) {
-		let cookieStore = HTTPCookieStorage()
-		cookies.forEach { cookieStore.setCookie($0) }
-		guard let download = FileDownload(url: url, cookieStore: cookieStore, tab: tab) else {
+		guard let download = FileDownload(url: url, cookies: cookies, tab: tab) else {
 			return
 		}
 		downloads.append(download)

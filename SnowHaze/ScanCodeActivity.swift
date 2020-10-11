@@ -51,6 +51,22 @@ class ScanCodeActivity: UIActivity {
 
 	override var activityViewController : UIViewController? {
 		let vc = ScanCodeViewController()
+		vc.metadataTypes = [
+			.aztec,
+			.code128,
+			.code39,
+			.code39Mod43,
+			.code93,
+			.dataMatrix,
+			.ean13,
+			.ean8,
+			.interleaved2of5,
+			.itf14,
+			.pdf417,
+			.qr,
+			.upce,
+		]
+		vc.overlayColor = .button
 		vc.useFrontCamera = PolicyManager.manager(for: tab).useFrontCamera
 		vc.buttonColor = .button
 		vc.codeColor = .title

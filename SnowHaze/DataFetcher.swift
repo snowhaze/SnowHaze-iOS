@@ -11,9 +11,11 @@ import Foundation
 class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 	private lazy var session = setupSession()
 	private weak var tab: Tab!
+	private let cookies: [HTTPCookie]
 
-	init(tab: Tab) {
+	init(tab: Tab, cookies: [HTTPCookie] = []) {
 		self.tab = tab
+		self.cookies = cookies
 		super.init()
 	}
 
@@ -36,14 +38,14 @@ class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 		return components.url!
 	}
 
-	func fetch(_ originalUrl: URL, callback: @escaping (Data?) -> Void) {
+	func fetch(_ originalUrl: URL, callback: @escaping (Data?) -> ()) {
 		guard let session = session else {
 			callback(nil)
 			return
 		}
 		let dec = InUseCounter.network.inc()
 		let url = upgrade(originalUrl.detorified ?? originalUrl)
-		let task = session.dataTask(with: url, completionHandler: { (data, _, error) -> Void in
+		let task = session.dataTask(with: url, completionHandler: { (data, _, error) -> () in
 			dec()
 			guard error == nil else {
 				callback(nil)
@@ -65,8 +67,8 @@ class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 		case missingURL
 		case contextReleased
 	}
-	private var downloadCallbacks = [URLSessionDownloadTask: (DownloadEvent) -> Void]()
-	func download(_ request: URLRequest, callback: @escaping (DownloadEvent) -> Void) {
+	private var downloadCallbacks = [URLSessionDownloadTask: (DownloadEvent) -> ()]()
+	func download(_ request: URLRequest, callback: @escaping (DownloadEvent) -> ()) {
 		assert(Thread.isMainThread)
 		guard usable else {
 			callback(.error(DownloadError.contextReleased))
@@ -103,6 +105,7 @@ class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 		guard let config = tabPolicy.urlSessionConfiguration(tabController: controller) else {
 			return nil
 		}
+		cookies.forEach { config.httpCookieStorage?.setCookie($0) }
 		return URLSession(configuration: config, delegate: self, delegateQueue: nil)
 	}
 
@@ -112,7 +115,7 @@ class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 		}
 	}
 
-	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()) {
 		let space = challenge.protectionSpace
 		guard space.authenticationMethod == NSURLAuthenticationMethodServerTrust else {
 			completionHandler(.performDefaultHandling, nil)
@@ -123,7 +126,11 @@ class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 			return
 		}
 		controller.accept(space.serverTrust!, for: space.host) { result in
-			completionHandler(result ? .performDefaultHandling : .cancelAuthenticationChallenge, nil)
+			if result {
+				completionHandler(.useCredential, URLCredential(trust: space.serverTrust!))
+			} else {
+				completionHandler(.cancelAuthenticationChallenge, nil)
+			}
 		}
 	}
 

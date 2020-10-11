@@ -241,7 +241,7 @@ protocol VPNManagerDelegate: AnyObject {
 
 class VPNManager {
 	private(set) var ipsecManagerLoaded = false
-	private var performWithLoadedVPNManager: [() -> Void]?
+	private var performWithLoadedVPNManager: [() -> ()]?
 	private var lastIPSecCredSwap = Date.distantPast
 
 	var selectedProfileID: String? = DataStore.shared.getString(for: selectedProfileKey) {
@@ -317,7 +317,7 @@ class VPNManager {
 	}
 
 	private(set) var isDownloading = false
-	private var downloadCompletionHandlers = [(Bool) -> Void]()
+	private var downloadCompletionHandlers = [(Bool) -> ()]()
 
 	static let shared = VPNManager()
 
@@ -372,7 +372,7 @@ class VPNManager {
 		return ovpnProfiles.contains(where: { !$0.hasProfile }) || ipsecProfiles.contains(where: { !$0.hasProfile })
 	}
 
-	func updateProfileList(withCompletionHandler completionHandler: ((Bool) -> Void)?) {
+	func updateProfileList(withCompletionHandler completionHandler: ((Bool) -> ())?) {
 		let timestamp = DataStore.shared.getDouble(for: lastProfileUpdateKey) ?? -Double.infinity
 		let date = Date(timeIntervalSince1970: timestamp)
 		guard date.timeIntervalSinceNow < -24 * 60 * 60 || needsProfileUpdate else {
@@ -394,7 +394,7 @@ class VPNManager {
 
 		self.isDownloading = true
 
-		func complete(success: Bool) -> Void {
+		func complete(success: Bool) -> () {
 			self.isDownloading = false
 			self.downloadCompletionHandlers.forEach { $0(success) }
 			self.downloadCompletionHandlers = []
@@ -467,9 +467,9 @@ extension VPNManager {
 		}
 	}
 
-	func withLoadedManager(perform block: @escaping (@escaping ()->Void) -> Void) {
+	func withLoadedManager(perform block: @escaping (@escaping ()->Void) -> ()) {
 		var retryCount = 0
-		let reload: () -> Void = {
+		let reload: () -> () = {
 			guard retryCount < 3 else {
 				return
 			}
@@ -485,7 +485,7 @@ extension VPNManager {
 		block(reload)
 	}
 
-	private func saveManager(with reload: @escaping () -> Void, success: (() -> Void)? = nil) {
+	private func saveManager(with reload: @escaping () -> (), success: (() -> ())? = nil) {
 		NEVPNManager.shared().saveToPreferences { err in
 			if let error = err {
 				let code = (error as NSError).code
@@ -516,7 +516,7 @@ extension VPNManager {
 		}
 	}
 
-	private func loadVPNManager(completion: (() -> Void)? = nil) {
+	private func loadVPNManager(completion: (() -> ())? = nil) {
 		guard performWithLoadedVPNManager == nil else {
 			if let block = completion {
 				performWithLoadedVPNManager!.append(block)
@@ -611,7 +611,7 @@ extension VPNManager {
 		}
 	}
 
-	func save(_ profile: IPSecProfile, enable: Bool = false, completion: (() -> Void)? = nil) {
+	func save(_ profile: IPSecProfile, enable: Bool = false, completion: (() -> ())? = nil) {
 		selectedProfileID = profile.id
 		guard profile.hasProfile else {
 			clearSavedProfile()

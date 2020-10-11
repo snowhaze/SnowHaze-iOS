@@ -566,7 +566,7 @@ class VPNSettingsManager: SettingsViewManager {
 		}
 	}
 
-	private func getIp(prefix: String, callback rawCallback: @escaping (IPAddressStatus) -> Void) {
+	private func getIp(prefix: String, callback rawCallback: @escaping (IPAddressStatus) -> ()) {
 		let callback = { result in
 			DispatchQueue.main.async {
 				rawCallback(result)
@@ -611,18 +611,7 @@ class VPNSettingsManager: SettingsViewManager {
 		if UIApplication.shared.canOpenURL(URL(string: "openvpn://")!) {
 			UIApplication.shared.open(URL(string: "openvpn://")!)
 		} else {
-			let title = NSLocalizedString("opening openvpn connect requires installing alert title", comment: "title of alert to point out that opening openvpn connect requires it being installed")
-			let message = NSLocalizedString("opening openvpn connect requires installing alert message", comment: "message of alert to point out that opening openvpn connect requires it being installed")
-			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-			let okTitle = NSLocalizedString("install openvpn connect app prompt ok button title", comment: "title of ok button of prompt to ask users if they want to install the openvpn connect app")
-			let okAction = UIAlertAction(title: okTitle, style: .default) { _ in
-				UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id590379981")!)
-			}
-			alert.addAction(okAction)
-
-			let cancelTitle = NSLocalizedString("install openvpn connect app prompt cancel button title", comment: "title of cancel button of prompt to ask users if they want to install the openvpn connect app")
-			let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
-			alert.addAction(cancelAction)
+			let alert = AlertType.installOpenVPNForOpening.build()
 			controller.present(alert, animated: true, completion: nil)
 		}
 	}
@@ -709,23 +698,11 @@ class VPNSettingsManager: SettingsViewManager {
 			VPNSettingsManager.docController!.annotation = ["id": profile.id] as NSDictionary
 			VPNSettingsManager.docController!.presentOpenInMenu(from: sender.frame, in: superview, animated: true)
 		} else {
-			let title = NSLocalizedString("installing ovpn requires openvpn connect alert title", comment: "title of alert to point out that installing a ovpn configuration requires openvpn connect")
-			let message = NSLocalizedString("installing ovpn requires openvpn connect alert message", comment: "message of alert to point out that installing a ovpn configuration requires openvpn connect")
-			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-			let okTitle = NSLocalizedString("install openvpn connect app prompt ok button title", comment: "title of ok button of prompt to ask users if they want to install the openvpn connect app")
-			let okAction = UIAlertAction(title: okTitle, style: .default) { _ in
-				UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id590379981")!)
+			let showTutorial = { [weak self] (action: UIAlertAction) -> () in
+				self?.showVPNTutorial(action)
 			}
-			alert.addAction(okAction)
-
-			let tutorialTitle = NSLocalizedString("install openvpn show tutorial button title", comment: "title of the show tutorial button of prompt to ask users if they want to install the openvpn connect app")
-			let tutorialAction = UIAlertAction(title: tutorialTitle, style: .default) { action in self.showVPNTutorial(action) }
-			alert.addAction(tutorialAction)
-
-			let cancelTitle = NSLocalizedString("install openvpn connect app prompt cancel button title", comment: "title of cancel button of prompt to ask users if they want to install the openvpn connect app")
-			let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
-			alert.addAction(cancelAction)
-			controller.present(alert, animated: true, completion: nil)
+			let alert = AlertType.installOpenVPNForOVPNInstall(showTutorial: showTutorial)
+			controller.present(alert.build(), animated: true, completion: nil)
 		}
 	}
 

@@ -12,6 +12,7 @@ import UIKit
 enum BrowserPageGeneratorType {
 	case pageError
 	case jsUrlBlocked
+	case tabDeleted
 }
 
 class BrowserPageGenerator {
@@ -53,6 +54,7 @@ class BrowserPageGenerator {
 		switch type {
 			case .pageError:	return getErrorPageHTML()
 			case .jsUrlBlocked:	return getJsUrlBlockedHTML()
+			case .tabDeleted:	return getTabDeletedHTML()
 		}
 	}
 
@@ -113,6 +115,15 @@ class BrowserPageGenerator {
 		}
 
 		return "<!DOCTYPE html><html>\(head)<body style=\"\(getBodyCSS())\">\(body)\(getReloadButton())\(moreInformation)\(memoryGame.getHTML())</body></html>"
+	}
+
+	private func getTabDeletedHTML() -> String {
+		let memoryGame = MemoryGame()
+		let title = NSLocalizedString("tab deleted error page title", comment: "title of the error page shown when a webpage could not be loaded because the corresponding tab has been deleted")
+		let head = getHead(title: title)
+		let message = NSLocalizedString("tab deleted error page message", comment: "message of the error page shown when a webpage could not be loaded because the corresponding tab has been deleted")
+		let body = encode(html: message)
+		return "<!DOCTYPE html><html>\(head)<body style=\"\(getBodyCSS())\"><div style=\"margin: 5em 0.5em;\">\(body)</div>\(memoryGame.getHTML())</body></html>"
 	}
 
 	private func getTitle() -> String {

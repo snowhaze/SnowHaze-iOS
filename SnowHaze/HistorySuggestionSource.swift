@@ -42,7 +42,7 @@ class HistorySuggestionSource: SuggestionSource {
 		dateFormatter.dateStyle = .short
 	}
 
-	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let historyItems = normalize(history: historyStore.items(forSearch: base))
 		let now = Date().timeIntervalSince1970
 		let suggestions = historyItems.map { (item) -> Suggestion in

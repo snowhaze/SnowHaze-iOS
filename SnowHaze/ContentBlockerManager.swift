@@ -136,10 +136,10 @@ class ContentBlockerManager {
 
 	private(set) var blockers = [String: WKContentRuleList]()
 	private var compilationCnt = 0
-	private var blockerCallbacks = [() -> Void]()
+	private var blockerCallbacks = [() -> ()]()
 	private var isLoading = false
 
-	func load(completionHandler: (() -> Void)?) {
+	func load(completionHandler: (() -> ())?) {
 		assert(Thread.isMainThread)
 		if canLoadPages {
 			completionHandler?()

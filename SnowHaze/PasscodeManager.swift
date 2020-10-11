@@ -114,7 +114,7 @@ class PasscodeManager {
 
 	private(set) var mode: LockingMode
 
-	private func asyncRawSetAndUnlock(key: String, type: PasscodeController.PasscodeType, mode: LockingMode, completionHandler: ((Bool) -> Void)?) {
+	private func asyncRawSetAndUnlock(key: String, type: PasscodeController.PasscodeType, mode: LockingMode, completionHandler: ((Bool) -> ())?) {
 		DispatchQueue.global(qos: .userInteractive).async {
 			db.withUniqueBackgroundConnection(qos: .userInteractive) { connection in
 				do {
@@ -136,7 +136,7 @@ class PasscodeManager {
 		}
 	}
 
-	private func tryLock(completionHandler: ((Bool) -> Void)?) -> Bool {
+	private func tryLock(completionHandler: ((Bool) -> ())?) -> Bool {
 		let result = lock.try()
 		if let handler = completionHandler, !result {
 			DispatchQueue.main.async {
@@ -147,7 +147,7 @@ class PasscodeManager {
 	}
 
 	/// also sets mode to off
-	func clearKey(completionHandler: ((Bool) -> Void)?) {
+	func clearKey(completionHandler: ((Bool) -> ())?) {
 		guard tryLock(completionHandler: completionHandler) else {
 			return
 		}
@@ -165,7 +165,7 @@ class PasscodeManager {
 		}
 	}
 
-	func clearBiometrics(completionHandler: ((Bool) -> Void)?) {
+	func clearBiometrics(completionHandler: ((Bool) -> ())?) {
 		guard tryLock(completionHandler: completionHandler) else {
 			return
 		}
@@ -198,7 +198,7 @@ class PasscodeManager {
 		}
 	}
 
-	func set(mode: LockingMode, withKey key: String, ofType type: PasscodeController.PasscodeType, completionHandler: ((Bool) -> Void)?) {
+	func set(mode: LockingMode, withKey key: String, ofType type: PasscodeController.PasscodeType, completionHandler: ((Bool) -> ())?) {
 		assert(isKey(key, ofType: type))
 		guard tryLock(completionHandler: completionHandler) else {
 			return
@@ -229,11 +229,11 @@ class PasscodeManager {
 		}
 	}
 
-	func set(mode: LockingMode, withKey key: String, completionHandler: ((Bool) -> Void)?) {
+	func set(mode: LockingMode, withKey key: String, completionHandler: ((Bool) -> ())?) {
 		set(mode: mode, withKey: key, ofType: type, completionHandler: completionHandler)
 	}
 
-	func set(key: String, ofType type: PasscodeController.PasscodeType, completionHandler: ((Bool) -> Void)?) {
+	func set(key: String, ofType type: PasscodeController.PasscodeType, completionHandler: ((Bool) -> ())?) {
 		set(mode: mode, withKey: key, ofType: type, completionHandler: completionHandler)
 	}
 
@@ -278,11 +278,11 @@ class PasscodeManager {
 		}
 	}
 
-	func setupIfCorrect(code: String, completionHandler: ((Bool) -> Void)?) {
+	func setupIfCorrect(code: String, completionHandler: ((Bool) -> ())?) {
 		trySetupKey(key: code, completionHandler: completionHandler)
 	}
 
-	func verify(code: String, withCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+	func verify(code: String, withCompletionHandler completionHandler: @escaping (Bool) -> ()) {
 		verifyDBKey(code, completionHandler: completionHandler)
 	}
 }

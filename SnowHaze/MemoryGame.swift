@@ -112,33 +112,33 @@ class MemoryGame {
 
 	function selectCard() {
 		var selectedCards = Array.prototype.slice.call(document.getElementsByClassName("selected"));
-	    selectedCards = selectedCards.filter(function (t) { return !t.classList.contains("found"); });
-	    if (!this.classList.contains("selected") && selectedCards.length < 2) {
-	        this.classList.add("selected");
-	        checkCards();
-	    }
+		selectedCards = selectedCards.filter(function (t) { return !t.classList.contains("found"); });
+		if (!this.classList.contains("selected") && selectedCards.length < 2) {
+			this.classList.add("selected");
+			checkCards();
+		}
 
 	}
 
 	function checkCards() {
-	    var selectedCards = Array.prototype.slice.call(document.getElementsByClassName("selected"));
-	    selectedCards = selectedCards.filter(function (t) { return !t.classList.contains("found"); });
-	    if (selectedCards.length >= 2) {
-	        var first = selectedCards[0];
-	        var second = selectedCards[1];
-	        if (first.classList.length === second.classList.length) {
-			    for (i = 0; i < first.classList.length; i++) {
-			        if (!second.classList.contains(first.classList.item(i))) break;
+		var selectedCards = Array.prototype.slice.call(document.getElementsByClassName("selected"));
+		selectedCards = selectedCards.filter(function (t) { return !t.classList.contains("found"); });
+		if (selectedCards.length >= 2) {
+			var first = selectedCards[0];
+			var second = selectedCards[1];
+			if (first.classList.length === second.classList.length) {
+				for (i = 0; i < first.classList.length; i++) {
+					if (!second.classList.contains(first.classList.item(i))) break;
 				}
 				if (i >= first.classList.length) {
-			        setTimeout(function () {
-	                    first.classList.add("found");
-	                    second.classList.add("found");
-	                    if (document.getElementsByClassName("found").length === numTiles) {
-	                    	showWinMessage();
-	                    }
-	                }, 750);
-			        return;
+					setTimeout(function () {
+						first.classList.add("found");
+						second.classList.add("found");
+						if (document.getElementsByClassName("found").length === numTiles) {
+							showWinMessage();
+						}
+					}, 750);
+					return;
 				}
 			}
 			setTimeout(unselectCards, 1000);
@@ -170,7 +170,7 @@ class MemoryGame {
 	}
 
 	for (var card of cards) {
-	    card.addEventListener('click', selectCard, false);
+		card.addEventListener('click', selectCard, false);
 	}
 
 	resizeBoard();

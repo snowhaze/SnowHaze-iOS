@@ -13,7 +13,7 @@ class Pinger: NSObject, SimplePingDelegate {
 	private(set) var hostAddress: String?
 
 	private let pinger: SimplePing
-	private let callback: (Pinger, TimeInterval?, Error?) -> Void
+	private let callback: (Pinger, TimeInterval?, Error?) -> ()
 
 	private let queue = DispatchQueue(label: "ch.illotros.snowhaze.pinger")
 
@@ -35,7 +35,7 @@ class Pinger: NSObject, SimplePingDelegate {
 	private var lastReport: UInt16? = nil
 	private var sentDates = [Date?](repeating: nil, count: 120)
 
-	init(host: String, callback: @escaping (Pinger, TimeInterval?, Error?) -> Void) {
+	init(host: String, callback: @escaping (Pinger, TimeInterval?, Error?) -> ()) {
 		hostName = host
 		pinger = SimplePing(hostName: host)
 		self.callback = callback

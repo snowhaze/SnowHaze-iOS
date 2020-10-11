@@ -175,10 +175,10 @@ class URLBar: UIView {
 			let hideButton = newValue ? reloadButton : cancelButton
 			let showButton = newValue ? cancelButton : reloadButton
 			showButton.isHidden = false
-			UIView.animate(withDuration: 0.3, animations: { () -> Void in
+			UIView.animate(withDuration: 0.3, animations: { () -> () in
 				showButton.alpha = 1
 				hideButton.alpha = 0
-			}, completion: { [weak self] _ -> Void in
+			}, completion: { [weak self] _ -> () in
 				if self?.showsCancelButton == newValue {
 					hideButton.isHidden = true
 				}
@@ -559,7 +559,7 @@ class URLBar: UIView {
 
 	override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
 		if action == #selector(URLBar.pasteAndGo(_:)) && sender as? UIMenuController == UIMenuController.shared {
-			return isEditing && UIPasteboard.general.string != nil
+			return isEditing && UIPasteboard.general.hasStrings
 		} else {
 			return super.canPerformAction(action, withSender: sender)
 		}
@@ -592,11 +592,11 @@ class URLBar: UIView {
 			reloadCounter.reset()
 			UIView.animate(withDuration: .pi / 16, delay: 0, options: .curveEaseIn, animations: {
 				self.reloadButton.transform = CGAffineTransform(rotationAngle: CGFloat(2.0 * .pi / 3.0))
-			}, completion: { (finished) -> Void in
+			}, completion: { (finished) -> () in
 				if finished {
 					UIView.animate(withDuration: .pi / 16, delay: 0, options: .curveLinear, animations: {
 						self.reloadButton.transform = CGAffineTransform(rotationAngle: CGFloat(2.0 * 2.0 * .pi / 3.0))
-					}, completion: { (finished) -> Void in
+					}, completion: { (finished) -> () in
 						if finished {
 							UIView.animate(withDuration: .pi / 16, delay: 0, options: .curveEaseOut, animations: {
 								self.reloadButton.transform = CGAffineTransform(rotationAngle: 0)

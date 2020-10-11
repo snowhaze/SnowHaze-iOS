@@ -274,6 +274,9 @@ private class TabSelectionViewLayout: UICollectionViewLayout {
 		}
 		let minI = max(0, Int(rect.minX) / Int(tabWidth) - 1)
 		let maxI = max(0, min(tsv.titleURLs.count - 1, Int(rect.maxX + tabWidth) / Int(tabWidth) + 1))
+		guard maxI > minI else {
+			return []
+		}
 		return (minI ... maxI).map { layoutAttributesForItem(at: IndexPath(row: $0, section: 0))! }
 	}
 

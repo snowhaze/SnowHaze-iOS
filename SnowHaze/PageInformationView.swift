@@ -14,7 +14,7 @@ class PageInformationView: UIView {
 
 	private var secondary: UIView?
 
-	var callback: (([String: SQLite.Data], Bool) -> Void)?
+	var callback: (([String: SQLite.Data], Bool) -> ())?
 
 	init(url: URL, tab: Tab) {
 		main = PageInformationOverview(url: url, tab: tab)

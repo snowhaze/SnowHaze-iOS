@@ -26,10 +26,10 @@ private extension CharacterSet {
 }
 
 private class LeakCheckStatus {
-	private var cancelCallbacks =  [UUID: (Bool?) -> Void]()
+	private var cancelCallbacks =  [UUID: (Bool?) -> ()]()
 
 	private var leakCheckResults = [String: Bool]()
-	private var leakCheckCallbacks = [String: [(Bool?) -> Void]]()
+	private var leakCheckCallbacks = [String: [(Bool?) -> ()]]()
 
 	private let queue = DispatchQueue(label: "ch.illotros.snowhaze.pwvalidate.leakcheck.status")
 
@@ -37,7 +37,7 @@ private class LeakCheckStatus {
 		return queue.sync { leakCheckResults[password] }
 	}
 
-	func result(for password: String, addingCallback callback: @escaping (Bool?) -> Void) -> (Bool?, Bool) {
+	func result(for password: String, addingCallback callback: @escaping (Bool?) -> ()) -> (Bool?, Bool) {
 		return queue.sync {
 			let result = leakCheckResults[password]
 			if result == nil {
@@ -72,7 +72,7 @@ private class LeakCheckStatus {
 		}
 	}
 
-	func startWait(cancel: @escaping (Bool?) -> Void) -> () -> Bool {
+	func startWait(cancel: @escaping (Bool?) -> ()) -> () -> Bool {
 		return queue.sync {
 			let uuid = UUID()
 			cancelCallbacks[uuid] = cancel
@@ -366,7 +366,7 @@ struct PasswordValidator {
 		leakStatus.cancel()
 	}
 
-	private static func leakCheckAPICall(for normalized: String, callback: @escaping (Bool?) -> Void) {
+	private static func leakCheckAPICall(for normalized: String, callback: @escaping (Bool?) -> ()) {
 		let sodium = Sodium()
 		let longSize = 16
 
@@ -410,7 +410,7 @@ struct PasswordValidator {
 		}
 	}
 
-	private func passwordInLeakedList(_ password: String, callback: @escaping (Bool?) -> Void) {
+	private func passwordInLeakedList(_ password: String, callback: @escaping (Bool?) -> ()) {
 		guard let leakCheckDelay = leakCheckDelay else {
 			return callback(false)
 		}
@@ -555,7 +555,7 @@ struct PasswordValidator {
 		return false
 	}
 
-	func issues(for password: String, blacklist: Set<String> = [], callback: @escaping (Issues) -> Void) {
+	func issues(for password: String, blacklist: Set<String> = [], callback: @escaping (Issues) -> ()) {
 		var issues = Issues.none
 		issues = pwTooShort(password) ? [issues, .tooShort] : issues
 		issues = noLowercaseLetter(password) ? [issues, .noLowercaseLetter] : issues
@@ -578,7 +578,7 @@ struct PasswordValidator {
 		}
 	}
 
-	func validate(_ password: String, blacklist: Set<String> = [], callback: @escaping (Bool) -> Void) {
+	func validate(_ password: String, blacklist: Set<String> = [], callback: @escaping (Bool) -> ()) {
 		return issues(for: password, blacklist: blacklist) { callback($0 == .none) }
 	}
 }

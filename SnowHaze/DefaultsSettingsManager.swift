@@ -47,12 +47,7 @@ class DefaultsSettingsManager: SettingsViewManager {
 	}
 
 	@objc private func resetSettings(_ sender: UIButton) {
-		let title = NSLocalizedString("reset global settings confirm dialog title", comment: "title for dialog to confirm resetting of global settings")
-		let message = NSLocalizedString("reset global settings confirm dialog message", comment: "message for dialog to confirm resetting of global settings")
-		let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-
-		let reset = NSLocalizedString("reset global settings confirm dialog confirm option title", comment: "title for confirm option of dialog to confirm resetting of global settings")
-		let confirmAction = UIAlertAction(title: reset, style: .destructive) { _ in
+		let reset = {
 			var resoreKeys = [lastTutorialVersionKey, lastOpenedVersionKey, lastEOLWarningVersionKey, doNotResetAutoUpdateKey]
 			if self.bool(for: doNotResetAutoUpdateKey) {
 				resoreKeys += [updateSiteListsKey, updateVPNListKey, updateAuthorizationTokenKey, updateSubscriptionProductListKey]
@@ -70,31 +65,18 @@ class DefaultsSettingsManager: SettingsViewManager {
 			MainViewController.controller.updateNightMode()
 			ReviewPrompt.settingsReset()
 		}
-		alert.addAction(confirmAction)
-
-		let cancel = NSLocalizedString("reset global settings confirm dialog cancel option title", comment: "title for cancel option of dialog to confirm resetting of global settings")
-		let cancelAction = UIAlertAction(title: cancel, style: .cancel, handler: nil)
-		alert.addAction(cancelAction)
+		let alert = AlertType.resetSettings(reset: reset).build()
 		alert.popoverPresentationController?.sourceView = sender
 		alert.popoverPresentationController?.sourceRect = sender.bounds
 		controller.present(alert, animated: true, completion: nil)
 	}
 
 	@objc private func resetPageSettings(_ sender: UIButton) {
-		let title = NSLocalizedString("reset page settings confirm dialog title", comment: "title for dialog to confirm resetting of per page settings")
-		let message = NSLocalizedString("reset page settings confirm dialog message", comment: "message for dialog to confirm resetting of per page settings")
-		let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-
-		let reset = NSLocalizedString("reset page settings confirm dialog confirm option title", comment: "title for confirm option of dialog to confirm resetting of per page settings")
-		let confirmAction = UIAlertAction(title: reset, style: .destructive) { _ in
+		let reset = {
 			Settings.unsetAllPageSettings()
 			ReviewPrompt.settingsReset()
 		}
-		alert.addAction(confirmAction)
-
-		let cancel = NSLocalizedString("reset page settings confirm dialog cancel option title", comment: "title for cancel option of dialog to confirm resetting of per page settings")
-		let cancelAction = UIAlertAction(title: cancel, style: .cancel, handler: nil)
-		alert.addAction(cancelAction)
+		let alert = AlertType.resetPageSettings(reset: reset).build()
 		alert.popoverPresentationController?.sourceView = sender
 		alert.popoverPresentationController?.sourceRect = sender.bounds
 		controller.present(alert, animated: true, completion: nil)

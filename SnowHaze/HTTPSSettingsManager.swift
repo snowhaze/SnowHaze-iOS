@@ -37,17 +37,26 @@ class HTTPSSettingsManager: SettingsViewManager {
 		   cell.textLabel?.text = NSLocalizedString("require https for trusted sites setting title", comment: "title of setting to force the use of https on trusted sites")
 		   uiSwitch.isOn = bool(for: requireHTTPSForTrustedSitesKey)
 		   uiSwitch.addTarget(self, action: #selector(toggleHTTPSOnTrusted(_:)), for: .valueChanged)
-		} else {
+		} else if indexPath.row == 4 {
 			cell.textLabel?.text = NSLocalizedString("upgrade all http connections setting title", comment: "title of upgrade all http connections setting")
 			uiSwitch.isOn = bool(for: upgradeAllHTTPKey)
 			uiSwitch.addTarget(self, action: #selector(toggleHTTPSOnly(_:)), for: .valueChanged)
+		} else {
+			cell.textLabel?.text = NSLocalizedString("block deprecated tls versions setting title", comment: "title of setting to block deprecated tls versions")
+			uiSwitch.isOn = bool(for: blockDeprecatedTLSKey)
+			uiSwitch.addTarget(self, action: #selector(toggleBlockDeprecatedTLS(_:)), for: .valueChanged)
+			if #available(iOS 14, *) {
+				// feature is supported
+			} else {
+				cell.detailTextLabel?.text = NSLocalizedString("blocking deprecated tls versions requires ios 14 notice", comment: "notice to inform users that blocking deprecated tls versions requires ios 14")
+			}
 		}
 		cell.accessoryView = uiSwitch
 		return cell
 	}
 
 	override func numberOfRows(inSection section: Int) -> Int {
-		return 5
+		return 6
 	}
 
 	@objc private func toggleHTTPSFirst(_ sender: UISwitch) {
@@ -72,6 +81,11 @@ class HTTPSSettingsManager: SettingsViewManager {
 
 	@objc private func toggleHTTPSOnly(_ sender: UISwitch) {
 		set(sender.isOn, for: upgradeAllHTTPKey)
+		updateHeaderColor(animated: true)
+	}
+
+	@objc private func toggleBlockDeprecatedTLS(_ sender: UISwitch) {
+		set(sender.isOn, for: blockDeprecatedTLSKey)
 		updateHeaderColor(animated: true)
 	}
 }

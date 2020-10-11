@@ -180,6 +180,8 @@
 		84C7BF3D20961AC6003C25B2 /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE9520961AC6003C25B2 /* TabController.swift */; };
 		D701909421C32C1900180EE8 /* ReviewPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D701909321C32C1900180EE8 /* ReviewPrompt.swift */; };
 		D75D8F6B24C896C000E5542F /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE0B20961AB9003C25B2 /* Regex.swift */; };
+		D76821272533B62E00BB2E11 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76821262533B62A00BB2E11 /* Alert.swift */; };
+		D768212B2533B6BB00BB2E11 /* DownloadActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D768212A2533B6BB00BB2E11 /* DownloadActivity.swift */; };
 		D799505F24BA95630039B858 /* DefaultSubscriptionSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D799505E24BA95630039B858 /* DefaultSubscriptionSettingsManager.swift */; };
 		D799506124BA95980039B858 /* RegisterSubscriptionSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D799506024BA95980039B858 /* RegisterSubscriptionSettingsManager.swift */; };
 		D799506324BA95E30039B858 /* LoginSubscriptionSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D799506224BA95E30039B858 /* LoginSubscriptionSettingsManager.swift */; };
@@ -295,13 +297,13 @@
 		84C7BDD620961AB6003C25B2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = InfoPlist.strings; sourceTree = "<group>"; };
 		84C7BDD920961AB6003C25B2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = Localizable.strings; sourceTree = "<group>"; };
 		84C7BDDB20961AB6003C25B2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = InfoPlist.strings; sourceTree = "<group>"; };
-		84C7BDDC20961AB6003C25B2 /* ShapeOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShapeOverlayView.swift; sourceTree = "<group>"; };
+		84C7BDDC20961AB6003C25B2 /* ShapeOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShapeOverlayView.swift; path = "shared/code-scanner/ShapeOverlayView.swift"; sourceTree = "<group>"; };
 		84C7BDDF20961AB6003C25B2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localizable.strings; sourceTree = "<group>"; };
 		84C7BDE120961AB6003C25B2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
 		84C7BDE220961AB6003C25B2 /* ScanCodeActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanCodeActivity.swift; sourceTree = "<group>"; };
 		84C7BDE320961AB6003C25B2 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
-		84C7BDE520961AB6003C25B2 /* ScanCodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanCodeViewController.swift; sourceTree = "<group>"; };
-		84C7BDE620961AB6003C25B2 /* SublayerResizingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SublayerResizingView.swift; sourceTree = "<group>"; };
+		84C7BDE520961AB6003C25B2 /* ScanCodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScanCodeViewController.swift; path = "shared/code-scanner/ScanCodeViewController.swift"; sourceTree = "<group>"; };
+		84C7BDE620961AB6003C25B2 /* SublayerResizingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SublayerResizingView.swift; path = "shared/code-scanner/SublayerResizingView.swift"; sourceTree = "<group>"; };
 		84C7BDE720961AB7003C25B2 /* AppSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppSettingsManager.swift; sourceTree = "<group>"; };
 		84C7BDE820961AB7003C25B2 /* PolicyAssessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolicyAssessor.swift; sourceTree = "<group>"; };
 		84C7BDEB20961AB7003C25B2 /* gsw */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = gsw; path = Localizable.strings; sourceTree = "<group>"; };
@@ -388,7 +390,7 @@
 		84C7BE4E20961ABF003C25B2 /* LoginFill.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = LoginFill.js; sourceTree = "<group>"; };
 		84C7BE4F20961ABF003C25B2 /* SimplePing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimplePing.m; sourceTree = "<group>"; };
 		84C7BE5020961AC0003C25B2 /* FaviconFetcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaviconFetcher.swift; sourceTree = "<group>"; };
-		84C7BE5120961AC0003C25B2 /* CodeOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodeOverlayView.swift; sourceTree = "<group>"; };
+		84C7BE5120961AC0003C25B2 /* CodeOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CodeOverlayView.swift; path = "shared/code-scanner/CodeOverlayView.swift"; sourceTree = "<group>"; };
 		84C7BE5220961AC0003C25B2 /* LoadBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadBar.swift; sourceTree = "<group>"; };
 		84C7BE5320961AC0003C25B2 /* PasscodeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasscodeController.swift; sourceTree = "<group>"; };
 		84C7BE5420961AC0003C25B2 /* SearchEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEngine.swift; sourceTree = "<group>"; };
@@ -416,7 +418,7 @@
 		84C7BE6D20961AC2003C25B2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = InfoPlist.strings; sourceTree = "<group>"; };
 		84C7BE6E20961AC3003C25B2 /* Pinger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pinger.swift; sourceTree = "<group>"; };
 		84C7BE6F20961AC3003C25B2 /* DetailPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailPopover.swift; sourceTree = "<group>"; };
-		84C7BE7020961AC3003C25B2 /* CaptureSessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureSessionManager.swift; sourceTree = "<group>"; };
+		84C7BE7020961AC3003C25B2 /* CaptureSessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CaptureSessionManager.swift; path = "shared/code-scanner/CaptureSessionManager.swift"; sourceTree = "<group>"; };
 		84C7BE7120961AC3003C25B2 /* ContentBlockerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentBlockerManager.swift; sourceTree = "<group>"; };
 		84C7BE7220961AC3003C25B2 /* JSONFetcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONFetcher.swift; sourceTree = "<group>"; };
 		84C7BE7320961AC3003C25B2 /* URLParamStripRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLParamStripRule.swift; sourceTree = "<group>"; };
@@ -447,6 +449,8 @@
 		84C7BE9520961AC6003C25B2 /* TabController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
 		A332F0A3DD107E44A936AAE6 /* Pods-SnowHaze.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SnowHaze.release.xcconfig"; path = "Pods/Target Support Files/Pods-SnowHaze/Pods-SnowHaze.release.xcconfig"; sourceTree = "<group>"; };
 		D701909321C32C1900180EE8 /* ReviewPrompt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviewPrompt.swift; sourceTree = "<group>"; };
+		D76821262533B62A00BB2E11 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		D768212A2533B6BB00BB2E11 /* DownloadActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadActivity.swift; sourceTree = "<group>"; };
 		D799505E24BA95630039B858 /* DefaultSubscriptionSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultSubscriptionSettingsManager.swift; sourceTree = "<group>"; };
 		D799506024BA95980039B858 /* RegisterSubscriptionSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterSubscriptionSettingsManager.swift; sourceTree = "<group>"; };
 		D799506224BA95E30039B858 /* LoginSubscriptionSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginSubscriptionSettingsManager.swift; sourceTree = "<group>"; };
@@ -556,6 +560,7 @@
 			children = (
 				84C7BE2220961ABB003C25B2 /* AcknowledgementsSettingsManager.swift */,
 				84C7BDEF20961AB7003C25B2 /* AddBookmarkActivity.swift */,
+				D76821262533B62A00BB2E11 /* Alert.swift */,
 				84C7BDCF20961AB6003C25B2 /* api3.cer */,
 				84C7BDF620961AB8003C25B2 /* AppDelegate.swift */,
 				84C7BE4920961ABF003C25B2 /* AppearanceSettingsManager.swift */,
@@ -589,6 +594,7 @@
 				84C7BE6F20961AC3003C25B2 /* DetailPopover.swift */,
 				D799509224BA99520039B858 /* DispatchHelpers.swift */,
 				84C7BE0120961AB9003C25B2 /* DomainList.swift */,
+				D768212A2533B6BB00BB2E11 /* DownloadActivity.swift */,
 				84C7BE2D20961ABC003C25B2 /* DownloadManager.swift */,
 				D79950A124BA9AA60039B858 /* DownloadProgressIndicator.swift */,
 				D79950A224BA9AA60039B858 /* DownloadsList.swift */,
@@ -1132,6 +1138,7 @@
 				84C7BF0A20961AC6003C25B2 /* SearchEngine.swift in Sources */,
 				D79950A424BA9AA60039B858 /* DownloadsList.swift in Sources */,
 				84C7BEC120961AC6003C25B2 /* URLInjectionDetection.swift in Sources */,
+				D768212B2533B6BB00BB2E11 /* DownloadActivity.swift in Sources */,
 				84C7BEB720961AC6003C25B2 /* SuggestionViewController.swift in Sources */,
 				84C7BF3420961AC6003C25B2 /* TabSelectionView.swift in Sources */,
 				D79950AA24BA9B550039B858 /* SnowHazeURLSession.swift in Sources */,
@@ -1203,6 +1210,7 @@
 				84C7BEE620961AC6003C25B2 /* StringURLHelpers.swift in Sources */,
 				84C7BEBD20961AC6003C25B2 /* EncryptedDBHelpers.swift in Sources */,
 				84C7BEA020961AC6003C25B2 /* FixedNavigationController.swift in Sources */,
+				D76821272533B62E00BB2E11 /* Alert.swift in Sources */,
 				D799508D24BA98050039B858 /* SafebrowsingSettingsManager.swift in Sources */,
 				84C7BEE320961AC6003C25B2 /* Version.swift in Sources */,
 				84C7BEFA20961AC6003C25B2 /* UserAgent.swift in Sources */,
@@ -1439,7 +1447,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 88;
 				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1447,7 +1455,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.3;
+				MARKETING_VERSION = 3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1460,7 +1468,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 88;
 				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1468,7 +1476,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.3;
+				MARKETING_VERSION = 3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1602,7 +1610,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SnowHaze/SnowHaze.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 88;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SnowHaze",
@@ -1613,7 +1621,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.3;
+				MARKETING_VERSION = 3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";
@@ -1632,7 +1640,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SnowHaze/SnowHaze.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 88;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SnowHaze",
@@ -1643,7 +1651,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.3;
+				MARKETING_VERSION = 3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";

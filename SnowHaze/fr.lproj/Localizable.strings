@@ -17,6 +17,9 @@
 /* title of button to ignore old snowhaze version warning */
 "old snowhaze version prompt ignore button title" = "Ignorer";
 
+/* format of the human-readable description of the app version */
+"version description format" = "%@ Build %@";
+
 /* title of home page displayed in url bar */
 "home screen page title" = "Page d'accueil";
 
@@ -74,19 +77,19 @@
 /* format of the accessibility label of the vpn protected loads usage stat */
 "vpn protected loads usage stats accessibility format" = "%d Protections VPN";
 
-/* Used to confirm message */
+/* title of button to confirm a js alert */
 "js alert panel confirmation button title" = "OK";
 
-/* Used to accept message */
+/* title of button to confirm a js confirmation dialog */
 "js confirm panel confirm button title" = "OK";
 
-/* Used to decline message */
+/* title of button to cancel a js confirmation dialog */
 "js confirm panel cancel button title" = "Annuler";
 
-/* Used to enter text */
+/* title of button to confirm a js text prompt */
 "js text prompt confirm button title" = "OK";
 
-/* Used to not enter text */
+/* title of button to cancel a js text prompt */
 "js text prompt cancel button title" = "Annuler";
 
 /* title of button to ignore further alerts by this site */
@@ -263,6 +266,9 @@
 /* title of preview action to open a link in a new tab */
 "open in new tab preview action title" = "Nouvel onglet";
 
+/* title of preview action to open a link in a new tab in the background */
+"open in new tab in background preview action title" = "Ouvrir en arrière-plan";
+
 /* title of preview action to open the url of a history item */
 "open history item preview action title" = "Ouvrir";
 
@@ -280,6 +286,30 @@
 
 /* title of preview action to share the url of a bookmark */
 "share bookmark preview action title" = "Partager...";
+
+/* title of the action to open the url in the bookmark or history context menu */
+"open url bookmark or history context menu action title" = "Ouvrir";
+
+/* title of the action to copy the url in the bookmark or history context menu */
+"copy url bookmark or history context menu action title" = "Copier l'URL";
+
+/* title of the action to share the bookmark in the bookmark context menu */
+"share bookmark context menu action title" = "Partager...";
+
+/* title of the action to rename the bookmark in the bookmark context menu */
+"rename bookmark context menu action title" = "Renommer";
+
+/* title of the action to reload the bookmark in the bookmark context menu */
+"reload bookmark context menu action title" = "Recharger";
+
+/* title of the action to delete the bookmark in the bookmark context menu */
+"delete bookmark context menu action title" = "Supprimer";
+
+/* title of the bookmark context menu */
+"bookmark context menu title" = "Signets";
+
+/* title of the action to share the history item in the history context menu */
+"share history context menu action title" = "Partager...";
 
 /* title for acknowledgements */
 "acknowledgements settings title" = "Mentions légales";
@@ -701,6 +731,9 @@
 /* title of the activity to find some text on page */
 "find on page activity title" = "Recherche sur la page";
 
+/* title of the activity to download the current page */
+"download page activity title" = "Télécharger";
+
 /* title of button to dismiss text input bar */
 "text input bar dismiss button title" = "OK";
 
@@ -718,6 +751,18 @@
 
 /* title of upgrade all http connections setting */
 "upgrade all http connections setting title" = "Upgrade tous les HTTP";
+
+/* title of setting to block deprecated tls versions */
+"block deprecated tls versions setting title" = "Bloquer les TLS dépréciés";
+
+/* notice to inform users that blocking deprecated tls versions requires ios 14 */
+"blocking deprecated tls versions requires ios 14 notice" = "Nécessite iOS 14 ou Tor";
+
+/* title of setting to render webpages as desktop sites */
+"render pages as desktop sites setting title" = "Vue desktop";
+
+/* notice to inform users that rendering webpages as desktop sites requires ios 13 */
+"render pages as desktop sites requires ios 13 notice" = "Nécessite iOS 13";
 
 /* title of block tracking scripts setting */
 "block tracking scripts setting title" = "Bloquer les scripts de tracking";
@@ -1407,7 +1452,7 @@
 "open url in app itunes app name" = "iTunes";
 
 /* name of the mail app used to confirm opening of url in other app */
-"open url in app mail app name" = "Mail";
+"open url in app mail app name" = "l'application de courrier par défaut";
 
 /* name of the messages app used to confirm opening of url in other app */
 "open url in app messages app name" = "Messages";
@@ -1883,6 +1928,12 @@
 /* message of the error page to inform the user that javascript urls are disabled */
 "javascript urls disabled error page message" = "Les URL JavaScript sont désactivées pour des raisons de sécurité. Vous pouvez les activer dans Réglages -> JavaScript -> Autoriser les URL JS.";
 
+/* title of the error page shown when a webpage could not be loaded because the corresponding tab has been deleted */
+"tab deleted error page title" = "Onglet supprimé";
+
+/* message of the error page shown when a webpage could not be loaded because the corresponding tab has been deleted */
+"tab deleted error page message" = "La page n'a pas pu être chargée car l'onglet correspondant a été fermé.";
+
 /* error page domain description where no host is available */
 "error page unknown domain" = "Domaine inconnu";
 
@@ -2341,4 +2392,7 @@
 
 /* name of the zuludesk app used to confirm opening of url in other app */
 "open url in app zuludesk app name" = "Zuludesk";
+
+/* name of the zoom app used to confirm opening of url in other app */
+"open url in app zoom app name" = "Zoom";
 

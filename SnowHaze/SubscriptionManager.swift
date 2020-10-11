@@ -143,7 +143,7 @@ class SubscriptionManager: NSObject {
 		}
 	}
 
-	func tryWithTokens(work: @escaping (String?, @escaping () -> Void) -> Void) {
+	func tryWithTokens(work: @escaping (String?, @escaping () -> ()) -> ()) {
 		func dispatch(with tokens: [String]) {
 			var tokens = tokens
 			let token = tokens.isEmpty ? nil : tokens.removeFirst()
@@ -450,7 +450,7 @@ class SubscriptionManager: NSObject {
 		}
 	}
 
-	private var loadCompletionHandlers = [SKProductsRequest: ([SKProduct]?, Error?) -> Void]()
+	private var loadCompletionHandlers = [SKProductsRequest: ([SKProduct]?, Error?) -> ()]()
 
 	private func loadReceipt() -> Data? {
 		guard let url = Bundle.main.appStoreReceiptURL else {
@@ -464,7 +464,7 @@ class SubscriptionManager: NSObject {
 		return data
 	}
 
-	func updateProducts(force: Bool = false, completionHandler: ((Bool) -> Void)?) {
+	func updateProducts(force: Bool = false, completionHandler: ((Bool) -> ())?) {
 		let timestamp = DataStore.shared.getDouble(for: lastProductUpdateKey) ?? -Double.infinity
 		let date = Date(timeIntervalSince1970: timestamp)
 		guard force || date.timeIntervalSinceNow < -2 * 24 * 60 * 60 else {
@@ -523,18 +523,18 @@ class SubscriptionManager: NSObject {
 		}
 	}
 
-	private func load(product: String, completionHandler: @escaping (SKProduct?, Error?) -> Void) {
+	private func load(product: String, completionHandler: @escaping (SKProduct?, Error?) -> ()) {
 		load(products: [product]) { completionHandler($0?.first, $1) }
 	}
 
-	private func load(products: [String], completionHandler: @escaping ([SKProduct]?, Error?) -> Void) {
+	private func load(products: [String], completionHandler: @escaping ([SKProduct]?, Error?) -> ()) {
 		let request = SKProductsRequest(productIdentifiers: Set(products))
 		loadCompletionHandlers[request] = completionHandler
 		request.delegate = self
 		request.start()
 	}
 
-	private func updateAuthTokenV2(completionHandler: ((Bool) -> Void)?) {
+	private func updateAuthTokenV2(completionHandler: ((Bool) -> ())?) {
 		guard let data = loadReceipt(), let _ = activeSubscription else {
 			if let handler = completionHandler {
 				DispatchQueue.main.async {
@@ -591,7 +591,7 @@ class SubscriptionManager: NSObject {
 		}
 	}
 
-	private func updateAuthTokenV3(completionHandler: ((Bool) -> Void)?) {
+	private func updateAuthTokenV3(completionHandler: ((Bool) -> ())?) {
 		if activeSubscription == nil, (authorizationTokenUpdateDate ?? Date.distantPast).timeIntervalSinceNow > -1 * 60 * 60 {
 			if let completionHandler = completionHandler {
 				DispatchQueue.main.async {
@@ -661,7 +661,7 @@ class SubscriptionManager: NSObject {
 		}
 	}
 
-	func updateAuthToken(completionHandler: ((Bool) -> Void)? = nil) {
+	func updateAuthToken(completionHandler: ((Bool) -> ())? = nil) {
 		if !validTokens.isEmpty, (authorizationTokenUpdateDate ?? Date.distantPast).timeIntervalSinceNow > -24 * 60 * 60 {
 			if let handler = completionHandler {
 				DispatchQueue.main.async {

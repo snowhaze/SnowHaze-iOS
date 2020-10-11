@@ -137,7 +137,7 @@ private let safebrowsingDB: SQLiteManager = {
 	}
 
 	SQLiteManager.freeSQLiteCachesOnMemoryWarning = true
-	let _ = initSQLite
+	_ = initSQLite
 	let keyingData = try! KeyManager(name: "safebrowsing.db.key").key()
 
 	let manager = SQLiteManager(setup: { _ in
@@ -165,7 +165,7 @@ class SafebrowsingCache {
 	static let shared = SafebrowsingCache(db: safebrowsingDB)
 	private let internalQueue = DispatchQueue(label: "ch.illotros.safebrowsing.cache.internal")
 	private var lists: [Safebrowsing.List: (String, Date, [(count: Int, size: Int, prefixes: Data)], [Data: Data])]
-	private var updateCallbacks: [(Bool) -> Void]? = nil
+	private var updateCallbacks: [(Bool) -> ()]? = nil
 	private let db: SQLiteManager?
 
 	init(db: SQLiteManager? = nil) {
@@ -189,7 +189,7 @@ class SafebrowsingCache {
 		}
 	}
 
-	func register(wait: Bool, updatedCallback: @escaping (Bool) -> Void) -> ((Bool) -> Void)? {
+	func register(wait: Bool, updatedCallback: @escaping (Bool) -> ()) -> ((Bool) -> ())? {
 		var usable = true
 		var needsUpdate = false
 		var updating = false
@@ -224,7 +224,7 @@ class SafebrowsingCache {
 		let block = BlockCallGuard()
 		return { success in
 			block.called()
-			let callbacks = self.internalQueue.sync { () -> [(Bool) -> Void] in
+			let callbacks = self.internalQueue.sync { () -> [(Bool) -> ()] in
 				let callbacks = self.updateCallbacks
 				self.updateCallbacks = nil
 				return callbacks!

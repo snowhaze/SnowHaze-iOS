@@ -14,16 +14,16 @@ class InUseCounter {
 		UIApplication.shared.isNetworkActivityIndicatorVisible = using
 	})
 
-	let using: (Bool) -> Void
+	let using: (Bool) -> ()
 	let queue: DispatchQueue
 	private(set) var count: UInt = 0
 
-	init(using: @escaping (Bool) -> Void, queue: DispatchQueue = DispatchQueue.main) {
+	init(using: @escaping (Bool) -> (), queue: DispatchQueue = DispatchQueue.main) {
 		self.using = using
 		self.queue = queue
 	}
 
-	func inc() -> () -> Void {
+	func inc() -> () -> () {
 		queue.async {
 			self.count += 1
 			if self.count == 1 {

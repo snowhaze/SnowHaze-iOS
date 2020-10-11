@@ -122,7 +122,7 @@ class InstallTutorialViewController : TutorialViewController {
 				label.numberOfLines = 0
 				let welcomeFormat = NSLocalizedString("tutorial welcome html", comment: "html of first tutorial page content")
 				let format = "<span style='font-size:\(label.font.pointSize)px;color:#\(color.hex);text-align:center;font-family: -apple-system'>\(welcomeFormat)</span>"
-				let data = format.data(using: String.Encoding.utf8)!
+				let data = format.data(using: .utf8)!
 				let options: [NSAttributedString.DocumentReadingOptionKey : Any] = [NSAttributedString.DocumentReadingOptionKey(rawValue: NSAttributedString.DocumentAttributeKey.documentType.rawValue): NSAttributedString.DocumentType.html, NSAttributedString.DocumentReadingOptionKey(rawValue: NSAttributedString.DocumentAttributeKey.characterEncoding.rawValue): String.Encoding.utf8.rawValue]
 				label.attributedText = try? NSAttributedString(data: data, options: options, documentAttributes: nil)
 				contentContainer.addSubview(label)

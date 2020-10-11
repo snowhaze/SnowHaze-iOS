@@ -18,7 +18,7 @@ private let dbPath = (NSSearchPathForDirectoriesInDomains(.applicationSupportDir
 
 private var keyingData: Data!
 
-func trySetupKey(key: String, completionHandler: ((Bool) -> Void)?) {
+func trySetupKey(key: String, completionHandler: ((Bool) -> ())?) {
 	DispatchQueue.global(qos: .userInteractive).async {
 		let data: Data
 		do {
@@ -47,7 +47,7 @@ func trySetupKey(key: String, completionHandler: ((Bool) -> Void)?) {
 	}
 }
 
-func verifyDBKey(_ key: String, completionHandler: @escaping (Bool) -> Void) {
+func verifyDBKey(_ key: String, completionHandler: @escaping (Bool) -> ()) {
 	DispatchQueue.global(qos: .userInteractive).async {
 		let data = try? pbkdf(key)
 		DispatchQueue.main.async {
@@ -112,6 +112,9 @@ let db: SQLiteManager = {
 				case (.function("strftime"), nil, nil):													return .ok
 				case (.transaction("BEGIN"), nil, nil):													return .ok
 				case (.transaction("COMMIT"), nil, nil):												return .ok
+				case (.pragma("secure_delete", "ON"), nil, nil):										return .ok
+				case (.pragma("foreign_keys", "ON"), nil, nil):											return .ok
+				case (.pragma("recursive_triggers", "ON"), nil, nil):									return .ok
 				case (.pragma("data_version", nil), "main", nil):										return .ok
 				case (.pragma("rekey", let key), nil, nil):
 					if key?.matches("x\'[a-f0-9]{64}\'") ?? false {
@@ -293,6 +296,9 @@ let db: SQLiteManager = {
 				case (.pragma("user_version", "2"), "main", nil):											return .ok
 				case (.pragma("auto_vacuum", "FULL"), nil, nil):											return .ok
 				case (.pragma("journal_mode", "DELETE"), nil, nil):											return .ok
+				case (.pragma("secure_delete", "ON"), nil, nil):											return .ok
+				case (.pragma("foreign_keys", "ON"), nil, nil):												return .ok
+				case (.pragma("recursive_triggers", "ON"), nil, nil):										return .ok
 
 				case (.insert("sqlite_master"), "main", nil):												return .ok
 				case (.read("sqlite_master", "ROWID"), "main", nil):										return .ok
@@ -450,12 +456,13 @@ let db: SQLiteManager = {
 		let excludedOptions: SQLite.SetupOptions = [.limitVariableNumber, .limitLength, .disableTriggers]
 		let setupOptions = SQLite.SetupOptions.secure.subtracting(excludedOptions)
 		let connection = SQLCipher(path: dbPath, key: keyingData, cipherOptions: .compatibility(3), setupOptions: setupOptions)!
-		try! connection.dropModules(except: ["fts5"])
-		try! connection.execute("PRAGMA secure_delete = on")
-		try! connection.execute("PRAGMA foreign_keys = on")
-		try! connection.busyTimeout(100)
-
 		try! connection.set(authorizer: authorizer)
+
+		try! connection.dropModules(except: ["fts5"])
+		try! connection.execute("PRAGMA secure_delete = ON")
+		try! connection.execute("PRAGMA foreign_keys = ON")
+		try! connection.execute("PRAGMA recursive_triggers = ON")
+		try! connection.busyTimeout(100)
 
 		try! connection.registerFTS5Tokenizer(named: "lemma") { _ in
 			return { flags, rawText in

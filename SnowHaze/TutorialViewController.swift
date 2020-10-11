@@ -201,7 +201,7 @@ class TutorialViewController: UIViewController {
 		close(completion: nil)
 	}
 
-	func close(completion: (() -> Void)?) {
+	func close(completion: (() -> ())?) {
 		dismiss(animated: true, completion: completion)
 		let policy = PolicyManager.globalManager()
 		policy.updateTutorialVersion()

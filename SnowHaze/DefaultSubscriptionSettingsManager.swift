@@ -609,13 +609,8 @@ extension DefaultSubscriptionSettingsManager: SubscriptionManagerDelegate {
 		updateHeaderColor(animated: true)
 	}
 
-	func purchaseFailed(besause description: String?) {
-		let title = NSLocalizedString("purchase failed error alert title", comment: "title of alert to inform users that a purchase has failed")
-		let error = NSLocalizedString("purchase failed error alert unknown error message", comment: "displayed instead of the error message in the alert to inform users that a purchase has failed when the reason for the failure is unknown")
-		let ok = NSLocalizedString("purchase failed error alert ok button title", comment: "title of the ok button of the alert to inform users that a purchase has failed")
-		let alert = UIAlertController(title: title, message: description ?? error, preferredStyle: .alert)
-		let cancel = UIAlertAction(title: ok, style: .default, handler: nil)
-		alert.addAction(cancel)
+	func purchaseFailed(besause reason: String?) {
+		let alert = AlertType.purchaseFailed(reason: reason).build()
 		controller.present(alert, animated: true, completion: nil)
 	}
 
@@ -624,24 +619,8 @@ extension DefaultSubscriptionSettingsManager: SubscriptionManagerDelegate {
 	}
 
 	func hasPreexistingPayments(until expiration: Date, renews: Bool, purchasing product: SubscriptionManager.Product) {
-		let title = NSLocalizedString("preexisting subscription warning alert title", comment: "title of the alert to warn users that they are about to purchase a subscription that overlaps with a previous one")
-		let renewFmt = NSLocalizedString("preexisting subscription warning alert renewing message format", comment: "format of message of the alert to warn users that they are about to purchase a subscription that overlaps with a previous one when the later renews")
-		let expireFmt = NSLocalizedString("preexisting subscription warning alert expiring message format", comment: "format of message of the alert to warn users that they are about to purchase a subscription that overlaps with a previous one when the later expires")
-		let formatter = DateFormatter()
-		formatter.dateStyle = .long
-		formatter.timeStyle = .short
-		let date = formatter.string(from: expiration)
-		let message = String(format: renews ? renewFmt : expireFmt, product.description, date)
-		let ok = NSLocalizedString("preexisting subscription warning alert confirm button title", comment: "title of the button to confirm purchase on the alert to warn users that they are about to purchase a subscription that overlaps with a previous one")
-		let cancel = NSLocalizedString("preexisting subscription warning alert cancel button title", comment: "title of the button to cancel purchase on the alert to warn users that they are about to purchase a subscription that overlaps with a previous one")
-		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-		let okAction = UIAlertAction(title: ok, style: .default) { _ in
-			SubscriptionManager.shared.purchase(product, force: true)
-		}
-		let cancelAction = UIAlertAction(title: cancel, style: .cancel, handler: nil)
-		alert.addAction(okAction)
-		alert.addAction(cancelAction)
-		controller?.splitMergeController?.present(alert, animated: true, completion: nil)
+		let alert = AlertType.preexistingSubscription(expiration: expiration, renews: renews, product: product)
+		controller?.splitMergeController?.present(alert.build(), animated: true, completion: nil)
 	}
 
 	func restoreFinished(succesfully success: Bool) {

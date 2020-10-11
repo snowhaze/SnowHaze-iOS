@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		return true
 	}
 
-	func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+	func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> ()) -> Bool {
 		if userActivity.activityType == CSSearchableItemActionType {
 			guard let id = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String else {
 				return false
@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		return false
 	}
 
-	func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+	func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> ()) {
 		if shortcutItem.type == bookmarkApplicationShortcutType {
 			guard let location = shortcutItem.userInfo?["url"] as? String, let url = URL(string: location) else {
 				completionHandler(false)
@@ -129,7 +129,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 	}
 
-	func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+	func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> ()) {
 		DownloadManager.shared.handleBackgroundTaskEvent(identifier: identifier, completionHandler: completionHandler)
 	}
 }

@@ -60,7 +60,7 @@ class Search {
 				return
 			}
 			self.searchInitiated = true
-			self.tab.controller?.evaluate(script) { (result, error) -> Void in
+			self.tab.controller?.evaluate(script) { (result, error) -> () in
 				DispatchQueue.main.async { [weak self] in
 					guard let self = self, let count = result as? NSNumber, search == self.searchPattern else {
 						return

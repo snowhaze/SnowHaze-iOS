@@ -13,7 +13,7 @@ private let maxCount = 3
 class BookmarkSuggestionSource: SuggestionSource {
 	private let bookmarkStore = BookmarkStore.store
 
-	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let bookmarks = bookmarkStore.bookmarks(forSearch: base, limit: UInt(maxCount))
 		let suggestions = bookmarks.map { (bookmark) -> Suggestion in
 			let name = bookmark.displayName

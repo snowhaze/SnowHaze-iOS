@@ -22,23 +22,31 @@ private func error(for url: URL?, code: Int, subscription: Bool = true) -> NSErr
 	return NSError(domain: "TorErrorDomain", code: code, userInfo: info)
 }
 
+protocol TorSchemeHandlerDelegate: class {
+	func torSchemeHandler(_ handler: TorSchemeHandler, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ())
+}
+
 class TorSchemeHandler: NSObject, WKURLSchemeHandler, URLSessionDataDelegate {
 	private var session: URLSession?
 
 	let sendDNT: Bool
+	let blockDeprecatedTLS: Bool
 
 	let user = String.secureRandom()
 	let password = String.secureRandom()
 
-	init(dnt: Bool) {
+	weak var delegate: TorSchemeHandlerDelegate?
+
+	init(dnt: Bool, blockDeprecatedTLS: Bool) {
 		sendDNT = dnt
+		self.blockDeprecatedTLS = blockDeprecatedTLS
 		super.init()
 	}
 
 	private var map = [URLSessionDataTask: WKURLSchemeTask]()
 	private var waiting = [WKURLSchemeTask]()
 
-	private func setupSession(callback: @escaping (URLSession?, Bool) -> Void) {
+	private func setupSession(callback: @escaping (URLSession?, Bool) -> ()) {
 		guard session == nil  else {
 			return callback(session, true)
 		}
@@ -57,13 +65,22 @@ class TorSchemeHandler: NSObject, WKURLSchemeHandler, URLSessionDataDelegate {
 				guard var proxyConfig = proxyConfig else {
 					return callback(nil, true)
 				}
-				guard let me = self, me.session == nil  else {
+				guard let me = self, me.session == nil else {
 					return callback(self?.session, true)
 				}
 				proxyConfig[kCFStreamPropertySOCKSUser] = me.user
 				proxyConfig[kCFStreamPropertySOCKSPassword] = me.password
 				let config: URLSessionConfiguration = .ephemeral
 				config.connectionProxyDictionary = proxyConfig
+
+				if me.blockDeprecatedTLS {
+					if #available(iOS 13, *) {
+						config.tlsMinimumSupportedProtocolVersion = .TLSv12
+					} else {
+						config.tlsMinimumSupportedProtocol = .tlsProtocol12
+					}
+				}
+
 				me.session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
 				callback(me.session, true)
 			}
@@ -88,16 +105,16 @@ class TorSchemeHandler: NSObject, WKURLSchemeHandler, URLSessionDataDelegate {
 					urlSchemeTask.didFailWithError(error(for: originalURL, code: -3))
 					return
 				}
-				guard let me = self, me.waiting.contains(where: { $0 === urlSchemeTask }) else {
+				guard let self = self, self.waiting.contains(where: { $0 === urlSchemeTask }) else {
 					return
 				}
-				me.waiting = me.waiting.filter { $0 !== urlSchemeTask }
+				self.waiting = self.waiting.filter { $0 !== urlSchemeTask }
 				request.url = detorifiedURL
-				if me.sendDNT {
+				if self.sendDNT {
 					request.setValue("1", forHTTPHeaderField: "DNT")
 				}
 				let task = session.dataTask(with: request)
-				me.map[task] = urlSchemeTask
+				self.map[task] = urlSchemeTask
 				task.resume()
 			}
 		}
@@ -122,14 +139,14 @@ class TorSchemeHandler: NSObject, WKURLSchemeHandler, URLSessionDataDelegate {
 
 	func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
 		DispatchQueue.main.async { [weak self] in
-			guard let me = self else {
+			guard let self = self else {
 				return
 			}
-			guard let dataTask = task as? URLSessionDataTask, let schemeTask = me.map[dataTask] else {
+			guard let dataTask = task as? URLSessionDataTask, let schemeTask = self.map[dataTask] else {
 				task.cancel()
 				return
 			}
-			me.map[dataTask] = nil
+			self.map[dataTask] = nil
 			if let error = error {
 				schemeTask.didFailWithError(error)
 			} else {
@@ -138,18 +155,18 @@ class TorSchemeHandler: NSObject, WKURLSchemeHandler, URLSessionDataDelegate {
 		}
 	}
 
-	func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+	func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> ()) {
 		DispatchQueue.main.async { [weak self] in
-			guard let me = self else {
+			guard let self = self else {
 				return
 			}
-			guard let schemeTask = me.map[dataTask] else {
+			guard let schemeTask = self.map[dataTask] else {
 				dataTask.cancel()
 				return completionHandler(.cancel)
 			}
 			if let headers = (response as? HTTPURLResponse)?.allHeaderFields as? [String: String] {
 				if let url = dataTask.originalRequest?.url?.detorified, var location = headers["Location"] {
-					me.map[dataTask] = nil
+					self.map[dataTask] = nil
 					location = URL(string: location)?.torified?.absoluteString ?? location
 					func escape(_ string: String) -> String {
 						return Array(string.unicodeScalars).map({ scalar -> String in
@@ -179,20 +196,34 @@ class TorSchemeHandler: NSObject, WKURLSchemeHandler, URLSessionDataDelegate {
 		}
 	}
 
-	func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+	func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> ()) {
 		completionHandler(nil)
 	}
 
 	func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
 		DispatchQueue.main.async { [weak self] in
-			guard let me = self else {
+			guard let self = self else {
 				return
 			}
-			guard let schemeTask = me.map[dataTask] else {
+			guard let schemeTask = self.map[dataTask] else {
 				dataTask.cancel()
 				return
 			}
 			schemeTask.didReceive(data)
+		}
+	}
+
+	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()) {
+		DispatchQueue.main.async { [weak self] in
+			guard let self = self else {
+				completionHandler(.cancelAuthenticationChallenge, nil)
+				return
+			}
+			guard let delegate = self.delegate else {
+				completionHandler(.performDefaultHandling, nil)
+				return
+			}
+			delegate.torSchemeHandler(self, didReceive: challenge, completionHandler: completionHandler)
 		}
 	}
 

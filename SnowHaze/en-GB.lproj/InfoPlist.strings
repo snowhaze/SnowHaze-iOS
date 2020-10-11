@@ -6,7 +6,7 @@
 
 "NSCameraUsageDescription" = "Camera is used exclusively for the barcode scanner.";
 
-"NSPhotoLibraryUsageDescription" = "SnowHaze needs photo library access to save or upload media.";
+"NSPhotoLibraryAddUsageDescription" = "SnowHaze needs photo library access to save media.";
 
 "open vpn settings application shortcut item title" = "VPN Settings";
 

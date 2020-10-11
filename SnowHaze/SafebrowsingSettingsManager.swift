@@ -72,7 +72,7 @@ class SafebrowsingSettingsManager: SettingsViewManager {
 			if success {
 				let safebrowsing = PolicyManager.globalManager().updateSafebrowsing
 				DispatchQueue.global(qos: .userInitiated).async {
-					let _ = safebrowsing?.lastFullPrefixUpdate
+					_ = safebrowsing?.lastFullPrefixUpdate
 					DispatchQueue.main.async {
 						self?.safebrowsing = safebrowsing
 						self?.reloadUpdate()

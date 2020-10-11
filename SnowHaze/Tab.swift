@@ -194,7 +194,7 @@ class Tab: Equatable {
 		}
 		root = row["root_id"]?.integerValue
 		title = row["title"]?.text
-		if let jsonData = row["history"]?.text?.data(using: String.Encoding.utf8) {
+		if let jsonData = row["history"]?.text?.data(using: .utf8) {
 			let deserialized = try? JSONSerialization.jsonObject(with: jsonData)
 			let strings = deserialized as? [String] ?? []
 			let urls = try? strings.map() { (string: String) -> URL in
@@ -348,7 +348,7 @@ class TabStore {
 		return result
 	}
 
-	func add(with request: URLRequest, copySettingsFromParent parent: Tab, customization: (Tab) -> Void = { _ in }) -> Tab? {
+	func add(with request: URLRequest, copySettingsFromParent parent: Tab, customization: (Tab) -> () = { _ in }) -> Tab? {
 		assert(Thread.isMainThread)
 		let history: [URL]
 		if let url = request.url {

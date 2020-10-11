@@ -60,12 +60,7 @@ class HistorySettingsManager: SettingsViewManager {
 	}
 
 	@objc private func confirmClearHistory(_ sender: UIButton) {
-		let title = NSLocalizedString("clear history confirm dialog title", comment: "title for dialog to confirm clearing of history")
-		let message = NSLocalizedString("clear history confirm dialog message", comment: "message for dialog to confirm clearing of history")
-		let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-
-		let reset = NSLocalizedString("clear history confirm dialog confirm option title", comment: "title for confirm option of dialog to confirm clearing of history")
-		let confirmAction = UIAlertAction(title: reset, style: .destructive) { _ in
+		let clear = {
 			let store = HistoryStore.store
 			guard let count = store.itemsByDate?.count , count > 0 else {
 				return
@@ -73,11 +68,7 @@ class HistorySettingsManager: SettingsViewManager {
 			let indexes = 0 ... count - 1
 			indexes.reversed().forEach { store.removeSection(at: $0) }
 		}
-		alert.addAction(confirmAction)
-
-		let cancel = NSLocalizedString("clear history confirm dialog cancel option title", comment: "title for cancel option of dialog to confirm clearing of history")
-		let cancelAction = UIAlertAction(title: cancel, style: .cancel, handler: nil)
-		alert.addAction(cancelAction)
+		let alert = AlertType.clearHistory(clear: clear).build()
 		alert.popoverPresentationController?.sourceView = sender
 		alert.popoverPresentationController?.sourceRect = sender.bounds
 		controller.present(alert, animated: true, completion: nil)

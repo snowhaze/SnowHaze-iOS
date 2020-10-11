@@ -22,7 +22,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
 	private var observer: NSObjectProtocol?
 	private var vpnManagerLoaded = false
-	private var performWithLoadedVPNManager: [() -> Void]?
+	private var performWithLoadedVPNManager: [() -> ()]?
 
 	enum Country: String {
 		case australia = "au"
@@ -125,7 +125,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		// Dispose of any resources that can be recreated.
 	}
 
-	func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> Void)) {
+	func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> ())) {
 		updateStatus()
 		completionHandler(NCUpdateResult.newData)
 	}
@@ -283,7 +283,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		}
 	}
 
-	private func saveManager(with reload: @escaping () -> Void, success: (() -> Void)? = nil) {
+	private func saveManager(with reload: @escaping () -> (), success: (() -> ())? = nil) {
 		NEVPNManager.shared().saveToPreferences { [weak self] err in
 			if let error = err {
 				let code = (error as NSError).code
@@ -335,9 +335,9 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		self.extensionContext?.open(URL(string: "shc://?open-setting=vpn&unfold-explanation")!, completionHandler: nil)
 	}
 
-	private func withLoadedManager(perform block: @escaping (@escaping ()->Void) -> Void) {
+	private func withLoadedManager(perform block: @escaping (@escaping ()->Void) -> ()) {
 		var retryCount = 0
-		let reload: () -> Void = { [weak self] in
+		let reload: () -> () = { [weak self] in
 			guard retryCount < 3 else {
 				return
 			}
@@ -353,7 +353,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		block(reload)
 	}
 
-	private func loadVPNManager(completion: (() -> Void)? = nil) {
+	private func loadVPNManager(completion: (() -> ())? = nil) {
 		guard performWithLoadedVPNManager == nil else {
 			if let block = completion {
 				performWithLoadedVPNManager!.append(block)

@@ -103,7 +103,7 @@ class DetailPopover {
 		if animated {
 			UIView.animate(withDuration: 0.2, animations: {
 				self.dismissView?.alpha = 0
-			}, completion: { (finished) -> Void in
+			}, completion: { (finished) -> () in
 				self.dismissView?.removeFromSuperview()
 				self.dismissView = nil
 			})

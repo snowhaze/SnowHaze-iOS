@@ -96,22 +96,7 @@ class WebsiteDataSettingsManager: SettingsViewManager {
 		let store = WKWebsiteDataStore.default()
 		let types = WKWebsiteDataStore.allWebsiteDataTypes()
 		store.fetchDataRecords(ofTypes: types) { [weak self] records in
-			let count = records.count
-			let formatter = NumberFormatter()
-			let nbString = formatter.string(from: NSNumber(value: count as Int))!
-			let title = NSLocalizedString("delete all data confirm dialog title", comment: "title for dialog to confirm deletion of all website data records")
-			let messageFormat = NSLocalizedString("delete all data message format", comment: "message format for dialog to confirm deletion of all website data records")
-			let alert = UIAlertController(title: title, message: String(format: messageFormat, nbString), preferredStyle: .actionSheet)
-
-			let deleteTitle = NSLocalizedString("delete all data confirm option title", comment: "title for confirm option of dialog to confirm deletion of all website data records")
-			let confirmAction = UIAlertAction(title: deleteTitle, style: .destructive) { _ in
-				store.removeData(ofTypes: types, for: records) { }
-			}
-			alert.addAction(confirmAction)
-
-			let cancelTitle = NSLocalizedString("delete all data cancel option title", comment: "title for confirm option of dialog to cancel deletion of all website data records")
-			let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
-			alert.addAction(cancelAction)
+			let alert = AlertType.deleteAllWebsiteData(count: records.count, delete: { store.removeData(ofTypes: types, for: records) { } }).build()
 			alert.popoverPresentationController?.sourceView = sender
 			alert.popoverPresentationController?.sourceRect = sender.bounds
 			self?.controller?.present(alert, animated: true, completion: nil)
@@ -122,22 +107,7 @@ class WebsiteDataSettingsManager: SettingsViewManager {
 		let store = WKWebsiteDataStore.default()
 		let types = Set<String>(arrayLiteral: WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache, WKWebsiteDataTypeOfflineWebApplicationCache)
 		store.fetchDataRecords(ofTypes: types) { [weak self] records in
-			let count = records.count
-			let formatter = NumberFormatter()
-			let nbString = formatter.string(from: NSNumber(value: count as Int))!
-			let title = NSLocalizedString("delete all caches confirm dialog title", comment: "title for dialog to confirm deletion of all website cache records")
-			let messageFormat = NSLocalizedString("delete all caches message format", comment: "message format for dialog to confirm deletion of all website cache records")
-			let alert = UIAlertController(title: title, message: String(format: messageFormat, nbString), preferredStyle: .actionSheet)
-
-			let deleteTitle = NSLocalizedString("delete all caches confirm option title", comment: "title for confirm option of dialog to confirm deletion of all website cache records")
-			let confirmAction = UIAlertAction(title: deleteTitle, style: .destructive) { _ in
-				store.removeData(ofTypes: types, for: records) { }
-			}
-			alert.addAction(confirmAction)
-
-			let cancelTitle = NSLocalizedString("delete all caches cancel option title", comment: "title for confirm option of dialog to cancel deletion of all website cache records")
-			let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
-			alert.addAction(cancelAction)
+			let alert = AlertType.deleteCacheWebsiteData(count: records.count, delete: { store.removeData(ofTypes: types, for: records) { } }).build()
 			alert.popoverPresentationController?.sourceView = sender
 			alert.popoverPresentationController?.sourceRect = sender.bounds
 			self?.controller?.present(alert, animated: true, completion: nil)
@@ -148,22 +118,7 @@ class WebsiteDataSettingsManager: SettingsViewManager {
 		let store = WKWebsiteDataStore.default()
 		let types = Set<String>(arrayLiteral: WKWebsiteDataTypeCookies)
 		store.fetchDataRecords(ofTypes: types) { [weak self] records in
-			let count = records.count
-			let formatter = NumberFormatter()
-			let nbString = formatter.string(from: NSNumber(value: count as Int))!
-			let title = NSLocalizedString("delete all cookies confirm dialog title", comment: "title for dialog to confirm deletion of all cookies")
-			let messageFormat = NSLocalizedString("delete all cookies message format", comment: "message format for dialog to confirm deletion of all cookies")
-			let alert = UIAlertController(title: title, message: String(format: messageFormat, nbString), preferredStyle: .actionSheet)
-
-			let deleteTitle = NSLocalizedString("delete all cookies confirm option title", comment: "title for confirm option of dialog to confirm deletion of all cookies")
-			let confirmAction = UIAlertAction(title: deleteTitle, style: .destructive) { _ in
-				store.removeData(ofTypes: types, for: records) { }
-			}
-			alert.addAction(confirmAction)
-
-			let cancelTitle = NSLocalizedString("delete all cookies cancel option title", comment: "title for confirm option of dialog to cancel deletion of all cookies")
-			let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
-			alert.addAction(cancelAction)
+			let alert = AlertType.deleteCookieWebsiteData(count: records.count, delete: { store.removeData(ofTypes: types, for: records) { } }).build()
 			alert.popoverPresentationController?.sourceView = sender
 			alert.popoverPresentationController?.sourceRect = sender.bounds
 			self?.controller?.present(alert, animated: true, completion: nil)
@@ -174,22 +129,7 @@ class WebsiteDataSettingsManager: SettingsViewManager {
 		let store = WKWebsiteDataStore.default()
 		let types = Set<String>(arrayLiteral: WKWebsiteDataTypeSessionStorage, WKWebsiteDataTypeLocalStorage, WKWebsiteDataTypeWebSQLDatabases, WKWebsiteDataTypeIndexedDBDatabases)
 		store.fetchDataRecords(ofTypes: types) { [weak self] records in
-			let count = records.count
-			let formatter = NumberFormatter()
-			let nbString = formatter.string(from: NSNumber(value: count as Int))!
-			let title = NSLocalizedString("delete all data stores confirm dialog title", comment: "title for dialog to confirm deletion of all website data stores")
-			let messageFormat = NSLocalizedString("delete all data stores message format", comment: "message format for dialog to confirm deletion of all website data stores")
-			let alert = UIAlertController(title: title, message: String(format: messageFormat, nbString), preferredStyle: .actionSheet)
-
-			let deleteTitle = NSLocalizedString("delete all data stores confirm option title", comment: "title for confirm option of dialog to confirm deletion of all website data stores")
-			let confirmAction = UIAlertAction(title: deleteTitle, style: .destructive) { _ in
-				store.removeData(ofTypes: types, for: records) { }
-			}
-			alert.addAction(confirmAction)
-
-			let cancelTitle = NSLocalizedString("delete all data stores cancel option title", comment: "title for confirm option of dialog to cancel deletion of all website data stores")
-			let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
-			alert.addAction(cancelAction)
+			let alert = AlertType.deleteOtherWebsiteData(count: records.count, delete: { store.removeData(ofTypes: types, for: records) { } }).build()
 			alert.popoverPresentationController?.sourceView = sender
 			alert.popoverPresentationController?.sourceRect = sender.bounds
 			self?.controller?.present(alert, animated: true, completion: nil)
@@ -219,22 +159,7 @@ class WebsiteDataSettingsManager: SettingsViewManager {
 			let ads = DomainList(type: .ads)
 			let tracking = DomainList(type: .trackingScripts)
 			let records = unfilteredRecords.filter { ads.contains($0.displayName) || tracking.contains($0.displayName) }
-			let count = records.count
-			let formatter = NumberFormatter()
-			let nbString = formatter.string(from: NSNumber(value: count as Int))!
-			let title = NSLocalizedString("delete tracking cookies confirm dialog title", comment: "title for dialog to confirm deletion of tracking cookies")
-			let messageFormat = NSLocalizedString("delete tracking cookies message format", comment: "message format for dialog to confirm deletion of tracking cookies")
-			let alert = UIAlertController(title: title, message: String(format: messageFormat, nbString), preferredStyle: .actionSheet)
-
-			let deleteTitle = NSLocalizedString("delete tracking cookies confirm option title", comment: "title for confirm option of dialog to confirm deletion of tracking cookies")
-			let confirmAction = UIAlertAction(title: deleteTitle, style: .destructive) { _ in
-				store.removeData(ofTypes: types, for: records) { }
-			}
-			alert.addAction(confirmAction)
-
-			let cancelTitle = NSLocalizedString("delete tracking cookies cancel option title", comment: "title for confirm option of dialog to cancel deletion of tracking cookies")
-			let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel, handler: nil)
-			alert.addAction(cancelAction)
+			let alert = AlertType.deleteTrackingCookieWebsiteData(count: records.count, delete: { store.removeData(ofTypes: types, for: records) { } }).build()
 			alert.popoverPresentationController?.sourceView = sender
 			alert.popoverPresentationController?.sourceRect = sender.bounds
 			self?.controller?.present(alert, animated: true, completion: nil)

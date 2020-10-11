@@ -40,7 +40,6 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 	}
 
 	private static let overlayWindow: UIWindow = {
-		let oldKeyWindow = UIApplication.shared.keyWindow
 		let overlayWindow = UIWindow(frame: UIScreen.main.bounds)
 		overlayWindow.windowLevel = UIWindow.Level.statusBar
 		overlayWindow.backgroundColor = .clear
@@ -116,7 +115,7 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 		navigationController?.setNavigationBarHidden(true, animated: false)
 	}
 
-	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> ()) {
 		if isMain {
 			PasscodeManager.shared.setupIfCorrect(code: code, completionHandler: completionHandler)
 		} else {

@@ -41,7 +41,7 @@ enum WebLoadType {
 	case userInput(String)
 	case url(URL)
 }
-protocol WebViewManager: WKScriptMessageHandler {
+protocol WebViewManager: WKScriptMessageHandler, TorSchemeHandlerDelegate, WKNavigationDelegate {
 	var webView: WKWebView { get }
 	var tab: Tab { get }
 	var securityCookie: String { get }
@@ -50,6 +50,15 @@ protocol WebViewManager: WKScriptMessageHandler {
 	func load(input: String, type: InputType)
 	func load(url: URL?)
 	func load(userInput: String)
+}
+
+extension WebViewManager {
+	func torSchemeHandler(_ handler: TorSchemeHandler, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()) {
+		guard let _ = webView?(webView, didReceive: challenge, completionHandler: completionHandler) else {
+			completionHandler(.performDefaultHandling, nil)
+			return
+		}
+	}
 }
 
 extension WebViewManager {
@@ -63,33 +72,39 @@ extension WebViewManager {
 
 // Public
 extension WebViewManager {
-	func enableJS() -> (() -> Void)? {
+	func enableJS() -> (() -> ())? {
 		let policy = PolicyManager.manager(for: webView.url, in: tab)
 		guard policy.allowApplicationJS else {
 			return nil
 		}
-		webView.configuration.preferences.javaScriptEnabled = true
+		if #available(iOS 14, *) {
+			// javascript is controlled by the webview's navigation delegate
+		} else {
+			webView.configuration.preferences.javaScriptEnabled = true
+		}
 		let blockGuard = BlockCallGuard()
-		let ret: () -> Void = {
+		let ret: () -> () = {
 			blockGuard.called()
 			let policy = PolicyManager.manager(for: self.webView.url, in: self.tab)
-			self.webView.configuration.preferences.javaScriptEnabled = policy.allowJS
+			if #available(iOS 14, *) {
+				// javascript is controlled by the webview's navigation delegate
+			} else {
+				self.webView.configuration.preferences.javaScriptEnabled = policy.allowJS
+			}
 		}
 		return ret
 	}
 
-	@discardableResult func enableJS(for block: () -> Void) -> Bool {
-		let policy = PolicyManager.manager(for: webView.url, in: tab)
-		guard policy.allowApplicationJS else {
+	@discardableResult func enableJS(for block: () -> ()) -> Bool {
+		guard let disable = enableJS() else {
 			return false
 		}
-		webView.configuration.preferences.javaScriptEnabled = true
 		block()
-		webView.configuration.preferences.javaScriptEnabled = policy.allowJS
+		disable()
 		return true
 	}
 
-	@discardableResult func evaluate(_ script: String?, completionHandler: ((Any?, Error?) -> Void)? = nil) -> Bool {
+	@discardableResult func evaluate(_ script: String?, completionHandler: ((Any?, Error?) -> ())? = nil) -> Bool {
 		guard let script = script else {
 			return false
 		}
@@ -130,7 +145,12 @@ internal extension WebViewManager {
 	}
 
 	func update(policy: PolicyManager, webView: WKWebView) {
-		webView.configuration.preferences.javaScriptEnabled = policy.allowJS
+		if #available(iOS 14, *) {
+			// javascript settings are applied in the call back in
+			// webView(_:, decidePolicyFor: , preferences: , decisionHandler: )
+		} else {
+			webView.configuration.preferences.javaScriptEnabled = policy.allowJS
+		}
 		webView.configuration.userContentController.removeAllUserScripts()
 		webView.configuration.preferences.minimumFontSize = policy.minFontSize
 		webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = policy.allowAutomaticJSPopovers
@@ -153,9 +173,14 @@ internal extension WebViewManager {
 				let url = request.url!.absoluteString
 				let substring = url[url.index(url.startIndex, offsetBy: jsSchemePrefix.count) ..< url.endIndex]
 				let js = substring.removingPercentEncoding ?? String(substring)
-				webView.configuration.preferences.javaScriptEnabled = true
-				webView.evaluateJavaScript(js)
-				webView.configuration.preferences.javaScriptEnabled = policy.allowJS
+				if #available(iOS 14, *) {
+					// javascript is controlled by the webview's navigation delegate
+					webView.evaluateJavaScript(js)
+				} else {
+					webView.configuration.preferences.javaScriptEnabled = true
+					webView.evaluateJavaScript(js)
+					webView.configuration.preferences.javaScriptEnabled = policy.allowJS
+				}
 			} else {
 				webView.loadHTMLString(BrowserPageGenerator(type: .jsUrlBlocked).getHTML(), baseURL: nil)
 			}

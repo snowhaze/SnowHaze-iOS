@@ -10,11 +10,11 @@ import Foundation
 import UIKit
 
 class StartReaderActivity: UIActivity {
-	private let callback: (StartReaderActivity) -> Void
+	private let callback: (StartReaderActivity) -> ()
 
 	private(set) var tab: Tab!
 
-	init(callback: @escaping (StartReaderActivity) -> Void) {
+	init(callback: @escaping (StartReaderActivity) -> ()) {
 		self.callback = callback
 	}
 

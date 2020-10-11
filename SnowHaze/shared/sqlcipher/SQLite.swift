@@ -231,6 +231,14 @@ public class SQLite {
 			}
 		}
 
+		public init(_ int: Int64?) {
+			if let int = int {
+				self = .integer(int)
+			} else {
+				self = .null
+			}
+		}
+
 		public static func ==(t1: Data, t2: Data) -> Bool {
 			switch (t1, t2) {
 				case (.text(let s1), .text(let s2)):		return s1 == s2
@@ -1207,7 +1215,7 @@ public class SQLite {
 			var names = names
 			let name = names.removeFirst()
 			try name.withCUTF8 { bytes in
-				try accumulate(pointers: pointers + [bytes] , for: names, callback: callback)
+				try accumulate(pointers: pointers + [bytes], for: names, callback: callback)
 			}
 		}
 		try accumulate(pointers: [], for: except) { pointers in

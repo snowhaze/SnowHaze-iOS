@@ -168,8 +168,8 @@ class SplitMergeController: UIViewController {
 		super.init(coder: coder)
 	}
 
-	private func layout() {
-		let size = view.bounds.size
+	private func layout(for targetSize: CGSize? = nil) {
+		let size = targetSize ?? view.bounds.size
 		if constrainedWidth {
 			masterViewController.view.frame = CGRect(origin: CGPoint.zero, size: size)
 			navigationItem.setRightBarButton(nil, animated: true)
@@ -224,8 +224,8 @@ extension SplitMergeController {
 	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
 		super.viewWillTransition(to: size, with: coordinator)
 		//Wait for view.bounds to be adjusted to the new size
-		DispatchQueue.main.async {
-			self.layout()
-		}
+		coordinator.animate(alongsideTransition: { _ in
+			self.layout(for: size)
+		})
 	}
 }

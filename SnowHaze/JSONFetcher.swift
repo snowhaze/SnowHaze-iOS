@@ -9,8 +9,8 @@
 import Foundation
 
 class JSONFetcher: DataFetcher {
-	func fetchJSON(from url: URL, callback: @escaping (Any?) -> Void) {
-		fetch(url) { (data) -> Void in
+	func fetchJSON(from url: URL, callback: @escaping (Any?) -> ()) {
+		fetch(url) { (data) -> () in
 			guard let data = data else {
 				callback(nil)
 				return

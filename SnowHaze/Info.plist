@@ -129,6 +129,7 @@
 		<string>waze</string>
 		<string>word</string>
 		<string>youtube</string>
+		<string>zoomus</string>
 		<string>zuludesk</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
@@ -143,8 +144,6 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Unlock SnowHaze using Face ID</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>SnowHaze needs library access to save images</string>
-	<key>NSPhotoLibraryUsageDescription</key>
 	<string>SnowHaze needs library access to save images</string>
 	<key>UIApplicationShortcutItems</key>
 	<array>

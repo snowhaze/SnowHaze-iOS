@@ -10,6 +10,7 @@ import UIKit
 
 protocol BookmarkHistoryDelegate: StatsViewDelegate {
 	var viewControllerForPreviewing: UIViewController { get }
+	var viewControllerForSharing: UIViewController { get }
 
 	func previewController(for url: URL) -> PagePreviewController?
 	func load(_ type: WebLoadType)
@@ -145,7 +146,7 @@ class BookmarkHistoryView: UIView {
 	}
 
 	override func layoutSubviews() {
-		let _ = lazySetup
+		_ = lazySetup
 		if constrainedWidth {
 			let historyX: CGFloat
 			let bookmarkX: CGFloat
@@ -379,6 +380,10 @@ private extension BookmarkHistoryView {
 			self?.historyTableView.reloadData()
 		}
 		observers.append(fontObserver)
+
+		if #available(iOS 13, *) {
+			addInteraction(UIContextMenuInteraction(delegate: self))
+		}
 	}
 
 	private func setStatsHidden() {
@@ -430,7 +435,9 @@ extension BookmarkHistoryView: UITableViewDataSource {
 
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "historyCell") as! HistoryTableViewCell
-		if !cell.previewRegistered, let vc = delegate?.viewControllerForPreviewing {
+		if #available(iOS 13, *) {
+			// use context menu
+		} else if !cell.previewRegistered, let vc = delegate?.viewControllerForPreviewing {
 			vc.registerForPreviewing(with: self, sourceView: cell)
 			cell.previewRegistered = true
 		}
@@ -465,7 +472,9 @@ extension BookmarkHistoryView: UICollectionViewDataSource {
 
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 		let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "bookmarkCell", for: indexPath) as! BookmarkCollectionViewCell
-		if !cell.previewRegistered, let vc = delegate?.viewControllerForPreviewing {
+		if #available(iOS 13, *) {
+			// use context menu
+		} else if !cell.previewRegistered, let vc = delegate?.viewControllerForPreviewing {
 			vc.registerForPreviewing(with: self, sourceView: cell)
 			cell.previewRegistered = true
 		}
@@ -545,7 +554,7 @@ extension BookmarkHistoryView {
 		let deleteIndexPaths = deleted?.map { IndexPath(item: $0, section: 0) } ?? []
 		let fromIndexPaths = movedFrom?.map { IndexPath(item: $0, section: 0) } ?? []
 		let toIndexPaths = movedTo?.map { IndexPath(item: $0, section: 0) } ?? []
-		bookmarkCollectionView.performBatchUpdates({ () -> Void in
+		bookmarkCollectionView.performBatchUpdates({ () -> () in
 			self.bookmarkCollectionView.insertItems(at: addIndexPaths)
 			self.bookmarkCollectionView.deleteItems(at: deleteIndexPaths)
 			for (fromPath, toPath) in zip(fromIndexPaths, toIndexPaths) {
@@ -640,7 +649,10 @@ extension BookmarkHistoryView: UIDropInteractionDelegate {
 // MARK: UIViewControllerPreviewingDelegate
 extension BookmarkHistoryView: UIViewControllerPreviewingDelegate {
 	func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-		if let cell = previewingContext.sourceView as? HistoryTableViewCell {
+		if #available(iOS 13, *) {
+			// use context menu
+			return nil
+		} else if let cell = previewingContext.sourceView as? HistoryTableViewCell {
 			guard let indexPath = historyTableView.indexPath(for: cell) else {
 				return nil
 			}
@@ -661,7 +673,7 @@ extension BookmarkHistoryView: UIViewControllerPreviewingDelegate {
 					let controller = UIActivityViewController(activityItems: items, applicationActivities: [])
 					controller.popoverPresentationController?.sourceView = cell.superview
 					controller.popoverPresentationController?.sourceRect = cell.frame
-					self?.delegate?.viewControllerForPreviewing.present(controller, animated: true, completion: nil)
+					self?.delegate?.viewControllerForSharing.present(controller, animated: true, completion: nil)
 				}
 				previewVC.previewActionItems = [open, copy, share]
 				return previewVC
@@ -688,7 +700,7 @@ extension BookmarkHistoryView: UIViewControllerPreviewingDelegate {
 					let controller = UIActivityViewController(activityItems: items, applicationActivities: [])
 					controller.popoverPresentationController?.sourceView = cell.superview
 					controller.popoverPresentationController?.sourceRect = cell.frame
-					self?.delegate?.viewControllerForPreviewing.present(controller, animated: true, completion: nil)
+					self?.delegate?.viewControllerForSharing.present(controller, animated: true, completion: nil)
 				}
 				previewVC.previewActionItems = [open, copy, share]
 				return previewVC
@@ -703,6 +715,112 @@ extension BookmarkHistoryView: UIViewControllerPreviewingDelegate {
 			return
 		}
 		delegate?.load(previewer.commitLoad)
+	}
+}
+
+
+@available(iOS 13.0, *)
+extension BookmarkHistoryView: UIContextMenuInteractionDelegate {
+	func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+		let url: URL
+		let bookmark: Bookmark?
+		let historyItem: HistoryItem?
+		let source: UIView
+		let bookmarkLocation = interaction.location(in: bookmarkCollectionView)
+		let historyLocation = interaction.location(in: historyTableView)
+		if bookmarkCollectionView.bounds.contains(bookmarkLocation) {
+			historyItem = nil
+			guard let indexPath = bookmarkCollectionView.indexPathForItem(at: bookmarkLocation) else {
+				return nil
+			}
+			guard let cell = bookmarkCollectionView.cellForItem(at: indexPath) as? BookmarkCollectionViewCell else {
+				return nil
+			}
+			source = cell
+			url = cell.bookmark.URL
+			bookmark = cell.bookmark
+		} else if historyTableView.bounds.contains(historyLocation) {
+			bookmark = nil
+			guard let indexPath = historyTableView.indexPathForRow(at: historyLocation) else {
+				return nil
+			}
+			guard let cell = historyTableView.cellForRow(at: indexPath) as? HistoryTableViewCell else {
+				return nil
+			}
+			guard let item = cell.historyItem else {
+				return nil
+			}
+			source = cell
+			historyItem = item
+			url = item.url
+		} else {
+			return nil
+		}
+		var menus = [UIMenu]()
+		var urlActions = [UIMenuElement]()
+		let openTitle = NSLocalizedString("open url bookmark or history context menu action title", comment: "title of the action to open the url in the bookmark or history context menu")
+		urlActions.append(UIAction(title: openTitle, image: #imageLiteral(resourceName: "open-context").withRenderingMode(.alwaysTemplate)) { [weak self] _ in
+			self?.delegate?.load(.url(url))
+		})
+		let copyTitle = NSLocalizedString("copy url bookmark or history context menu action title", comment: "title of the action to copy the url in the bookmark or history context menu")
+		urlActions.append(UIAction(title: copyTitle, image: #imageLiteral(resourceName: "copy-context").withRenderingMode(.alwaysTemplate)) { _ in
+			UIPasteboard.general.url = url
+		})
+		menus.append(UIMenu(title: url.absoluteString, options: .displayInline, children: urlActions))
+		if let bookmark = bookmark {
+			var bookmarkActions = [UIMenuElement]()
+			let shareTitle = NSLocalizedString("share bookmark context menu action title", comment: "title of the action to share the bookmark in the bookmark context menu")
+			bookmarkActions.append(UIAction(title: shareTitle, image: #imageLiteral(resourceName: "share-context").withRenderingMode(.alwaysTemplate)) { [weak self, weak bookmark, weak source] _ in
+				guard let bookmark = bookmark, let source = source else {
+					return
+				}
+				let items = [bookmark.title as AnyObject, bookmark.URL as AnyObject, bookmark.favicon as AnyObject]
+				let controller = UIActivityViewController(activityItems: items, applicationActivities: [])
+				controller.popoverPresentationController?.sourceView = source.superview
+				controller.popoverPresentationController?.sourceRect = source.frame
+				self?.delegate?.viewControllerForSharing.present(controller, animated: true, completion: nil)
+			})
+			let renameTitle = NSLocalizedString("rename bookmark context menu action title", comment: "title of the action to rename the bookmark in the bookmark context menu")
+			bookmarkActions.append(UIAction(title: renameTitle, image: #imageLiteral(resourceName: "rename-context").withRenderingMode(.alwaysTemplate)) { [weak self, weak bookmark] _ in
+				if let bookmark = bookmark {
+					self?.delegate?.rename(bookmark: bookmark)
+				}
+			})
+			let reloadTitle = NSLocalizedString("reload bookmark context menu action title", comment: "title of the action to reload the bookmark in the bookmark context menu")
+			bookmarkActions.append(UIAction(title: reloadTitle, image: #imageLiteral(resourceName: "reload-context").withRenderingMode(.alwaysTemplate)) { [weak self, weak bookmark] _ in
+				if let bookmark = bookmark {
+					self?.delegate?.refresh(bookmark: bookmark)
+				}
+			})
+			let deleteTitle = NSLocalizedString("delete bookmark context menu action title", comment: "title of the action to delete the bookmark in the bookmark context menu")
+			bookmarkActions.append(UIAction(title: deleteTitle, image: #imageLiteral(resourceName: "delete-context").withRenderingMode(.alwaysTemplate), attributes: .destructive) { [weak self, weak bookmark] _ in
+				if let bookmark = bookmark {
+					self?.delegate?.remove(bookmark: bookmark)
+				}
+			})
+			let bookmarkTitle = NSLocalizedString("bookmark context menu title", comment: "title of the bookmark context menu")
+			menus.append(UIMenu(title: bookmark.displayName ?? bookmarkTitle, options: .displayInline, children: bookmarkActions))
+		}
+		if let historyItem = historyItem {
+			var historyActions = [UIMenuElement]()
+			let shareTitle = NSLocalizedString("share history context menu action title", comment: "title of the action to share the history item in the history context menu")
+			historyActions.append(UIAction(title: shareTitle, image: #imageLiteral(resourceName: "share-context").withRenderingMode(.alwaysTemplate)) { [weak self, weak historyItem, weak source] _ in
+				guard let historyItem = historyItem, let source = source else {
+					return
+				}
+				let items = [historyItem.title as AnyObject, historyItem.url as AnyObject]
+				let controller = UIActivityViewController(activityItems: items, applicationActivities: [])
+				controller.popoverPresentationController?.sourceView = source.superview
+				controller.popoverPresentationController?.sourceRect = source.frame
+				self?.delegate?.viewControllerForSharing.present(controller, animated: true, completion: nil)
+			})
+			menus.append(UIMenu(title: historyItem.title, options: .displayInline, children: historyActions))
+		}
+		return UIContextMenuConfiguration(identifier: nil) { [weak self] () -> UIViewController? in
+			return self?.delegate?.previewController(for: url)
+		} actionProvider: { _ -> UIMenu? in
+			return UIMenu(title: url.absoluteString, children: menus)
+		}
 	}
 }
 

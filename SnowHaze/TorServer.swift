@@ -44,8 +44,8 @@ class TorServer {
 	private var connectionProxyDictionaryInitialized = false
 	private(set) var connectionProxyDictionary: [AnyHashable : Any]?
 
-	private var startCallbacks: [(Error?) -> Void] = []
-	private var proxyConfigCallbacks: [([AnyHashable : Any]?) -> Void] = []
+	private var startCallbacks: [(Error?) -> ()] = []
+	private var proxyConfigCallbacks: [([AnyHashable : Any]?) -> ()] = []
 
 	let bootstrapProgress = Progress(totalUnitCount: 100)
 
@@ -72,7 +72,7 @@ class TorServer {
 		}
 	}
 
-	func start(callback: @escaping (Error?) -> Void) {
+	func start(callback: @escaping (Error?) -> ()) {
 		guard !running else {
 			callback(nil)
 			return
@@ -164,7 +164,7 @@ class TorServer {
 		}
 	}
 
-	func getURLSessionProxyConfig(callback: @escaping ([AnyHashable : Any]?) -> Void) {
+	func getURLSessionProxyConfig(callback: @escaping ([AnyHashable : Any]?) -> ()) {
 		guard !connectionProxyDictionaryInitialized else {
 			return callback(connectionProxyDictionary)
 		}
@@ -252,7 +252,7 @@ class TorServer {
 			return clean(raw.remoteReason)
 		}
 	}
-	func getCircuits(callback: @escaping ([Circuit]?) -> Void) {
+	func getCircuits(callback: @escaping ([Circuit]?) -> ()) {
 		guard let controller = controller else {
 			return callback(nil)
 		}

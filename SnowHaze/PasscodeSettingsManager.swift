@@ -308,7 +308,7 @@ class PasscodeSettingsManager: SettingsViewManager {
 }
 
 extension PasscodeSettingsManager: PasscodeControllerDelegate {
-	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> ()) {
 		assert(modeAfterSetup == nil)
 		PasscodeManager.shared.verify(code: code) { [weak self] success in
 			if success, let self = self, let newMode = self.modeAfterVerify {
@@ -356,7 +356,7 @@ extension PasscodeSettingsManager: PasscodeControllerDelegate {
 		controller.dismiss(animated: true, completion: nil)
 	}
 
-	func passcodeController(_ controller: PasscodeController, setCode code: String, ofType type: PasscodeController.PasscodeType, withCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+	func passcodeController(_ controller: PasscodeController, setCode code: String, ofType type: PasscodeController.PasscodeType, withCompletionHandler completionHandler: @escaping (Bool) -> ()) {
 		assert(modeAfterVerify == nil)
 		if let newMode = modeAfterSetup {
 			assert(modeAfterController == controller)

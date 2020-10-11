@@ -45,7 +45,7 @@ class Settings {
 
 	private var observer: NSObjectProtocol!
 
-	static func atomically(perform: () -> Void) {
+	static func atomically(perform: () -> ()) {
 		try! db.inTransaction(ofType: .exclusive, perform: perform)
 	}
 

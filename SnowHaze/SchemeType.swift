@@ -71,6 +71,7 @@ enum SchemeType {
 	case word					// Microsoft Word
 	case youtube				// Youtube
 	case zuludesk				// Zuludesk
+	case zoom					// Zoom
 	case settings				// Apple Settings
 
 	init(_ url: URL?) {
@@ -220,6 +221,8 @@ enum SchemeType {
 				self = .youtube
 			case "zuludesk":
 				self = .zuludesk
+			case "zoomus":
+				self = .zoom
 			case "prefs":
 				self = .settings
 			default:
@@ -285,6 +288,7 @@ enum SchemeType {
 			case .word:				return NSLocalizedString("open url in app word app name", comment: "name of the word app used to confirm opening of url in other app")
 			case .youtube:			return NSLocalizedString("open url in app youtube app name", comment: "name of the youtube app used to confirm opening of url in other app")
 			case .zuludesk:			return NSLocalizedString("open url in app zuludesk app name", comment: "name of the zuludesk app used to confirm opening of url in other app")
+			case .zoom:				return NSLocalizedString("open url in app zoom app name", comment: "name of the zoom app used to confirm opening of url in other app")
 			case .settings:			return NSLocalizedString("open url in app settings app name", comment: "name of the settings app used to confirm opening of url in other app")
 			case .unknown:			return nil
 			case .http:				return nil
@@ -351,6 +355,7 @@ enum SchemeType {
 			case .word:				return true
 			case .youtube:			return true
 			case .zuludesk:			return true
+			case .zoom:				return true
 			case .unknown:			return false
 			case .http:				return false
 			case .store:			return false

@@ -47,7 +47,7 @@ public class KeyManager {
 	}
 
 	private func store(key: String) {
-		let valueData = key.data(using: String.Encoding.utf8)!
+		let valueData = key.data(using: .utf8)!
 		let query = [kSecAttrService: serviceName, kSecClass: kSecClassGenericPassword] as NSDictionary
 		let attributes = [kSecValueData: valueData] as NSDictionary
 		let updateErr = SecItemUpdate(query, attributes)

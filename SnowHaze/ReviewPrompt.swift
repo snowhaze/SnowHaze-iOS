@@ -36,7 +36,14 @@ class ReviewPrompt {
 		guard !prompted else {
 			return
 		}
-		SKStoreReviewController.requestReview()
+		if #available(iOS 14, *) {
+			guard let scene = MainViewController.controller?.viewIfLoaded?.window?.windowScene else {
+				return
+			}
+			SKStoreReviewController.requestReview(in: scene)
+		} else {
+			SKStoreReviewController.requestReview()
+		}
 		prompted = true
 	}
 }

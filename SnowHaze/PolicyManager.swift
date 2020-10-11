@@ -19,6 +19,7 @@ let allowApplicationJavaScriptKey			= "ch.illotros.snowhaze.allowApplicationJava
 let allowPasswordManagerIntegrationKey		= "ch.illotros.snowhaze.allowPasswordManagerIntegration"
 let saveHistoryKey							= "ch.illotros.snowhaze.saveHistory"
 let userAgentsKey							= "ch.illotros.snowhaze.userAgents"
+let renderAsDesktopSiteKey					= "ch.illotros.snowhaze.renderAsDesktopSite"
 let searchEngineKey							= "ch.illotros.snowhaze.searchEngine"
 let searchSuggestionEnginesKey				= "ch.illotros.snowhaze.searchSuggestionEngines"
 let requiresUserActionForMediaPlaybackKey	= "ch.illotros.snowhaze.requiresUserActionForMediaPlayback"
@@ -73,6 +74,7 @@ let requireHTTPSForTrustedSitesKey			= "ch.illotros.snowhaze.trustedSite.require
 let upgradeAllHTTPKey						= "ch.illotros.snowhaze.trustedSite.upgradeAllHTTP"
 let blockDOHServersKey						= "ch.illotros.snowhaze.blockDOHServers"
 let warnCrossFrameNavigationKey				= "ch.illotros.snowhaze.warnCrossFrameNavigation"
+let blockDeprecatedTLSKey					= "ch.illotros.snowhaze.blockDeprecatedTLS"
 
 let lastOpenedVersionKey					= "ch.illotros.snowhaze.lastOpenedVersion"
 let lastTutorialVersionKey					= "ch.illotros.snowhaze.lastTutorialVersion"
@@ -82,6 +84,7 @@ let trustedSiteKey							= "ch.illotros.snowhaze.trustedSite"
 let readerModeKey							= "ch.illotros.snowhaze.readerMode"
 let doNotResetAutoUpdateKey					= "ch.illotros.snowhaze.doNotResetAutoUpdate"
 let strictTabGroupSeparationKey				= "ch.illotros.snowhaze.strictTabGroupSeparation"
+
 let useTorNetworkKey						= "ch.illotros.snowhaze.useTorNetwork"
 let startTorOnAppLaunchKey					= "ch.illotros.snowhaze.startTorOnAppLaunch"
 let useTorForAPICallsKey					= "ch.illotros.snowhaze.useTorForAPICalls"
@@ -122,6 +125,7 @@ private let defaults: [String: SQLite.Data] = [
 
 	// User Agent
 	userAgentsKey:							.text(UserAgent.encode(UserAgent.defaultUserAgentTypes)),
+	renderAsDesktopSiteKey:					SQLite.Data(UIDevice.current.userInterfaceIdiom == .pad),
 
 	// Search Engine
 	searchEngineKey:						.integer(SearchEngineType.startpage.rawValue),
@@ -147,6 +151,7 @@ private let defaults: [String: SQLite.Data] = [
 	blockMixedContentKey:					.true,
 	requireHTTPSForTrustedSitesKey:			.false,
 	upgradeAllHTTPKey:						.false,
+	blockDeprecatedTLSKey:					.true,
 
 	// Appearence
 	nightModeKey:							.false,
@@ -236,9 +241,12 @@ class PolicyManager {
 	}
 
 	static func manager(for url: URL?, in tab: Tab) -> PolicyManager {
+		return manager(for: PolicyDomain(url: url), in: tab)
+	}
+
+	static func manager(for domain: PolicyDomain, in tab: Tab) -> PolicyManager {
 		precondition(!tab.deleted)
 		setup()
-		let domain = PolicyDomain(url: url)
 		let wrapper = SettingsDefaultWrapper.wrapSettings(for: domain, inTab: tab)
 		return PolicyManager(wrapper: wrapper)
 	}
@@ -266,7 +274,10 @@ class PolicyManager {
 		config.ignoresViewportScaleLimits = bool(for: ignoresViewportScaleLimitsKey)
 		config.mediaTypesRequiringUserActionForPlayback = userActionForMedia ? .all : []
 		if manager.tab.useTor {
-			let handler = TorSchemeHandler(dnt: bool(for: sendDNTHeaderOverTorKey))
+			let setDNT = bool(for: sendDNTHeaderOverTorKey)
+			let blockDeprecatedTLS = bool(for: blockDeprecatedTLSKey)
+			let handler = TorSchemeHandler(dnt: setDNT, blockDeprecatedTLS: blockDeprecatedTLS)
+			handler.delegate = manager
 			config.setURLSchemeHandler(handler, forURLScheme: "tor")
 			config.setURLSchemeHandler(handler, forURLScheme: "tors")
 		}
@@ -286,7 +297,7 @@ class PolicyManager {
 		return config
 	}
 
-	func awaitTorIfNecessary(for tab: Tab?, callback: @escaping (Bool) -> Void) {
+	func awaitTorIfNecessary(for tab: Tab?, callback: @escaping (Bool) -> ()) {
 		guard tab?.useTor ?? useTor else {
 			callback(true)
 			return
@@ -529,7 +540,7 @@ class PolicyManager {
 		return ret
 	}
 
-	func withEnabledContentRuleLists(for tab: Tab, do work: @escaping ([WKContentRuleList], [WKUserScript]) -> Void) {
+	func withEnabledContentRuleLists(for tab: Tab, do work: @escaping ([WKContentRuleList], [WKUserScript]) -> ()) {
 		assert(ContentTypes.allTypes == [.document, .image, .styleSheet, .script, .font, .raw, .svgDocument, .media, .popup, .thirdPartyScripts])
 		let blockAds = self.blockAds
 		let blockTrackingScripts = self.blockTrackingScripts
@@ -673,6 +684,10 @@ class PolicyManager {
 		}
 	}
 
+	var blockDeprecatedTLS: Bool {
+		return bool(for: blockDeprecatedTLSKey)
+	}
+
 	var blockAds: Bool {
 		return bool(for: blockAdsKey)
 	}
@@ -710,6 +725,10 @@ class PolicyManager {
 		let type = PopoverBlockingPolicyType(rawValue: policyInt)!
 		let policy = PopoverBlockingPolicy(type: type)
 		return policy.allowAutomaticJSPopovers
+	}
+
+	var renderAsDesktopSite: Bool {
+		return bool(for: renderAsDesktopSiteKey)
 	}
 
 	var needsScreenLockPreparation: Bool {
@@ -906,7 +925,7 @@ class PolicyManager {
 		return blockAds && DomainList(type: .ads).contains(host)
 	}
 
-	func dangerReasons(for url: URL?, in tabController: TabController, callback: @escaping (Set<Safebrowsing.Danger>) -> Void) {
+	func dangerReasons(for url: URL?, in tabController: TabController, callback: @escaping (Set<Safebrowsing.Danger>) -> ()) {
 		guard bool(for: showDangerousSitesWarningsKey), let url = url else {
 			callback([])
 			return
@@ -973,6 +992,14 @@ struct PolicyDomain {
 		} else if PolicyDomain.isNormalDataURI(url) {
 			domain = PolicyDomain.dataURIPseudoDomain
 		} else if let host = url?.host {
+			domain = host.replacingOccurrences(of: ":", with: "::")
+		} else {
+			domain = PolicyDomain.missingHostPseudoDomain
+		}
+	}
+
+	init(host: String?) {
+		if let host = host {
 			domain = host.replacingOccurrences(of: ":", with: "::")
 		} else {
 			domain = PolicyDomain.missingHostPseudoDomain

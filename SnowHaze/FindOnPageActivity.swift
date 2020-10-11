@@ -11,11 +11,11 @@ import UIKit
 import WebKit
 
 class FindOnPageActivity: UIActivity {
-	private let callback: (FindOnPageActivity) -> Void
+	private let callback: (FindOnPageActivity) -> ()
 
 	private(set) var tab: Tab!
 
-	init(callback: @escaping (FindOnPageActivity) -> Void) {
+	init(callback: @escaping (FindOnPageActivity) -> ()) {
 		self.callback = callback
 	}
 

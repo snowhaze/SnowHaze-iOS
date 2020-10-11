@@ -15,7 +15,7 @@ class EphemeralSafebrowsingStorage: SafebrowsingCache, SafebrowsingStorage {
 }
 
 class DummySafebrowsingStorage: SafebrowsingStorage {
-	func register(wait: Bool, updatedCallback: @escaping (Bool) -> Void) -> ((Bool) -> Void)? {
+	func register(wait: Bool, updatedCallback: @escaping (Bool) -> ()) -> ((Bool) -> ())? {
 		updatedCallback(true)
 		return nil
 	}
@@ -47,7 +47,7 @@ class PrefixCachingSafebrowsingStorage: SafebrowsingStorage {
 	private var lists = [Safebrowsing.List: (String, [Data: Set<Data>])]()
 	private let internalQueue = DispatchQueue(label: "ch.illotros.safebrowsing.storage.prefix-caching.internal")
 
-	func register(wait: Bool, updatedCallback: @escaping (Bool) -> Void) -> ((Bool) -> Void)? {
+	func register(wait: Bool, updatedCallback: @escaping (Bool) -> ()) -> ((Bool) -> ())? {
 		return SafebrowsingCache.shared.register(wait: wait, updatedCallback: updatedCallback)
 	}
 
@@ -98,7 +98,7 @@ class PrefixCachingSafebrowsingStorage: SafebrowsingStorage {
 }
 
 class CachingSafebrowsingStorage: SafebrowsingStorage {
-	func register(wait: Bool, updatedCallback: @escaping (Bool) -> Void) -> ((Bool) -> Void)? {
+	func register(wait: Bool, updatedCallback: @escaping (Bool) -> ()) -> ((Bool) -> ())? {
 		return SafebrowsingCache.shared.register(wait: wait, updatedCallback: updatedCallback)
 	}
 

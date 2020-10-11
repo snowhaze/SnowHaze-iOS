@@ -52,7 +52,7 @@ class DownloadsList: UIView {
 	}
 
 	override func layoutSubviews() {
-		let _ = lazySetup
+		_ = lazySetup
 
 		label.frame = bounds
 		label.frame.size.height = 30
@@ -72,7 +72,7 @@ class DownloadsList: UIView {
 	}
 
 	func reload(at index: Int) {
-		let reload: () -> Void = { [weak self] in
+		let reload: () -> () = { [weak self] in
 			guard let self = self, !self.reloadIndices.isEmpty else {
 				return
 			}

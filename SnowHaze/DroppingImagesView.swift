@@ -96,13 +96,18 @@ class DroppingImagesView: UIView {
 
 			if isInit && motionManager.isAccelerometerAvailable {
 				motionManager.accelerometerUpdateInterval = 0.2
-				motionManager.startAccelerometerUpdates(to: OperationQueue.main) { [weak self] (data, error) -> Void in
+				motionManager.startAccelerometerUpdates(to: OperationQueue.main) { [weak self] (data, error) -> () in
 					guard let acceleration = data?.acceleration, error == nil else {
 						return
 					}
 					let gravity: CGVector
-
-					switch UIApplication.shared.statusBarOrientation {
+					let orientation: UIInterfaceOrientation?
+					if #available(iOS 13, *) {
+						orientation = self?.window?.windowScene?.interfaceOrientation
+					} else {
+						orientation = UIApplication.shared.statusBarOrientation
+					}
+					switch orientation {
 						case .landscapeLeft:		gravity = CGVector(dx: acceleration.y, dy: acceleration.x)
 						case .landscapeRight:		gravity = CGVector(dx: -acceleration.y, dy: -acceleration.x)
 						case .portrait:				gravity = CGVector(dx: acceleration.x, dy: -acceleration.y)

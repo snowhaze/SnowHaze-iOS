@@ -12,6 +12,12 @@ import UIKit
 class ShapeOverlayView: UIView {
 	var corners: [CGPoint]?
 
+	var overlayColor: UIColor = .blue {
+		didSet {
+			setNeedsDisplay()
+		}
+	}
+
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 		backgroundColor = .clear
@@ -22,7 +28,7 @@ class ShapeOverlayView: UIView {
 	}
 
 	override func draw(_ rect: CGRect) {
-		guard let corners = corners , !corners.isEmpty else {
+		guard let corners = corners, !corners.isEmpty else {
 			return
 		}
 		let context = UIGraphicsGetCurrentContext()
@@ -34,8 +40,8 @@ class ShapeOverlayView: UIView {
 		context!.closePath()
 		context!.setLineWidth(3)
 		context!.setLineJoin(.round)
-		context!.setFillColor(UIColor.button.withAlphaComponent(0.4).cgColor)
-		context!.setStrokeColor(UIColor.button.cgColor)
+		context!.setFillColor(overlayColor.withAlphaComponent(0.4).cgColor)
+		context!.setStrokeColor(overlayColor.cgColor)
 		context!.drawPath(using: .fillStroke)
 	}
 }

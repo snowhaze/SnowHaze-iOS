@@ -18,8 +18,28 @@ protocol ScanCodeViewControllerDelegate: class {
 	func codeScannerDidDisappear(_ scanner: ScanCodeViewController)
 }
 
+extension ScanCodeViewControllerDelegate {
+	func codeScanner(_ scanner: ScanCodeViewController, canPreviewCode code: String) -> Bool {
+		return false
+	}
+
+	func codeScanner(_ scanner: ScanCodeViewController, viewControllerForCodePreview code: String) -> UIViewController? {
+		return nil
+	}
+
+	func codeScanner(_ scanner: ScanCodeViewController, didSelectCode code: String?) { }
+
+	func codeScanner(_ scanner: ScanCodeViewController, canSelectCode code: String) -> Bool {
+		return true
+	}
+
+	func codeScannerDidDisappear(_ scanner: ScanCodeViewController) { }
+}
+
 class ScanCodeViewController: UIViewController {
 	weak var delegate: ScanCodeViewControllerDelegate?
+
+	var simulatorDebugCode: String?
 
 	var errorMessage: String? = "No Camera access" {
 		didSet {
@@ -38,6 +58,8 @@ class ScanCodeViewController: UIViewController {
 			codeOverlay?.buttonColor = buttonColor
 		}
 	}
+
+	var overlayColor = UIColor.blue
 
 	var errorColor = UIColor.white {
 		didSet {
@@ -87,6 +109,26 @@ class ScanCodeViewController: UIViewController {
 		}
 	}
 
+	var codeFilter = try! NSRegularExpression(pattern: ".*")
+
+	var showScanResult = true {
+		didSet {
+			codeOverlay?.showScanResult = showScanResult
+		}
+	}
+
+	var showControlButtons = true {
+	   didSet {
+		   codeOverlay?.showControlButtons = showControlButtons
+	   }
+   }
+
+	var metadataTypes: [AVMetadataObject.ObjectType]? {
+		didSet {
+			sessionManager?.metadataTypes = metadataTypes
+		}
+	}
+
 	var useFrontCamera = false
 
 	private static var globalSessionManager = CaptureSessionManager()
@@ -125,6 +167,10 @@ class ScanCodeViewController: UIViewController {
 		return true
 	}
 
+	private var hasCameraAccess: Bool {
+		return sessionManager?.authorizationStatus == .authorized && sessionManager?.hasCamera ?? false
+	}
+
 	override func loadView() {
 		preferredContentSize = CGSize(width: 400, height: 300)
 		view = SublayerResizingView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
@@ -138,6 +184,8 @@ class ScanCodeViewController: UIViewController {
 		codeOverlay.cancelButtonTitle = cancelButtonTitle
 		codeOverlay.doneButtonTitle = doneButtonTitle
 		codeOverlay.previewButtonTitle = previewButtonTitle
+		codeOverlay.showScanResult = showScanResult
+		codeOverlay.showControlButtons = showControlButtons
 
 		errorMessageView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 250))
 		errorMessageView.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin]
@@ -160,45 +208,28 @@ class ScanCodeViewController: UIViewController {
 		errorMessageImageView.tintColor = errorColor
 		errorMessageView.addSubview(errorMessageImageView)
 
-		DispatchQueue.global().async {
-			typealias SCVC = ScanCodeViewController
-			self.sessionManager = self.useFrontCamera ? SCVC.globalFrontSessionManager : SCVC.globalSessionManager;
-			self.sessionManager.startRunning()
-			self.sessionManager.delegate = self;
+		typealias SCVC = ScanCodeViewController
+		sessionManager = useFrontCamera ? SCVC.globalFrontSessionManager : SCVC.globalSessionManager;
+		sessionManager.startRunning()
+		sessionManager.delegate = self;
+		sessionManager.metadataTypes = metadataTypes
 
-			self.previewLayer = self.useFrontCamera ? SCVC.globalFrontPreviewLayer : SCVC.globalPreviewLayer
+		previewLayer = useFrontCamera ? SCVC.globalFrontPreviewLayer : SCVC.globalPreviewLayer
 
-			DispatchQueue.main.async {
-				self.previewLayer.frame = self.view.bounds
+		previewLayer.frame = view.bounds
 
-				let resizingView = self.view as! SublayerResizingView
-				resizingView.layersToResize.append(self.previewLayer)
-				self.view.layer.insertSublayer(self.previewLayer, at: 0)
-				self.view.layer.masksToBounds = true
+		let resizingView = view as! SublayerResizingView
+		resizingView.layersToResize.append(previewLayer)
+		view.layer.insertSublayer(previewLayer, at: 0)
+		view.layer.masksToBounds = true
 
-				if self.previewLayer.connection?.isVideoOrientationSupported ?? false {
-					let orientation =  UIApplication.shared.statusBarOrientation;
-					if orientation == .landscapeLeft {
-						self.previewLayer.connection?.videoOrientation = .landscapeLeft
-					} else if orientation == .landscapeRight {
-						self.previewLayer.connection?.videoOrientation = .landscapeRight
-					} else if orientation == .portrait {
-						self.previewLayer.connection?.videoOrientation = .portrait
-					} else if orientation == .portraitUpsideDown {
-						self.previewLayer.connection?.videoOrientation = .portraitUpsideDown
-					}
-				}
-			}
-		}
-		let notification = UIApplication.didChangeStatusBarOrientationNotification
-		NotificationCenter.default.addObserver(self, selector: #selector(didRotate(_:)), name: notification, object: nil)
-		let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-		view.addGestureRecognizer(recognizer)
-	}
-
-	@objc private func didRotate(_ notification: Notification) {
 		if previewLayer.connection?.isVideoOrientationSupported ?? false {
-			let orientation = UIApplication.shared.statusBarOrientation
+			let orientation: UIInterfaceOrientation?
+			if #available(iOS 13, *) {
+				orientation = view.window?.windowScene?.interfaceOrientation
+			} else {
+				orientation = UIApplication.shared.statusBarOrientation
+			}
 			if orientation == .landscapeLeft {
 				previewLayer.connection?.videoOrientation = .landscapeLeft
 			} else if orientation == .landscapeRight {
@@ -207,6 +238,31 @@ class ScanCodeViewController: UIViewController {
 				previewLayer.connection?.videoOrientation = .portrait
 			} else if orientation == .portraitUpsideDown {
 				previewLayer.connection?.videoOrientation = .portraitUpsideDown
+			}
+		}
+		let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+		view.addGestureRecognizer(recognizer)
+	}
+
+	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+		super.viewWillTransition(to: size, with: coordinator)
+		coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+			if self?.previewLayer.connection?.isVideoOrientationSupported ?? false {
+				let orientation: UIInterfaceOrientation?
+				if #available(iOS 13, *) {
+					orientation = self?.view.window?.windowScene?.interfaceOrientation
+				} else {
+					orientation = UIApplication.shared.statusBarOrientation
+				}
+				if orientation == .landscapeLeft {
+					self?.previewLayer.connection?.videoOrientation = .landscapeLeft
+				} else if orientation == .landscapeRight {
+					self?.previewLayer.connection?.videoOrientation = .landscapeRight
+				} else if orientation == .portrait {
+					self?.previewLayer.connection?.videoOrientation = .portrait
+				} else if orientation == .portraitUpsideDown {
+					self?.previewLayer.connection?.videoOrientation = .portraitUpsideDown
+				}
 			}
 		}
 	}
@@ -219,8 +275,19 @@ class ScanCodeViewController: UIViewController {
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		errorMessageView.isHidden = sessionManager?.authorizationStatus == .authorized
+		errorMessageView.isHidden = hasCameraAccess
 		sessionManager?.startRunning()
+
+#if targetEnvironment(simulator)
+		if !(sessionManager?.hasCamera ?? true) {
+			DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
+				guard let self = self, let code = self.simulatorDebugCode, let manager = self.sessionManager else {
+					return
+				}
+				self.sessionManager(manager, didScanBarCode: code, withCorners: [])
+			}
+		}
+#endif
 	}
 
 	@objc private func handleTap(_ recognizer: UIGestureRecognizer) {
@@ -242,6 +309,7 @@ class ScanCodeViewController: UIViewController {
 	func addOverlay(for corners: [CGPoint]) {
 		let overlay = ShapeOverlayView(frame: view.bounds)
 		overlay.corners = corners
+		overlay.overlayColor = overlayColor
 		view.addSubview(overlay)
 		UIView.animate(withDuration: 0.6, animations: {
 			overlay.alpha = 0;
@@ -254,7 +322,7 @@ class ScanCodeViewController: UIViewController {
 extension ScanCodeViewController: CaptureSessionManagerDelegate {
 	func sessionManagerAccessGranted(_ manger: CaptureSessionManager) {
 		DispatchQueue.main.async {
-			self.errorMessageView.isHidden = true
+			self.errorMessageView.isHidden = self.hasCameraAccess
 		}
 	}
 
@@ -262,10 +330,18 @@ extension ScanCodeViewController: CaptureSessionManagerDelegate {
 		let viewCorners = corners.map() { self.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
 		if self.code != code {
 			DispatchQueue.main.async {
+				let range = NSRange(code.startIndex ..< code.endIndex, in: code)
+				guard let _ = self.codeFilter.firstMatch(in: code, range: range) else {
+					return
+				}
 				if self.code != code {
 					self.code = code
 					self.addOverlay(for: viewCorners)
 					self.codeOverlay.code = code
+
+					if !self.showScanResult, self.delegate?.codeScanner(self, canSelectCode: code) ?? true {
+						self.delegate?.codeScanner(self, didSelectCode: code)
+					}
 				}
 			}
 		}

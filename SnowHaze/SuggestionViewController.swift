@@ -18,7 +18,7 @@ protocol SuggestionViewControllerDelegate: class {
 }
 
 protocol SuggestionSource {
-	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> Void)
+	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ())
 	func cancelSuggestions()
 }
 
@@ -213,7 +213,7 @@ class Suggestion: Equatable {
 	let image: UIImage?
 	let priority: Double
 
-	var selectionCallback: (() -> Void)?
+	var selectionCallback: (() -> ())?
 
 	init(title: String?, subtitle: String?, url: URL, image: UIImage?, priority: Double) {
 		self.title = title

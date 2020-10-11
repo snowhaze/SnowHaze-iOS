@@ -90,11 +90,25 @@ class CodeOverlayView: UIView {
 		}
 	}
 
+	 var showScanResult = true {
+		 didSet {
+			codeBackgroundView.isHidden = !(showScanResult && code != nil)
+		 }
+	 }
+
+	 var showControlButtons = true {
+		didSet {
+			backgroundView.isHidden = !showControlButtons
+		}
+	}
+
 	var code: String? {
 		didSet {
 			codeLabel.text = code
-			if let code = code , codeBackgroundView.alpha == 0 {
-				codeBackgroundView.isHidden = false
+			if let code = code, codeBackgroundView.alpha == 0 {
+				if showScanResult {
+					codeBackgroundView.isHidden = false
+				}
 				let hidePreviewButton = !(delegate?.codeOverlayView(self, canPreviewCode: code) ?? false)
 				let hideDoneButton = !(delegate?.codeOverlayView(self, canSelectCode: code) ?? true)
 				if !hidePreviewButton {
@@ -107,7 +121,7 @@ class CodeOverlayView: UIView {
 					self.codeBackgroundView.alpha = 1
 					self.previewButton.alpha = hidePreviewButton ? 0 : 1
 					self.doneButton.alpha = hideDoneButton ? 0 : 1
-				}, completion: { (finished) -> Void in
+				}, completion: { (finished) -> () in
 					if finished {
 						self.previewButton.isHidden = hidePreviewButton
 						self.doneButton.isHidden = hideDoneButton
@@ -118,7 +132,7 @@ class CodeOverlayView: UIView {
 					self.codeBackgroundView.alpha = 0
 					self.previewButton.alpha = 0
 					self.doneButton.alpha = 0
-				}, completion: { (finished) -> Void in
+				}, completion: { (finished) -> () in
 					if finished {
 						self.codeBackgroundView.isHidden = true
 						self.previewButton.isHidden = true
@@ -165,24 +179,24 @@ class CodeOverlayView: UIView {
 		doneButton.setTitle(doneButtonTitle, for: [])
 		previewButton.setTitle(previewButtonTitle, for: [])
 
-		cancelButton.autoresizingMask = [.flexibleTopMargin, .flexibleRightMargin, .flexibleWidth]
-		cancelButton.frame = CGRect(x: bounds.minX, y: bounds.maxY - buttonHeight, width: bounds.width / 3, height: buttonHeight)
+		cancelButton.autoresizingMask = [.flexibleHeight, .flexibleRightMargin, .flexibleWidth]
+		cancelButton.frame = CGRect(x: bounds.minX, y: 0, width: bounds.width / 3, height: buttonHeight)
 		cancelButton.addTarget(self, action: #selector(cancelButtonPressed(_:)), for: .touchUpInside)
-		addSubview(cancelButton)
+		backgroundView.addSubview(cancelButton)
 
-		previewButton.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth]
-		previewButton.frame = CGRect(x: bounds.minX + bounds.width / 3, y: bounds.maxY - buttonHeight, width: bounds.width / 3, height: buttonHeight)
+		previewButton.autoresizingMask = [.flexibleHeight, .flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth]
+		previewButton.frame = CGRect(x: bounds.minX + bounds.width / 3, y: 0, width: bounds.width / 3, height: buttonHeight)
 		previewButton.alpha = 0
 		previewButton.isHidden = true
 		previewButton.addTarget(self, action: #selector(previewButtonPressed(_:)), for: .touchUpInside)
-		addSubview(previewButton)
+		backgroundView.addSubview(previewButton)
 
-		doneButton.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleWidth]
-		doneButton.frame = CGRect(x: bounds.maxX - bounds.width / 3, y: bounds.maxY - buttonHeight, width: bounds.width / 3, height: buttonHeight)
+		doneButton.autoresizingMask = [.flexibleHeight, .flexibleLeftMargin, .flexibleWidth]
+		doneButton.frame = CGRect(x: bounds.maxX - bounds.width / 3, y: 0, width: bounds.width / 3, height: buttonHeight)
 		doneButton.alpha = 0
 		doneButton.isHidden = true
 		doneButton.addTarget(self, action: #selector(doneButtonPressed(_:)), for: .touchUpInside)
-		addSubview(doneButton)
+		backgroundView.addSubview(doneButton)
 	}
 
 	override func layoutSubviews() {
@@ -194,9 +208,9 @@ class CodeOverlayView: UIView {
 		codeLabel.frame = CGRect(x: max(leftMargin, 8), y: 0, width: bounds.width - max(leftMargin + rightMargin, 2 * 8), height: labelHeight)
 
 		backgroundView.frame = CGRect(x: bounds.minX, y: bounds.maxY - buttonHeight - bottomMargin, width: bounds.width, height: buttonHeight + bottomMargin)
-		cancelButton.frame = CGRect(x: bounds.minX + leftMargin, y: bounds.maxY - buttonHeight - bottomMargin, width: (bounds.width - leftMargin - rightMargin) / 3, height: buttonHeight)
-		previewButton.frame = CGRect(x: bounds.minX + leftMargin + (bounds.width - leftMargin - rightMargin) / 3, y: bounds.maxY - buttonHeight - bottomMargin, width: (bounds.width - leftMargin - rightMargin) / 3, height: buttonHeight)
-		doneButton.frame = CGRect(x: bounds.maxX - rightMargin - (bounds.width - leftMargin - rightMargin) / 3, y: bounds.maxY - buttonHeight - bottomMargin, width: (bounds.width - leftMargin - rightMargin) / 3, height: buttonHeight)
+		cancelButton.frame = CGRect(x: bounds.minX + leftMargin, y: backgroundView.bounds.minY, width: (bounds.width - leftMargin - rightMargin) / 3, height: buttonHeight)
+		previewButton.frame = CGRect(x: bounds.minX + leftMargin + (bounds.width - leftMargin - rightMargin) / 3, y: backgroundView.bounds.minY, width: (bounds.width - leftMargin - rightMargin) / 3, height: buttonHeight)
+		doneButton.frame = CGRect(x: bounds.maxX - rightMargin - (bounds.width - leftMargin - rightMargin) / 3, y: backgroundView.bounds.minY, width: (bounds.width - leftMargin - rightMargin) / 3, height: buttonHeight)
 	}
 
 	convenience init(view: UIView) {

@@ -35,8 +35,8 @@ class SecPolicyEvaluator {
 	private(set) var issue: SecChallengeHandlerIssue = .notEvaluated
 	private(set) var error: Int = Int(errSecSuccess)
 
-	func evaluate(_ policy: SecChallengeHandlerPolicy, completionHandler: @escaping (Bool) -> Void) {
-		let callback: (Bool) -> Void = { result in
+	func evaluate(_ policy: SecChallengeHandlerPolicy, completionHandler: @escaping (Bool) -> ()) {
+		let callback: (Bool) -> () = { result in
 			DispatchQueue.main.sync { completionHandler(result) }
 		}
 		DispatchQueue.global(qos: .userInitiated).async {
@@ -114,7 +114,11 @@ class SecPolicyEvaluator {
 		guard SecTrustCreateWithCertificates(cert, nil, &t) == errSecSuccess else {
 			return nil
 		}
-		return SecTrustCopyPublicKey(t!)
+		if #available(iOS 14, *) {
+			return SecTrustCopyKey(t!)
+		} else {
+			return SecTrustCopyPublicKey(t!)
+		}
 	}
 
 	static func cert(named name: String, in bundle: Bundle = Bundle.main) -> SecCertificate! {

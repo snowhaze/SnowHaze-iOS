@@ -14,7 +14,7 @@ class TabHistoryView: UIView, UITableViewDelegate, UITableViewDataSource {
 	private let label = UILabel(frame: CGRect(x: 0, y: 0, width: 300, height: 30))
 	private let tableView = UITableView(frame: CGRect(x: 0, y: 30, width: 300, height: 160), style: .plain)
 	private let history: [WKBackForwardListItem]
-	var load: ((WKBackForwardListItem) -> Void)?
+	var load: ((WKBackForwardListItem) -> ())?
 
 	init(history: [WKBackForwardListItem], title: String) {
 		self.history = history

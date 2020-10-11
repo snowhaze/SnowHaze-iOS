@@ -290,7 +290,7 @@ class BookmarkStore {
 			return false
 		}
 		listChanged()
-		FaviconFetcher(manager: controller).fetch { imageData -> Void in
+		FaviconFetcher(manager: controller).fetch { imageData -> () in
 			DispatchQueue.main.async {
 				bookmark.iconData = imageData as Data?
 			}

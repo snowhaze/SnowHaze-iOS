@@ -126,7 +126,7 @@ struct GoogleSafebrowsingNetworking: SafebrowsingNetworking {
 		}
 	}
 
-	func verify(_ requests: [Safebrowsing.List: (String, Set<Data>)], callback: @escaping ([Safebrowsing.List: (String, [Data: Set<Data>]?)]) -> Void) {
+	func verify(_ requests: [Safebrowsing.List: (String, Set<Data>)], callback: @escaping ([Safebrowsing.List: (String, [Data: Set<Data>]?)]) -> ()) {
 		var result = [Safebrowsing.List: (String, [Data: Set<Data>]?)]()
 		let internalQueue = self.internalQueue
 		for (list, (version, prefixes)) in requests {
@@ -187,7 +187,7 @@ struct GoogleSafebrowsingNetworking: SafebrowsingNetworking {
 		}
 	}
 
-	func update(_ lists: [Safebrowsing.List: String?], callback: @escaping ([Safebrowsing.List: (String, Set<Data>, Set<Int>?)]?) -> Void) {
+	func update(_ lists: [Safebrowsing.List: String?], callback: @escaping ([Safebrowsing.List: (String, Set<Data>, Set<Int>?)]?) -> ()) {
 		let orderedLists = lists.map { $0.0 }
 		let updateRequests: [[String: Any]] = orderedLists.map { list in
 			return [
@@ -222,7 +222,7 @@ struct GoogleSafebrowsingNetworking: SafebrowsingNetworking {
 		}
 	}
 
-	private func perform(_ request: URLRequest, of type: RequestType, callback: @escaping (Any?) -> Void) {
+	private func perform(_ request: URLRequest, of type: RequestType, callback: @escaping (Any?) -> ()) {
 		let bucket = RequestBucket(type: type, tabId: tabId)
 		guard GoogleSafebrowsingNetworking.requestWaitTime(for: bucket) <= 0 else {
 			callback(nil)
@@ -258,11 +258,11 @@ struct DummySafebrowsingNetworking: SafebrowsingNetworking {
 		return false
 	}
 
-	func verify(_ requests: [Safebrowsing.List : (String, Set<Data>)], callback: @escaping ([Safebrowsing.List : (String, [Data : Set<Data>]?)]) -> Void) {
+	func verify(_ requests: [Safebrowsing.List : (String, Set<Data>)], callback: @escaping ([Safebrowsing.List : (String, [Data : Set<Data>]?)]) -> ()) {
 		callback(requests.mapValues { ($0.0, nil) })
 	}
 
-	func update(_ list: [Safebrowsing.List : String?], callback: @escaping ([Safebrowsing.List : (String, Set<Data>, Set<Int>?)]?) -> Void) {
+	func update(_ list: [Safebrowsing.List : String?], callback: @escaping ([Safebrowsing.List : (String, Set<Data>, Set<Int>?)]?) -> ()) {
 		callback(nil)
 	}
 }
@@ -303,7 +303,7 @@ class ProxySafebrowsingNetworking: SafebrowsingNetworking {
 		case update(lists: [(list: Safebrowsing.List, oldVersion: String?)])
 		case check(list: Safebrowsing.List, version: String, prefixes: Set<Data>)
 	}
-	private func apiCall(_ type: APICallType, callback: @escaping (Any?) -> Void) {
+	private func apiCall(_ type: APICallType, callback: @escaping (Any?) -> ()) {
 		SubscriptionManager.shared.tryWithTokens { token, retry in
 			guard let token = token else {
 				callback(nil)
@@ -351,7 +351,7 @@ class ProxySafebrowsingNetworking: SafebrowsingNetworking {
 		}
 	}
 
-	func verify(_ requests: [Safebrowsing.List : (String, Set<Data>)], callback: @escaping ([Safebrowsing.List : (String, [Data : Set<Data>]?)]) -> Void) {
+	func verify(_ requests: [Safebrowsing.List : (String, Set<Data>)], callback: @escaping ([Safebrowsing.List : (String, [Data : Set<Data>]?)]) -> ()) {
 		var results = [Safebrowsing.List : (String, [Data : Set<Data>]?)]()
 		let internalQueue = self.internalQueue
 		for (list, (version, prefixes)) in requests {
@@ -381,7 +381,7 @@ class ProxySafebrowsingNetworking: SafebrowsingNetworking {
 		}
 	}
 
-	func update(_ lists: [Safebrowsing.List : String?], callback: @escaping ([Safebrowsing.List : (String, Set<Data>, Set<Int>?)]?) -> Void) {
+	func update(_ lists: [Safebrowsing.List : String?], callback: @escaping ([Safebrowsing.List : (String, Set<Data>, Set<Int>?)]?) -> ()) {
 		let listAray = lists.map { ($0, $1) }
 		apiCall(.update(lists: listAray)) { result in
 			guard let entries = result as? [[String: Any]] else {

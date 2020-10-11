@@ -6,7 +6,7 @@
 
 "NSCameraUsageDescription" = "カメラはバーコードスキャナのためにだけ使用されている。";
 
-"NSPhotoLibraryUsageDescription" = "メディアの保存やアップロードの機能を有効にするためには、SnowHazeにフォトライブラリ（写真）へのアクセスを許可する必要があります。";
+"NSPhotoLibraryAddUsageDescription" = "メディアの保存を有効にするためには、SnowHazeにフォトライブラリ（写真）へのアクセスを許可する必要があります。";
 
 "open vpn settings application shortcut item title" = "VPNの設定";
 

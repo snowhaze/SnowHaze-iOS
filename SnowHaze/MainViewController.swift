@@ -64,9 +64,9 @@ class MainViewController: UIViewController {
 		case rotateIPSecCreds
 	}
 
-	private static var openTasks = [(LaunchTask, (() -> Void)?)]()
+	private static var openTasks = [(LaunchTask, (() -> ())?)]()
 
-	private class func perform(_ action: LaunchTask, completionHandler: (() -> Void)?) {
+	private class func perform(_ action: LaunchTask, completionHandler: (() -> ())?) {
 		DispatchQueue.main.async {
 			if let controller = controller {
 				switch action {
@@ -82,19 +82,19 @@ class MainViewController: UIViewController {
 		}
 	}
 
-	class func addEmptyTab(_ sender: AnyObject, completionHandler: (() -> Void)? = nil) {
+	class func addEmptyTab(_ sender: AnyObject, completionHandler: (() -> ())? = nil) {
 		MainViewController.perform(.openTab(sender), completionHandler: completionHandler)
 	}
 
-	class func openSettings(type: SettingsViewController.SettingsType, unfold: Bool = false, completionHandler: (() -> Void)? = nil) {
+	class func openSettings(type: SettingsViewController.SettingsType, unfold: Bool = false, completionHandler: (() -> ())? = nil) {
 		MainViewController.perform(.openSettings(type, unfold), completionHandler: completionHandler)
 	}
 
-	class func rotateIPSecCreds(completionHandler: (() -> Void)? = nil) {
+	class func rotateIPSecCreds(completionHandler: (() -> ())? = nil) {
 		MainViewController.perform(.rotateIPSecCreds, completionHandler: completionHandler)
 	}
 
-	class func loadInFreshTab(input: String, type: InputType, completionHandler: (() -> Void)? = nil) {
+	class func loadInFreshTab(input: String, type: InputType, completionHandler: (() -> ())? = nil) {
 		MainViewController.perform(.loadInFreshTab(input, type), completionHandler: completionHandler)
 	}
 
@@ -260,23 +260,7 @@ class MainViewController: UIViewController {
 		}
 		let policy = PolicyManager.globalManager()
 		if policy.showEOLWarning {
-			let title = NSLocalizedString("old snowhaze version prompt title", comment: "title of prompt to warn user that their snowhaze version is old")
-			let messageFormat = NSLocalizedString("old snowhaze version prompt message format", comment: "format string of message of prompt to warn user that their snowhaze version is old")
-			let updateTitle = NSLocalizedString("old snowhaze version prompt update button title", comment: "title of button to lead users to the app store to update snowhaze")
-			let cancelTitle = NSLocalizedString("old snowhaze version prompt ignore button title", comment: "title of button to ignore old snowhaze version warning")
-
-			let message = String(format: messageFormat, versionDescription)
-			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-			let okAction = UIAlertAction(title: updateTitle, style: .default) { _ in
-				UIApplication.shared.open(URL(string: "https://itunes.apple.com/app/id1121026941")!)
-				policy.updateEOLWarningVersion()
-			}
-			alert.addAction(okAction)
-			let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel) { _ in
-				policy.updateEOLWarningVersion()
-			}
-			alert.addAction(cancelAction)
-			present(alert, animated: true, completion: nil)
+			present(AlertType.update.build(), animated: true, completion: nil)
 		}
 	}
 
@@ -362,8 +346,11 @@ private extension MainViewController {
 		return tabs.last ?? tabStore.add()!
 	}
 
-	@discardableResult func scroll(to tab: Tab, animated: Bool = true) -> IndexPath {
-		let indexPath = IndexPath(item: tabs.firstIndex(of: tab)!, section: 0)
+	@discardableResult func scroll(to tab: Tab, animated: Bool = true) -> IndexPath? {
+		guard let index = tabs.firstIndex(of: tab) else {
+			return nil
+		}
+		let indexPath = IndexPath(item: index, section: 0)
 		tabCollectionView.scrollToItem(at: indexPath, at: [], animated: animated)
 		return indexPath
 	}
@@ -494,7 +481,7 @@ extension MainViewController {
 	func openSettings(_ type: SettingsViewController.SettingsType? = nil, unfold: Bool = false) {
 		let vcs = navigationController!.viewControllers
 		let index = vcs.firstIndex(of: self)!
-		let show: () -> Void = {
+		let show: () -> () = {
 			SettingsViewController.requestedType = (type, unfold)
 			self.showSettings()
 		}
@@ -545,19 +532,20 @@ extension MainViewController {
 		tabCollectionView.alpha = 0
 		tabVC.tab?.controller?.saveTabState()
 		if let tab = tabVC.tab {
-			let indexPath = scroll(to: tab, animated: false)
-			if let attributes = tabCollectionView.layoutAttributesForItem(at: indexPath) {
-				let tabVC = self.tabVC
-				UIView.animate(withDuration: animationDuration, animations: {
-					var frame = attributes.frame
-					frame.size.height -= TabCollectionViewCell.barHeight
-					frame.origin.y += TabCollectionViewCell.barHeight
-					frame.size.width -= tabControllerEdgeOffset * 2
-					frame.origin.x += tabControllerEdgeOffset
-					let convertedFrame = self.pageContentView.convert(frame, from: self.tabCollectionView)
-					tabVC?.view.frame = convertedFrame
-					tabVC?.view.layer.transform = attributes.transform3D
-				})
+			if let indexPath = scroll(to: tab, animated: false) {
+				if let attributes = tabCollectionView.layoutAttributesForItem(at: indexPath) {
+					let tabVC = self.tabVC
+					UIView.animate(withDuration: animationDuration, animations: {
+						var frame = attributes.frame
+						frame.size.height -= TabCollectionViewCell.barHeight
+						frame.origin.y += TabCollectionViewCell.barHeight
+						frame.size.width -= tabControllerEdgeOffset * 2
+						frame.origin.x += tabControllerEdgeOffset
+						let convertedFrame = self.pageContentView.convert(frame, from: self.tabCollectionView)
+						tabVC?.view.frame = convertedFrame
+						tabVC?.view.layer.transform = attributes.transform3D
+					})
+				}
 			}
 		}
 		hideTextInputBar()
@@ -621,7 +609,7 @@ extension MainViewController {
 			self.tabVC.view.layer.transform = CATransform3DIdentity
 		})
 		pageContentView.isHidden = false
-		UIView.animate(withDuration: animationDuration / 3, animations: { () -> Void in
+		UIView.animate(withDuration: animationDuration / 3, animations: { () -> () in
 			self.pageContentView.alpha = 1
 		})
 		UIView.animate(withDuration: animationDuration, animations: {
@@ -899,7 +887,7 @@ extension MainViewController: URLBarDelegate {
 				activity.activityDidFinish(false)
 				return
 			}
-			let customization: (Tab) -> Void = { newtab in
+			let customization: (Tab) -> () = { newtab in
 				let settings = Settings.settings(for: PolicyDomain(url: url), in: newtab)
 				settings.set(.true, for: readerModeKey)
 			}
@@ -918,6 +906,9 @@ extension MainViewController: URLBarDelegate {
 		var activities = [AddBookmarkActivity(), ShowDownloadsActivity(), readerActivity, searchActivity]
 		if scanActivity.available {
 			activities.append(scanActivity)
+		}
+		if let downloadData = tabVC?.tab?.controller?.downloadData {
+			activities.append(DownloadActivity(data: downloadData))
 		}
 		let controller = UIActivityViewController(activityItems: items, applicationActivities: activities)
 		controller.excludedActivityTypes = [UIActivity.ActivityType.addToReadingList]
@@ -948,34 +939,19 @@ extension MainViewController: URLBarDelegate {
 	}
 
 	func tabsButtonHeld(for urlBar: URLBar) {
-		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-		if let tab = tabVC.tab {
-			let closeTitle = NSLocalizedString("close tab tab menu option title", comment: "title of option in the tab menu to close the current tab")
-			let close = UIAlertAction(title: closeTitle, style: .destructive) { [weak self, weak tab]_ in
-				if let tab = tab {
-					self?.close(tab)
-				}
+		let tab = tabVC.tab
+		let alert = AlertType.tabActions(close: tabVC.tab != nil ? { [weak self, weak tab] in
+			if let tab = tab {
+				self?.close(tab)
 			}
-			alert.addAction(close)
-		}
-		if !tabs.isEmpty && PolicyManager.globalManager().allowCloseAllTabs {
-			let closeAllTitle = NSLocalizedString("close all tabs tab menu option title", comment: "title of option in the tab menu to close all tabs")
-			let new = UIAlertAction(title: closeAllTitle, style: .destructive) { [weak self]_ in
-				self?.closeAllTabs()
-			}
-			alert.addAction(new)
-		}
-		let newTitle = NSLocalizedString("new tab tab menu option title", comment: "title of option in the tab menu to create a new tab")
-		let new = UIAlertAction(title: newTitle, style: .default) { [weak self]_ in
+		} : nil, closeAll: tabs.count > 1 && PolicyManager.globalManager().allowCloseAllTabs ? { [weak self] in
+			self?.closeAllTabs()
+		} : nil, new: { [weak self] in
 			guard let self = self else {
 				return
 			}
 			self.set(tab: self.tabStore.add()!, animated: true)
-		}
-		alert.addAction(new)
-		let cancelTitle = NSLocalizedString("cancel tab menu option title", comment: "title of option in the tab menu to close the menu")
-		let cancel = UIAlertAction(title: cancelTitle, style: .cancel) { _ in }
-		alert.addAction(cancel)
+		}).build()
 		alert.popoverPresentationController?.sourceView = view
 		alert.popoverPresentationController?.sourceRect = urlBar.tabsButtonFrame(in: view) ?? .zero
 		present(alert, animated: true, completion: nil)
@@ -1078,11 +1054,13 @@ extension MainViewController: URLBarDelegate {
 
 // MARK: Tab View Controller Delegate
 extension MainViewController: TabViewControllerDelegate {
-	func tabViewController(_ controller: TabViewController, openTabForRequest request: URLRequest) {
+	func tabViewController(_ controller: TabViewController, openTabForRequest request: URLRequest, inForeground: Bool) {
 		guard let tab = tabStore.add(with: request, copySettingsFromParent: controller.tab!) else {
 			return
 		}
-		set(tab: tab, animated: true)
+		if inForeground {
+			set(tab: tab, animated: true)
+		}
 	}
 
 	func showSuggestions(searchString: String) {
@@ -1119,7 +1097,7 @@ extension MainViewController: TabViewControllerDelegate {
 		stopShowingSuggestions()
 	}
 
-	func showRenameBar(fallback: String?, prefill: String?, callback: @escaping (String?) -> Void) {
+	func showRenameBar(fallback: String?, prefill: String?, callback: @escaping (String?) -> ()) {
 		let bar = BookmarkRenameBar()
 		bar.callback = callback
 		bar.textField.text = prefill
@@ -1174,7 +1152,7 @@ extension MainViewController {
 
 	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
 		super.viewWillTransition(to: size, with: coordinator)
-		DispatchQueue.main.async {
+		coordinator.animate(alongsideTransition: nil) { _ in
 			self.updateSuggestionVCHeight()
 		}
 	}
@@ -1309,7 +1287,7 @@ extension MainViewController: SearchBarDelegate, SearchListener {
 			self.textInputBar = nil
 			UIView.animate(withDuration: 0.12, delay: 0, options: UIView.AnimationOptions(rawValue: UInt(UIView.AnimationCurve.easeOut.rawValue)), animations: {
 				textInputBar.frame.origin.y = self.view.bounds.maxY + 10
-			}, completion: { (_) -> Void in
+			}, completion: { (_) -> () in
 				textInputBar.removeFromSuperview()
 			})
 		}

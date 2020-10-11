@@ -17,6 +17,9 @@
 /* title of button to ignore old snowhaze version warning */
 "old snowhaze version prompt ignore button title" = "Ignoriere";
 
+/* format of the human-readable description of the app version */
+"version description format" = "%@ Build %@";
+
 /* title of home page displayed in url bar */
 "home screen page title" = "Startsite";
 
@@ -74,19 +77,19 @@
 /* format of the accessibility label of the vpn protected loads usage stat */
 "vpn protected loads usage stats accessibility format" = "%d VPN Schutz";
 
-/* Used to confirm message */
+/* title of button to confirm a js alert */
 "js alert panel confirmation button title" = "OK";
 
-/* Used to accept message */
+/* title of button to confirm a js confirmation dialog */
 "js confirm panel confirm button title" = "OK";
 
-/* Used to decline message */
+/* title of button to cancel a js confirmation dialog */
 "js confirm panel cancel button title" = "Abbräche";
 
-/* Used to enter text */
+/* title of button to confirm a js text prompt */
 "js text prompt confirm button title" = "OK";
 
-/* Used to not enter text */
+/* title of button to cancel a js text prompt */
 "js text prompt cancel button title" = "Abbräche";
 
 /* title of button to ignore further alerts by this site */
@@ -263,6 +266,9 @@
 /* title of preview action to open a link in a new tab */
 "open in new tab preview action title" = "I nöiem Tab ufdue";
 
+/* title of preview action to open a link in a new tab in the background */
+"open in new tab in background preview action title" = "Im Hingergrund ufdue";
+
 /* title of preview action to open the url of a history item */
 "open history item preview action title" = "Ufdue";
 
@@ -280,6 +286,30 @@
 
 /* title of preview action to share the url of a bookmark */
 "share bookmark preview action title" = "Teile...";
+
+/* title of the action to open the url in the bookmark or history context menu */
+"open url bookmark or history context menu action title" = "Ufdue";
+
+/* title of the action to copy the url in the bookmark or history context menu */
+"copy url bookmark or history context menu action title" = "URL kopiere";
+
+/* title of the action to share the bookmark in the bookmark context menu */
+"share bookmark context menu action title" = "Teile...";
+
+/* title of the action to rename the bookmark in the bookmark context menu */
+"rename bookmark context menu action title" = "Umbenenne";
+
+/* title of the action to reload the bookmark in the bookmark context menu */
+"reload bookmark context menu action title" = "Nöi lade";
+
+/* title of the action to delete the bookmark in the bookmark context menu */
+"delete bookmark context menu action title" = "Lösche";
+
+/* title of the bookmark context menu */
+"bookmark context menu title" = "Läsezeiche";
+
+/* title of the action to share the history item in the history context menu */
+"share history context menu action title" = "Teile...";
 
 /* title for acknowledgements */
 "acknowledgements settings title" = "Rächtliches";
@@ -567,10 +597,10 @@
 "enable safebrowsing setting title" = "Safebrowsing bruche";
 
 /* accessibility label for the enable safebrowsing setting when the user does not have an active subscription */
-"enable safebrowsing setting missing subscription accessibility label" = "Safebrowsing - Benötigt ein Abonnement";
+"enable safebrowsing setting missing subscription accessibility label" = "Safebrowsing - Brucht es Abo";
 
 /* accessibility label for the enable safebrowsing setting when the user does not have an active subscription but the setting is enabled */
-"disable safebrowsing setting missing subscription accessibility label" = "Safebrowsing - Benötigt ein Abonnement. Auswählen zum ausschalten.";
+"disable safebrowsing setting missing subscription accessibility label" = "Safebrowsing - Brucht es Abo. Uswähle zum usschalte.";
 
 /* title of setting to enable proxy for safebrowsing */
 "use safebrowsing proxy setting title" = "Proxy verwände";
@@ -701,6 +731,9 @@
 /* title of the activity to find some text on page */
 "find on page activity title" = "Site dürsueche";
 
+/* title of the activity to download the current page */
+"download page activity title" = "Download";
+
 /* title of button to dismiss text input bar */
 "text input bar dismiss button title" = "Fertig";
 
@@ -718,6 +751,18 @@
 
 /* title of upgrade all http connections setting */
 "upgrade all http connections setting title" = "Alli HTTP upgraden";
+
+/* title of setting to block deprecated tls versions */
+"block deprecated tls versions setting title" = "Veraltetes TLS blockiere";
+
+/* notice to inform users that blocking deprecated tls versions requires ios 14 */
+"blocking deprecated tls versions requires ios 14 notice" = "Erforderet iOS 14 oder Tor";
+
+/* title of setting to render webpages as desktop sites */
+"render pages as desktop sites setting title" = "Desktop Ansicht";
+
+/* notice to inform users that rendering webpages as desktop sites requires ios 13 */
+"render pages as desktop sites requires ios 13 notice" = "Erforderet iOS 13";
 
 /* title of block tracking scripts setting */
 "block tracking scripts setting title" = "Tracking Scripts blockiere";
@@ -1083,13 +1128,13 @@
 "installing ovpn requires openvpn connect alert message" = "Füre VPN bruchts d App OpenVPN Connect. Lad si vom App Store abe.";
 
 /* format of the accessibility label of the vpn profile cell when user is not subscribed to snowhaze premium */
-"vpn profile missing subscription accessibility label format" = "%@ VPN- Benötigt ein SnowHaze Premium Abonnement";
+"vpn profile missing subscription accessibility label format" = "%@ VPN- Brucht es SnowHaze Premium Abo";
 
 /* format of the accessibility label of the vpn profile cell when the profile is being downloaded */
 "vpn profile downloading accessibility label format" = "%@ - Ladet";
 
 /* format of the accessibility label of the vpn profile cell when the profile credentials are not yet downloaded */
-"vpn profile download required accessibility label format" = "%@ VPN - Muss geladen werden";
+"vpn profile download required accessibility label format" = "%@ VPN - Muess glade wärde";
 
 /* suffix of the client's ip address title to indicate that this is the device's prefered network type */
 "client ip address title default indicator suffic" = " (Standard)";
@@ -1137,7 +1182,7 @@
 "select ipsec vpn profile prompt" = "Standort uswähle";
 
 /* accessibility label of prompt for user to select the ipsec vpn profile when user is not subscribed to snowhaze premium */
-"select ipsec vpn profile prompt missing subscription accessibility label" = "VPN Standort auswählen - Benötigt ein SnowHaze Premium Abonnement";
+"select ipsec vpn profile prompt missing subscription accessibility label" = "VPN Standort uswähle - Brucht es SnowHaze Premium Abo";
 
 /* title of alert to warn users that a single installed VPN profile has expired */
 "vpn profile expiration warning single profile expired alert title" = "VPN Profil lauft ab";
@@ -1182,10 +1227,10 @@
 "use tor setting title" = "Tor bruche";
 
 /* accessibility label for the use tor setting when the user does not have an active subscription */
-"use tor setting missing subscription accessibility label" = "Tor - Benötigt ein Abonnement";
+"use tor setting missing subscription accessibility label" = "Tor - Brucht es Abo";
 
 /* accessibility label for the use tor setting when the user does not have an active subscription but the setting is enabled */
-"disable use tor setting missing subscription accessibility label" = "Tor - Benötigt ein Abonnement. Auswählen zum ausschalten.";
+"disable use tor setting missing subscription accessibility label" = "Tor - Brucht es Abo. Uswähle zum usschalte.";
 
 /* title of start tor on launch setting */
 "start tor on launch setting title" = "Bim Start verbinde";
@@ -1200,10 +1245,10 @@
 "rotate tor circuit for new api tokens setting title" = "Circuit für neui Token rotiere";
 
 /* accessibility label for the use tor for api calls setting when the user does not have an active subscription */
-"use tor for api calls setting missing subscription accessibility label" = "Tor für API calls - Benötigt ein Abonnement";
+"use tor for api calls setting missing subscription accessibility label" = "Tor für API calls - Brucht es Abo";
 
 /* accessibility label for the use tor for api calls setting when the user does not have an active subscription but the setting is enabled */
-"disable use tor for api calls setting missing subscription accessibility label" = "Tor für API calls - Benötigt ein Abonnement. Auswählen zum ausschalten.";
+"disable use tor for api calls setting missing subscription accessibility label" = "Tor für API calls - Brucht es Abo. Uswähle zum usschalte.";
 
 /* title of button to launch the tor thread */
 "connect tor button title" = "Verbinden";
@@ -1407,7 +1452,7 @@
 "open url in app itunes app name" = "iTunes";
 
 /* name of the mail app used to confirm opening of url in other app */
-"open url in app mail app name" = "Mail";
+"open url in app mail app name" = "d Standard Mail App";
 
 /* name of the messages app used to confirm opening of url in other app */
 "open url in app messages app name" = "Nachrichten";
@@ -1883,6 +1928,12 @@
 /* message of the error page to inform the user that javascript urls are disabled */
 "javascript urls disabled error page message" = "Die JavaScript URLs si us Sicherheitsgründ deaktiviert. Du chasch das unter Iistellige -> JavaScript -> JS URLs zuelaa";
 
+/* title of the error page shown when a webpage could not be loaded because the corresponding tab has been deleted */
+"tab deleted error page title" = "Tab glöscht";
+
+/* message of the error page shown when a webpage could not be loaded because the corresponding tab has been deleted */
+"tab deleted error page message" = "D Site isch nid glade worde, will ds entsprächende Tab zue isch.";
+
 /* error page domain description where no host is available */
 "error page unknown domain" = "Domain unbekannt";
 
@@ -2341,4 +2392,7 @@
 
 /* name of the zuludesk app used to confirm opening of url in other app */
 "open url in app zuludesk app name" = "Zuludesk";
+
+/* name of the zoom app used to confirm opening of url in other app */
+"open url in app zoom app name" = "Zoom";
 

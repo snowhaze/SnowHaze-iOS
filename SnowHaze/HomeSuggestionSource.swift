@@ -9,7 +9,7 @@
 import Foundation
 
 class HomeSuggestionSource: SuggestionSource {
-	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> Void) {
+	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ()) {
 		if let url = PolicyManager.globalManager().homepageURL {
 			let list = NSLocalizedString("home suggestion source search terms", comment: "a comma separated list of terms the user can search for to get the home page suggestion")
 			let terms = list.components(separatedBy: ",")

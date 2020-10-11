@@ -53,6 +53,20 @@ class CaptureSessionManager: NSObject {
 	private var pipelineRunningTask: UIBackgroundTaskIdentifier
 	private var metadataOutput: AVCaptureMetadataOutput?
 
+	var hasCamera: Bool {
+		return videoDevice != nil
+	}
+
+	var metadataTypes: [AVMetadataObject.ObjectType]? {
+		didSet {
+			guard let metadataOutput = metadataOutput else {
+				return
+			}
+			let availableTypes = metadataOutput.availableMetadataObjectTypes
+			metadataOutput.metadataObjectTypes = metadataTypes?.filter { availableTypes.contains($0) } ?? availableTypes
+		}
+	}
+
 	private var focusMode: AVCaptureDevice.FocusMode {
 		get {
 			guard let videoInput = videoInput else {
@@ -224,12 +238,16 @@ class CaptureSessionManager: NSObject {
 		} else {
 			videoDevice = AVCaptureDevice.default(for: .video)
 		}
-		videoInput = try? AVCaptureDeviceInput(device: videoDevice!)
-		if let input = videoInput, internalCaptureSession!.canAddInput(input) {
-			internalCaptureSession!.addInput(input)
+		if let videoDevice = videoDevice {
+			videoInput = try? AVCaptureDeviceInput(device: videoDevice)
+			if let input = videoInput, internalCaptureSession!.canAddInput(input) {
+				internalCaptureSession!.addInput(input)
+			}
 		}
 
 		metadataOutput = AVCaptureMetadataOutput()
+		let availableTypes = metadataOutput!.availableMetadataObjectTypes
+		metadataOutput!.metadataObjectTypes = metadataTypes?.filter { availableTypes.contains($0) } ?? availableTypes
 		let metadataQueue = DispatchQueue(label: "ch.illotros.scancode.codedata")
 		metadataOutput!.setMetadataObjectsDelegate(self, queue: metadataQueue)
 
@@ -302,7 +320,15 @@ extension CaptureSessionManager: AVCaptureMetadataOutputObjectsDelegate {
 				guard let code = object as? AVMetadataMachineReadableCodeObject else {
 					continue
 				}
-				self.delegate?.sessionManager(self, didScanBarCode: code.stringValue!, withCorners: code.corners)
+
+// TODO: remove once simulator SDK is fixed
+				let corners: [CGPoint]
+#if targetEnvironment(simulator)
+				corners = []
+#else
+				corners = code.corners
+#endif
+				self.delegate?.sessionManager(self, didScanBarCode: code.stringValue!, withCorners: corners)
 			}
 		}
 	}

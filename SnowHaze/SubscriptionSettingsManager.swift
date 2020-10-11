@@ -138,7 +138,7 @@ class SubscriptionSettingsManager: SettingsViewManager {
 		return manager.didSelectRow(atIndexPath: indexPath, tableView: tableView)
 	}
 
-	private func reloadData(with animation: UITableView.RowAnimation, change: () -> Void) {
+	private func reloadData(with animation: UITableView.RowAnimation, change: () -> ()) {
 		guard let tableView = self.controller?.tableView else {
 			return
 		}
@@ -205,32 +205,14 @@ class SubscriptionSettingsManager: SettingsViewManager {
 	}
 
 	class func show(error: V3APIConnection.Error, in hostVC: UIViewController) {
-		let title: String
-		let message: String
-		let ok: String
+		let type: AlertType
 		switch error {
-			case .network:
-				title = NSLocalizedString("subscription network error alert title", comment: "title of the alert to indicate that a subscription operation could not complete due to a network error")
-				message = NSLocalizedString("subscription network error alert message", comment: "message of the alert to indicate that a subscription operation could not complete due to a network error")
-				ok = NSLocalizedString("subscription network error alert ok button title", comment: "title of the ok button of the alert to indicate that a subscription operation could not complete due to a network error")
-			case .noSuchAccount:
-				title = NSLocalizedString("subscription invalid account error alert title", comment: "title of the alert to indicate that a subscription operation could not complete due to the specified account not existing")
-				message = NSLocalizedString("subscription invalid account error alert message", comment: "message of the alert to indicate that a subscription operation could not complete due to the specified account not existing")
-				ok = NSLocalizedString("subscription invalid account error alert ok button title", comment: "title of the ok button of the alert to indicate that a subscription operation could not complete due to the specified account not existing")
-			case .emailInUse:
-				title = NSLocalizedString("subscription email in use error alert title", comment: "title of the alert to indicate that a subscription operation could not complete due to the specified email already being in use")
-				message = NSLocalizedString("subscription email in use error alert message", comment: "message of the alert to indicate that a subscription operation could not complete due to the specified email already being in use")
-				ok = NSLocalizedString("subscription email in use error alert ok button title", comment: "title of the ok button of the alert to indicate that a subscription operation could not complete due to the specified email already being in use")
-			case .clearMasterSecret:
-				title = NSLocalizedString("subscription logout error alert title", comment: "title of the alert to indicate that a user's zka credentials have been rejected")
-				message = NSLocalizedString("subscription logout error alert message", comment: "message of the alert to indicate that a user's zka credentials have been rejected")
-				ok = NSLocalizedString("subscription logout error alert ok button title", comment: "title of the ok button of the alert to indicate that a user's zka credentials have been rejected")
-			default:
-				fatalError("no error message for error \(error) implemented")
+			case .network:				type = .subscriptionNetworkError
+			case .noSuchAccount:		type = .subscriptionNoSuchAccountError
+			case .emailInUse:			type = .subscriptionEmailInUseError
+			case .clearMasterSecret:	type = .subscriptionLogout
+			default:					fatalError("no error message for error \(error) implemented")
 		}
-		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-		let action = UIAlertAction(title: ok, style: .default, handler: nil)
-		alert.addAction(action)
-		hostVC.present(alert, animated: true, completion: nil)
+		hostVC.present(type.build(), animated: true, completion: nil)
 	}
 }

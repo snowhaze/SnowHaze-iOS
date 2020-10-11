@@ -21,7 +21,7 @@ class FaviconFetcher: DataFetcher {
 	 *	Downloads the favicon for the website currently loaded in webView
 	 *	- parameter callback: is called on main queue with the image data
 	 */
-	func fetch(_ callback: @escaping (Data?) -> Void) {
+	func fetch(_ callback: @escaping (Data?) -> ()) {
 		let script = jsgenerator.generate()!
 		manager.evaluate(script) { result, error in
 			guard let path = result as? String,  let url = URL(string: path) else {

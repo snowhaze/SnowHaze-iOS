@@ -6,9 +6,10 @@
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
-let versionDescription			= "3.0.3 Build 86"
-let currentVersion				= version_3_0_3__086
+let currentVersion				= version_3_1_0__088
 
+let version_3_1_0__088: Int64	= 03010001	// App Store
+let version_3_1_0__087: Int64	= 03010000	// TestFlight
 let version_3_0_3__086: Int64	= 03000300	// App Store
 let version_3_0_2__085: Int64	= 03000200	// App Store
 let version_3_0_1__084: Int64	= 03000100	// App Store
@@ -96,4 +97,11 @@ let compilationDate: Date = {
 	formater.timeZone = TimeZone(abbreviation: "CET")
 	formater.dateFormat = "MMM d yyyy HH:mm:ss"
 	return formater.date(from: dateString)!
+}()
+
+let versionDescription: String	= {
+	let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+	let buildNr = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+	let versionFormat = NSLocalizedString("version description format", comment: "format of the human-readable description of the app version")
+	return String(format: versionFormat, version, buildNr)
 }()

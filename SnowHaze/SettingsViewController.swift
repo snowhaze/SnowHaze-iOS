@@ -47,32 +47,11 @@ class SettingsViewController: UIViewController, SettingsDetailViewControllerDele
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		if let (multiple, expired) = VPNManager.shared.profileExpirationWarningConfig {
-			let title: String
-			let message: String
-			switch (multiple, expired) {
-				case (false, true):
-					title = NSLocalizedString("vpn profile expiration warning single profile expired alert title", comment: "title of alert to warn users that a single installed VPN profile has expired")
-					message = NSLocalizedString("vpn profile expiration warning single profile expired alert message", comment: "message of alert to warn users that a single installed VPN profile has expired")
-				case (false, false):
-					title = NSLocalizedString("vpn profile expiration warning single profile expiring alert title", comment: "title of alert to warn users that a single installed VPN profile is about to expire")
-					message = NSLocalizedString("vpn profile expiration warning single profile expiring alert message", comment: "message of alert to warn users that a single installed VPN profile is about to expire")
-				case (true, true):
-					title = NSLocalizedString("vpn profile expiration warning multiple profiles expired alert title", comment: "title of alert to warn users that multiple installed VPN profiles have expired")
-					message = NSLocalizedString("vpn profile expiration warning multiple profiles expired alert message", comment: "message of alert to warn users that multiple installed VPN profiles have expired")
-				case (true, false):
-					title = NSLocalizedString("vpn profile expiration warning multiple profiles expiring alert title", comment: "title of alert to warn users that multiple installed VPN profiles are about to expire")
-					message = NSLocalizedString("vpn profile expiration warning multiple profiles expiring alert message", comment: "message of alert to warn users that multiple installed VPN profiles are about to expire")
-			}
-			let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-			let renewTitle = NSLocalizedString("vpn profile expiration warning alert vpn settings button title", comment: "title of vpn settings button of alert to warn users of VPN profile expiration")
-			let renewAction = UIAlertAction(title: renewTitle, style: .default) { [weak self] _ in
+			let showVPNSettings = { [weak self] () -> () in
 				self?.showSettings(.vpn, unfold: false)
 			}
-			let okTitle = NSLocalizedString("vpn profile expiration warning alert ignore button title", comment: "title of ignore button of alert to warn users of VPN profile expiration")
-			let okAction = UIAlertAction(title: okTitle, style: .cancel, handler: nil)
-			alert.addAction(renewAction)
-			alert.addAction(okAction)
-			present(alert, animated: true) {
+			let alert = AlertType.profileExpiration(multiple: multiple, expired: expired, showVPNSettings: showVPNSettings)
+			present(alert.build(), animated: true) {
 				VPNManager.shared.didDisplayProfileExpirationWarning()
 			}
 		}

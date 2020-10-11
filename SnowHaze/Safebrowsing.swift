@@ -24,7 +24,7 @@ enum SafebrowsingCacheSharing: Int64 {
 }
 
 protocol SafebrowsingStorage {
-	func register(wait: Bool, updatedCallback: @escaping (Bool) -> Void) -> ((Bool) -> Void)?
+	func register(wait: Bool, updatedCallback: @escaping (Bool) -> ()) -> ((Bool) -> ())?
 	func lists(for hashes: Set<Data>, filler: Int) -> (certain: Set<Safebrowsing.List>, requests: [Safebrowsing.List: (String, Set<Data>)])?
 	func set(_ results: [Safebrowsing.List: (String, [Data: Set<Data>]?)])
 
@@ -36,8 +36,8 @@ protocol SafebrowsingStorage {
 }
 
 protocol SafebrowsingNetworking {
-	func verify(_ requests: [Safebrowsing.List: (String, Set<Data>)], callback: @escaping ([Safebrowsing.List: (String, [Data: Set<Data>]?)]) -> Void)
-	func update(_ list: [Safebrowsing.List: String?], callback: @escaping ([Safebrowsing.List: (String, Set<Data>, Set<Int>?)]?) -> Void)
+	func verify(_ requests: [Safebrowsing.List: (String, Set<Data>)], callback: @escaping ([Safebrowsing.List: (String, [Data: Set<Data>]?)]) -> ())
+	func update(_ list: [Safebrowsing.List: String?], callback: @escaping ([Safebrowsing.List: (String, Set<Data>, Set<Int>?)]?) -> ())
 
 	var shouldTry: Bool { get }
 }
@@ -166,13 +166,13 @@ struct Safebrowsing {
 		storage.clear()
 	}
 
-	func updatePrefixes(callback: @escaping (Bool?) -> Void) {
+	func updatePrefixes(callback: @escaping (Bool?) -> ()) {
 		var updated = false
 		withUsableCache(wait: true) { callback(updated ? $0 : nil) }
 		updated = true
 	}
 
-	private func withUsableCache(wait: Bool = false, callback: @escaping (Bool) -> Void) {
+	private func withUsableCache(wait: Bool = false, callback: @escaping (Bool) -> ()) {
 		let completion = storage.register(wait: wait, updatedCallback: callback)
 		if let completion = completion {
 			let storedVersions = storage.listsForUpdate
@@ -187,7 +187,7 @@ struct Safebrowsing {
 		}
 	}
 
-	func types(for url: URL, callback: @escaping (Set<Safebrowsing.Danger>) -> Void) {
+	func types(for url: URL, callback: @escaping (Set<Safebrowsing.Danger>) -> ()) {
 		let hashes = hashQueries(for: url)
 		var dangerTypes = Set<Safebrowsing.Danger>()
 		if checkLocal {

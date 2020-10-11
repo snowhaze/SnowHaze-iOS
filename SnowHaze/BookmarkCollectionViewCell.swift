@@ -117,15 +117,17 @@ class BookmarkCollectionViewCell: UICollectionViewCell {
 		}
 		if renameButton == nil {
 			renameButton = UIButton()
-			let cancelButtonTitle = NSLocalizedString("rename bookmark button title", comment: "title of button to rename bookmark in bookmark view")
-			renameButton.setTitle(cancelButtonTitle, for: [])
+			let renameButtonTitle = NSLocalizedString("rename bookmark button title", comment: "title of button to rename bookmark in bookmark view")
+			renameButton.setTitle(renameButtonTitle, for: [])
 			renameButton.frame = CGRect(x: 0, y: 66, width: 100, height: 34)
 			renameButton.addTarget(self, action: #selector(renameBookmark(_:)), for: .touchUpInside)
 			renameButton.isHidden = true
 			renameButton.titleLabel?.adjustsFontSizeToFitWidth = true
 			contentView.addSubview(renameButton)
 		}
-		if pressRecognizer == nil {
+		if #available(iOS 13, *) {
+			// use context menu
+		} else if pressRecognizer == nil {
 			pressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(toggleEditMode(_:)))
 			addGestureRecognizer(pressRecognizer)
 		}

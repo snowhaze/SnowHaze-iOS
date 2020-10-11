@@ -16,7 +16,7 @@ public class PinningSessionDelegate: NSObject, URLSessionDelegate {
 
 	static let pinnedCerts = [api2Cert, api3Cert]
 
-	public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+	public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()) {
 		let space = challenge.protectionSpace
 		guard space.authenticationMethod == NSURLAuthenticationMethodServerTrust else {
 			completionHandler(.performDefaultHandling, nil)

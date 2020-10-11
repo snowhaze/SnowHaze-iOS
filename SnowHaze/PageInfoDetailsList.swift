@@ -73,7 +73,7 @@ class PageInfoDetailsList: UIView {
 
 	func set(state: State, animated: Bool) {
 		precondition(Thread.isMainThread)
-		func change(_ change: @escaping () -> Void, completion: @escaping () -> Void) {
+		func change(_ change: @escaping () -> (), completion: @escaping () -> ()) {
 			if animated {
 				UIView.animate(withDuration: 0.2, animations: change) { _ in completion() }
 			} else {

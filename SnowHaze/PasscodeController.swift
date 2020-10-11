@@ -12,18 +12,18 @@ import UIKit
 private let servicePrefix = "ch.illotros.ios.passcodecontroller.touchid.keychainservicename.external."
 
 public protocol PasscodeControllerDelegate {
-	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> Void)
-	func passcodeController(_ controller: PasscodeController, setCode code: String, ofType type: PasscodeController.PasscodeType, withCompletionHandler completionHandler: @escaping (Bool) -> Void)
+	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> ())
+	func passcodeController(_ controller: PasscodeController, setCode code: String, ofType type: PasscodeController.PasscodeType, withCompletionHandler completionHandler: @escaping (Bool) -> ())
 	func passcodeControllerDidComplete(_ controller: PasscodeController)
 	func passcodeControllerErrorButtonPressed(_ controller: PasscodeController, for error: Any)
 }
 
 extension PasscodeControllerDelegate {
-	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> ()) {
 		completionHandler(false)
 	}
 
-	func passcodeController(_ controller: PasscodeController, setCode code: String, ofType type: PasscodeController.PasscodeType, withCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+	func passcodeController(_ controller: PasscodeController, setCode code: String, ofType type: PasscodeController.PasscodeType, withCompletionHandler completionHandler: @escaping (Bool) -> ()) {
 		completionHandler(false)
 	}
 
@@ -183,8 +183,8 @@ public class PasscodeController: UIViewController {
 		}
 	}
 
-	static func set(code: String, forKeychainID keychainID: String, completionHandler: ((Bool) -> Void)?) {
-		let completed: (Bool) -> Void = { ok in
+	static func set(code: String, forKeychainID keychainID: String, completionHandler: ((Bool) -> ())?) {
+		let completed: (Bool) -> () = { ok in
 			DispatchQueue.main.async { completionHandler?(ok) }
 		}
 		DispatchQueue.global(qos: .userInteractive).async {
@@ -217,8 +217,8 @@ public class PasscodeController: UIViewController {
 		}
 	}
 
-	static func clearCode(forKeychainID keychainID: String, completionHandler: ((Bool) -> Void)?) {
-		let completed: (Bool) -> Void = { ok in
+	static func clearCode(forKeychainID keychainID: String, completionHandler: ((Bool) -> ())?) {
+		let completed: (Bool) -> () = { ok in
 			DispatchQueue.main.async { completionHandler?(ok) }
 		}
 		DispatchQueue.global(qos: .userInteractive).async {
