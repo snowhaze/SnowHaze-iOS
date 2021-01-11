@@ -710,6 +710,7 @@ class VPNSettingsManager: SettingsViewManager {
 		if let o = observer {
 			NotificationCenter.default.removeObserver(o)
 		}
+		 session.cancelAndInvalidate()
 	}
 }
 

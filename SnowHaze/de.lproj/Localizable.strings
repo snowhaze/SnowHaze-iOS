@@ -966,7 +966,7 @@
 "subscription expires in 1 days notice" = "Läuft morgen ab";
 
 /* format of text to indicate that the subscription will expire in n days for n > 1 */
-"subscription expires in n days notice format" = "Läuft in %@ ab";
+"subscription expires in n days notice format" = "Läuft in %@ Tagen ab";
 
 /* notice to warn users that snowhaze premium subscriptions auto-renew */
 "snowhaze premium subscription auto-renew notice" = "Erneuern automatisch, siehe Bedingungen unten";
@@ -2395,4 +2395,10 @@
 
 /* name of the zoom app used to confirm opening of url in other app */
 "open url in app zoom app name" = "Zoom";
+
+/* name of the facetime app used to confirm opening of url in other app */
+"open url in app facetime app name" = "Telefon";
+
+/* name of the phone app used to confirm opening of url in other app */
+"open url in app phone app name" = "FaceTime";
 

@@ -145,6 +145,15 @@ public class SnowHazeURLSession {
 		}
 	}
 
+	public func cancelAndInvalidate() {
+		syncToMainThread {
+			withTorSession { session in
+				session?.invalidateAndCancel()
+			}
+			nonTorSession.invalidateAndCancel()
+		}
+	}
+
 	public func loadSessions(includingTor: Bool, failure: @escaping () -> ()) {
 		_ = nonTorSession
 		if includingTor {

@@ -179,8 +179,7 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 				decisionHandler(.cancel, preferences)
 				return
 			}
-			let actionURL = navigationAction.request.url?.detorified ?? navigationAction.request.url
-			let policy = PolicyManager.manager(for: actionURL, in: self.tab)
+			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
 			if #available(iOS 14, *) {
 				preferences.allowsContentJavaScript = policy.allowJS
 			}
@@ -214,7 +213,8 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 			load(request: newRequest)
 			return
 		}
-		let policy = PolicyManager.manager(for: actionURL, in: tab)
+		let policyURL = webView.url
+		let policy = PolicyManager.manager(for: policyURL, in: tab)
 		if policy.shouldBlockLoad(of: actionURL) || (policy.preventXSS && actionURL?.potentialXSS ?? false) {
 			decisionHandler(.cancel)
 			delegate?.webViewManagerDidFailLoad(self)
@@ -252,7 +252,7 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 					return
 				}
 				if dangers.isEmpty {
-					me.update(for: actionURL, webView: webView)
+					me.update(for: policyURL, webView: webView)
 					decisionHandler(.allow)
 				} else {
 					decisionHandler(.cancel)
@@ -260,7 +260,7 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 				}
 			}
 		} else {
-			update(for: actionURL, webView: webView)
+			update(for: policyURL, webView: webView)
 			decisionHandler(.allow)
 		}
 	}
@@ -286,7 +286,7 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 			tabDeletedAbort()
 			return
 		}
-		let domain = PolicyDomain(host: challenge.protectionSpace.host)
+		let domain = PolicyDomain(host: webView.url?.host)
 		let policy = PolicyManager.manager(for: domain, in: tab)
 		decisionHandler(!policy.blockDeprecatedTLS)
 	}
@@ -299,10 +299,11 @@ private extension WorkerWebViewManager {
 		guard let url = rawURL?.detorified ?? rawURL, navigationAction.targetFrame?.isMainFrame ?? false else {
 			return nil
 		}
+		let policyURL = webView.url
 		guard navigationAction.request.isHTTPGet else {
 			return nil
 		}
-		let policy = PolicyManager.manager(for: url, in: tab)
+		let policy = PolicyManager.manager(for: policyURL, in: tab)
 		guard policy.stripTrackingURLParameters else {
 			return nil
 		}

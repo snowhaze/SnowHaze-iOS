@@ -45,13 +45,14 @@ class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 		}
 		let dec = InUseCounter.network.inc()
 		let url = upgrade(originalUrl.detorified ?? originalUrl)
-		let task = session.dataTask(with: url, completionHandler: { (data, _, error) -> () in
+		let task = session.dataTask(with: url, completionHandler: { [weak self] (data, _, error) -> () in
 			dec()
 			guard error == nil else {
 				callback(nil)
 				return
 			}
 			callback(data)
+			self?.cancel()
 		})
 		task.resume()
 	}
@@ -110,9 +111,7 @@ class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 	}
 
 	func cancel() {
-		session?.getAllTasks { tasks in
-			tasks.forEach { $0.cancel() }
-		}
+		session?.invalidateAndCancel()
 	}
 
 	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()) {
@@ -152,6 +151,7 @@ class DataFetcher: NSObject, URLSessionDelegate, URLSessionDownloadDelegate {
 				callback(.error(error))
 			}
 		}
+		cancel()
 	}
 
 	func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {

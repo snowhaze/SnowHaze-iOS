@@ -21,7 +21,11 @@ class ScanCodeActivity: UIActivity {
 	weak var delegate: ScanCodeActivityDelegate?
 
 	var available: Bool {
+#if targetEnvironment(simulator)
+		return true
+#else
 		return AVCaptureDevice.default(for: AVMediaType.video) != nil
+#endif
 	}
 
 	override var activityType : UIActivity.ActivityType? {
@@ -51,6 +55,7 @@ class ScanCodeActivity: UIActivity {
 
 	override var activityViewController : UIViewController? {
 		let vc = ScanCodeViewController()
+		vc.simulatorDebugCode = "https://snowhaze.com"
 		vc.metadataTypes = [
 			.aztec,
 			.code128,
@@ -66,7 +71,8 @@ class ScanCodeActivity: UIActivity {
 			.qr,
 			.upce,
 		]
-		vc.overlayColor = .button
+		vc.successOverlayColor = .veryGoodPrivacy
+		vc.failOverlayColor = .veryBadPrivacy
 		vc.useFrontCamera = PolicyManager.manager(for: tab).useFrontCamera
 		vc.buttonColor = .button
 		vc.codeColor = .title

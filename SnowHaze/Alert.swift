@@ -606,6 +606,8 @@ enum AlertType {
 
 			case (.invalidTLSCert(_, _), 1):					return .cancel
 
+			case (.tlsDomainMismatch(_, _, _), 1):				return .cancel
+
 			case (.httpAuthentication(_, _, _, _, _, _), 1):	return .cancel
 
 			default:											return .default

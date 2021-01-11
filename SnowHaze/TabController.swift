@@ -647,8 +647,7 @@ extension TabController: WKNavigationDelegate {
 				decisionHandler(.cancel, preferences)
 				return
 			}
-			let actionURL = navigationAction.request.url?.detorified ?? navigationAction.request.url
-			let policy = PolicyManager.manager(for: actionURL, in: self.tab)
+			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
 			if #available(iOS 14, *) {
 				preferences.allowsContentJavaScript = policy.allowJS
 			}
@@ -693,7 +692,8 @@ extension TabController: WKNavigationDelegate {
 		let actionURL = navigationAction.request.url?.detorified ?? navigationAction.request.url
 		let requestingDomain = navigationAction.realSourceFrame?.securityOrigin.host
 
-		let policy = PolicyManager.manager(for: actionURL, in: tab)
+		let policyURL = webView.url
+		let policy = PolicyManager.manager(for: policyURL, in: tab)
 		if navigationAction.request.isHTTPGet && navigationAction.targetFrame?.isMainFrame ?? true, let url = policy.torifyIfNecessary(for: tab, url: navigationAction.request.url) {
 			decisionHandler(.cancel)
 			load(url: url)
@@ -710,7 +710,7 @@ extension TabController: WKNavigationDelegate {
 						return
 					}
 					if navigationAction.targetFrame?.isMainFrame ?? false {
-						self.updatePolicy(for: actionURL)
+						self.updatePolicy(for: policyURL)
 					}
 					decisionHandler(.allow)
 				}
@@ -759,7 +759,7 @@ extension TabController: WKNavigationDelegate {
 				finalDecision(false)
 				return
 			}
-			self.promptForParamStripAndRedirect(for: navigationAction) { [weak self] cont, url in
+			self.promptForParamStripAndRedirect(for: navigationAction, in: webView) { [weak self] cont, url in
 				externalHandler(cont)
 				guard let url = url, let self = self else {
 					return
@@ -774,7 +774,7 @@ extension TabController: WKNavigationDelegate {
 				finalDecision(false)
 				return
 			}
-			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
+			let policy = PolicyManager.manager(for: policyURL, in: self.tab)
 			if policy.preventXSS, actionURL?.potentialXSS ?? false {
 				self.xssPrompt(host: actionURL?.host, completion: paramHandler)
 			} else {
@@ -791,7 +791,7 @@ extension TabController: WKNavigationDelegate {
 				xssHandler(true)
 				return
 			}
-			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
+			let policy = PolicyManager.manager(for: policyURL, in: self.tab)
 			if policy.warnCrossFrameNavigation, source != target, navigationAction.navigationType != .other {
 				self.crossFrameNavigationPrompt(src: source, target: target, url: webView.url, action: navigationAction.request, completion: xssHandler)
 			} else {
@@ -804,7 +804,7 @@ extension TabController: WKNavigationDelegate {
 				finalDecision(false)
 				return
 			}
-			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
+			let policy = PolicyManager.manager(for: policyURL, in: self.tab)
 			if policy.shouldBlockLoad(of: actionURL) {
 				finalDecision(false)
 			} else {
@@ -835,7 +835,7 @@ extension TabController: WKNavigationDelegate {
 			decisionHandler(false)
 			return
 		}
-		let domain = PolicyDomain(host: challenge.protectionSpace.host)
+		let domain = PolicyDomain(host: webView.url?.host)
 		let policy = PolicyManager.manager(for: domain, in: tab)
 		decisionHandler(!policy.blockDeprecatedTLS)
 	}
@@ -1018,20 +1018,21 @@ private extension TabController {
 		post(event: .alert(type: alert, domain: url?.normalizedHost, fallbackHandler: { completion(false) }))
 	}
 
-	func promptForParamStripAndRedirect(for navigationAction: WKNavigationAction, completion: @escaping (Bool, URL?) -> ()) {
+	func promptForParamStripAndRedirect(for navigationAction: WKNavigationAction, in webView: WKWebView, completion: @escaping (Bool, URL?) -> ()) {
 		let rawURL = navigationAction.request.url
 		guard let url = rawURL?.detorified ?? rawURL, navigationAction.targetFrame?.isMainFrame ?? false else {
 			completion(true, nil)
 			return
 		}
+		let policyURL = webView.url
 		guard navigationAction.request.isHTTPGet else {
 			completion(true, nil)
 			return
 		}
-		let policy = PolicyManager.manager(for: url, in: tab)
+		let policy = PolicyManager.manager(for: policyURL, in: tab)
 		let redirect: (URL) -> URL? = { [weak self] original in
 			if let self = self {
-				let policy = PolicyManager.manager(for: original, in: self.tab)
+				let policy = PolicyManager.manager(for: policyURL, in: self.tab)
 				return policy.skipRedirects ? Redirector.shared.redirect(original) : nil
 			} else {
 				return nil

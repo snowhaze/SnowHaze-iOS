@@ -37,7 +37,7 @@ However, for everyday use as a private browser, we still suggest downloading Sno
 
 ## Prerequisites
 
-An Apple ID, [CocoaPods](https://guides.cocoapods.org/using/getting-started.html#installation) and [Xcode 11.5](https://developer.apple.com/xcode/) are needed to build SnowHaze.
+An Apple ID, [CocoaPods](https://guides.cocoapods.org/using/getting-started.html#installation) and [Xcode 12.3](https://developer.apple.com/xcode/) are needed to build SnowHaze.
 
 
 ## Deployment

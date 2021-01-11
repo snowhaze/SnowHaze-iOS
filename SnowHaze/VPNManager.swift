@@ -451,6 +451,10 @@ class VPNManager {
 			}
 		}
 	}
+
+	deinit {
+		urlSession.cancelAndInvalidate()
+	}
 }
 
 /// IPSec management

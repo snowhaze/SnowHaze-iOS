@@ -676,6 +676,10 @@ class SubscriptionManager: NSObject {
 			updateAuthTokenV2(completionHandler: completionHandler)
 		}
 	}
+
+	deinit {
+		urlSession.cancelAndInvalidate()
+	}
 }
 
 extension SubscriptionManager: SKPaymentTransactionObserver {

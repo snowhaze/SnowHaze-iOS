@@ -139,6 +139,11 @@ class DownloadManager: PinningSessionDelegate {
 	@objc private func timerFired(_ timer: Timer) {
 		trigger()
 	}
+
+	deinit {
+		backgroundSession.cancelAndInvalidate()
+		backgroundWifiSession.cancelAndInvalidate()
+	}
 }
 
 extension DownloadManager: URLSessionDownloadDelegate {

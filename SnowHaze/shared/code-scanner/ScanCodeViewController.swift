@@ -59,7 +59,8 @@ class ScanCodeViewController: UIViewController {
 		}
 	}
 
-	var overlayColor = UIColor.blue
+	var successOverlayColor = UIColor.green
+	var failOverlayColor = UIColor.red
 
 	var errorColor = UIColor.white {
 		didSet {
@@ -155,7 +156,49 @@ class ScanCodeViewController: UIViewController {
 	private var sessionManager: CaptureSessionManager!
 	private var previewLayer: AVCaptureVideoPreviewLayer!
 
-	private(set) var code: String?
+	private var lastScan: ScanResult?
+	private enum ScanResult: Equatable {
+		case unreadable
+		case ok(String)
+		case filtered(String)
+
+		static func ==(_ lhs: ScanResult, _ rhs: ScanResult) -> Bool {
+			switch (lhs, rhs) {
+				case (.unreadable, unreadable):
+					return true
+				case (.ok(let a), .ok(let b)):
+					return a == b
+				case (.filtered(let a), .filtered(let b)):
+					return a == b
+				default:
+					return false
+			}
+		}
+
+		init(code: String?, filter: NSRegularExpression) {
+			if let code = code {
+				let range = NSRange(code.startIndex ..< code.endIndex, in: code)
+				let match = filter.firstMatch(in: code, range: range)
+				self = match == nil ? .filtered(code) : .ok(code)
+			} else {
+				self = .unreadable
+			}
+		}
+
+		var validCode: String? {
+			switch self {
+				case .ok(let code):	return code
+				default:			return nil
+			}
+		}
+
+		var success: Bool {
+			switch self {
+				case .ok(_):	return true
+				default:		return false
+			}
+		}
+	}
 
 	private var codeOverlay: CodeOverlayView!
 
@@ -306,10 +349,10 @@ class ScanCodeViewController: UIViewController {
 		sessionManager.expose(at: convertedExposurePoint)
 	}
 
-	func addOverlay(for corners: [CGPoint]) {
+	func addOverlay(for corners: [CGPoint], success: Bool) {
 		let overlay = ShapeOverlayView(frame: view.bounds)
 		overlay.corners = corners
-		overlay.overlayColor = overlayColor
+		overlay.overlayColor = success ? successOverlayColor : failOverlayColor
 		view.addSubview(overlay)
 		UIView.animate(withDuration: 0.6, animations: {
 			overlay.alpha = 0;
@@ -326,22 +369,17 @@ extension ScanCodeViewController: CaptureSessionManagerDelegate {
 		}
 	}
 
-	func sessionManager(_ manger: CaptureSessionManager, didScanBarCode code: String, withCorners corners: [CGPoint]) {
-		let viewCorners = corners.map() { self.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
-		if self.code != code {
-			DispatchQueue.main.async {
-				let range = NSRange(code.startIndex ..< code.endIndex, in: code)
-				guard let _ = self.codeFilter.firstMatch(in: code, range: range) else {
-					return
-				}
-				if self.code != code {
-					self.code = code
-					self.addOverlay(for: viewCorners)
-					self.codeOverlay.code = code
+	func sessionManager(_ manger: CaptureSessionManager, didScanBarCode code: String?, withCorners corners: [CGPoint]) {
+		DispatchQueue.main.async {
+			let viewCorners = corners.map() { self.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
+			let scan = ScanResult(code: code, filter: self.codeFilter)
+			if self.lastScan != scan {
+				self.lastScan = scan
+				self.addOverlay(for: viewCorners, success: scan.success)
+				self.codeOverlay.code = scan.validCode
 
-					if !self.showScanResult, self.delegate?.codeScanner(self, canSelectCode: code) ?? true {
-						self.delegate?.codeScanner(self, didSelectCode: code)
-					}
+				if let code = scan.validCode, !self.showScanResult, self.delegate?.codeScanner(self, canSelectCode: code) ?? true {
+					self.delegate?.codeScanner(self, didSelectCode: code)
 				}
 			}
 		}

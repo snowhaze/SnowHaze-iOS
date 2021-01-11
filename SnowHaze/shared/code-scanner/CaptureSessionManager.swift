@@ -11,7 +11,7 @@ import AVFoundation
 import UIKit
 
 protocol CaptureSessionManagerDelegate: class {
-	func sessionManager(_ manger: CaptureSessionManager, didScanBarCode code: String, withCorners corners: [CGPoint])
+	func sessionManager(_ manger: CaptureSessionManager, didScanBarCode code: String?, withCorners corners: [CGPoint])
 	func sessionManagerAccessGranted(_ manger: CaptureSessionManager)
 }
 
@@ -328,7 +328,7 @@ extension CaptureSessionManager: AVCaptureMetadataOutputObjectsDelegate {
 #else
 				corners = code.corners
 #endif
-				self.delegate?.sessionManager(self, didScanBarCode: code.stringValue!, withCorners: corners)
+				self.delegate?.sessionManager(self, didScanBarCode: code.stringValue, withCorners: corners)
 			}
 		}
 	}

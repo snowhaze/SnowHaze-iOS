@@ -331,7 +331,7 @@ class TabStore {
 		var result: Tab?
 		var notify: (() -> ())?
 		try! database.inTransaction {
-			if let tmpNotify = addItem(with: [], snapshot: nil, title: nil, root: parent?.root ?? parent?.id) {
+			if let tmpNotify = addItem(with: nil, title: nil, root: parent?.root ?? parent?.id) {
 				notify = tmpNotify
 				let newTab = tab(with: database.lastInsertRowId)!
 				let settings = Settings.settings(for: newTab)
@@ -350,17 +350,11 @@ class TabStore {
 
 	func add(with request: URLRequest, copySettingsFromParent parent: Tab, customization: (Tab) -> () = { _ in }) -> Tab? {
 		assert(Thread.isMainThread)
-		let history: [URL]
-		if let url = request.url {
-			history = [url]
-		} else {
-			history = []
-		}
 		var newTab: Tab!
 		var notify: (() -> ())!
 		do {
 			try database.inTransaction {
-				let res = addItem(with: history, snapshot: nil, title: nil, root: parent.root ?? parent.id)
+				let res = addItem(with: nil, title: nil, root: parent.root ?? parent.id)
 				let id = database.lastInsertRowId!
 				guard let tmpNotify = res, let tab = tab(with: id) else {
 					throw TabError.databaseError
@@ -383,13 +377,10 @@ class TabStore {
 		return newTab
 	}
 
-	private func addItem(with history: [URL], snapshot: UIImage?, title: String?, root: Int64?) -> (() -> ())? {
+	private func addItem(with snapshot: UIImage?, title: String?, root: Int64?) -> (() -> ())? {
 		assert(Thread.isMainThread)
 		do {
-			let strings = history.map() { return $0.absoluteString }
 			let oldItems = items
-			let jsonData = try! JSONSerialization.data(withJSONObject: strings)
-			let json = String(data: jsonData, encoding: .utf8)!
 			let snapshotBinding = SQLite.Data(snapshot?.pngData())
 			let titleBinding = SQLite.Data(title)
 			let rootBinding: SQLite.Data
@@ -398,7 +389,7 @@ class TabStore {
 			} else {
 				rootBinding = .null
 			}
-			let bindings = [rootBinding, .text(json), snapshotBinding, .false, titleBinding]
+			let bindings = [rootBinding, .text("[]"), snapshotBinding, .false, titleBinding]
 			let query = "INSERT INTO \(tableName) (root_id, history, snapshot, active, title) VALUES (?, ?, ?, ?, ?)"
 			try database.execute(query, with: bindings)
 			internalItems = nil

@@ -168,6 +168,9 @@ class TabViewController: UIViewController {
 		bookmarkHistoryView.showDownloads(!FileDownload.downloads.isEmpty, animated: false)
 		bookmarkHistoryView.reloadDownloads()
 		FileDownload.delegate = self
+		if !(tab?.controller?.unused ?? true) {
+			webView.becomeFirstResponder()
+		}
 	}
 
 	override func viewDidLoad() {
@@ -414,6 +417,7 @@ extension TabViewController: TabControllerNavigationDelegate {
 				self.bookmarkHistoryView.removeFromSuperview()
 			})
 		}
+		webView.becomeFirstResponder()
 	}
 
 	func tabController(_ controller: TabController, securityAssessmentDidUpdate assessment: PolicyAssessmentResult) {

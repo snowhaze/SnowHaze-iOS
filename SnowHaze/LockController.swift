@@ -112,7 +112,14 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		navigationController?.setNavigationBarHidden(true, animated: false)
+		if let nvc = navigationController {
+			if let main = MainViewController.controller {
+				nvc.setNavigationBarHidden(true, animated: true)
+				nvc.pushViewController(main, animated: true)
+			} else {
+				nvc.setNavigationBarHidden(true, animated: false)
+			}
+		}
 	}
 
 	func passcodeController(_ controller: PasscodeController, verifyPasscode code: String, withCompletionHandler completionHandler: @escaping (Bool) -> ()) {

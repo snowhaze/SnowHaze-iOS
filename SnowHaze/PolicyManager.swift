@@ -999,7 +999,7 @@ struct PolicyDomain {
 	}
 
 	init(host: String?) {
-		if let host = host {
+		if let host = host?.lowercased() {
 			domain = host.replacingOccurrences(of: ":", with: "::")
 		} else {
 			domain = PolicyDomain.missingHostPseudoDomain
