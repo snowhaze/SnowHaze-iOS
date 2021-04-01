@@ -113,7 +113,7 @@ class LockController: PasscodeController, PasscodeControllerDelegate {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		if let nvc = navigationController {
-			if let main = MainViewController.controller {
+			if let main = MainViewController.controller, isMain {
 				nvc.setNavigationBarHidden(true, animated: true)
 				nvc.pushViewController(main, animated: true)
 			} else {

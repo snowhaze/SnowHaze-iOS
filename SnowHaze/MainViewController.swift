@@ -139,13 +139,15 @@ class MainViewController: UIViewController {
 			commands += [startInput, close]
 			if tabVC?.tab?.controller?.canGoBack ?? false {
 				let backTitle = NSLocalizedString("go back in history key command title", comment: "discoverability title of key command to go back in history")
-				let back = UIKeyCommand(input: "[", modifierFlags: .command, action: #selector(historyBack(_:)), title: backTitle)
-				commands.append(back)
+				let back1 = UIKeyCommand(input: "[", modifierFlags: .command, action: #selector(historyBack(_:)), title: backTitle)
+				let back2 = UIKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: .command, action: #selector(historyBack(_:)), title: backTitle)
+				commands += [back1, back2]
 			}
 			if tabVC?.tab?.controller?.canGoForward ?? false {
 				let forwardTitle = NSLocalizedString("go forward in history key command title", comment: "discoverability title of key command to go forward in history")
-				let forward = UIKeyCommand(input: "]", modifierFlags: .command, action: #selector(historyForward(_:)), title: forwardTitle)
-				commands.append(forward)
+				let forward1 = UIKeyCommand(input: "]", modifierFlags: .command, action: #selector(historyForward(_:)), title: forwardTitle)
+				let forward2 = UIKeyCommand(input: UIKeyCommand.inputRightArrow, modifierFlags: .command, action: #selector(historyForward(_:)), title: forwardTitle)
+				commands += [forward1, forward2]
 			}
 			if tabVC?.tab?.controller?.webViewLoaded ?? false, let _ = tabVC?.tab?.controller?.url {
 				let searchTitle = NSLocalizedString("search on page key command title", comment: "discoverability title of key command to search for text on a page")
@@ -182,6 +184,8 @@ class MainViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+
+		navigationItem.title = NSLocalizedString("main view controller navigation title", comment: "title of the main view controller for back buttons in settings")
 
 		let crashCount: Int64
 		if let oldCrashCount = DataStore.shared.getInt(for: crashCountKey) {
@@ -459,6 +463,19 @@ extension MainViewController {
 	func loadInFreshTab(input: String, type: InputType) {
 		if !(tabVC.tab?.controller?.unused ?? false) {
 			guard let tab = tabStore.add(loadHomepage: false) else {
+				return
+			}
+			set(tab: tab, animated: true)
+		}
+		hideTabsView(nil)
+		tabVC.tab?.controller?.load(input: input, type: type)
+	}
+
+	func loadInFreshTorTab(input: String, type: InputType) {
+		if let tab = tabVC.tab, tab.controller?.unused ?? false, PolicyManager.manager(for: tab).useTor {
+			// use the existing tab
+		} else {
+			guard let tab = tabStore.add(withSettings: [useTorNetworkKey: .true], loadHomepage: false) else {
 				return
 			}
 			set(tab: tab, animated: true)
@@ -764,46 +781,10 @@ private extension MainViewController {
 		case forward
 		case backward
 
-		func placement(in view: UIView, with urlBar: URLBar, oldArrowDirection: DetailPopoverArrowPosition?) -> (CGPoint, DetailPopoverArrowPosition)? {
-			let rect: CGRect?
-			switch self {
-				case .forward:	rect = urlBar.nextButtonFrame(in: view)
-				case .backward:	rect = urlBar.prevButtonFrame(in: view)
-			}
-			if let rect = rect {
-				if let arrow = oldArrowDirection, case .bottom(_) = arrow {
-					return nil
-				}
-				let offset: CGFloat
-				switch self {
-					case .forward:	offset = 40
-					case .backward:	offset = 20
-				}
-				return (CGPoint(x: rect.midX, y: rect.maxY), .top(offset: offset))
-			} else {
-				if let arrow = oldArrowDirection, case .top(_) = arrow {
-					return nil
-				}
-				let scale: CGFloat
-				switch self {
-					case .forward:	scale = 0.25
-					case .backward:	scale = 0.02
-				}
-				let x = view.bounds.minX + 25 + (view.bounds.width - 50) * scale
-				let point = CGPoint(x: x, y: view.bounds.maxY - 40)
-				let offset: CGFloat
-				switch self {
-					case .forward:	offset = 90
-					case .backward:	offset = 25
-				}
-				return (point, .bottom(offset: offset))
-			}
-		}
-
 		func list(from controller: TabController) -> [WKBackForwardListItem]? {
 			switch self {
 				case .forward:	return controller.forwardList
-				case .backward:	return controller.backList
+				case .backward:	return controller.backList?.reversed()
 			}
 		}
 
@@ -814,29 +795,24 @@ private extension MainViewController {
 			}
 		}
 	}
-	private func showTabHistoryView(ofType type: TabHistoryViewType) {
+
+	@available (iOS 14, *)
+	private func menuForTabHistory(ofType type: TabHistoryViewType) -> UIMenu? {
 		guard let controller = tabVC.tab?.controller, let history = type.list(from: controller) else {
-			return
+			return nil
 		}
-		let historyView = TabHistoryView(history: history, title: type.title)
-		let placement = type.placement(in: view, with: urlBar, oldArrowDirection: nil)!
-		let oldArrowDirection = placement.1
-		let popover = DetailPopover(contentView: historyView, arrowPosition: oldArrowDirection) { [weak self] popover -> CGPoint in
-			guard let self = self else {
-				return .zero
+		var children = [UIMenuElement]()
+		for item in history {
+			let url = item.url.absoluteString
+			let action = UIAction(title: item.title ?? url, image: nil, identifier: nil, discoverabilityTitle: url, attributes: [], state: .off) { [weak controller, weak item] _ in
+				guard let controller = controller, let item = item else {
+					return
+				}
+				controller.go(to: item)
 			}
-			guard let placement = type.placement(in: self.view, with: self.urlBar, oldArrowDirection: oldArrowDirection) else {
-				popover.dismiss(animated: true)
-				self.showTabHistoryView(ofType: type)
-				return .zero
-			}
-			return placement.0
+			children.append(action)
 		}
-		historyView.load = { [weak controller, weak popover] item in
-			controller?.go(to: item)
-			popover?.dismiss(animated: true)
-		}
-		popover.show(in: view, animated: true)
+		return UIMenu(title: type.title, image: nil, identifier: nil, options: [], children: children)
 	}
 }
 
@@ -846,16 +822,18 @@ extension MainViewController: URLBarDelegate {
 		tabVC.tab?.controller?.goBack()
 	}
 
-	func prevButtonHeld(for urlBar: URLBar) {
-		showTabHistoryView(ofType: .backward)
-	}
-
 	func nextButtonTapped(for urlBar: URLBar) {
 		tabVC.tab?.controller?.goForward()
 	}
 
-	func nextButtonHeld(for urlBar: URLBar) {
-		showTabHistoryView(ofType: .forward)
+	@available (iOS 14, *)
+	var forwardHistoryMenu: UIMenu? {
+		return menuForTabHistory(ofType: .forward)
+	}
+
+	@available (iOS 14, *)
+	var backHistoryMenu: UIMenu? {
+		return menuForTabHistory(ofType: .backward)
 	}
 
 	func shareButtonPressed(for urlBar: URLBar, sender: NSObject) {
@@ -938,23 +916,34 @@ extension MainViewController: URLBarDelegate {
 		showTabsView()
 	}
 
-	func tabsButtonHeld(for urlBar: URLBar) {
-		let tab = tabVC.tab
-		let alert = AlertType.tabActions(close: tabVC.tab != nil ? { [weak self, weak tab] in
-			if let tab = tab {
+	@available (iOS 14, *)
+	var tabsActionsMenu: UIMenu? {
+		let closeTitle = NSLocalizedString("close tab tab menu option title", comment: "title of option in the tab menu to close the current tab")
+		let closeAllTitle = NSLocalizedString("close all tabs tab menu option title", comment: "title of option in the tab menu to close all tabs")
+		let newTitle = NSLocalizedString("new tab tab menu option title", comment: "title of option in the tab menu to create a new tab")
+
+		let close = UIAction(title: closeTitle, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off) { [weak self] _ in
+			if let tab = self?.tabVC.tab {
 				self?.close(tab)
 			}
-		} : nil, closeAll: tabs.count > 1 && PolicyManager.globalManager().allowCloseAllTabs ? { [weak self] in
+		}
+
+		let closeAll = UIAction(title: closeAllTitle, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off) { [weak self] _ in
 			self?.closeAllTabs()
-		} : nil, new: { [weak self] in
-			guard let self = self else {
+		}
+
+		let new = UIAction(title: newTitle, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: [], state: .off) { [weak self] _ in
+			guard let self = self, PolicyManager.globalManager().allowCloseAllTabs else {
 				return
 			}
 			self.set(tab: self.tabStore.add()!, animated: true)
-		}).build()
-		alert.popoverPresentationController?.sourceView = view
-		alert.popoverPresentationController?.sourceRect = urlBar.tabsButtonFrame(in: view) ?? .zero
-		present(alert, animated: true, completion: nil)
+		}
+
+		let allowCloseAll = tabs.count > 1 && PolicyManager.globalManager().allowCloseAllTabs
+
+		let children = [close, allowCloseAll ? closeAll : nil, new]
+		let title = NSLocalizedString("tab menu title", comment: "title of the tab actions menu")
+		return UIMenu(title: title, image: nil, identifier: nil, options: [], children: children.compactMap { $0 })
 	}
 
 	func settingsButtonPressed(for urlBar: URLBar) {
@@ -1181,6 +1170,9 @@ extension MainViewController {
 
 		if let tab = tabVC?.tab {
 			urlBar.selectedTab = tabs.firstIndex(of: tab) ?? -1
+		}
+		DispatchQueue.main.async { [weak self] in
+			self?.urlBar.reloadTabActions()
 		}
 	}
 

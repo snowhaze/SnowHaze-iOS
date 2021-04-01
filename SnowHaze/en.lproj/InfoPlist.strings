@@ -4,7 +4,9 @@
 
   Language: en */
 
-"NSCameraUsageDescription" = "Camera is used exclusively for the barcode scanner.";
+"NSCameraUsageDescription" = "Camera is used for the barcode scanner or - upon separate permission grant - to pass threw to websites.";
+
+"NSMicrophoneUsageDescription" = "Microphone is used by websites if you grant separate permission.";
 
 "NSPhotoLibraryAddUsageDescription" = "SnowHaze needs photo library access to save media.";
 

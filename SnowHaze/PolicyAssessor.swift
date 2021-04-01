@@ -155,6 +155,7 @@ class PolicyAssessor {
 			case .swisscows:	return 0.55
 			case .duckDuckGo:	return 0.85
 			case .qwant:		return 0.85
+			case .custom:		return 0.25
 			case .none:			return 1
 		}
 	}

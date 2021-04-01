@@ -16,13 +16,19 @@ class HistorySuggestionSource: SuggestionSource {
 	private let timeFormatter: DateFormatter = DateFormatter()
 	private let dateFormatter: DateFormatter = DateFormatter()
 
-	private func normalize(history denormalized: [HistoryItem]) -> [HistoryItem] {
+	private func priority(for item: (item: HistoryItem, rank: Double)) -> Double {
+		let now = Date().timeIntervalSince1970
+		return 10 * (-40 + pow(now - item.item.timestamp.timeIntervalSince1970, 0.2)) / item.rank
+	}
+
+	private func normalize(history denormalized: [(HistoryItem, Double)]) -> [(item: HistoryItem, rank: Double)] {
 		var existingSet = Set<String>(minimumCapacity: maxCount)
-		var normalized = [HistoryItem]()
+		var normalized = [(HistoryItem, Double)]()
 		normalized.reserveCapacity(maxCount)
 		var newCount = 0
-		for item in denormalized {
-			let urlString = item.url.absoluteString
+		let sorted = denormalized.sorted {  priority(for: $0) > priority(for: $1) }
+		for item in sorted {
+			let urlString = item.0.url.absoluteString.lowercased()
 			if !existingSet.contains(urlString) {
 				existingSet.insert(urlString)
 				normalized.append(item)
@@ -44,14 +50,13 @@ class HistorySuggestionSource: SuggestionSource {
 
 	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let historyItems = normalize(history: historyStore.items(forSearch: base))
-		let now = Date().timeIntervalSince1970
 		let suggestions = historyItems.map { (item) -> Suggestion in
-			let title = item.title
-			let urlString = item.url.absoluteString
-			let url = item.url
-			let priority = 50 - pow(now - item.timestamp.timeIntervalSince1970, 0.1)
-			let image = self.image(for: item.timestamp)
-			return Suggestion(title: title, subtitle: urlString, url: url, image: image, priority: priority)
+			let title = item.item.title
+			let urlString = item.item.url.absoluteString
+			let url = item.item.url
+			let ranking = priority(for: item)
+			let image = self.image(for: item.item.timestamp)
+			return Suggestion(title: title, subtitle: urlString, url: url, image: image, priority: ranking)
 		}
 		callback(suggestions, "history")
 	}

@@ -37,8 +37,6 @@ class TorServer {
 	private init() { }
 	static let shared = TorServer()
 
-	var running = false
-
 	private var controller: TorController?
 
 	private var connectionProxyDictionaryInitialized = false
@@ -49,6 +47,53 @@ class TorServer {
 
 	let bootstrapProgress = Progress(totalUnitCount: 100)
 
+	enum Status {
+		case shutDown
+		case starting
+		case started
+		case resetting
+
+		var running: Bool {
+			switch self {
+				case .shutDown:		return false
+				case .starting:		return false
+				case .started:		return true
+				case .resetting:	return true
+			}
+		}
+
+		var temporary: Bool {
+			switch self {
+				case .shutDown:		return false
+				case .starting:		return true
+				case .started:		return false
+				case .resetting:	return true
+			}
+		}
+
+		static func ==(_ a: Status, _ b: Status) -> Bool {
+			switch (a, b) {
+				case (.shutDown, .shutDown):	return true
+				case (.starting, .starting):	return true
+				case (.started, .started):		return true
+				case (.resetting, .resetting):	return true
+				default:						return false
+			}
+		}
+	}
+	private(set) var status: Status = .shutDown
+	var statusCallback: ((Status) -> ())?
+
+	private func update(status: Status) {
+		precondition(Thread.isMainThread)
+		guard status != self.status else {
+			return
+		}
+		let old = self.status
+		self.status = status
+		statusCallback?(old)
+	}
+
 	private func notify(error: Error?) {
 		let callbacks = startCallbacks
 		startCallbacks = []
@@ -56,6 +101,9 @@ class TorServer {
 			self.controller?.disconnect()
 			self.controller = nil
 			notify(proxyConfig: nil)
+			update(status: .shutDown)
+		} else {
+			update(status: .started)
 		}
 		syncToMainThread {
 			for callback in callbacks {
@@ -72,8 +120,23 @@ class TorServer {
 		}
 	}
 
-	func start(callback: @escaping (Error?) -> ()) {
-		guard !running else {
+	func reset(callback: ((Bool?) -> ())? = nil) {
+		guard case .started = status else {
+			callback?(nil)
+			return
+		}
+		update(status: .resetting)
+		controller?.resetConnection { [weak self] success in
+			DispatchQueue.main.async {
+				callback?(success)
+				self?.update(status: .started)
+			}
+		}
+	}
+
+	func start(callback: ((Error?) -> ())? = nil) {
+		let callback = callback ?? { _ in }
+		guard !status.running else {
 			callback(nil)
 			return
 		}
@@ -85,6 +148,7 @@ class TorServer {
 		guard startCallbacks.count == 1 else {
 			return
 		}
+		update(status: .starting)
 
 		let dataDir = FileManager.default.temporaryDirectory
 		let cookieURL = dataDir.appendingPathComponent("control_auth_cookie")
@@ -108,7 +172,6 @@ class TorServer {
 			}
 			self.controller?.authenticate(with: cookie) { success, error in
 				DispatchQueue.main.async {
-					self.running = success
 					self.notify(error: success ? nil : .controlAuthenticationFailure(error!))
 					print("authenticated? \(success)")
 					if success {

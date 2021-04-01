@@ -82,7 +82,8 @@ class VPNSettingsManager: SettingsViewManager {
 		return PolicyAssessor(wrapper: settings).assess([.vpn]).color
 	}
 
-	private var observer: NSObjectProtocol?
+	private var vpnObserver: NSObjectProtocol?
+	private var foregroundObserver: NSObjectProtocol?
 
 	override func setup() {
 		super.setup()
@@ -90,8 +91,8 @@ class VPNSettingsManager: SettingsViewManager {
 		VPNManager.shared.ovpnProfiles.forEach { setupPinger(for: $0) }
 		VPNManager.shared.ipsecProfiles.forEach { setupPinger(for: $0) }
 
-		let name = NSNotification.Name.NEVPNStatusDidChange
-		observer = NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
+		let status = NSNotification.Name.NEVPNStatusDidChange
+		vpnObserver = NotificationCenter.default.addObserver(forName: status, object: nil, queue: nil) { [weak self] _ in
 			DispatchQueue.main.async {
 				guard let self = self else {
 					return
@@ -108,6 +109,16 @@ class VPNSettingsManager: SettingsViewManager {
 				}
 			}
 		}
+		let foreground = UIApplication.willEnterForegroundNotification
+		foregroundObserver = NotificationCenter.default.addObserver(forName: foreground, object: nil, queue: nil, using: { [weak self] _ in
+			if VPNSettingsManager.sendingFile, let doc = VPNSettingsManager.docController {
+				// work around bug in UIDocumentInteractionController.dismissMenu(animated:)
+				self?.controller.dismiss(animated: true) {
+					self?.documentInteractionControllerDidDismissOpenInMenu(doc)
+					self?.documentInteractionController(doc, didEndSendingToApplication: nil)
+				}
+			}
+		})
 		if !VPNManager.shared.ipsecManagerLoaded {
 			VPNManager.shared.withLoadedManager { _ in }
 		}
@@ -400,6 +411,14 @@ class VPNSettingsManager: SettingsViewManager {
 				cell.accessibilityLabel = String(format: format, profileName)
 			} else if isIPSec && selectedProfileIndex == indexPath.row - 1 {
 				cell.accessoryType = .checkmark
+			} else if profile.outdatedConfig {
+				let icon = #imageLiteral(resourceName: "credential-warning")
+				let button = UIButton()
+				button.frame.size = icon.size
+				button.setImage(icon, for: [])
+				button.addTarget(self, action: #selector(updateOutdatedConfigs), for: .touchUpInside)
+				button.accessibilityLabel = NSLocalizedString("update outdated vpn configurations button accessibility label", comment: "accessibility label of the button to update outdated vpn configurations")
+				cell.accessoryView = button
 			}
 		} else {
 			fatalError("unexpected section")
@@ -513,19 +532,12 @@ class VPNSettingsManager: SettingsViewManager {
 					tableView.reloadRows(at: [indexPath], with: .none)
 					VPNManager.shared.updateProfileList { [weak self] success in
 						self?.downloading.remove(profile.id)
-						guard let index = VPNSettingsManager.listIndex(for: profile) else {
+						guard let profile = VPNManager.shared.updated(profile) else {
 							return
 						}
-						let indexPath = IndexPath(row: index + 1, section: listSection)
-						let correctProfiles: [VPNProfile]
-						if profile is IPSecProfile {
-							correctProfiles = VPNManager.shared.ipsecProfiles
-						} else if profile is OVPNProfile {
-							correctProfiles = VPNManager.shared.ovpnProfiles
-						} else {
-							fatalError("A VPNProfile should be eigther an OVPNProfile or an IPSecProfile")
+						guard let indexPath = self?.currentIndexPath(for: profile) else {
+							return
 						}
-						let profile = correctProfiles[index]
 						if success && profile.hasProfile {
 							if let profile = profile as? IPSecProfile, let self = self {
 								var reload = [indexPath]
@@ -544,18 +556,7 @@ class VPNSettingsManager: SettingsViewManager {
 								self?.install(profile, for: cell)
 							}
 						} else {
-							self?.downloadErrors.insert(profile.id)
-							DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [weak self] in
-								guard let self = self else {
-									return
-								}
-								self.downloadErrors.remove(profile.id)
-								guard let index = VPNSettingsManager.listIndex(for: profile) else {
-									return
-								}
-								let indexPath = IndexPath(row: index + 1, section: listSection)
-								self.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
-							}
+							self?.flashDownloadError(for: profile)
 						}
 						self?.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
 					}
@@ -564,6 +565,62 @@ class VPNSettingsManager: SettingsViewManager {
 				controller.switchToSubscriptionSettings()
 			}
 		}
+	}
+
+	@objc private func updateOutdatedConfigs() {
+		let profiles: [VPNProfile]
+		if isIPSec {
+			profiles = VPNManager.shared.ipsecProfiles
+		} else {
+			profiles = VPNManager.shared.ovpnProfiles
+		}
+		let outdated = profiles.filter { $0.outdatedConfig }
+		for profile in outdated {
+			downloading.insert(profile.id)
+			if let indexPath = currentIndexPath(for: profile) {
+				controller.tableView.reloadRows(at: [indexPath], with: .none)
+			}
+		}
+		VPNManager.shared.updateProfileList { [weak self] success in
+			for profile in outdated {
+				self?.downloading.remove(profile.id)
+				guard let profile = VPNManager.shared.updated(profile) else {
+					continue
+				}
+				if !success || !profile.hasProfile {
+					self?.flashDownloadError(for: profile)
+				}
+				if let indexPath = self?.currentIndexPath(for: profile) {
+					self?.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
+				}
+			}
+		}
+	}
+
+	private func currentIndexPath(for profile: VPNProfile) -> IndexPath? {
+		precondition(profile is IPSecProfile || profile is OVPNProfile)
+		guard profile is IPSecProfile == isIPSec else {
+			return nil
+		}
+		guard let index = VPNSettingsManager.listIndex(for: profile) else {
+			return nil
+		}
+		return IndexPath(row: index + 1, section: listSection)
+	}
+
+	private func flashDownloadError(for profile: VPNProfile) {
+		guard let indexPath = currentIndexPath(for: profile) else {
+			return
+		}
+		downloadErrors.insert(profile.id)
+		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [weak self] in
+			self?.downloadErrors.remove(profile.id)
+			guard let indexPath = self?.currentIndexPath(for: profile) else {
+				return
+			}
+			self?.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
+		}
+		controller?.tableView?.reloadRows(at: [indexPath], with: .none)
 	}
 
 	private func getIp(prefix: String, callback rawCallback: @escaping (IPAddressStatus) -> ()) {
@@ -707,8 +764,9 @@ class VPNSettingsManager: SettingsViewManager {
 	}
 
 	deinit {
-		if let o = observer {
-			NotificationCenter.default.removeObserver(o)
+		if let o1 = vpnObserver, let o2 = foregroundObserver {
+			NotificationCenter.default.removeObserver(o1)
+			NotificationCenter.default.removeObserver(o2)
 		}
 		 session.cancelAndInvalidate()
 	}

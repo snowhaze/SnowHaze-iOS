@@ -49,9 +49,7 @@ class JSGenerator {
 			if !self.parameters.contains(parameter) {
 				return nil
 			}
-			let rawOption = JSONSerialization.ReadingOptions.allowFragments.rawValue
-			let option = JSONSerialization.WritingOptions(rawValue: rawOption)
-			guard let valueData = try? JSONSerialization.data(withJSONObject: value, options: option) else {
+			guard let valueData = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) else {
 				return nil
 			}
 			guard let valueString = String(data: valueData, encoding: .utf8) else {

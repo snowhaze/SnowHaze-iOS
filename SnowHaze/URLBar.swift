@@ -12,14 +12,17 @@ private let tabSelectionMaxHeight: CGFloat = 45
 private let tabSelectionShinkage: CGFloat = 8
 
 protocol URLBarDelegate: class {
+	@available (iOS 14, *)
+	var forwardHistoryMenu: UIMenu? { get }
+	@available (iOS 14, *)
+	var backHistoryMenu: UIMenu? { get }
+	@available (iOS 14, *)
+	var tabsActionsMenu: UIMenu? { get }
 	func prevButtonTapped(for urlBar: URLBar)
 	func nextButtonTapped(for urlBar: URLBar)
-	func prevButtonHeld(for urlBar: URLBar)
-	func nextButtonHeld(for urlBar: URLBar)
 	func shareButtonPressed(for urlBar: URLBar, sender: NSObject)
 	func plusButtonPressed(for urlBar: URLBar)
 	func tabsButtonPressed(for urlBar: URLBar)
-	func tabsButtonHeld(for urlBar: URLBar)
 	func settingsButtonPressed(for urlBar: URLBar)
 	func reloadButtonPressed(for urlBar: URLBar)
 	func securityDetailButtonPressed(for urlBar: URLBar)
@@ -145,7 +148,12 @@ class URLBar: UIView {
 
 	private let loadBarHeight: CGFloat = 2.5
 
-	weak var delegate: URLBarDelegate?
+	weak var delegate: URLBarDelegate? {
+		didSet {
+			reloadBackforwardList()
+			reloadTabActions()
+		}
+	}
 
 	var canGoForward: Bool {
 		get {
@@ -183,6 +191,22 @@ class URLBar: UIView {
 					hideButton.isHidden = true
 				}
 			})
+		}
+	}
+
+	func reloadBackforwardList() {
+		if #available(iOS 14, *) {
+			nextButton.menu = delegate?.forwardHistoryMenu
+			externalNextButton?.menu = delegate?.forwardHistoryMenu
+			prevButton.menu = delegate?.backHistoryMenu
+			externalPrevButton?.menu = delegate?.backHistoryMenu
+		}
+	}
+
+	func reloadTabActions() {
+		if #available(iOS 14, *) {
+			tabsButton.menu = delegate?.tabsActionsMenu
+			externalTabsButton?.menu = delegate?.tabsActionsMenu
 		}
 	}
 
@@ -300,30 +324,6 @@ class URLBar: UIView {
 
 	func securityButtonFrame(in view: UIView) -> CGRect {
 		return containerView.convert(securityButton.frame, to: view)
-	}
-
-	func nextButtonFrame(in view: UIView) -> CGRect? {
-		if constrainedWidth {
-			return nil
-		} else {
-			return nextButton.convert(nextButton.bounds, to: view)
-		}
-	}
-
-	func prevButtonFrame(in view: UIView) -> CGRect? {
-		if constrainedWidth {
-			return nil
-		} else {
-			return prevButton.convert(prevButton.bounds, to: view)
-		}
-	}
-
-	func tabsButtonFrame(in view: UIView) -> CGRect? {
-		if constrainedWidth {
-			return nil
-		} else {
-			return tabsButton.convert(tabsButton.bounds, to: view)
-		}
 	}
 
 	func shareButtonFrame(in view: UIView) -> CGRect? {
@@ -517,6 +517,7 @@ class URLBar: UIView {
 		let pasteAndGo = NSLocalizedString("paste and go menu option title", comment: "title of the option to paste & go in the contexxt menu of the url bar")
 		let item = UIMenuItem(title: pasteAndGo, action: #selector(URLBar.pasteAndGo(_:)))
 		UIMenuController.shared.menuItems = [item]
+		reloadTabActions()
 	}
 
 	override init(frame: CGRect) {
@@ -530,19 +531,11 @@ class URLBar: UIView {
 	}
 
 	@IBAction func prevButtonPressed(_ sender: AnyObject, by event: UIEvent) {
-		if event.allTouches?.count == 1 && event.allTouches?.randomElement()?.tapCount == 0 {
-			delegate?.prevButtonHeld(for: self)
-		} else {
-			delegate?.prevButtonTapped(for: self)
-		}
+		delegate?.prevButtonTapped(for: self)
 	}
 
 	@IBAction func nextButtonPressed(_ sender: AnyObject, by event: UIEvent) {
-		if event.allTouches?.count == 1 && event.allTouches?.randomElement()?.tapCount == 0 {
-			delegate?.nextButtonHeld(for: self)
-		} else {
-			delegate?.nextButtonTapped(for: self)
-		}
+		delegate?.nextButtonTapped(for: self)
 	}
 
 	@IBAction func shareButtonPressed(_ sender: NSObject) {
@@ -550,11 +543,7 @@ class URLBar: UIView {
 	}
 
 	@IBAction func tabsButtonPressed(_ sender: AnyObject, by event: UIEvent) {
-		if event.allTouches?.count == 1 && event.allTouches?.randomElement()?.tapCount == 0 {
-			delegate?.tabsButtonHeld(for: self)
-		} else {
-			delegate?.tabsButtonPressed(for: self)
-		}
+		delegate?.tabsButtonPressed(for: self)
 	}
 
 	override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {

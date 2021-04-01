@@ -17,6 +17,7 @@ private let anyRow = 0
 class LoginSubscriptionSettingsManager: SettingsViewManager {
 	private weak var parent: SubscriptionSettingsManager?
 	private var useKey = false
+	private var loading = false
 
 	private var keyField: UITextField?
 	private var emailField: UITextField?
@@ -139,6 +140,9 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 	}
 
 	@objc private func login(_ sender: UIButton) {
+		precondition(!loading)
+		loading = true
+		updateUIState()
 		let svc = controller!.splitMergeController!
 		if useKey {
 			let key = keyField!.text!
@@ -146,11 +150,16 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 			let joined = split.joined(separator: "")
 			let bytes = Bytes(Data(hex: joined)!)
 			assert(V3APIConnection.validateCRCedMasterSecret(bytes))
-			V3APIConnection.register(secret: bytes) { [weak self] error in
+			V3APIConnection.register(secret: bytes) { [weak self] error, secret in
 				if let error = error {
 					SubscriptionSettingsManager.show(error: error, in: svc)
-				} else {
+					self?.loading = false
+					self?.updateUIState()
+				} else if let secret = secret {
+					V3APIConnection.set(masterSecret: secret)
 					self?.parent?.switchToNormal()
+				} else {
+					fatalError("invalid result")
 				}
 			}
 		} else {
@@ -162,6 +171,8 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 					self?.parent?.switchToNormal()
 				} else {
 					SubscriptionSettingsManager.show(error: error!, in: svc)
+					self?.loading = false
+					self?.updateUIState()
 				}
 			}
 		}
@@ -183,7 +194,7 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 			keyField?.layer.borderColor = UIColor.black.cgColor
 		}
 		let accountOK = !(emailField?.text ?? "").isEmpty && !(passwordField?.text ?? "").isEmpty
-		let canLogin = (useKey && keyOK) || (!useKey && accountOK)
+		let canLogin = ((useKey && keyOK) || (!useKey && accountOK)) && !loading
 		if canLogin && !(loginButton?.isEnabled ?? true) {
 			UIView.animate(withDuration: 0.2) { [weak self] in
 				self?.loginButton?.backgroundColor = .button
@@ -212,13 +223,7 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 
 extension LoginSubscriptionSettingsManager: UITextFieldDelegate {
 	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-		let text = (textField.text ?? "") as NSString
-		let new = text.replacingCharacters(in: range, with: string)
-		textField.text = new
-		let end = range.lowerBound + (string as NSString).length
-		if let position = textField.position(from: textField.beginningOfDocument, offset: end) {
-			textField.selectedTextRange = textField.textRange(from: position, to: position)
-		}
+		update(textField, range: range, replacement: string)
 		updateUIState()
 		return false
 	}

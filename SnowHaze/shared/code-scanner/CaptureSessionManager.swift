@@ -320,15 +320,7 @@ extension CaptureSessionManager: AVCaptureMetadataOutputObjectsDelegate {
 				guard let code = object as? AVMetadataMachineReadableCodeObject else {
 					continue
 				}
-
-// TODO: remove once simulator SDK is fixed
-				let corners: [CGPoint]
-#if targetEnvironment(simulator)
-				corners = []
-#else
-				corners = code.corners
-#endif
-				self.delegate?.sessionManager(self, didScanBarCode: code.stringValue, withCorners: corners)
+				self.delegate?.sessionManager(self, didScanBarCode: code.stringValue, withCorners: code.corners)
 			}
 		}
 	}

@@ -243,14 +243,17 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 		loading = true
 		updateUIState()
 		let svc = controller!.splitMergeController!
-		V3APIConnection.register { [weak self] error in
+		V3APIConnection.register { [weak self] error, secret in
 			self?.loading = false
 			if let error = error {
 				SubscriptionSettingsManager.show(error: error, in: svc)
-			} else {
+			} else if let secret = secret {
+				V3APIConnection.set(masterSecret: secret)
 				let key = V3APIConnection.crcedMasterSecretHex!
 				UIPasteboard.general.string = key
 				self?.parent?.switchToNormal()
+			} else {
+				fatalError("invalid result")
 			}
 			self?.updateUIState()
 		}
@@ -278,23 +281,26 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 		assert(email == emailConfirm)
 		registerButton?.backgroundColor = .dimmedTitle
 		let svc = controller!.splitMergeController!
-		V3APIConnection.register { [weak self] error in
+		V3APIConnection.register { [weak self] error, secret in
 			if let error = error {
 				self?.loading = false
 				SubscriptionSettingsManager.show(error: error, in: svc)
 				self?.updateUIState()
-			} else {
+			} else if let secret = secret {
 				let code = PolicyManager.globalManager().threeLanguageCode
 				let language = V3APIConnection.Language(rawValue: code)!
-				V3APIConnection.addLogin(user: email, password: password, sendCleartextEmail: upload, language: language) { error in
+				V3APIConnection.addLogin(user: email, password: password, sendCleartextEmail: upload, language: language, secret: secret) { error in
 					self?.loading = false
 					if let error = error {
 						SubscriptionSettingsManager.show(error: error, in: svc)
 					} else {
+						V3APIConnection.set(masterSecret: secret)
 						self?.parent?.switchToNormal()
 					}
 					self?.updateUIState()
 				}
+			} else {
+				fatalError("invalid result")
 			}
 		}
 	}
@@ -441,13 +447,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 
 extension RegisterSubscriptionSettingsManager: UITextFieldDelegate {
 	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-		let text = (textField.text ?? "") as NSString
-		let new = text.replacingCharacters(in: range, with: string)
-		textField.text = new
-		let end = range.lowerBound + (string as NSString).length
-		if let position = textField.position(from: textField.beginningOfDocument, offset: end) {
-			textField.selectedTextRange = textField.textRange(from: position, to: position)
-		}
+		update(textField, range: range, replacement: string)
 		updateUIState()
 		return false
 	}

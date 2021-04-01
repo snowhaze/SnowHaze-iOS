@@ -47,11 +47,11 @@ public class SnowHazeURLSession {
 		}
 	}
 
-	private func withTorSession(callback: @escaping (URLSession?) -> ()) {
+	private func withTorSession(create: Bool = true, callback: @escaping (URLSession?) -> ()) {
 		syncToMainThread {
 			if let session = torSession {
 				callback(session)
-			} else {
+			} else if create {
 				torSessionCallbacks.append(callback)
 				if torSessionCallbacks.count == 1 {
 					TorServer.shared.start { error in
@@ -73,12 +73,15 @@ public class SnowHazeURLSession {
 						}
 					}
 				}
+			} else {
+				callback(nil)
 			}
 		}
 	}
 
 	private func withProperSession(callback: @escaping (URLSession?) -> ()) {
-		if PolicyManager.globalManager().useTorForAPICalls {
+		let useTor = syncToMainThread { PolicyManager.globalManager().useTorForAPICalls }
+		if useTor {
 			withTorSession(callback: callback)
 		} else {
 			callback(nonTorSession)
@@ -147,7 +150,7 @@ public class SnowHazeURLSession {
 
 	public func cancelAndInvalidate() {
 		syncToMainThread {
-			withTorSession { session in
+			withTorSession(create: false) { session in
 				session?.invalidateAndCancel()
 			}
 			nonTorSession.invalidateAndCancel()

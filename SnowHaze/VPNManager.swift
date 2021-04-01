@@ -36,6 +36,7 @@ protocol VPNProfile {
 	var expiration: Date? { get }
 	var hasProfile: Bool { get }
 	var data: [String: Any] { get }
+	var outdatedConfig: Bool { get }
 
 	func unchanged(since: VPNProfile) -> Bool
 	func equals(_: VPNProfile) -> Bool
@@ -48,6 +49,7 @@ struct IPSecProfile: VPNProfile, Equatable {
 	let hosts: [String]
 	let configs: [IPSecConfig]
 	let expiration: Date?
+	let outdatedConfig: Bool
 
 	public static func ==(_ lhs: IPSecProfile, _ rhs: IPSecProfile) -> Bool {
 		return lhs.id == rhs.id
@@ -66,7 +68,7 @@ struct IPSecProfile: VPNProfile, Equatable {
 		return configs == other.configs
 	}
 
-	fileprivate init?(data: [String: Any]) {
+	fileprivate init?(data: [String: Any], previous: [IPSecProfile]? = nil) {
 		guard let id = data["id"] as? String else {
 			return nil
 		}
@@ -86,7 +88,9 @@ struct IPSecProfile: VPNProfile, Equatable {
 			return nil
 		}
 		self.flag = flag
-		if let expirationTimestamp = data["expiration"] as? Double {
+
+		let authorized = data["is_authorized"] as? Bool
+		if authorized ?? true, let expirationTimestamp = data["expiration"] as? Double {
 			let date = Date(timeIntervalSince1970: expirationTimestamp)
 			if date > Date() {
 				expiration = date
@@ -109,13 +113,20 @@ struct IPSecProfile: VPNProfile, Equatable {
 					return nil
 				}
 				self.configs = configs
+				outdatedConfig = data["outdated_config"] as? Bool ?? false
 			} else {
 				expiration = nil
 				configs = []
+				outdatedConfig = false
 			}
+		} else if authorized ?? false, let old = previous?.first(where: { $0.id == id && $0.hasProfile }) {
+			expiration = old.expiration
+			configs = old.configs
+			outdatedConfig = true
 		} else {
 			expiration = nil
 			configs = []
+			outdatedConfig = false
 		}
 	}
 
@@ -132,6 +143,7 @@ struct IPSecProfile: VPNProfile, Equatable {
 		ret["credentials"] = configs.map { ["identity": $0.identity, "host": $0.host, "psk": $0.psk] }
 		let flagData = flag.pngData()!
 		ret["flag"] = flagData.base64EncodedString()
+		ret["outdated_config"] = outdatedConfig
 		if let timestamp = expiration?.timeIntervalSince1970 {
 			ret["expiration"] = timestamp
 		}
@@ -148,6 +160,7 @@ struct OVPNProfile: VPNProfile, Equatable {
 	let profile: String?
 	let expiration: Date?
 	let installedExpiration: Date?
+	let outdatedConfig: Bool
 
 	public static func ==(_ lhs: OVPNProfile, _ rhs: OVPNProfile) -> Bool {
 		return lhs.id == rhs.id
@@ -163,7 +176,7 @@ struct OVPNProfile: VPNProfile, Equatable {
 		return profile == other.profile && expiration == other.expiration
 	}
 
-	fileprivate init?(data: [String: Any], installed: [String: Double]) {
+	fileprivate init?(data: [String: Any], installed: [String: Double], previous: [OVPNProfile]? = nil) {
 		guard let id = data["id"] as? String else {
 			return nil
 		}
@@ -184,7 +197,9 @@ struct OVPNProfile: VPNProfile, Equatable {
 		}
 		self.flag = flag
 		self.flagChar = data["flagchar"] as? String
-		if let expirationTimestamp = data["expiration"] as? Double {
+
+		let authorized = data["is_authorized"] as? Bool
+		if authorized ?? true, let expirationTimestamp = data["expiration"] as? Double {
 			let date = Date(timeIntervalSince1970: expirationTimestamp)
 			if date > Date() {
 				expiration = date
@@ -192,13 +207,20 @@ struct OVPNProfile: VPNProfile, Equatable {
 					return nil
 				}
 				self.profile = profile
+				outdatedConfig = data["outdated_config"] as? Bool ?? false
 			} else {
 				expiration = nil
 				profile = nil
+				outdatedConfig = false
 			}
+		} else if authorized ?? false, let old = previous?.first(where: { $0.id == id && $0.hasProfile }) {
+			expiration = old.expiration
+			profile = old.profile
+			outdatedConfig = true
 		} else {
 			expiration = nil
 			profile = nil
+			outdatedConfig = false
 		}
 		if let installed = installed[id] {
 			installedExpiration = Date(timeIntervalSince1970: installed)
@@ -227,6 +249,7 @@ struct OVPNProfile: VPNProfile, Equatable {
 		}
 		let flagData = flag.pngData()!
 		ret["flag"] = flagData.base64EncodedString()
+		ret["outdated_config"] = outdatedConfig
 		if let timestamp = expiration?.timeIntervalSince1970 {
 			ret["expiration"] = timestamp
 		}
@@ -323,6 +346,18 @@ class VPNManager {
 
 	private let urlSession = SnowHazeURLSession()
 
+	func updated(_ profile: VPNProfile) -> VPNProfile? {
+		let correctProfiles: [VPNProfile]
+		if profile is IPSecProfile {
+			correctProfiles = VPNManager.shared.ipsecProfiles
+		} else if profile is OVPNProfile {
+			correctProfiles = VPNManager.shared.ovpnProfiles
+		} else {
+			fatalError("A VPNProfile should be eigther an OVPNProfile or an IPSecProfile")
+		}
+		return correctProfiles.first { $0.id == profile.id }
+	}
+
 	private(set) var ovpnProfiles: [OVPNProfile] {
 		didSet {
 			let rawArray = ovpnProfiles.map { $0.data }
@@ -417,11 +452,14 @@ class VPNManager {
 			self.urlSession.performDataTask(with: request) { data, response, error in
 				dec()
 				DispatchQueue.main.async {
-					guard let data = data, let dictionary = (try? JSONSerialization.jsonObject(with: data)) as? [String: [[String: Any]]], let response = response as? HTTPURLResponse else {
+					guard let data = data, let response = response as? HTTPURLResponse else {
 						return complete(success: false)
 					}
 					if let _ = token, response.statusCode == 429 {
 						return retry()
+					}
+					guard let dictionary = (try? JSONSerialization.jsonObject(with: data)) as? [String: [[String: Any]]] else {
+						return complete(success: false)
 					}
 					guard response.statusCode == 200 else {
 						return complete(success: false)
@@ -431,9 +469,9 @@ class VPNManager {
 					}
 
 					let installed = self.installedProfiles
-					let newOVPNProfiles = ovpn.compactMap { OVPNProfile(data: $0, installed: installed) }
+					let newOVPNProfiles = ovpn.compactMap { OVPNProfile(data: $0, installed: installed, previous: self.ovpnProfiles) }
 					let ovpnSuccess = newOVPNProfiles.count == ovpn.count
-					let newIPSecProfiles = ipsec.compactMap { IPSecProfile(data: $0) }
+					let newIPSecProfiles = ipsec.compactMap { IPSecProfile(data: $0, previous: self.ipsecProfiles) }
 					let ipsecSuccess = newIPSecProfiles.count == ipsec.count
 
 					if ovpnSuccess {

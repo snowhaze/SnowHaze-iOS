@@ -325,4 +325,14 @@ class SettingsViewManager: NSObject {
 		let insets = tableView.separatorInset.left
 		return fullWidth - 2 * insets
 	}
+
+	internal func update(_ textField: UITextField, range: NSRange, replacement string: String) {
+		let text = (textField.text ?? "") as NSString
+		let new = text.replacingCharacters(in: range, with: string)
+		textField.text = new
+		let end = range.lowerBound + (string as NSString).length
+		if let position = textField.position(from: textField.beginningOfDocument, offset: end) {
+			textField.selectedTextRange = textField.textRange(from: position, to: position)
+		}
+	}
 }

@@ -9,24 +9,23 @@
 import Foundation
 import UIKit
 
-private enum SearchEngineSuggestionError: Error {
-	case contentError
-}
-
 private let maxCount = 3
 
 class SearchEngineSuggestionSource: SuggestionSource {
 	var engine: SearchEngine
 	var tab: Tab
+	var policy: PolicyManager
 
 	init(engine: SearchEngine, tab: Tab) {
 		self.engine = engine
 		self.tab = tab
+		policy = PolicyManager.manager(for: tab)
 	}
 
 	init(tab: Tab) {
 		engine = SearchEngine(type: .none)
 		self.tab = tab
+		policy = PolicyManager.manager(for: tab)
 	}
 
 	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ()) {
@@ -47,6 +46,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				case .swisscows:	self.swisscowsSuggestions(for: base, callback: callback)
 				case .duckDuckGo:	self.duckDuckGoSuggestions(for: base, callback: callback)
 				case .qwant:		self.qwantSuggestions(for: base, callback: callback)
+				case .custom:		self.customSuggestions(for: base, callback: callback)
 				case .none:			return
 			}
 		}
@@ -73,7 +73,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 			let phrases = array.prefix(maxCount)
 			var suggestions = [Suggestion]()
 			for (index, title) in phrases.enumerated() {
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return
 				}
 				let subtitle = NSLocalizedString("bing search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from bing")
@@ -106,7 +106,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 			let phrases = array.prefix(maxCount)
 			var suggestions = [Suggestion]()
 			for (index, title) in phrases.enumerated() {
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return
 				}
 				let subtitle = NSLocalizedString("google search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from google")
@@ -147,7 +147,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				guard let title = res["key"] as? String else {
 					return
 				}
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return
 				}
 				let subtitle = NSLocalizedString("yahoo search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from yahoo")
@@ -221,7 +221,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				guard let title = sug["input"] as? String else {
 					return nil
 				}
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return nil
 				}
 				let subtitle = NSLocalizedString("wolframalpha search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from wolframalpha")
@@ -255,7 +255,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 			var suggestions = [Suggestion]()
 			suggestions.reserveCapacity(array.count)
 			for (index, title) in array.enumerated() {
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return
 				}
 				let subtitle = NSLocalizedString("ecosia search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from ecosia")
@@ -287,7 +287,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 			var suggestions = [Suggestion]()
 			suggestions.reserveCapacity(results.count)
 			for (index, title) in results.enumerated() {
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return
 				}
 				let subtitle = NSLocalizedString("startpage search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from startpage")
@@ -315,7 +315,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 			var suggestions = [Suggestion]()
 			suggestions.reserveCapacity(result.count)
 			for (index, title) in result.enumerated() {
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return
 				}
 				let subtitle = NSLocalizedString("swisscows search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from swisscows")
@@ -345,7 +345,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				guard let title = phrase["phrase"] else {
 					return
 				}
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return
 				}
 				let subtitle = NSLocalizedString("duckduckgo search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from duckduckgo")
@@ -380,7 +380,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				guard let title = item["value"] as? String else {
 					return
 				}
-				guard let url = self.engine.url(for: title) else {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
 					return
 				}
 				let subtitle = NSLocalizedString("qwant search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from qwant")
@@ -390,7 +390,36 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				suggestions.append(suggestion)
 			}
 			if !suggestions.isEmpty {
-				callback(suggestions, "duckduckgo")
+				callback(suggestions, "qwant")
+			}
+		}
+	}
+
+	func customSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
+		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
+			return
+		}
+		guard let (url, path) = policy.customSearchSuggestionParams(for: queryString) else {
+			return
+		}
+		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
+			guard let json = json, let items = try? path.apply(to: json) as? [String] else {
+				return
+			}
+			let titles = items.prefix(maxCount)
+			var suggestions = [Suggestion]()
+			for (index, title) in titles.enumerated() {
+				guard let url = self.engine.url(for: title, using: self.policy) else {
+					return
+				}
+				let subtitle = NSLocalizedString("custom search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from a custom search engine")
+				let image = #imageLiteral(resourceName: "custom-search")
+				let priority = self.priority(for: index + 1)
+				let suggestion = Suggestion(title: title, subtitle: subtitle, url: url, image: image, priority: priority)
+				suggestions.append(suggestion)
+			}
+			if !suggestions.isEmpty {
+				callback(suggestions, "custom")
 			}
 		}
 	}

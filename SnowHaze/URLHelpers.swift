@@ -16,6 +16,10 @@ extension URL {
 	var normalizedHost: String? {
 		return host?.lowercased()
 	}
+
+	var isOnion: Bool {
+		return normalizedHost?.hasSuffix(".onion") ?? false
+	}
 }
 
 extension URLComponents {
@@ -25,5 +29,26 @@ extension URLComponents {
 
 	var normalizedHost: String? {
 		return host?.lowercased()
+	}
+}
+
+extension URLProtectionSpace {
+	var normalizedHost: String {
+		return host.lowercased()
+	}
+}
+
+extension WKSecurityOrigin {
+	var normalizedHost: String {
+		return host.lowercased()
+	}
+}
+
+extension WKNavigationAction {
+	var loadedMainURL: URL? {
+		guard targetFrame?.isMainFrame ?? false else {
+			return nil
+		}
+		return request.url
 	}
 }

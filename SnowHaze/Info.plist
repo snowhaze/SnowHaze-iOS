@@ -63,6 +63,7 @@
 	<true/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>sbbmobile</string>
 		<string>whatsapp</string>
 		<string>workflow</string>
 		<string>openvpn</string>
@@ -131,6 +132,24 @@
 		<string>youtube</string>
 		<string>zoomus</string>
 		<string>zuludesk</string>
+		<string>twint-issuer1</string>
+		<string>twint-issuer2</string>
+		<string>twint-issuer3</string>
+		<string>twint-issuer4</string>
+		<string>twint-issuer5</string>
+		<string>twint-issuer6</string>
+		<string>twint-issuer7</string>
+		<string>twint-issuer8</string>
+		<string>twint-issuer9</string>
+		<string>twint-issuer10</string>
+		<string>twint-issuer11</string>
+		<string>twint-issuer12</string>
+		<string>twint-issuer13</string>
+		<string>twint-issuer14</string>
+		<string>twint-issuer15</string>
+		<string>twint-issuer16</string>
+		<string>twint-issuer17</string>
+		<string>twint-issuer18</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -140,9 +159,11 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera is used exclusively for the barcode scanner</string>
+	<string>Camera is used for the barcode scanner or - upon separate permission grant - to pass threw to websites.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Unlock SnowHaze using Face ID</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone is used to pass threw to websites upon separate permission grant.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>SnowHaze needs library access to save images</string>
 	<key>UIApplicationShortcutItems</key>

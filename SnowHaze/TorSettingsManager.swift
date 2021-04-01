@@ -22,7 +22,24 @@ class TorSettingsManager: SettingsViewManager {
 		return PolicyAssessor(wrapper: settings).assess([.tor]).color
 	}
 
-	private var connectButton: UIButton?
+	private var torButton: UIButton?
+
+	override func setup() {
+		TorServer.shared.statusCallback = { [weak self] _ in
+			self?.updateConnectButton()
+		}
+	}
+
+	private func updateConnectButton() {
+		guard let button = torButton else {
+			return
+		}
+		let reset = NSLocalizedString("reset tor button title", comment: "title of button to reset tor circuits")
+		let connect = NSLocalizedString("connect tor button title", comment: "title of button to launch the tor thread")
+		let title = TorServer.shared.status.running ? reset : connect
+		button.setTitle(title, for: [])
+		button.isEnabled = !TorServer.shared.status.temporary
+	}
 
 	override func cellForRow(atIndexPath indexPath: IndexPath, tableView: UITableView) -> UITableViewCell {
 		assert(sectionIndex == 0)
@@ -82,11 +99,9 @@ class TorSettingsManager: SettingsViewManager {
 			progress.observedProgress = TorServer.shared.bootstrapProgress
 		} else {
 			let button = makeButton(for: cell)
-			let title = NSLocalizedString("connect tor button title", comment: "title of button to launch the tor thread")
-			button.setTitle(title, for: [])
-			connectButton = button
-			button.isEnabled = !TorServer.shared.running && SubscriptionManager.status.possible
-			button.addTarget(self, action: #selector(connect(_:)), for: .touchUpInside)
+			torButton = button
+			updateConnectButton()
+			button.addTarget(self, action: #selector(torOperation(_:)), for: .touchUpInside)
 		}
 		return cell
 	}
@@ -125,20 +140,19 @@ class TorSettingsManager: SettingsViewManager {
 
 	@objc private func toggleStartOnLaunch(_ sender: UISwitch) {
 		set(sender.isOn, for: startTorOnAppLaunchKey)
-		if sender.isOn {
-			connect(nil)
+		if sender.isOn, case .shutDown = TorServer.shared.status {
+			torOperation(nil)
 		}
 		updateHeaderColor(animated: true)
 	}
 
-	@objc private func connect(_ sender: UIButton?) {
-		connectButton?.isEnabled = false
-		TorServer.shared.start { [weak self] error in
-			self?.connectButton?.isEnabled = error != nil
-			if case .noSubscription = error {
-				self?.controller?.tableView?.reloadData()
-			}
+	@objc private func torOperation(_ sender: UIButton?) {
+		if TorServer.shared.status.running {
+			TorServer.shared.reset()
+		} else {
+			TorServer.shared.start()
 		}
+		updateConnectButton()
 	}
 
 	override func didSelectRow(atIndexPath indexPath: IndexPath, tableView: UITableView) {

@@ -56,6 +56,7 @@ enum SchemeType {
 	case podcast				// Apple Podcast
 	case powerpoint				// Microsoft Powerpoint
 	case protonmail				// Protonmail
+	case sbb					// SBB
 	case signal					// Signal
 	case shazam					// Shazam
 	case skype					// Skype
@@ -73,6 +74,27 @@ enum SchemeType {
 	case zuludesk				// Zuludesk
 	case zoom					// Zoom
 	case settings				// Apple Settings
+
+	case twintPrepaid			// Twint Prepaid
+	case twintUBS				// Twint UBS
+	case twintZKB				// Twint ZKB
+	case twintCS				// Twint CS
+	case twintBCV				// Twint BCV
+	case twintRaiffeisen		// Twint Raiffeisen
+	case twintPostfinance		// Twint Postfinance
+	case twintOKB				// Twint OKB
+	case twintZugerKB			// Twint ZugerKB
+	case twintBCGE				// Twint BCGE
+	case twintNAB				// Twint NAB
+	case twintAPPKB				// Twint APPKB
+	case twintBCVS				// Twint BCVS
+	case twintSGKB				// Twint SGKB
+	case twintGKB				// Twint GKB
+	case twintBCF				// Twint BCF
+	case twintBCJ				// Twint BCJ
+	case twintBCN				// Twint BCN
+
+	private static let twintRx = Regex(pattern: "twint-issuer([1-4][0-9]|[1-9]|50)")
 
 	init(_ url: URL?) {
 		guard let target = url, let scheme = target.normalizedScheme else {
@@ -191,6 +213,8 @@ enum SchemeType {
 				self = .powerpoint
 			case "protonmail":
 				self = .protonmail
+			case "sbbmobile":
+			   self = .sbb
 			case "sgnl":
 				self = .signal
 			case "shazam":
@@ -225,6 +249,42 @@ enum SchemeType {
 				self = .zoom
 			case "prefs":
 				self = .settings
+			case "twint-issuer1":
+				self = .twintPrepaid
+			case "twint-issuer2":
+				   self = .twintUBS
+			case "twint-issuer3":
+				   self = .twintZKB
+			case "twint-issuer4":
+				   self = .twintCS
+			case "twint-issuer5":
+				   self = .twintBCV
+			case "twint-issuer6":
+				   self = .twintRaiffeisen
+			case "twint-issuer7":
+				   self = .twintPostfinance
+			case "twint-issuer8":
+				   self = .twintOKB
+			case "twint-issuer9":
+				   self = .twintZugerKB
+			case "twint-issuer10":
+				   self = .twintBCGE
+			case "twint-issuer11":
+				   self = .twintNAB
+			case "twint-issuer12":
+				   self = .twintAPPKB
+			case "twint-issuer13":
+				   self = .twintBCVS
+			case "twint-issuer14":
+				   self = .twintSGKB
+			case "twint-issuer15":
+				   self = .twintGKB
+			case "twint-issuer16":
+				   self = .twintBCF
+			case "twint-issuer17":
+				   self = .twintBCJ
+			case "twint-issuer18":
+				   self = .twintBCN
 			default:
 				self = .unknown
 		}
@@ -273,6 +333,7 @@ enum SchemeType {
 			case .podcast:			return NSLocalizedString("open url in app podcast app name", comment: "name of the podcast app used to confirm opening of url in other app")
 			case .powerpoint:		return NSLocalizedString("open url in app powerpoint app name", comment: "name of the powerpoint app used to confirm opening of url in other app")
 			case .protonmail:		return NSLocalizedString("open url in app protonmail app name", comment: "name of the protonmail app used to confirm opening of url in other app")
+			case .sbb:			return NSLocalizedString("open url in app sbb app name", comment: "name of the sbb app used to confirm opening of url in other app")
 			case .signal:			return NSLocalizedString("open url in app signal app name", comment: "name of the signal app used to confirm opening of url in other app")
 			case .shazam:			return NSLocalizedString("open url in app shazam app name", comment: "name of the shazam app used to confirm opening of url in other app")
 			case .skype:			return NSLocalizedString("open url in app skype app name", comment: "name of the skype app used to confirm opening of url in other app")
@@ -295,6 +356,25 @@ enum SchemeType {
 			case .intent(_):		return nil
 			case .call(_, true):	return NSLocalizedString("open url in app facetime app name", comment: "name of the facetime app used to confirm opening of url in other app")
 			case .call(_, false):	return NSLocalizedString("open url in app phone app name", comment: "name of the phone app used to confirm opening of url in other app")
+
+			case .twintPrepaid:		return NSLocalizedString("open url in app twint prepaid app name", comment: "name of the twint prepaid app used to confirm opening of url in other app")
+			case .twintUBS:			return NSLocalizedString("open url in app twint ubs app name", comment: "name of the twint ubs app used to confirm opening of url in other app")
+			case .twintZKB:			return NSLocalizedString("open url in app twint zkb app name", comment: "name of the twint zkb app used to confirm opening of url in other app")
+			case .twintCS:			return NSLocalizedString("open url in app twint credit suisse app name", comment: "name of the twint credit suisse app used to confirm opening of url in other app")
+			case .twintBCV:			return NSLocalizedString("open url in app twint bcv app name", comment: "name of the twint bcv app used to confirm opening of url in other app")
+			case .twintRaiffeisen:	return NSLocalizedString("open url in app twint raiffeisen app name", comment: "name of the twint raiffeisen app used to confirm opening of url in other app")
+			case .twintPostfinance:	return NSLocalizedString("open url in app twint postfinance app name", comment: "name of the twint postfinance app used to confirm opening of url in other app")
+			case .twintOKB:			return NSLocalizedString("open url in app twint okb app name", comment: "name of the twint okb app used to confirm opening of url in other app")
+			case .twintZugerKB:		return NSLocalizedString("open url in app twint zugerkb app name", comment: "name of the twint zugerkb app used to confirm opening of url in other app")
+			case .twintBCGE:		return NSLocalizedString("open url in app twint bcge app name", comment: "name of the twint bcge app used to confirm opening of url in other app")
+			case .twintNAB:			return NSLocalizedString("open url in app twint nab app name", comment: "name of the twint nab app used to confirm opening of url in other app")
+			case .twintAPPKB:		return NSLocalizedString("open url in app twint appkb app name", comment: "name of the twint appkb app used to confirm opening of url in other app")
+			case .twintBCVS:		return NSLocalizedString("open url in app twint bcvs app name", comment: "name of the twint bcvs app used to confirm opening of url in other app")
+			case .twintSGKB:	return NSLocalizedString("open url in app twint sgkb app name", comment: "name of the twint sgkb app used to confirm opening of url in other app")
+			case .twintGKB:	return NSLocalizedString("open url in app twint gkb app name", comment: "name of the twint gkb app used to confirm opening of url in other app")
+			case .twintBCF:	return NSLocalizedString("open url in app twint bcf app name", comment: "name of the twint bcf app used to confirm opening of url in other app")
+			case .twintBCJ:	return NSLocalizedString("open url in app twint bcj app name", comment: "name of the twint bcj app used to confirm opening of url in other app")
+			case .twintBCN:	return NSLocalizedString("open url in app twint bcm app name", comment: "name of the twint bcn app used to confirm opening of url in other app")
 		}
 	}
 
@@ -340,6 +420,7 @@ enum SchemeType {
 			case .podcast:			return true
 			case .powerpoint:		return true
 			case .protonmail:		return true
+			case .sbb:				return true
 			case .signal:			return true
 			case .shazam:			return true
 			case .skype:			return true
@@ -356,6 +437,24 @@ enum SchemeType {
 			case .youtube:			return true
 			case .zuludesk:			return true
 			case .zoom:				return true
+			case .twintPrepaid:		return true
+			case .twintUBS:			return true
+			case .twintZKB:			return true
+			case .twintCS:			return true
+			case .twintBCV:			return true
+			case .twintRaiffeisen:	return true
+			case .twintPostfinance:	return true
+			case .twintOKB:			return true
+			case .twintZugerKB:		return true
+			case .twintBCGE:		return true
+			case .twintNAB:			return true
+			case .twintAPPKB:		return true
+			case .twintBCVS:		return true
+			case .twintSGKB:		return true
+			case .twintGKB:			return true
+			case .twintBCF:			return true
+			case .twintBCJ:			return true
+			case .twintBCN:			return true
 			case .unknown:			return false
 			case .http:				return false
 			case .store:			return false

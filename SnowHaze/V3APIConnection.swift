@@ -90,6 +90,7 @@ public enum V3APIConnection {
 	}
 
 	static let masterSecretChangedNotification = Notification.Name("v3apiMasterSecretChangedNotificationName")
+	static let queue = DispatchQueue(label: "ch.illotros.snowhaze.v3api.worker", qos: .userInteractive)
 
 	private static let urlSession = SnowHazeURLSession()
 
@@ -188,9 +189,9 @@ public enum V3APIConnection {
 		return Data(msg + [crc.high, crc.low]).hex
 	}
 
-	static func register(secret: Bytes? = nil, callback: @escaping (Error?) -> ()) {
+	static func register(secret: Bytes? = nil, callback: @escaping (Error?, Bytes?) -> ()) {
 		guard secret == nil || validateCRCedMasterSecret(secret!) else {
-			callback(.invalidMasterSecret)
+			callback(.invalidMasterSecret, nil)
 			return
 		}
 		let rawSecret: Bytes
@@ -201,12 +202,11 @@ public enum V3APIConnection {
 		}
 		getData(command: "register", masterSecret: rawSecret) { statusCode, _ in
 			if [201, 409].contains(statusCode) {
-				set(masterSecret: rawSecret)
-				callback(nil)
+				callback(nil, rawSecret)
 			} else if statusCode == 429 {
-				callback(.exessiveUsage)
+				callback(.exessiveUsage, nil)
 			} else {
-				callback(.network)
+				callback(.network, nil)
 			}
 		}
 	}
@@ -231,80 +231,80 @@ public enum V3APIConnection {
 		case german = "de"
 		case french = "fr"
 	}
-	static func addLogin(user: String, password: String, sendCleartextEmail: Bool, language: Language, callback: @escaping (Error?) -> ()) {
-		guard let secret = masterSecret else {
-			callback(.missingMasterSecret)
-			return
-		}
-		let emailSecret = user.emailSecretHash
-		let key = masterSecretUploadKeys(for: emailSecret, password: password)
-		let encryptedMS = Data([1] + sodium.aead.xchacha20poly1305ietf.encrypt(message: secret, secretKey: key.key, additionalData: [1])!)
-		var parameters = [
-			"email_hash": publicHashBase64(from: emailSecret),
-			"password_key": key.id.base64EncodedString(),
-			"master_secret": encryptedMS.base64EncodedString(),
-		]
+	static func addLogin(user: String, password: String, sendCleartextEmail: Bool, language: Language, secret: Bytes, callback: @escaping (Error?) -> ()) {
+		queue.async {
+			let emailSecret = user.emailSecretHash
+			let key = masterSecretUploadKeys(for: emailSecret, password: password)
+			let encryptedMS = Data([1] + sodium.aead.xchacha20poly1305ietf.encrypt(message: secret, secretKey: key.key, additionalData: [1])!)
+			var parameters = [
+				"email_hash": publicHashBase64(from: emailSecret),
+				"password_key": key.id.base64EncodedString(),
+				"master_secret": encryptedMS.base64EncodedString(),
+			]
 
-		let rawConfig: [String: Any] = [
-			"email": user,
-			"lang": language.rawValue,
-			"version": 1,
-		]
+			let rawConfig: [String: Any] = [
+				"email": user,
+				"lang": language.rawValue,
+				"version": 1,
+			]
 
-		let config = try! JSONSerialization.data(withJSONObject: rawConfig)
+			let config = try! JSONSerialization.data(withJSONObject: rawConfig)
 
-		if sendCleartextEmail {
-			parameters["config"] = String(data: config, encoding: .utf8)!
-		} else {
-			let configKey = sodium.keyDerivation.derive(secretKey: emailSecret, index: 0, length: sodium.aead.xchacha20poly1305ietf.KeyBytes, context: "confenck")!
-			let encrypted: Bytes = sodium.aead.xchacha20poly1305ietf.encrypt(message: user.bytes, secretKey: configKey, additionalData: [1])!
-			parameters["encrypted_config"] = Data([1] + encrypted).base64EncodedString()
-		}
-
-		getData(for: parameters, command: "set_credentials") { statusCode, _ in
-			if statusCode == 200 {
-				callback(nil)
-			} else if statusCode == 409 {
-				callback(.emailInUse)
-			} else if statusCode == 403 {
-				callback(.clearMasterSecret)
-			} else if statusCode == 429 {
-				callback(.exessiveUsage)
+			if sendCleartextEmail {
+				parameters["config"] = String(data: config, encoding: .utf8)!
 			} else {
-				callback(.network)
+				let configKey = sodium.keyDerivation.derive(secretKey: emailSecret, index: 0, length: sodium.aead.xchacha20poly1305ietf.KeyBytes, context: "confenck")!
+				let encrypted: Bytes = sodium.aead.xchacha20poly1305ietf.encrypt(message: user.bytes, secretKey: configKey, additionalData: [1])!
+				parameters["encrypted_config"] = Data([1] + encrypted).base64EncodedString()
+			}
+
+			getData(for: parameters, command: "set_credentials", masterSecret: secret) { statusCode, _ in
+				if statusCode == 200 {
+					callback(nil)
+				} else if statusCode == 409 {
+					callback(.emailInUse)
+				} else if statusCode == 403 {
+					callback(.clearMasterSecret)
+				} else if statusCode == 429 {
+					callback(.exessiveUsage)
+				} else {
+					callback(.network)
+				}
 			}
 		}
 	}
 
 	static func getMasterSecret(user: String, password: String, callback: @escaping (Bytes?, Error?) -> ()) {
-		let emailSecret = user.emailSecretHash
-		let key = masterSecretUploadKeys(for: emailSecret, password: password)
-		let parameters = ["email_hash": publicHashBase64(from: emailSecret), "password_key": key.id.base64EncodedString()]
-		getData(for: parameters, command: "get_master_secret", addKey: false) { statusCode, response in
-			guard statusCode == 200, let base64 = response["master_secret"] as? String, let ciphertext = Data(base64Encoded: base64) else {
-				if statusCode == 404 {
-					callback(nil, .noSuchAccount)
-				} else if statusCode == 429 {
-					callback(nil, .exessiveUsage)
-				} else {
-					callback(nil, .network)
+		queue.async {
+			let emailSecret = user.emailSecretHash
+			let key = masterSecretUploadKeys(for: emailSecret, password: password)
+			let parameters = ["email_hash": publicHashBase64(from: emailSecret), "password_key": key.id.base64EncodedString()]
+			getData(for: parameters, command: "get_master_secret", addKey: false) { statusCode, response in
+				guard statusCode == 200, let base64 = response["master_secret"] as? String, let ciphertext = Data(base64Encoded: base64) else {
+					if statusCode == 404 {
+						callback(nil, .noSuchAccount)
+					} else if statusCode == 429 {
+						callback(nil, .exessiveUsage)
+					} else {
+						callback(nil, .network)
+					}
+					return
 				}
-				return
+				guard ciphertext.count > 1, ciphertext[0] == 1 else {
+					callback(nil, .network)
+					return
+				}
+				let encryptedSecret = Bytes(ciphertext[1 ..< ciphertext.count])
+				guard let secret = sodium.aead.xchacha20poly1305ietf.decrypt(nonceAndAuthenticatedCipherText: encryptedSecret, secretKey: key.key, additionalData: [1]) else {
+					callback(nil, .network)
+					return
+				}
+				guard secret.count == sodium.box.SecretKeyBytes else {
+					callback(nil, .network)
+					return
+				}
+				callback(secret, nil)
 			}
-			guard ciphertext.count > 1, ciphertext[0] == 1 else {
-				callback(nil, .network)
-				return
-			}
-			let encryptedSecret = Bytes(ciphertext[1 ..< ciphertext.count])
-			guard let secret = sodium.aead.xchacha20poly1305ietf.decrypt(nonceAndAuthenticatedCipherText: encryptedSecret, secretKey: key.key, additionalData: [1]) else {
-				callback(nil, .network)
-				return
-			}
-			guard secret.count == sodium.box.SecretKeyBytes else {
-				callback(nil, .network)
-				return
-			}
-			callback(secret, nil)
 		}
 	}
 
@@ -552,7 +552,8 @@ public enum V3APIConnection {
 			}
 		}
 		if addKey {
-			guard let keys = keys(from: masterSecret ?? self.masterSecret) else {
+			let zkaKeys = syncToMainThread { keys(from: masterSecret ?? self.masterSecret) }
+			guard let keys = zkaKeys else {
 				callback(0, [:])
 				return
 			}

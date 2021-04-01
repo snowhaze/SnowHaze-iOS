@@ -49,15 +49,20 @@ class StatsView: UICollectionReusableView {
 
 	private func fmt(_ i: Int) -> String {
 		if i >= 100_000_000 {
-			return "\(i / 1_000_000_000).\((i % 1_000_000_000) / 100_000_000)G"
+			let a = i + 50_000_000
+			return "\(a / 1_000_000_000).\((a % 1_000_000_000) / 100_000_000)G"
 		} else if i >= 10_000_000 {
-			return "\(i / 1_000_000)M"
+			let a = i + 500_000
+			return "\(a / 1_000_000)M"
 		} else if i >= 100_000 {
-			return "\(i / 1_000_000).\((i % 1_000_000) / 100_000)M"
+			let a = i + 50_000
+			return "\(a / 1_000_000).\((a % 1_000_000) / 100_000)M"
 		} else if i >= 10_000 {
-			return "\(i / 1_000)k"
+			let a = i + 500
+			return "\(a / 1_000)k"
 		} else if i >= 1_000 {
-			return "\(i / 1_000).\((i % 1_000) / 100)k"
+			let a = i + 50
+			return "\(a / 1_000).\((a % 1_000) / 100)k"
 		} else {
 			return "\(i)"
 		}

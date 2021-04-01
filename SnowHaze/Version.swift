@@ -6,8 +6,9 @@
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
-let currentVersion				= version_3_1_1__089
+let currentVersion				= version_3_2_0__090
 
+let version_3_2_0__090: Int64	= 03020000	// App Store
 let version_3_1_1__089: Int64	= 03010100	// App Store
 let version_3_1_0__088: Int64	= 03010001	// App Store
 let version_3_1_0__087: Int64	= 03010000	// TestFlight

@@ -22,6 +22,9 @@ let userAgentsKey							= "ch.illotros.snowhaze.userAgents"
 let renderAsDesktopSiteKey					= "ch.illotros.snowhaze.renderAsDesktopSite"
 let searchEngineKey							= "ch.illotros.snowhaze.searchEngine"
 let searchSuggestionEnginesKey				= "ch.illotros.snowhaze.searchSuggestionEngines"
+let customSearchURLKey						= "ch.illotros.snowhaze.customSearchURL"
+let customSearchSuggestionsURLKey			= "ch.illotros.snowhaze.customSearchSuggestionsURL"
+let customSearchSuggestionsJSONPathKey		= "ch.illotros.snowhaze.customSearchSuggestionsJSONPath"
 let requiresUserActionForMediaPlaybackKey	= "ch.illotros.snowhaze.requiresUserActionForMediaPlayback"
 let allowsInlineMediaPlaybackKey			= "ch.illotros.snowhaze.allowsInlineMediaPlayback"
 let blockHTTPReferrersKey					= "ch.illotros.snowhaze.blockHTTPReferrers"
@@ -130,6 +133,9 @@ private let defaults: [String: SQLite.Data] = [
 	// Search Engine
 	searchEngineKey:						.integer(SearchEngineType.startpage.rawValue),
 	searchSuggestionEnginesKey:				.text(SearchEngine.encode([SearchEngineType.startpage, SearchEngineType.wikipedia])),
+	customSearchURLKey:						.text(""),
+	customSearchSuggestionsURLKey:			.text(""),
+	customSearchSuggestionsJSONPathKey:		.text(""),
 
 	// Media Playback
 	requiresUserActionForMediaPlaybackKey:	.false,
@@ -825,6 +831,38 @@ class PolicyManager {
 		return (bool(for: showLocalSiteSuggestionsKey) ? localSources : []) + engineSources
 	}
 
+	static func customSearchTemplate(for query: String) -> Templating? {
+		guard let escaped = query.addingPercentEncoding(withAllowedCharacters: .alphanumerics) else {
+			return nil
+		}
+		var template = Templating()
+		template.add("@@") { _ in return "@" }
+		template.add("@query@") { _ in return escaped }
+		return template
+	}
+
+	func customSearchURL(for query: String) -> URL? {
+		guard let template = PolicyManager.customSearchTemplate(for: query) else {
+			return nil
+		}
+		let text = settingsWrapper.value(for: customSearchURLKey).text!
+		return try? URL(string: template.apply(to: text))
+	}
+
+	func customSearchSuggestionParams(for query: String) -> (URL, JSONPath)? {
+		guard let template = PolicyManager.customSearchTemplate(for: query) else {
+			return nil
+		}
+		let text = settingsWrapper.value(for: customSearchURLKey).text!
+		guard let url = try? URL(string: template.apply(to: text)) else {
+			return nil
+		}
+		guard let path = try? JSONPath(settingsWrapper.value(for: customSearchSuggestionsJSONPathKey).text!) else {
+			return nil
+		}
+		return (url, path)
+	}
+
 	var showTLSCertWarnings: Bool {
 		return bool(for: showTLSCertificateWarningsKey)
 	}
@@ -873,16 +911,19 @@ class PolicyManager {
 		}
 
 		if let encoded = userInput.punycodeExtension {
-			let httpsFirst = bool(for: tryHTTPSfirstKey)
+			var httpsFirst = bool(for: tryHTTPSfirstKey)
 			var https = [Action]()
 
 			if let url = encoded.extendToURL(https: true, www: false) {
+				httpsFirst = httpsFirst && !url.isOnion
 				let upgraded = httpsFirst || enfoceHTTPS(for: url)
 				https.append(.load(url, upgraded: upgraded))
 			}
 			if let url = encoded.extendToURL(https: true, www: true), !encoded.hasWPrefix {
 				let upgraded = httpsFirst || enfoceHTTPS(for: url)
-				https.append(.load(url, upgraded: https.isEmpty && upgraded))
+				if !url.isOnion {
+					https.append(.load(url, upgraded: https.isEmpty && upgraded))
+				}
 			}
 			var http = [Action]()
 			if let url = encoded.extendToURL(https: false, www: false) {
@@ -891,7 +932,7 @@ class PolicyManager {
 				}
 			}
 			if let url = encoded.extendToURL(https: false, www: true), !encoded.hasWPrefix {
-				if !enfoceHTTPS(for: url) {
+				if !enfoceHTTPS(for: url) && !url.isOnion {
 					http.append(.load(url, upgraded: false))
 				}
 			}
@@ -905,7 +946,7 @@ class PolicyManager {
 			}
 		}
 		let engine = searchEngine
-		if let url = engine.url(for: userInput) {
+		if let url = engine.url(for: userInput, using: self) {
 			ret.append(.load(url, upgraded: false))
 		}
 		return ret

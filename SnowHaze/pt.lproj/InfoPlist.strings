@@ -6,6 +6,8 @@
 
 "NSCameraUsageDescription" = "A câmera é usado exclusivamente para o escâner de código de barras.";
 
+"NSMicrophoneUsageDescription" = "O microfone é utilizado pelos sítios web se conceder autorização.";
+
 "NSPhotoLibraryAddUsageDescription" = "O SnowHaze precisa ter acesso ao Photos para poder fazer download dos médias.";
 
 "open vpn settings application shortcut item title" = "Definições VPN";

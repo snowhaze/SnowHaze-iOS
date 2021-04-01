@@ -51,7 +51,7 @@ class SplitMergeController: UIViewController {
 			addChild(masterViewController)
 			viewIfLoaded?.addSubview(masterViewController.view)
 			masterViewController.didMove(toParent: self)
-			navigationItem.title = masterViewController.navigationItem.title
+			use(masterViewController.navigationItem)
 			if let _ = viewIfLoaded {
 				layout()
 			}
@@ -189,6 +189,10 @@ class SplitMergeController: UIViewController {
 		navigationItem.title = navItem.title
 		navigationItem.titleView = navItem.titleView
 		navigationItem.prompt = navItem.prompt
+		navigationItem.backButtonTitle = navItem.backButtonTitle
+		if #available(iOS 14, *) {
+			navigationItem.backButtonDisplayMode = navItem.backButtonDisplayMode
+		}
 	}
 }
 

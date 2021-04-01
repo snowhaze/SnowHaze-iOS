@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -138,7 +138,6 @@
 		84C7BF1320961AC6003C25B2 /* SettingsViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE5E20961AC1003C25B2 /* SettingsViewManager.swift */; };
 		84C7BF1420961AC6003C25B2 /* FindOnPageActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE5F20961AC1003C25B2 /* FindOnPageActivity.swift */; };
 		84C7BF1520961AC6003C25B2 /* HTTPSSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE6120961AC1003C25B2 /* HTTPSSettingsManager.swift */; };
-		84C7BF1620961AC6003C25B2 /* api2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BE6220961AC2003C25B2 /* api2.cer */; };
 		84C7BF1720961AC6003C25B2 /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE6320961AC2003C25B2 /* DataStore.swift */; };
 		84C7BF1820961AC6003C25B2 /* DroppingImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE6420961AC2003C25B2 /* DroppingImagesView.swift */; };
 		84C7BF1920961AC6003C25B2 /* DataFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE6520961AC2003C25B2 /* DataFetcher.swift */; };
@@ -182,6 +181,9 @@
 		D75D8F6B24C896C000E5542F /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE0B20961AB9003C25B2 /* Regex.swift */; };
 		D76821272533B62E00BB2E11 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76821262533B62A00BB2E11 /* Alert.swift */; };
 		D768212B2533B6BB00BB2E11 /* DownloadActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D768212A2533B6BB00BB2E11 /* DownloadActivity.swift */; };
+		D7688F23261632D700EF0E42 /* MultiviewSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7688F22261632D700EF0E42 /* MultiviewSettingsManager.swift */; };
+		D7688F26261636A100EF0E42 /* Templating.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7688F25261636A100EF0E42 /* Templating.swift */; };
+		D7688F2A26163B1B00EF0E42 /* JSONPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7688F2926163B1B00EF0E42 /* JSONPath.swift */; };
 		D799505F24BA95630039B858 /* DefaultSubscriptionSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D799505E24BA95630039B858 /* DefaultSubscriptionSettingsManager.swift */; };
 		D799506124BA95980039B858 /* RegisterSubscriptionSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D799506024BA95980039B858 /* RegisterSubscriptionSettingsManager.swift */; };
 		D799506324BA95E30039B858 /* LoginSubscriptionSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D799506224BA95E30039B858 /* LoginSubscriptionSettingsManager.swift */; };
@@ -219,7 +221,6 @@
 		D79950A624BA9AE50039B858 /* DER.swift in Sources */ = {isa = PBXBuildFile; fileRef = D79950A524BA9AE40039B858 /* DER.swift */; };
 		D79950A824BA9B210039B858 /* PasswordValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D79950A724BA9B210039B858 /* PasswordValidator.swift */; };
 		D79950AA24BA9B550039B858 /* SnowHazeURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = D79950A924BA9B550039B858 /* SnowHazeURLSession.swift */; };
-		D79950AC24BA9B790039B858 /* TabHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D79950AB24BA9B790039B858 /* TabHistoryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -404,7 +405,6 @@
 		84C7BE5F20961AC1003C25B2 /* FindOnPageActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindOnPageActivity.swift; sourceTree = "<group>"; };
 		84C7BE6020961AC1003C25B2 /* SimplePing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimplePing.h; sourceTree = "<group>"; };
 		84C7BE6120961AC1003C25B2 /* HTTPSSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPSSettingsManager.swift; sourceTree = "<group>"; };
-		84C7BE6220961AC2003C25B2 /* api2.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = api2.cer; sourceTree = "<group>"; };
 		84C7BE6320961AC2003C25B2 /* DataStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
 		84C7BE6420961AC2003C25B2 /* DroppingImagesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DroppingImagesView.swift; sourceTree = "<group>"; };
 		84C7BE6520961AC2003C25B2 /* DataFetcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataFetcher.swift; sourceTree = "<group>"; };
@@ -448,6 +448,9 @@
 		D701909321C32C1900180EE8 /* ReviewPrompt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviewPrompt.swift; sourceTree = "<group>"; };
 		D76821262533B62A00BB2E11 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		D768212A2533B6BB00BB2E11 /* DownloadActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadActivity.swift; sourceTree = "<group>"; };
+		D7688F22261632D700EF0E42 /* MultiviewSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiviewSettingsManager.swift; sourceTree = "<group>"; };
+		D7688F25261636A100EF0E42 /* Templating.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Templating.swift; sourceTree = "<group>"; };
+		D7688F2926163B1B00EF0E42 /* JSONPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONPath.swift; sourceTree = "<group>"; };
 		D799505E24BA95630039B858 /* DefaultSubscriptionSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultSubscriptionSettingsManager.swift; sourceTree = "<group>"; };
 		D799506024BA95980039B858 /* RegisterSubscriptionSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterSubscriptionSettingsManager.swift; sourceTree = "<group>"; };
 		D799506224BA95E30039B858 /* LoginSubscriptionSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginSubscriptionSettingsManager.swift; sourceTree = "<group>"; };
@@ -486,7 +489,6 @@
 		D79950A524BA9AE40039B858 /* DER.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DER.swift; sourceTree = "<group>"; };
 		D79950A724BA9B210039B858 /* PasswordValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordValidator.swift; sourceTree = "<group>"; };
 		D79950A924BA9B550039B858 /* SnowHazeURLSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnowHazeURLSession.swift; sourceTree = "<group>"; };
-		D79950AB24BA9B790039B858 /* TabHistoryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -631,6 +633,7 @@
 				84C7BDFC20961AB8003C25B2 /* JavaScriptSettingsManager.swift */,
 				84C7BE2620961ABC003C25B2 /* JSGenerator.swift */,
 				84C7BE7220961AC3003C25B2 /* JSONFetcher.swift */,
+				D7688F2926163B1B00EF0E42 /* JSONPath.swift */,
 				84C7BE2A20961ABC003C25B2 /* KeyManager.swift */,
 				84C7BE5220961AC0003C25B2 /* LoadBar.swift */,
 				84C7BE4D20961ABF003C25B2 /* LocalSettingsView.swift */,
@@ -641,6 +644,7 @@
 				84C7BDCD20961AB6003C25B2 /* MaskingRule.swift */,
 				84C7BE7620961AC3003C25B2 /* MediaPlaybackSettingsManager.swift */,
 				84C7BDCE20961AB6003C25B2 /* MemoryGame.swift */,
+				D7688F22261632D700EF0E42 /* MultiviewSettingsManager.swift */,
 				84C7BE5620961AC0003C25B2 /* NightMode.js */,
 				D799509B24BA9A270039B858 /* PageInfoDetailsList.swift */,
 				D799509924BA9A270039B858 /* PageInformationOverview.swift */,
@@ -677,7 +681,6 @@
 				84C7BE4320961ABE003C25B2 /* SchemeType.swift */,
 				84C7BE1920961ABA003C25B2 /* ScreenDimmer.swift */,
 				84C7BE4820961ABF003C25B2 /* ScriptBlackListing.js */,
-				84C7BE6220961AC2003C25B2 /* api2.cer */,
 				84C7BE2B20961ABC003C25B2 /* Search.swift */,
 				84C7BE5B20961AC1003C25B2 /* SearchBar.swift */,
 				84C7BE5420961AC0003C25B2 /* SearchEngine.swift */,
@@ -714,10 +717,10 @@
 				84C7BE5A20961AC1003C25B2 /* Tab.swift */,
 				84C7BE1820961ABA003C25B2 /* TabCollectionViewCell.swift */,
 				84C7BE9520961AC6003C25B2 /* TabController.swift */,
-				D79950AB24BA9B790039B858 /* TabHistoryView.swift */,
 				84C7BDFB20961AB8003C25B2 /* TabSelectionCollectionViewLayout.swift */,
 				84C7BE8920961AC5003C25B2 /* TabSelectionView.swift */,
 				84C7BDCA20961AB6003C25B2 /* TabViewController.swift */,
+				D7688F25261636A100EF0E42 /* Templating.swift */,
 				84C7BDF820961AB8003C25B2 /* TextInputBar.swift */,
 				D799509024BA99210039B858 /* TLSInfoView.swift */,
 				D799507024BA969C0039B858 /* TorHelpers.swift */,
@@ -919,6 +922,7 @@
 				84C7BDAB20961A4D003C25B2 /* Resources */,
 				842737FB212DC5E200B535BC /* Embed App Extensions */,
 				D79950AF24BA9CA70039B858 /* Embed Frameworks */,
+				308C8D9CF982F1F300A0C605 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -991,7 +995,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84C7BF1620961AC6003C25B2 /* api2.cer in Resources */,
 				84C7BED120961AC6003C25B2 /* Localizable.strings in Resources */,
 				84C7BEF520961AC6003C25B2 /* InfoPlist.strings in Resources */,
 				84C7BEA320961AC6003C25B2 /* Localizable.strings in Resources */,
@@ -1035,6 +1038,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		308C8D9CF982F1F300A0C605 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SnowHaze/Pods-SnowHaze-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SnowHaze/Pods-SnowHaze-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SnowHaze/Pods-SnowHaze-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		AAB56DF815771D1169F6FF3E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1125,6 +1145,7 @@
 				842737FE212DC68400B535BC /* Stats.swift in Sources */,
 				84C7BEF620961AC6003C25B2 /* SearchEngineSettingsManager.swift in Sources */,
 				84C7BF3320961AC6003C25B2 /* SettingsDetailViewController.swift in Sources */,
+				D7688F26261636A100EF0E42 /* Templating.swift in Sources */,
 				84C7BF0C20961AC6003C25B2 /* BookmarkRenameBar.swift in Sources */,
 				84C7BEF220961AC6003C25B2 /* PasscodeManager.swift in Sources */,
 				84C7BE9A20961AC6003C25B2 /* Punycode.swift in Sources */,
@@ -1150,7 +1171,6 @@
 				D799509D24BA9A270039B858 /* PageInformationView.swift in Sources */,
 				84C7BF3220961AC6003C25B2 /* PolicyManager.swift in Sources */,
 				84C7BEF920961AC6003C25B2 /* SchemeType.swift in Sources */,
-				D79950AC24BA9B790039B858 /* TabHistoryView.swift in Sources */,
 				84C7BEC620961AC6003C25B2 /* BookmarkSuggestionSource.swift in Sources */,
 				84C7BF0820961AC6003C25B2 /* LoadBar.swift in Sources */,
 				84C7BF2020961AC6003C25B2 /* DetailPopover.swift in Sources */,
@@ -1176,6 +1196,7 @@
 				84C7BECF20961AC6003C25B2 /* SQLCipher.swift in Sources */,
 				84C7BEA920961AC6003C25B2 /* History.swift in Sources */,
 				D799508C24BA98050039B858 /* SafebrowsingNetworking.swift in Sources */,
+				D7688F23261632D700EF0E42 /* MultiviewSettingsManager.swift in Sources */,
 				84C7BF1320961AC6003C25B2 /* SettingsViewManager.swift in Sources */,
 				84C7BECC20961AC6003C25B2 /* sqlite.c in Sources */,
 				84C7BECE20961AC6003C25B2 /* SQLiteManager.swift in Sources */,
@@ -1209,6 +1230,7 @@
 				84C7BEE320961AC6003C25B2 /* Version.swift in Sources */,
 				84C7BEFA20961AC6003C25B2 /* UserAgent.swift in Sources */,
 				84C7BEA520961AC6003C25B2 /* ShapeOverlayView.swift in Sources */,
+				D7688F2A26163B1B00EF0E42 /* JSONPath.swift in Sources */,
 				D799508924BA98050039B858 /* SafebrowsingStorage.swift in Sources */,
 				84C7BF0020961AC6003C25B2 /* BookmarkCollectionViewCell.swift in Sources */,
 				D799507624BA969C0039B858 /* TorHelpers.swift in Sources */,
@@ -1441,7 +1463,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 89;
+				CURRENT_PROJECT_VERSION = 90;
 				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1449,7 +1471,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.1.1;
+				MARKETING_VERSION = 3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1462,7 +1484,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 89;
+				CURRENT_PROJECT_VERSION = 90;
 				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1470,7 +1492,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.1.1;
+				MARKETING_VERSION = 3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1604,7 +1626,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SnowHaze/SnowHaze.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 89;
+				CURRENT_PROJECT_VERSION = 90;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SnowHaze",
@@ -1615,7 +1637,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.1.1;
+				MARKETING_VERSION = 3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";
@@ -1634,7 +1656,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SnowHaze/SnowHaze.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 89;
+				CURRENT_PROJECT_VERSION = 90;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SnowHaze",
@@ -1645,7 +1667,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.1.1;
+				MARKETING_VERSION = 3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";

@@ -26,6 +26,9 @@
 /* displayed instead of title for masked tabs in app snapshots */
 "masked tab title" = "Masqué";
 
+/* title of the main view controller for back buttons in settings */
+"main view controller navigation title" = "Web";
+
 /* title for settings controller navigation item */
 "settings title" = "Réglages";
 
@@ -653,6 +656,57 @@
 /* name of none search engine to be displayed to user */
 "none search engine display name" = "Aucun";
 
+/* name of custom search engine setting to be displayed to user */
+"custom search engine display name" = "Personnalisation";
+
+/* title of the generic section of the custom search engine settings */
+"custom search engine settings generic settings title" = "Générique";
+
+/* title of the searx section of the custom search engine settings */
+"custom search engine settings searx settings title" = "Searx";
+
+/* placeholder of textfield for custom search url */
+"custom search url setting placeholder" = "URL de recherche";
+
+/* placeholder of textfield for custom search suggestion api url */
+"custom search suggestion api url setting placeholder" = "URL de l'API de suggestion";
+
+/* placeholder of textfield for custom search suggestion jsonpath */
+"custom search suggestion jsonpath setting placeholder" = "JSONPath de suggestion";
+
+/* error message for bad custom search engine configuration because of escape in jsonpath */
+"escape unsupported jsonpath parse error custom search configuration error message" = "Les séquences d'échappement dans les strings ne sont pas prises en charge";
+
+/* error message for bad custom search engine configuration because of unanchored jsonpath */
+"jsonpath not anchored parse error custom search configuration error message" = "JSONPath n'est pas ancré";
+
+/* format of error message for bad custom search engine configuration because of syntax error in jsonpath */
+"jsonpath syntax error custom search configuration error message format" = "Erreur syntaxique JSONPath près de '%@'";
+
+/* error message for bad custom search engine configuration because filters are not supported in jsonpaths */
+"jsonpath filter not supported custom search configuration error message" = "Les expressions de filtrage ne sont pas prises en charge\nJSONPath n'est pas ancré";
+
+/* error message for bad custom search engine configuration because scripts are not supported in jsonpaths */
+"jsonpath script not supported custom search configuration error message" = "Les expressions de script ne sont pas prises en charge";
+
+/* error message for bad custom search engine configuration because of invalid url */
+"url invalid custom search configuration error message" = "L'URL n'est pas valide";
+
+/* error message for bad custom search engine configuration because of invalid url scheme */
+"url scheme invalid custom search configuration error message" = "Le schéma URL n'est pas valide";
+
+/* error message for bad custom search engine configuration because of invalid url host */
+"url host invalid custom search configuration error message" = "L'hôte de l'URL n'est pas valide";
+
+/* error message for bad custom search engine configuration because of missing url query */
+"missing url query custom search configuration error message" = "Il manque une requête à l'URL";
+
+/* error message for bad custom search engine configuration because of a templating error */
+"templating error custom search configuration error message" = "Le modèle n'a pas pu être évalué";
+
+/* title of settings subsection to setup custom search engines */
+"custom search engine setting subsection title" = "MOTEUR DE RECHERCHE PERSONNALISÉ";
+
 /* title of settings subsection to choose search engine */
 "search engine selection setting subsection title" = "MOTEUR DE RECHERCHE";
 
@@ -727,6 +781,9 @@
 
 /* subtitle for autocomplete search suggestions from qwant */
 "qwant search suggestion subtitle" = "Recherche Qwant";
+
+/* subtitle for autocomplete search suggestions from a custom search engine */
+"custom search suggestion subtitle" = "Recherche personnalisée";
 
 /* title of the activity to find some text on page */
 "find on page activity title" = "Recherche sur la page";
@@ -1136,6 +1193,9 @@
 /* format of the accessibility label of the vpn profile cell when the profile credentials are not yet downloaded */
 "vpn profile download required accessibility label format" = "%@ VPN - Doit être chargé";
 
+/* accessibility label of the button to update outdated vpn configurations */
+"update outdated vpn configurations button accessibility label" = "Mise à jour des données d'identification périmées";
+
 /* suffix of the client's ip address title to indicate that this is the device's prefered network type */
 "client ip address title default indicator suffic" = " (Défaut)";
 
@@ -1253,6 +1313,9 @@
 /* title of button to launch the tor thread */
 "connect tor button title" = "Se connecter";
 
+/* title of button to reset tor circuits */
+"reset tor button title" = "Réinitialiser";
+
 /* error message to indicate that the user should purchase a subscription to use tor */
 "tor missing subscription error message" = "L'utilisation de Tor nécessite un abonnement.";
 
@@ -1361,6 +1424,9 @@
 /* title of setting to block raw request to known doh servers */
 "block doh servers setting title" = "Bloquer les serveurs DoH";
 
+/* title of the tab actions menu */
+"tab menu title" = "Actions de l'onglet";
+
 /* title of option in the tab menu to close the current tab */
 "close tab tab menu option title" = "Fermer cet onglet";
 
@@ -1369,9 +1435,6 @@
 
 /* title of option in the tab menu to create a new tab */
 "new tab tab menu option title" = "Nouvel onglet";
-
-/* title of option in the tab menu to close the menu */
-"cancel tab menu option title" = "Annuler";
 
 /* title of popover to go forward in tab history */
 "forward tab history title" = "Avancer";
@@ -1510,6 +1573,27 @@
 
 /* title of load action of prompt to block xss on an unknown host */
 "block xss unknown host prompt load action title" = "Charger";
+
+/* title of alert which suggests opening an onion service in a tor tab */
+"open onion service in tor alert title" = "Service Onion détecté";
+
+/* format of the message of the alert which suggests opening an onion service in a tor tab when a user is subscribed */
+"open onion service in tor alert message format subscribed" = "La page %@ semble être un service Onion. L'ouverture d'un service Onion nécessite l'utilisation de Tor. Voulez-vous passer à Tor ?";
+
+/* format of the message of the alert which suggests opening an onion service in a tor tab when a user is not subscribed */
+"open onion service in tor alert message format not subscribed" = "La page %@ semble être un service Onion. Pour ouvrir un service Onion, il faut utiliser Tor. Tor est une fonctionnalité premium.";
+
+/* title of the button to load the url using a normal tab anyway in the alert which suggests opening an onion service in a tor tab */
+"open onion service in tor alert ignore button title" = "Charger quand même";
+
+/* title of the button to load the url using a tor tab in the alert which suggests opening an onion service in a tor tab */
+"open onion service in tor alert open tor button title" = "Ouvrir dans l'onglet Tor";
+
+/* title of the button to open the subscription settings in the alert which suggests opening an onion service in a tor tab */
+"open onion service in tor alert open subscription settings button title" = "Acheter un abonnement";
+
+/* title of the button to cancel the page load in the alert which suggests opening an onion service in a tor tab */
+"open onion service in tor alert cancel button title" = "Annuler";
 
 /* title of the alert that is displayed when trying to connect to a server with an invalid certificate */
 "invalid certificate alert title" = "Certificat pas valable";
@@ -2401,4 +2485,64 @@
 
 /* name of the phone app used to confirm opening of url in other app */
 "open url in app phone app name" = "FaceTime";
+
+/* name of the twint prepaid app used to confirm opening of url in other app */
+"open url in app twint prepaid app name" = "TWINT Prepaid";
+
+/* name of the twint ubs app used to confirm opening of url in other app */
+"open url in app twint ubs app name" = "UBS TWINT";
+
+/* name of the twint zkb app used to confirm opening of url in other app */
+"open url in app twint zkb app name" = "ZKB TWINT";
+
+/* name of the twint credit suisse app used to confirm opening of url in other app */
+"open url in app twint credit suisse app name" = "Credit Suisse TWINT";
+
+/* name of the twint bcv app used to confirm opening of url in other app */
+"open url in app twint bcv app name" = "BCV TWINT";
+
+/* name of the twint raiffeisen app used to confirm opening of url in other app */
+"open url in app twint raiffeisen app name" = "Raiffeisen TWINT";
+
+/* name of the twint postfinance app used to confirm opening of url in other app */
+"open url in app twint postfinance app name" = "PostFinance TWINT";
+
+/* name of the twint okb app used to confirm opening of url in other app */
+"open url in app twint okb app name" = "OKB TWINT";
+
+/* name of the twint zugerkb app used to confirm opening of url in other app */
+"open url in app twint zugerkb app name" = "ZugerKB TWINT";
+
+/* name of the twint bcge app used to confirm opening of url in other app */
+"open url in app twint bcge app name" = "BCGE TWINT";
+
+/* name of the twint nab app used to confirm opening of url in other app */
+"open url in app twint nab app name" = "NAB TWINT";
+
+/* name of the twint appkb app used to confirm opening of url in other app */
+"open url in app twint appkb app name" = "APPKB TWINT";
+
+/* name of the twint bcvs app used to confirm opening of url in other app */
+"open url in app twint bcvs app name" = "BCVS TWINT";
+
+/* name of the twint sgkb app used to confirm opening of url in other app */
+"open url in app twint sgkb app name" = "SGKB TWINT";
+
+/* name of the twint gkb app used to confirm opening of url in other app */
+"open url in app twint gkb app name" = "GKB TWINT";
+
+/* name of the twint bcf app used to confirm opening of url in other app */
+"open url in app twint bcf app name" = "BCF TWINT";
+
+/* name of the twint bcj app used to confirm opening of url in other app */
+"open url in app twint bcj app name" = "BCJ TWINT";
+
+/* name of the twint bcm app used to confirm opening of url in other app */
+"open url in app twint bcm app name" = "BCN TWINT";
+
+/* name of the sbb app used to confirm opening of url in other app */
+"open url in app sbb app name" = "Mobile CFF";
+
+/* title of option in the tab menu to close the menu */
+"cancel tab menu option title" = "Annuler";
 

@@ -179,7 +179,8 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 				decisionHandler(.cancel, preferences)
 				return
 			}
-			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
+			let policyURL = navigationAction.loadedMainURL ?? webView.url
+			let policy = PolicyManager.manager(for: policyURL, in: self.tab)
 			if #available(iOS 14, *) {
 				preferences.allowsContentJavaScript = policy.allowJS
 			}
@@ -213,7 +214,7 @@ extension WorkerWebViewManager: WKNavigationDelegate {
 			load(request: newRequest)
 			return
 		}
-		let policyURL = webView.url
+		let policyURL = navigationAction.loadedMainURL ?? webView.url
 		let policy = PolicyManager.manager(for: policyURL, in: tab)
 		if policy.shouldBlockLoad(of: actionURL) || (policy.preventXSS && actionURL?.potentialXSS ?? false) {
 			decisionHandler(.cancel)
@@ -299,7 +300,7 @@ private extension WorkerWebViewManager {
 		guard let url = rawURL?.detorified ?? rawURL, navigationAction.targetFrame?.isMainFrame ?? false else {
 			return nil
 		}
-		let policyURL = webView.url
+		let policyURL = navigationAction.loadedMainURL ?? webView.url
 		guard navigationAction.request.isHTTPGet else {
 			return nil
 		}

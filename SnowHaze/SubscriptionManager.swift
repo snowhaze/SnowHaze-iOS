@@ -155,7 +155,7 @@ class SubscriptionManager: NSObject {
 			}
 		}
 		if !hasValidToken && status.confirmed && PolicyManager.globalManager().autoUpdateAuthToken {
-			SubscriptionManager.shared.updateAuthToken { success in
+			updateAuthToken { _ in
 				DispatchQueue.main.async {
 					dispatch(with: self.validTokens.shuffled())
 				}

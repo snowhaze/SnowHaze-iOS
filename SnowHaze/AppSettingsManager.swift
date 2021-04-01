@@ -397,10 +397,9 @@ class AppSettingsManager: SettingsViewManager, UITextFieldDelegate {
 	}
 
 	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-		let text = (textField.text ?? "") as NSString
-		let new = text.replacingCharacters(in: range, with: string)
-		updatedBorder(of: textField, for: new)
-		return true
+		update(textField, range: range, replacement: string)
+		updatedBorder(of: textField, for: textField.text ?? "")
+		return false
 	}
 
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {

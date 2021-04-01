@@ -16,13 +16,13 @@ class BookmarkSuggestionSource: SuggestionSource {
 	func generateSuggestion(base: String, callback: @escaping ([Suggestion], String) -> ()) {
 		let bookmarks = bookmarkStore.bookmarks(forSearch: base, limit: UInt(maxCount))
 		let suggestions = bookmarks.map { (bookmark) -> Suggestion in
-			let name = bookmark.displayName
-			let urlString = bookmark.URL.absoluteString
-			let url = bookmark.URL
-			let priority = bookmark.weight
-			let icon = bookmark.displayIcon
+			let name = bookmark.bookmark.displayName
+			let urlString = bookmark.bookmark.URL.absoluteString
+			let url = bookmark.bookmark.URL
+			let priority = -4 * bookmark.bookmark.weight / bookmark.rank
+			let icon = bookmark.bookmark.displayIcon
 			let suggestion = Suggestion(title: name, subtitle: urlString, url: url, image: icon, priority: priority)
-			suggestion.selectionCallback = bookmark.wasSelected
+			suggestion.selectionCallback = bookmark.bookmark.wasSelected
 			return suggestion
 		}
 		callback(suggestions, "bookmark")

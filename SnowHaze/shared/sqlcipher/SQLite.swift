@@ -239,6 +239,14 @@ public class SQLite {
 			}
 		}
 
+		public init(_ double: Double?) {
+			if let double = double {
+				self = .float(double)
+			} else {
+				self = .null
+			}
+		}
+
 		public static func ==(t1: Data, t2: Data) -> Bool {
 			switch (t1, t2) {
 				case (.text(let s1), .text(let s2)):		return s1 == s2

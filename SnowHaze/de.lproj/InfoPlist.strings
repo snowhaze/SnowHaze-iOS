@@ -6,6 +6,8 @@
 
 "NSCameraUsageDescription" = "Die Kamera wird ausschliesslich für den Strichcode-Scanner verwendet.";
 
+"NSMicrophoneUsageDescription" = "Das Mikrofon wird von Webseiten verwendet, wenn du eine separate Genehmigung erteilst.";
+
 "NSPhotoLibraryAddUsageDescription" = "SnowHaze braucht Zugriff auf die Fotomediathek um Medien zu speichern.";
 
 "open vpn settings application shortcut item title" = "VPN Einstellungen";

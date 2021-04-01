@@ -10,7 +10,6 @@ import Foundation
 
 enum AlertType {
 	case update
-	case tabActions(close: (() -> ())?, closeAll: (() -> ())?, new: () -> ())
 	case jsAlert(domain: String, alert: String, completion: () -> ())
 	case jsConfirm(domain: String, question: String, completion: (Bool) -> ())
 	case jsPrompt(domain: String, question: String, default: String?, completion: (String?) -> ())
@@ -42,6 +41,7 @@ enum AlertType {
 	case invalidTLSCert(domain: String, completion: (Bool) -> ())
 	case tlsDomainMismatch(domain: String, certDomain: String?, completion: (Bool) -> ())
 	case httpAuthentication(realm: String?, domain: String, failCount: Int, secure: Bool, suggestion: URLCredential?, completion: (Bool, UIAlertController) -> ())
+	case switchToTor(host: String, load: URL, completion: (Bool) -> ())
 
 	private var title: String? {
 		switch self {
@@ -120,8 +120,8 @@ enum AlertType {
 				return NSLocalizedString("certificate domain name mismatch alert title", comment: "title of the alert that is displayed when trying to connect to a server with a certificate with an incorrect domain name")
 			case .httpAuthentication(_, _, _, _, _, _):
 				return NSLocalizedString("http authentication prompt title", comment: "title of prompt for http authentication")
-			default:
-				return nil
+			case .switchToTor(_, _, _):
+				return NSLocalizedString("open onion service in tor alert title", comment: "title of alert which suggests opening an onion service in a tor tab")
 		}
 	}
 
@@ -335,14 +335,16 @@ enum AlertType {
 				let warn = NSLocalizedString("http authentication prompt insecure transmission warning", comment: "warning displayed when credentials entered in http authentication prompt will be transmitted insecurely")
 				let warning = secure ? "" : ("\n\n" + warn)
 				return errormsg + prompt + warning
-			default:
-				return nil
+			case .switchToTor(let host, _, _):
+				let subscribedFormat = NSLocalizedString("open onion service in tor alert message format subscribed", comment: "format of the message of the alert which suggests opening an onion service in a tor tab when a user is subscribed")
+				let notSubscribedFormat = NSLocalizedString("open onion service in tor alert message format not subscribed", comment: "format of the message of the alert which suggests opening an onion service in a tor tab when a user is not subscribed")
+				let fmt = SubscriptionManager.status.possible ? subscribedFormat : notSubscribedFormat
+				return String(format: fmt, host)
 		}
 	}
 
 	private var numberOfActions: Int {
 		switch self {
-			case .tabActions(_, _, _):						return 4
 			case .jsAlert(_, _, _):							return 1
 			case .subscriptionNetworkError:					return 1
 			case .subscriptionNoSuchAccountError:			return 1
@@ -351,13 +353,13 @@ enum AlertType {
 			case .purchaseFailed(_):						return 1
 			case .installOpenVPNForOVPNInstall(_):			return 3
 			case .paramStrip(_, _, _):						return 3
+			case .switchToTor(_, _, _):						return 3
 			default:										return 2
 		}
 	}
 
 	private var style: UIAlertController.Style {
 		switch self {
-			case .tabActions(_, _, _):						return .actionSheet
 			case .download(_, _, _):						return .actionSheet
 			case .deleteAllWebsiteData(_, _):				return .actionSheet
 			case .deleteCacheWebsiteData(_, _):				return .actionSheet
@@ -373,9 +375,6 @@ enum AlertType {
 
 	private func actionEnabled(at index: Int) -> Bool {
 		switch (self, index) {
-			case (.tabActions(let close, _, _), 0):			return close != nil
-			case (.tabActions(_, let closeAll, _), 1):		return closeAll != nil
-
 			default:										return true
 		}
 	}
@@ -386,15 +385,6 @@ enum AlertType {
 				return NSLocalizedString("old snowhaze version prompt update button title", comment: "title of button to lead users to the app store to update snowhaze")
 			case (.update, 1):
 				return NSLocalizedString("old snowhaze version prompt ignore button title", comment: "title of button to ignore old snowhaze version warning")
-
-			case (.tabActions(_, _, _), 0):
-				return NSLocalizedString("close tab tab menu option title", comment: "title of option in the tab menu to close the current tab")
-			case (.tabActions(_, _, _), 1):
-				return NSLocalizedString("close all tabs tab menu option title", comment: "title of option in the tab menu to close all tabs")
-			case (.tabActions(_, _, _), 2):
-				return NSLocalizedString("new tab tab menu option title", comment: "title of option in the tab menu to create a new tab")
-			case (.tabActions(_, _, _), 3):
-				return NSLocalizedString("cancel tab menu option title", comment: "title of option in the tab menu to close the menu")
 
 			case (.jsAlert(_, _, _), 0):
 				return NSLocalizedString("js alert panel confirmation button title", comment: "title of button to confirm a js alert")
@@ -540,6 +530,15 @@ enum AlertType {
 			case (.httpAuthentication(_, _, _, _, _, _), 1):
 				return NSLocalizedString("http authentication prompt cancel button title", comment: "title of cancel button of http authentication prompt")
 
+			case (.switchToTor(_, _, _), 0):
+				return NSLocalizedString("open onion service in tor alert ignore button title", comment: "title of the button to load the url using a normal tab anyway in the alert which suggests opening an onion service in a tor tab")
+			case (.switchToTor(_, _, _), 1):
+				let openTor = NSLocalizedString("open onion service in tor alert open tor button title", comment: "title of the button to load the url using a tor tab in the alert which suggests opening an onion service in a tor tab")
+				let openSubscription = NSLocalizedString("open onion service in tor alert open subscription settings button title", comment: "title of the button to open the subscription settings in the alert which suggests opening an onion service in a tor tab")
+				return SubscriptionManager.status.possible ? openTor : openSubscription
+			case (.switchToTor(_, _, _), 2):
+				   return NSLocalizedString("open onion service in tor alert cancel button title", comment: "title of the button to cancel the page load in the alert which suggests opening an onion service in a tor tab")
+
 			default:	fatalError()
 		}
 	}
@@ -547,10 +546,6 @@ enum AlertType {
 	private func actionStyle(at index: Int) -> UIAlertAction.Style {
 		switch (self, index) {
 			case (.update, 1):	return .cancel
-
-			case (.tabActions(_, _, _), 0):						return .destructive
-			case (.tabActions(_, _, _), 1):						return .destructive
-			case (.tabActions(_, _, _), 3):						return .cancel
 
 			case (.jsConfirm(_, _, _), 1):						return .cancel
 
@@ -610,6 +605,8 @@ enum AlertType {
 
 			case (.httpAuthentication(_, _, _, _, _, _), 1):	return .cancel
 
+			case (.switchToTor(_, _, _), 2):						return .cancel
+
 			default:											return .default
 		}
 	}
@@ -623,13 +620,6 @@ enum AlertType {
 				}
 			case (.update, 1):
 				return { _, _ in PolicyManager.globalManager().updateEOLWarningVersion() }
-
-			case (.tabActions(let close, _, _), 0):
-				return { _, _ in close!() }
-			case (.tabActions(_, let closeAll, _), 1):
-				return { _, _ in closeAll!() }
-			case (.tabActions(_, _, let new), 2):
-				return { _, _ in new() }
 
 			case (.jsAlert(_, _, let completion), 0):
 				return { _, _ in completion() }
@@ -732,6 +722,20 @@ enum AlertType {
 				return { _, alert in completion(true, alert) }
 			case (.httpAuthentication(_, _, _, _, _, let completion), 1):
 				return { _, alert in completion(false, alert) }
+
+			case (.switchToTor(_, _, let completion), 0):
+				return { _, _ in completion(true) }
+			case (.switchToTor(_, let load, let completion), 1):
+				return { _, _ in
+					if SubscriptionManager.status.possible {
+						MainViewController.controller.loadInFreshTorTab(input: load.absoluteString, type: .url)
+					} else {
+						MainViewController.controller.openSettings(.subscription)
+					}
+					completion(false)
+				}
+			case (.switchToTor(_, _, let completion), 2):
+				return { _, _ in completion(false) }
 
 			default:			return nil
 		}

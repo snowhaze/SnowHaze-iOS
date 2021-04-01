@@ -429,6 +429,10 @@ extension TabViewController: TabControllerNavigationDelegate {
 		urlBar?.canGoForward = controller.canGoForward
 	}
 
+	func tabControllerTabHistoryUpdate(_ controller: TabController) {
+		urlBar?.reloadBackforwardList()
+	}
+
 	func tabController(_ controller: TabController, serverTrustDidChange trust: SecTrust?) {
 		urlBar?.attributedTitle = tab?.formatedDisplayTitle
 	}

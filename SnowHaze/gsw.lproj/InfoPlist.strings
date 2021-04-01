@@ -6,6 +6,8 @@
 
 "NSCameraUsageDescription" = "D'Kamera wird nur füre Striichcode-Scanner brucht.";
 
+"NSMicrophoneUsageDescription" = "Ds Mikrofon wird vo Website brucht, wenn du di separati Genähmigung erteilsch.";
+
 "NSPhotoLibraryAddUsageDescription" = "SnowHaze brucht Zuegriff uf dini Fotos zum Medie spichere.";
 
 "open vpn settings application shortcut item title" = "VPN Iistellige";

@@ -219,7 +219,7 @@ class HistoryStore {
 		remove(section: section, atIndex: index)
 	}
 
-	func items(forSearch search: String) -> [HistoryItem] {
+	func items(forSearch search: String) -> [(item: HistoryItem, rank: Double)] {
 		var components = search.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
 		components = components.map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }
 		if !(components.last?.isEmpty ?? true) {
@@ -228,14 +228,17 @@ class HistoryStore {
 		}
 
 		let fts = components.joined(separator: " OR ")
-		let query = "SELECT \(tableName).id, \(tableName).url, \(tableName).title, \(tableName).timestamp FROM \(tableName), \(HistoryStore.ftsName) WHERE \(tableName).id = \(HistoryStore.ftsName).rowid AND \(HistoryStore.ftsName) MATCH :query ORDER BY rank * (3600 + strftime('%s','now') - timestamp)"
+		let query = "SELECT \(tableName).id, \(tableName).url, \(tableName).title, \(tableName).timestamp, rank FROM \(tableName), \(HistoryStore.ftsName) WHERE \(tableName).id = \(HistoryStore.ftsName).rowid AND \(HistoryStore.ftsName) MATCH :query ORDER BY rank * (3600 + strftime('%s','now') - timestamp)"
 
 		let rows = (try? database.execute(query, with: [":query": .text(fts)])) ?? []
-		let items = try? rows.map() { (row) -> HistoryItem in
+		let items = try? rows.map() { (row) -> (HistoryItem, Double) in
 			guard let item = HistoryItem(row: row) else {
 				throw HistoryError.databaseError
 			}
-			return item
+			guard let rank = row["rank"]?.float else {
+				throw HistoryError.databaseError
+			}
+			return (item, rank)
 		}
 		return items ?? []
 	}

@@ -404,7 +404,7 @@ class BookmarkStore {
 		}
 	}
 
-	func bookmarks(forSearch search: String, limit: UInt) -> [Bookmark] {
+	func bookmarks(forSearch search: String, limit: UInt) -> [(bookmark: Bookmark, rank: Double)] {
 		assert(Thread.isMainThread)
 		var components = search.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
 		components = components.map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }
@@ -413,18 +413,21 @@ class BookmarkStore {
 			components[lastIndex] = components[lastIndex] + "*"
 		}
 		let fts = components.joined(separator: " OR ")
-		let query = "SELECT \(tableName).id FROM \(tableName), \(BookmarkStore.ftsName) WHERE \(BookmarkStore.ftsName).rowid = \(tableName).id AND \(BookmarkStore.ftsName) MATCH :query ORDER BY rank / weight LIMIT :limit"
+		let query = "SELECT \(tableName).id, rank FROM \(tableName), \(BookmarkStore.ftsName) WHERE \(BookmarkStore.ftsName).rowid = \(tableName).id AND \(BookmarkStore.ftsName) MATCH :query ORDER BY rank / weight LIMIT :limit"
 		let bindings: [String: SQLite.Data] = [":query": .text(fts), ":limit": .integer(Int64(limit))]
 		let rows = (try? database.execute(query, with: bindings)) ?? []
-		let bookmarks = try? rows.map() { (row) -> Bookmark in
+		let bookmarks = try? rows.map() { (row) -> (Bookmark, Double) in
+			guard let rank = row["rank"]?.float else {
+				throw BookmarkError.databaseError
+			}
 			if let id = row["id"]?.integerValue, let cachedBookmark = bookmarkCache[id] {
-				return cachedBookmark
+				return (cachedBookmark, rank)
 			}
 			guard let item = Bookmark(row: row) else {
 				throw BookmarkError.databaseError
 			}
 			bookmarkCache[item.id] = item
-			return item
+			return (item, rank)
 		}
 		return bookmarks ?? []
 	}

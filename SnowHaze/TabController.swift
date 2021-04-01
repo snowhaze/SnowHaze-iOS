@@ -40,6 +40,7 @@ protocol TabControllerNavigationDelegate: class {
 	func tabController(_ controller: TabController, serverTrustDidChange trust: SecTrust?)
 
 	func tabControllerCanGoForwardBackwardUpdate(_ controller: TabController)
+	func tabControllerTabHistoryUpdate(_ controller: TabController)
 
 	func tabController(_ controller: TabController, didUpgradeLoadOf url: URL)
 }
@@ -218,6 +219,7 @@ class TabController: NSObject, WebViewManager {
 				if let self = self {
 					self.navigationDelegate?.tabController(self, didLoadTitle: webView.title)
 					self.navigationDelegate?.tabController(self, estimatedProgress: self.progress)
+					self.navigationDelegate?.tabControllerTabHistoryUpdate(self)
 				}
 				if webView.isLoading {
 					self?.dec = InUseCounter.network.inc()
@@ -227,19 +229,19 @@ class TabController: NSObject, WebViewManager {
 				}
 			}))
 
-			self.observations.insert(ret.observe(\.canGoBack, options: .initial, changeHandler: { [weak self] webView, _ in
+			self.observations.insert(ret.observe(\.canGoBack, options: .initial, changeHandler: { [weak self] _, _ in
 				if let self = self {
 					self.navigationDelegate?.tabControllerCanGoForwardBackwardUpdate(self)
 				}
 			}))
 
-			self.observations.insert(ret.observe(\.canGoForward, options: .initial, changeHandler: { [weak self] webView, _ in
+			self.observations.insert(ret.observe(\.canGoForward, options: .initial, changeHandler: { [weak self] _, _ in
 				if let self = self {
 					self.navigationDelegate?.tabControllerCanGoForwardBackwardUpdate(self)
 				}
 			}))
 
-			self.observations.insert(ret.observe(\.estimatedProgress, options: .initial, changeHandler: { [weak self] webView, _ in
+			self.observations.insert(ret.observe(\.estimatedProgress, options: .initial, changeHandler: { [weak self] _, _ in
 				if let self = self {
 					self.navigationDelegate?.tabController(self, estimatedProgress: self.progress)
 				}
@@ -345,21 +347,18 @@ extension TabController: WKUIDelegate {
 	}
 
 	func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> ()) {
-		let domain = frame.securityOrigin.host
-		let type = AlertType.jsAlert(domain: domain, alert: message, completion: completionHandler)
-		post(event: .alert(type: type, domain: domain, fallbackHandler: completionHandler))
+		let type = AlertType.jsAlert(domain: frame.securityOrigin.host, alert: message, completion: completionHandler)
+		post(event: .alert(type: type, domain: frame.securityOrigin.normalizedHost, fallbackHandler: completionHandler))
 	}
 
 	func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> ()) {
-		let domain = frame.securityOrigin.host
-		let type = AlertType.jsConfirm(domain: domain, question: message, completion: completionHandler)
-		post(event: .alert(type: type, domain: domain, fallbackHandler: { completionHandler(false) }))
+		let type = AlertType.jsConfirm(domain: frame.securityOrigin.host, question: message, completion: completionHandler)
+		post(event: .alert(type: type, domain: frame.securityOrigin.normalizedHost, fallbackHandler: { completionHandler(false) }))
 	}
 
 	func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> ()) {
-		let domain = frame.securityOrigin.host
-		let type = AlertType.jsPrompt(domain: domain, question: prompt, default: defaultText, completion: completionHandler)
-		post(event: .alert(type: type, domain: domain, fallbackHandler: { completionHandler(nil) }))
+		let type = AlertType.jsPrompt(domain: frame.securityOrigin.host, question: prompt, default: defaultText, completion: completionHandler)
+		post(event: .alert(type: type, domain: frame.securityOrigin.normalizedHost, fallbackHandler: { completionHandler(nil) }))
 	}
 }
 
@@ -647,7 +646,8 @@ extension TabController: WKNavigationDelegate {
 				decisionHandler(.cancel, preferences)
 				return
 			}
-			let policy = PolicyManager.manager(for: webView.url, in: self.tab)
+			let policyURL = navigationAction.loadedMainURL ?? webView.url
+			let policy = PolicyManager.manager(for: policyURL, in: self.tab)
 			if #available(iOS 14, *) {
 				preferences.allowsContentJavaScript = policy.allowJS
 			}
@@ -690,9 +690,9 @@ extension TabController: WKNavigationDelegate {
 		reloadedRequest = nil
 
 		let actionURL = navigationAction.request.url?.detorified ?? navigationAction.request.url
-		let requestingDomain = navigationAction.realSourceFrame?.securityOrigin.host
+		let requestingDomain = navigationAction.realSourceFrame?.securityOrigin.normalizedHost
 
-		let policyURL = webView.url
+		let policyURL = navigationAction.loadedMainURL ?? webView.url
 		let policy = PolicyManager.manager(for: policyURL, in: tab)
 		if navigationAction.request.isHTTPGet && navigationAction.targetFrame?.isMainFrame ?? true, let url = policy.torifyIfNecessary(for: tab, url: navigationAction.request.url) {
 			decisionHandler(.cancel)
@@ -793,10 +793,30 @@ extension TabController: WKNavigationDelegate {
 			}
 			let policy = PolicyManager.manager(for: policyURL, in: self.tab)
 			if policy.warnCrossFrameNavigation, source != target, navigationAction.navigationType != .other {
-				self.crossFrameNavigationPrompt(src: source, target: target, url: webView.url, action: navigationAction.request, completion: xssHandler)
+				self.crossFrameNavigationPrompt(src: source, target: target, url: policyURL, action: navigationAction.request, completion: xssHandler)
 			} else {
 				xssHandler(true)
 			}
+		}
+
+		let onionHandler: (Bool) -> () = { [weak self] cont in
+			guard let self = self, cont, !self.tab.deleted else {
+				finalDecision(false)
+				return
+			}
+			guard navigationAction.targetFrame?.isMainFrame ?? false, let loadUrl = actionURL else {
+				frameHandler(true)
+				return
+			}
+			let policy = PolicyManager.manager(for: policyURL, in: self.tab)
+			guard actionURL?.isOnion ?? false, let host = loadUrl.normalizedHost, !policy.useTor else {
+				frameHandler(true)
+				return
+			}
+			let alert = AlertType.switchToTor(host: host, load: loadUrl, completion: frameHandler)
+			let url = navigationAction.realSourceFrame?.request.url ?? webView.url
+			let blockHost = url?.normalizedHost ?? host
+			self.post(event: .alert(type: alert, domain: blockHost, fallbackHandler: { finalDecision(false) }))
 		}
 
 		policy.awaitTorIfNecessary(for: tab) { [weak self] _ in
@@ -808,13 +828,13 @@ extension TabController: WKNavigationDelegate {
 			if policy.shouldBlockLoad(of: actionURL) {
 				finalDecision(false)
 			} else {
-				self.promptForDangers(on: actionURL, conformingTo: policy, decisionHandler: frameHandler)
+				self.promptForDangers(on: actionURL, conformingTo: policy, decisionHandler: onionHandler)
 			}
 		}
 	}
 
 	func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()) {
-		let domain = challenge.protectionSpace.host
+		let domain = challenge.protectionSpace.normalizedHost
 		let method = challenge.protectionSpace.authenticationMethod
 		let secure = challenge.protectionSpace.receivesCredentialSecurely
 		let realm = challenge.protectionSpace.realm
@@ -835,8 +855,7 @@ extension TabController: WKNavigationDelegate {
 			decisionHandler(false)
 			return
 		}
-		let domain = PolicyDomain(host: webView.url?.host)
-		let policy = PolicyManager.manager(for: domain, in: tab)
+		let policy = PolicyManager.manager(for: webView.url, in: tab)
 		decisionHandler(!policy.blockDeprecatedTLS)
 	}
 }
@@ -1024,7 +1043,7 @@ private extension TabController {
 			completion(true, nil)
 			return
 		}
-		let policyURL = webView.url
+		let policyURL = navigationAction.loadedMainURL ?? webView.url
 		guard navigationAction.request.isHTTPGet else {
 			completion(true, nil)
 			return
@@ -1061,7 +1080,7 @@ private extension TabController {
 			}
 		}
 		let alert = AlertType.paramStrip(url: url, changes: changes, completion: completionHandler)
-		post(event: .alert(type: alert, domain: navigationAction.realSourceFrame?.request.url?.host, fallbackHandler: { completion(false, nil) }))
+		post(event: .alert(type: alert, domain: navigationAction.realSourceFrame?.request.url?.normalizedHost, fallbackHandler: { completion(false, nil) }))
 	}
 
 	func promptForDangers(on url: URL?, conformingTo policy: PolicyManager, decisionHandler: @escaping (Bool) -> ()) {
@@ -1191,7 +1210,7 @@ extension TabController {
 						 FileDownload.start(for: url, cookies: cookies, tab: tab)
 					}
 				}
-				self?.post(event: .alert(type: type, domain: downloadData.response.url?.host, fallbackHandler: { }))
+				self?.post(event: .alert(type: type, domain: downloadData.response.url?.normalizedHost, fallbackHandler: { }))
 			} else if let tab = self?.tab {
 				FileDownload.start(for: url, cookies: cookies, tab: tab)
 			}
@@ -1257,7 +1276,7 @@ extension TabController {
 			}
 			if let alertType = alertType {
 				if let tab = tab, PolicyManager.manager(for: url, in: tab).showTLSCertWarnings {
-					self.post(event: .alert(type: alertType, domain: domain, fallbackHandler: { completionHandler(.cancelAuthenticationChallenge, nil) }))
+					self.post(event: .alert(type: alertType, domain: url?.normalizedHost ?? domain, fallbackHandler: { completionHandler(.cancelAuthenticationChallenge, nil) }))
 				} else {
 					completionHandler(.cancelAuthenticationChallenge, nil)
 				}

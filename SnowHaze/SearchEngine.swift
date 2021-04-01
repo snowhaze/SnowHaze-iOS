@@ -20,6 +20,7 @@ enum SearchEngineType: Int64 {
 	case swisscows
 	case duckDuckGo
 	case qwant			= 12
+	case custom
 }
 
 class SearchEngine {
@@ -68,7 +69,7 @@ class SearchEngine {
 		return numbers.map { SearchEngineType(rawValue: $0.int64Value) ?? .none }
 	}
 
-	func url(for search: String) -> URL? {
+	func url(for search: String, using policy: PolicyManager) -> URL? {
 		let allowedChars = CharacterSet.urlQueryValueAllowed
 		guard let escapedSearch = search.addingPercentEncoding(withAllowedCharacters: allowedChars) else {
 			return nil
@@ -84,6 +85,7 @@ class SearchEngine {
 			case .swisscows:	return URL(string: "https://swisscows.com/?query=" + escapedSearch)
 			case .duckDuckGo:	return URL(string: "https://duckduckgo.com/?q=" + escapedSearch)
 			case .qwant:		return URL(string: "https://www.qwant.com/?q=\(escapedSearch)")
+			case .custom:		return syncToMainThread { policy.customSearchURL(for: search) }
 			case .none:			return nil
 		}
 	}
