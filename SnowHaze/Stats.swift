@@ -14,7 +14,7 @@ let statsResetNotificationName = Notification.Name(rawValue: "StatsResetNotifica
 class Stats {
 	static let shared = Stats(prefix: "ch.illotros.ios.snowhaze.stats.")
 
-	private var oldCookiesCount = NSMapTable<WKWebsiteDataStore, NSNumber>.weakToStrongObjects()
+	private var oldCookiesCount = [WKWebsiteDataStore: UInt]()
 
 	var protectedSiteLoads: UInt {
 		return UInt(DataStore.shared.getInt(for: protectedLoadKey) ?? 0)
@@ -33,14 +33,7 @@ class Stats {
 	}
 
 	var aliveCookies: UInt {
-		guard let enumerator = oldCookiesCount.objectEnumerator() else {
-			return 0
-		}
-		var total: UInt = 0
-		while let number = enumerator.nextObject() as? NSNumber {
-			total += number.uintValue
-		}
-		return total
+		return oldCookiesCount.reduce(0) { $0 + $1.value }
 	}
 
 	var killedCookies: UInt {
@@ -134,16 +127,21 @@ class Stats {
 
 	private func set(_ count: Int, for store: WKWebsiteDataStore) {
 		let new = UInt(count)
-		let old = min(oldCookiesCount.object(forKey: store)?.uintValue ?? 0, new)
-		oldCookiesCount.setObject(NSNumber(value: new), forKey: store)
+		let old = min(oldCookiesCount[store] ?? 0, new)
+		oldCookiesCount[store] = UInt(new)
 		DataStore.shared.set(Int64(ephemeralCookies + new - old), for: ephemeralCookiesKey)
 	}
 
 	func updateCookieCount(for tab: Tab) {
 		let policy = policyManager(tab: tab)
-		guard policy.keepStats, !policy.allowPermanentDataStorage, let store = tab.controller?.webbsiteDataStore else {
-			return
+		if policy.keepStats, !policy.allowPermanentDataStorage, let store = tab.controller?.webbsiteDataStore {
+			store.httpCookieStore.getAllCookies { self.set($0.filter({ !$0.isSessionOnly }).count, for: store) }
 		}
-		store.httpCookieStore.getAllCookies { self.set($0.filter({ !$0.isSessionOnly }).count, for: store) }
+	}
+
+	func clear(_ tab: Tab) {
+		if let store = tab.controller?.webbsiteDataStore {
+			oldCookiesCount[store] = nil
+		}
 	}
 }

@@ -390,7 +390,7 @@ class PolicyManager {
 
 	var updateSiteLists: Bool {
 		let lastUpdate = (lastSiteListUpdate ?? .distantPast)
-		return !deleteSiteLists && ((lastUpdate < compilationDate) || (SubscriptionManager.status.confirmed && lastUpdate.timeIntervalSinceNow < -7 * 24 * 60 * 60))
+		return !deleteSiteLists && ((lastUpdate < compilationDate) || (SubscriptionManager.status.confirmed && lastUpdate.timeIntervalSinceNow < -4 * 7 * 24 * 60 * 60))
 	}
 
 	var deleteSiteLists: Bool {

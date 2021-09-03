@@ -25,7 +25,7 @@ class FileDownload {
 	private(set) var state = DataFetcher.DownloadEvent.progressUnknown
 	private init?(url: URL, cookies: [HTTPCookie], tab: Tab) {
 		let url = url.detorified ?? url
-		guard ["http", "https", "data"].contains(url.scheme?.lowercased()) else {
+		guard ["http", "https", "data"].contains(url.normalizedScheme) else {
 			return nil
 		}
 		var request = URLRequest(url: url)

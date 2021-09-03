@@ -168,6 +168,7 @@ class Tab: Equatable {
 	}
 
 	func cleanup() {
+		Stats.shared.clear(self)
 		controller?.stopLoading()
 		controller?.cleanup()
 		controller = nil

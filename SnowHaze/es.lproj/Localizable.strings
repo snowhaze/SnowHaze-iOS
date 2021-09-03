@@ -2109,7 +2109,7 @@
 "contact settings explanation" = "Póngase en contacto con nosotros por correo electrónico o visite nuestra web. Si usted tiene cualquier problema o comentario no dude en ponerse en contacto con nosotros. Estamos encantados de ayudarle. También puede visitar nuestra página web o compartir SnowHaze con amigos y familiares y valorar SnowHaze en la App Store.";
 
 /* explanations of the search engine settings */
-"search engine settings explanation" = "<p>Seleccione la forma en que desea buscar en la web.</p><p><strong>Buscador:</strong> Un buscador es una herramienta utilizada para encontrar el contenido en Internet. Los ejemplos más famosos son Google, Yahoo entre muchos más. Las solicitudes realizadas sobre el campo de búsqueda siempre serán procesados por el buscador seleccionado. Cuando se selecciona 'Ninguno' sólo se podrá acceder a un sitio web introduciendo la dirección de esa página o eligiendo una página de su historial o los marcadores.</p><strong>Sugerencias de Buscador:</strong> Además de su buscador principal, puede tener otros servicios que sugieran términos que podría estar buscando.";
+"search engine settings explanation" = "<p>Seleccione la forma en que desea buscar en la web.</p><p><strong>Buscador:</strong> Un buscador es una herramienta utilizada para encontrar el contenido en Internet. Los ejemplos más famosos son Google, Yahoo entre muchos más. Las solicitudes realizadas sobre el campo de búsqueda siempre serán procesados por el buscador seleccionado. Cuando se selecciona 'Ninguno' sólo se podrá acceder a un sitio web introduciendo la dirección de esa página o eligiendo una página de su historial o los marcadores.</p><p>Si desea utilizar un motor de búsqueda que no está en la lista, elija Personalizado e introduzca su motor de búsqueda en el siguiente formato: https://example.com/search?q=@query@</p><strong>Sugerencias de Buscador:</strong> Además de su buscador principal, puede tener otros servicios que sugieran términos que podría estar buscando.";
 
 /* explanations of the history settings */
 "history settings explanation" = "<p>Administrar el historial de navegación. Su historial de navegación es una lista de sitios que ha visitado, así como la fecha y el tiempo que les ha visitado. Se puede acceder a una página visitada anteriormente pulsando sobre ella en la lista del historial.</p><p><strong>Guardar Historial:</strong> Al activar su historial se almacena localmente en el dispositivo. Además solo usted puede acceder. SnowHaze no guarda las páginas visitadas, si esta opción está desactivada.</p><p><strong>Olvidar sitios web privados:</strong> Aunque Guardar historial está activado, no se guardará el historial en sitios aunque esté activado.</p><strong>Eliminar Historial:</strong> Borrar todo el historial de navegación.";
@@ -2542,7 +2542,4 @@
 
 /* name of the sbb app used to confirm opening of url in other app */
 "open url in app sbb app name" = "SBB Mobile";
-
-/* title of option in the tab menu to close the menu */
-"cancel tab menu option title" = "Cancalar";
 

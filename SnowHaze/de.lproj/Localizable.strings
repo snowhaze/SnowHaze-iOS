@@ -2109,7 +2109,7 @@
 "contact settings explanation" = "Kontaktiere uns per Mail oder besuche unsere Webseite. Falls du ein Problem oder eine Rückmeldung hast, freuen wir uns, dir zu helfen. Du kannst auch unsere Webseite besuchen und SnowHaze mit Freunden und Bekannten teilen und SnowHaze im App Store bewerten.";
 
 /* explanations of the search engine settings */
-"search engine settings explanation" = "<p>Wähle aus, wie deine Suchanfragen durchgeführt werden sollen.</p><p><strong>Suchmaschine:</strong> Eine Suchmaschine ist ein Programm, um im Internet nach Inhalten zu suchen. Beispiele hierfür sind Google, Yahoo und viele mehr. Suchanfragen, die über das Suchfeld eingegeben werden, werden immer von der ausgewählten Suchmaschine durchgeführt. Falls 'Keine' ausgewählt wird, kann eine Seite nur mit der genauen Adresse oder über Lesezeichen und Verlaufseinträge aufgerufen werden.</p><strong>Suchvorschläge:</strong> Zusätzlich zu den Vorschlägen der jeweiligen Suchmaschine, können Suchvorschläge von weiteren Seiten eingeblendet werden.";
+"search engine settings explanation" = "<p>Wähle aus, wie deine Suchanfragen durchgeführt werden sollen.</p><p><strong>Suchmaschine:</strong> Eine Suchmaschine ist ein Programm, um im Internet nach Inhalten zu suchen. Beispiele hierfür sind Google, Yahoo und viele mehr. Suchanfragen, die über das Suchfeld eingegeben werden, werden immer von der ausgewählten Suchmaschine durchgeführt. Falls 'Keine' ausgewählt wird, kann eine Seite nur mit der genauen Adresse oder über Lesezeichen und Verlaufseinträge aufgerufen werden.</p><p>Wenn du eine Suchmaschine verwenden willst, die nicht in der Liste steht, wähle Benutzerdefiniert und gib deine Suchmaschine in folgendem Format ein: https://example.com/search?q=@query@</p><strong>Suchvorschläge:</strong> Zusätzlich zu den Vorschlägen der jeweiligen Suchmaschine, können Suchvorschläge von weiteren Seiten eingeblendet werden.";
 
 /* explanations of the history settings */
 "history settings explanation" = "<p>Verwalte deinen Suchverlauf. Der Suchverlauf ist eine Liste der besuchten Webseiten, sowie Datum und Zeit des Besuchs. Du gelangst durch Tippen auf den Verlaufseintrag wieder auf die Webseite.</p><p><strong>Verlauf speichern:</strong> Wenn diese Einstellung eingeschaltet ist, wird der Verlauf lokal auf deinem Gerät gespeichert. Dieser ist nur dir zugänglich. Besuchte Seiten werden nicht gespeichert, wenn diese Einstellung ausgeschaltet ist.</p><p><strong>Private Seiten vergessen:</strong> Obwohl 'Verlauf speichern' eingeschalten ist, wird der Verlauf für private Seiten nicht gespeichert.</p><strong>Verlauf löschen:</strong> Gesamten Suchverlauf löschen.";
@@ -2542,7 +2542,4 @@
 
 /* name of the sbb app used to confirm opening of url in other app */
 "open url in app sbb app name" = "SBB Mobile";
-
-/* title of option in the tab menu to close the menu */
-"cancel tab menu option title" = "Abbrechen";
 

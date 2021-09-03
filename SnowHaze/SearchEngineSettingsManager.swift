@@ -380,7 +380,7 @@ class SearchEngineSettingsManager: SettingsViewManager, UITextFieldDelegate {
 		guard let url = URLComponents(string: templated) else {
 			return .invalidURL
 		}
-		guard ["http", "https"].contains(url.scheme?.lowercased()) else {
+		guard ["http", "https"].contains(url.normalizedScheme) else {
 			return .invalidScheme
 		}
 		guard !(url.host?.isEmpty ?? true) else {

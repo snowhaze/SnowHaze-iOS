@@ -2109,7 +2109,7 @@
 "contact settings explanation" = "Contattaci via e-mail o visita il nostro sito web. Se avete qualsiasi problema o commento non esitate a contattarci. Saremo felici di aiutarvi. Puoi anche visitare il nostro sito web o condividere SnowHaze con amici e famiglia. Valuta SnowHaze nell'App store.";
 
 /* explanations of the search engine settings */
-"search engine settings explanation" = "<p>Seleziona come vuoi fare ricerche nel web.</p><p><strong>Motore di ricerca:</strong> Un motore di ricerca è uno strumento utilizzato per trovare i contenuti su Internet. Gli esempi sono Google, Yahoo e molti altri. Le richieste fatte su un campo di ricerca saranno sempre trattate dal motore selezionato. Quando si seleziona 'Nessuna' sarà possibile accedere a un sito web solo inserendo l'indirizzo della pagina o scegliendo una pagina dalla cronologia o dai segnalibri.</p><strong>Suggerimenti di ricerca:</strong> Oltre al vostro motore di ricerca principale è possibile avere suggerimenti di altre pagine che si potrebbe stare cercando.";
+"search engine settings explanation" = "<p>Seleziona come vuoi fare ricerche nel web.</p><p><strong>Motore di ricerca:</strong> Un motore di ricerca è uno strumento utilizzato per trovare i contenuti su Internet. Gli esempi sono Google, Yahoo e molti altri. Le richieste fatte su un campo di ricerca saranno sempre trattate dal motore selezionato. Quando si seleziona 'Nessuna' sarà possibile accedere a un sito web solo inserendo l'indirizzo della pagina o scegliendo una pagina dalla cronologia o dai segnalibri.</p><p>Se vuoi usare un motore di ricerca che non è nella lista, scegli Personalizzato e inserisci il tuo motore di ricerca nel seguente formato: https://example.com/search?q=@query@</p><strong>Suggerimenti di ricerca:</strong> Oltre al vostro motore di ricerca principale è possibile avere suggerimenti di altre pagine che si potrebbe stare cercando.";
 
 /* explanations of the history settings */
 "history settings explanation" = "<p>Gestire la cronologia di navigazione. La cronologia di navigazione è un elenco di siti visitati, nonché la data e l'ora in cui li ha visitati. È possibile accedere a una pagina precedentemente visitata cliccando su di essa nella lista.</p><p><strong>Salva la cronologia:</strong> Quando abilitata, la cronologia della vostra navigazione è memorizzata localmente sul dispositivo. È accessibile solo da voi e da nessun altro. SnowHaze non salva le pagine visitate se questa impostazione è disattivata.</p><p><strong>Dimentica Siti privati:</strong> Anche se Salva cronologia è attivo, la cronologia di navigazione non verrà registrato per i siti privati, se questa impostazione è stata attivata.</p><strong>Cancella cronologia:</strong> Cancella l'intera cronologia di navigazione.";
@@ -2542,7 +2542,4 @@
 
 /* name of the sbb app used to confirm opening of url in other app */
 "open url in app sbb app name" = "Mobile FFS";
-
-/* title of option in the tab menu to close the menu */
-"cancel tab menu option title" = "Cancella";
 

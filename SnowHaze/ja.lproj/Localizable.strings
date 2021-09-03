@@ -2109,7 +2109,7 @@
 "contact settings explanation" = "メールもしくはウェブサイトにてお問い合わせください。何か問題やコメント等ございましたら、遠慮なくお問い合わせください。お待ちしております。SnowHazeのウェブサイトをご覧になる、もしくはSnowHazeをご友人、ご家族にシェアすることも可能です。Apple StoreでSnowHazeの評価を行う。";
 
 /* explanations of the search engine settings */
-"search engine settings explanation" = "<p>ウェブでの検索方法を選択する</p><p><strong>検索エンジン:</strong> 検索エンジンはGoogle, Yahoo等のインターネット上でコンテンツを探すのに使用するツールです。検索フィールドでの検索要求は、常に選択された検索エンジンで行われます。 'なし'が選択されていた場合、ウェブサイトへのアクセスは、直接アドレスを入力する、もしくは履歴やブックマーク上での検索結果のみになります。</p><strong>検索予測:</strong> メインの検索エンジンの設定に加え、検索したい単語を予測する機能もあります。";
+"search engine settings explanation" = "<p>ウェブでの検索方法を選択する</p><p><strong>検索エンジン:</strong> 検索エンジンはGoogle, Yahoo等のインターネット上でコンテンツを探すのに使用するツールです。検索フィールドでの検索要求は、常に選択された検索エンジンで行われます。 'なし'が選択されていた場合、ウェブサイトへのアクセスは、直接アドレスを入力する、もしくは履歴やブックマーク上での検索結果のみになります。</p><p>リストにない検索エンジンを使用したい場合は、「カスタム」を選択し、次の形式で検索エンジンを入力してください： https://example.com/search?q=@query@</p><strong>検索予測:</strong> メインの検索エンジンの設定に加え、検索したい単語を予測する機能もあります。";
 
 /* explanations of the history settings */
 "history settings explanation" = "<p>閲覧履歴の管理。閲覧履歴は、ウェブサイトを閲覧した日付や時間のリストだけでなく、そのウェブサイトのリストでもあります。以前アクセスしたページを閲覧履歴のリストからタップすることで、またアクセスすることができます。</p><p><strong>履歴の保存:</strong> デバイスでローカルに保存された履歴がある場合です。これは、使用している本人以外は閲覧することができません。SnowHazeでは、この設定がオフの場合、閲覧したページを保存することはありません。</p><p><strong>プライベートサイトを消去する:</strong> 履歴の保存の設定がオンになっている場合でも、プライベートサイトで閲覧した場合、履歴が保存されることはありません。</p><strong>履歴を削除する:</strong> すべての閲覧履歴を削除します。";
@@ -2542,7 +2542,4 @@
 
 /* name of the sbb app used to confirm opening of url in other app */
 "open url in app sbb app name" = "SBB Mobile";
-
-/* title of option in the tab menu to close the menu */
-"cancel tab menu option title" = "キャンセル";
 

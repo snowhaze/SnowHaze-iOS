@@ -657,7 +657,7 @@
 "none search engine display name" = "Aucun";
 
 /* name of custom search engine setting to be displayed to user */
-"custom search engine display name" = "Personnalisation";
+"custom search engine display name" = "Personnalisé";
 
 /* title of the generic section of the custom search engine settings */
 "custom search engine settings generic settings title" = "Générique";
@@ -2109,7 +2109,7 @@
 "contact settings explanation" = "Contactez-nous par e-mail ou visitez notre site web. Si vous avez quelconque question ou problème, n'hésitez pas à nous contacter. Vous pouvez aussi visiter notre site web ou partager SnowHaze avec vos amis et noter SnowHaze dans l'App Store.";
 
 /* explanations of the search engine settings */
-"search engine settings explanation" = "<p>Choisissez votre moteur de recherche préféré.</p><p><strong>Moteur de recherche :</strong> Un moteur de recherche est un outil utilisé pour faire des recherches sur internet. Des exemples sont Google, Yahoo et autres. Les recherches effectuées depuis la barre de recherche sont toujours traitées par le moteur de recherche sélectionné. Quand 'Aucun' est choisi, il n'est possible d'accéder à une page seulement en entrant l'adresse exacte ou en choisissant une page depuis l'historique ou les onglets.</p><strong>Suggestions de recherche :</strong> En plus des suggestions du moteur de recherche principal, il est possible d'afficher les suggestions d'autres services.";
+"search engine settings explanation" = "<p>Choisissez votre moteur de recherche préféré.</p><p><strong>Moteur de recherche :</strong> Un moteur de recherche est un outil utilisé pour faire des recherches sur internet. Des exemples sont Google, Yahoo et autres. Les recherches effectuées depuis la barre de recherche sont toujours traitées par le moteur de recherche sélectionné. Quand 'Aucun' est choisi, il n'est possible d'accéder à une page seulement en entrant l'adresse exacte ou en choisissant une page depuis l'historique ou les onglets.</p><p>Si vous voulez utiliser un moteur de recherche qui n'est pas dans la liste, choisissez Personnalisé et entrez votre moteur de recherche dans le format suivant : https://example.com/search?q=@query@.</p><strong>Suggestions de recherche :</strong> En plus des suggestions du moteur de recherche principal, il est possible d'afficher les suggestions d'autres services.";
 
 /* explanations of the history settings */
 "history settings explanation" = "<p>Réglages de l'historique. L'historique est une liste des sites visités ainsi que la date et l'heure de la visite. Il est possible d'accéder à une page précédemment visitée en cliquant dans la liste.</p><p><strong>Sauver l'historique :</strong> Quand cette option est choisie l'historique des sites visités est enregistré sur l'appareil et n'est accessible qu'à l'utilisateur. SnowHaze n'enregistre aucun historique si cette option est éteinte.</p><p><strong>Oublier les sites privés :</strong> Même que l'enregistrement de l'historique est actif, l'historique ne sera pas enregistré pour les sites privés.</p><strong>Effacer l'historique :</strong> Tout l'historique est effacé.";
@@ -2542,7 +2542,4 @@
 
 /* name of the sbb app used to confirm opening of url in other app */
 "open url in app sbb app name" = "Mobile CFF";
-
-/* title of option in the tab menu to close the menu */
-"cancel tab menu option title" = "Annuler";
 

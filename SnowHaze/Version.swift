@@ -6,8 +6,10 @@
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
-let currentVersion				= version_3_2_0__090
+let currentVersion				= version_3_2_1__092
 
+let version_3_2_1__092: Int64	= 03020101	// App Store
+let version_3_2_1__091: Int64	= 03020100	// TestFlight Internal
 let version_3_2_0__090: Int64	= 03020000	// App Store
 let version_3_1_1__089: Int64	= 03010100	// App Store
 let version_3_1_0__088: Int64	= 03010001	// App Store
@@ -91,7 +93,7 @@ let version_0_4_0__009: Int64	= 00040000	// Crashlytics
 let version_0_3_0__008: Int64	= 00000300	// Crashlytics
 let version_0_2_3__005: Int64	= 00000202	// Crashlytics
 
-let buildExpiration: Date = compilationDate.addingTimeInterval(200 * 24 * 60 * 60)
+let buildExpiration: Date = compilationDate.addingTimeInterval(250 * 24 * 60 * 60)
 let compilationDate: Date = {
 	let dateString = String(utf8String: VERSION_TIMESTAMP)!
 	let formater = DateFormatter()

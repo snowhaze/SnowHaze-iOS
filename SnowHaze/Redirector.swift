@@ -507,14 +507,13 @@ struct Redirector {
 				} else if param.name == "redirectUrl" {
 					if let value = param.value {
 						url = URL(string: value)
-						let lowerScheme = url!.scheme?.lowercased()
-						guard lowerScheme == "http" || lowerScheme == "https" else {
+						guard ["http", "https"].contains(url?.normalizedScheme) else {
 							return nil
 						}
-						guard let lowerHost = url!.host?.lowercased() else {
+						guard let host = url?.normalizedHost else {
 							return nil
 						}
-						guard lowerHost == "apple.com" || lowerHost.hasSuffix(".apple.com") else {
+						guard host == "apple.com" || host.hasSuffix(".apple.com") else {
 							return nil
 						}
 					}

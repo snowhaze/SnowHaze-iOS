@@ -2109,7 +2109,7 @@
 "contact settings explanation" = "Schrib üs es Mail oder bsuech üsi Website. Falls du es Problem oder e Rückmäldig hesch, fröie mir üs dir z'hälfe. Du chasch o üsi Website bsueche oder SnowHaze mit Fründe u Bekannte teile u SnowHaze im App Store bewärte.";
 
 /* explanations of the search engine settings */
-"search engine settings explanation" = "<p>Wähl us, wi dini Suechafrage sölle düregfüert wärde.</p><p><strong>Suechmaschine:</strong> E Suechmaschine isch es Programm zum im Internet nach Sache z'sueche. Bispiil si Google, Yahoo und vili me. Suechafrage wo über z Suechfäld iigä wärde, wärde immer vor usgwählte Suechmaschine düregfüert. Falls 'Keni' usgwählt wird, chunnt me nume uf e Site mit dr gnaue Adrässe oder über Läsezeiche und Verloufsiträg.</p><strong>Suchvorschläge:</strong> Zuesätzlich zu de Vorschleg vor jewilige Suechmaschine, chöi o Vorschleg vo witere Site iibländet wärde.";
+"search engine settings explanation" = "<p>Wähl us, wi dini Suechafrage sölle düregfüert wärde.</p><p><strong>Suechmaschine:</strong> E Suechmaschine isch es Programm zum im Internet nach Sache z'sueche. Bispiil si Google, Yahoo und vili me. Suechafrage wo über z Suechfäld iigä wärde, wärde immer vor usgwählte Suechmaschine düregfüert. Falls 'Keni' usgwählt wird, chunnt me nume uf e Site mit dr gnaue Adrässe oder über Läsezeiche und Verloufsiträg.</p><p>Wenn du e Suechmaschine wosch bruche, wo nid ir Liste steit, wähl Benutzerdefiniert und gib dini Suchmaschine i folgendem Format ii: https://example.com/search?q=@query@</<strong>Suchvorschläge:</strong> Zuesätzlich zu de Vorschleg vor jewilige Suechmaschine, chöi o Vorschleg vo witere Site iibländet wärde.";
 
 /* explanations of the history settings */
 "history settings explanation" = "<p>Da chasch di Suechverlouf verwalte. Dr Suechverlouf isch e Liste vo bsuechte Website sowie Datum u Ziit vom bsuech. Du chasch ufe Verloufsiitrag tippe und chunnsch wider uf di Website.</p><p><strong>Verlouf spichere:</strong> Wenn die Iistellig igschaltet isch wird dr Verlouf lokal uf dim Gräät gspicheret. Dä gsesch nume du. Bsuechti Site wärde nid gspicheret wenn die Iistellig usgschalte isch.</p><p><strong>Privati Site vergässe:</strong> Obwohl 'Verlouf spichere' iigschaltet isch, wird dr Verlouf für private Site nid gspicheret.</p><strong>Verlouf lösche:</strong> Dr gsamt Suechverlouf wird glösche.";
@@ -2542,7 +2542,4 @@
 
 /* name of the sbb app used to confirm opening of url in other app */
 "open url in app sbb app name" = "SBB Mobile";
-
-/* title of option in the tab menu to close the menu */
-"cancel tab menu option title" = "Abbräche";
 

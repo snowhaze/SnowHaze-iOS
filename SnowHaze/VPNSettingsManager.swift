@@ -412,7 +412,7 @@ class VPNSettingsManager: SettingsViewManager {
 			} else if isIPSec && selectedProfileIndex == indexPath.row - 1 {
 				cell.accessoryType = .checkmark
 			} else if profile.outdatedConfig {
-				let icon = #imageLiteral(resourceName: "credential-warning")
+				let icon = #imageLiteral(resourceName: "credential-warning").withRenderingMode(.alwaysTemplate)
 				let button = UIButton()
 				button.frame.size = icon.size
 				button.setImage(icon, for: [])
@@ -581,13 +581,13 @@ class VPNSettingsManager: SettingsViewManager {
 				controller.tableView.reloadRows(at: [indexPath], with: .none)
 			}
 		}
-		VPNManager.shared.updateProfileList { [weak self] success in
+		VPNManager.shared.updateProfileList(minWait: 60) { [weak self] success in
 			for profile in outdated {
 				self?.downloading.remove(profile.id)
 				guard let profile = VPNManager.shared.updated(profile) else {
 					continue
 				}
-				if !success || !profile.hasProfile {
+				if !success || !profile.hasProfile || profile.outdatedConfig {
 					self?.flashDownloadError(for: profile)
 				}
 				if let indexPath = self?.currentIndexPath(for: profile) {

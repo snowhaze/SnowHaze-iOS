@@ -130,6 +130,8 @@ class ScanCodeViewController: UIViewController {
 		}
 	}
 
+	var repeatInterval: TimeInterval = 10
+
 	var useFrontCamera = false
 
 	private static var globalSessionManager = CaptureSessionManager()
@@ -156,8 +158,8 @@ class ScanCodeViewController: UIViewController {
 	private var sessionManager: CaptureSessionManager!
 	private var previewLayer: AVCaptureVideoPreviewLayer!
 
-	private var lastScan: ScanResult?
-	private enum ScanResult: Equatable {
+	private var processedScans = [ScanResult: Date]()
+	private enum ScanResult: Hashable {
 		case unreadable
 		case ok(String)
 		case filtered(String)
@@ -373,8 +375,9 @@ extension ScanCodeViewController: CaptureSessionManagerDelegate {
 		DispatchQueue.main.async {
 			let viewCorners = corners.map() { self.previewLayer.layerPointConverted(fromCaptureDevicePoint: $0) }
 			let scan = ScanResult(code: code, filter: self.codeFilter)
-			if self.lastScan != scan {
-				self.lastScan = scan
+			self.processedScans = self.processedScans.filter { $1.timeIntervalSinceNow > -self.repeatInterval }
+			if self.processedScans[scan] == nil {
+				self.processedScans[scan] = Date()
 				self.addOverlay(for: viewCorners, success: scan.success)
 				self.codeOverlay.code = scan.validCode
 

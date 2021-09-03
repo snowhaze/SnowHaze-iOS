@@ -22,7 +22,7 @@ extension URL {
 		guard var components = URLComponents(url: self, resolvingAgainstBaseURL: true) else {
 			return nil
 		}
-		guard let scheme = components.scheme?.lowercased(), ["tor", "tors"].contains(scheme) else {
+		guard let scheme = components.normalizedScheme, ["tor", "tors"].contains(scheme) else {
 			return self
 		}
 		if scheme == "tor" {
@@ -37,7 +37,7 @@ extension URL {
 		guard var components = URLComponents(url: self, resolvingAgainstBaseURL: true) else {
 			return nil
 		}
-		guard let scheme = components.scheme?.lowercased(), ["http", "https"].contains(scheme) else {
+		guard let scheme = components.normalizedScheme, ["http", "https"].contains(scheme) else {
 			return self
 		}
 		if scheme == "http" {
