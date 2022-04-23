@@ -283,6 +283,8 @@ let db: SQLiteManager = {
 				case (.select, nil, nil):																	return .ok
 				case (.function("fts5"), nil, nil):															return .ok
 				case (.function("substr"), nil, nil):														return .ok
+				case (.function("printf"), nil, nil):                                                       return .ok
+				case (.function("length"), nil, nil):                                                       return .ok
 				case (.transaction("BEGIN"), nil, nil):														return .ok
 				case (.transaction("COMMIT"), nil, nil):													return .ok
 				case (.transaction("ROLLBACK"), nil, nil):													return .ok

@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import UIKit
 
-protocol ScanCodeViewControllerDelegate: class {
+protocol ScanCodeViewControllerDelegate: AnyObject {
 	func codeScanner(_ scanner: ScanCodeViewController, canPreviewCode code: String) -> Bool
 	func codeScanner(_ scanner: ScanCodeViewController, viewControllerForCodePreview code: String) -> UIViewController?
 	func codeScanner(_ scanner: ScanCodeViewController, didSelectCode code: String?)

@@ -142,6 +142,8 @@ internal class MultiviewSettingsManager<Mode: MultiviewSettingsManagerMode> : Se
 		}
 		reloadData(with: .fade) {
 			self.mode = mode
+			ensureManagerIsSetup()
+			(manager as? ChildSettingsManager<Self>)?.resetIfNeeded()
 			let newButton = barButton(for: mode)
 			if newButton != rightBarButtonItem {
 				rightBarButtonItem = newButton

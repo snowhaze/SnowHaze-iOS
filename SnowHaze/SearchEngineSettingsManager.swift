@@ -47,6 +47,7 @@ class SearchEngineSettingsManager: SettingsViewManager, UITextFieldDelegate {
 				case 8:		title = NSLocalizedString("swisscows search engine display name", comment: "name of swisscows search engine to be displayed to user")
 				case 9:		title = NSLocalizedString("duckduckgo search engine display name", comment: "name of duckduckgo search engine to be displayed to user")
 				case 12:	title = NSLocalizedString("qwant search engine display name", comment: "name of qwant search engine to be displayed to user")
+				case 14:	title = NSLocalizedString("mojeek search engine display name", comment: "name of mojeek search engine to be displayed to user")
 				case 13:	title = NSLocalizedString("custom search engine display name", comment: "name of custom search engine setting to be displayed to user")
 				default:	fatalError("invalid index path")
 			}
@@ -136,7 +137,7 @@ class SearchEngineSettingsManager: SettingsViewManager, UITextFieldDelegate {
 		assert(customSection == 3)
 		switch section {
 			case 0:		return 0
-			case 1:		return 12
+			case 1:		return 13
 			case 2:		return 3
 			case 3:		return 1
 			default:	fatalError("invalid section")
@@ -257,7 +258,15 @@ class SearchEngineSettingsManager: SettingsViewManager, UITextFieldDelegate {
 	}
 
 	private func rawValue(for index: Int) -> Int64 {
-		return Int64(index + (index < 10 ? 0: 2))
+		if index < 10 {
+			return Int64(index)
+		} else if index == 10 {
+			return 12
+		} else if index == 12 {
+			return 13
+		} else {
+			return Int64(index) + 3
+		}
 	}
 
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {

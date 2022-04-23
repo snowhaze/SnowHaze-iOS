@@ -9,7 +9,7 @@
 import Foundation
 
 public class SnowHazeURLSession {
-	private let delegate: URLSessionDelegate
+	private let delegate: URLSessionDelegate?
 	private let config: URLSessionConfiguration
 	private let torConfig: URLSessionConfiguration?
 
@@ -88,7 +88,7 @@ public class SnowHazeURLSession {
 		}
 	}
 
-	public init(configuration: URLSessionConfiguration = .ephemeral, torConfig: URLSessionConfiguration? = nil, delegate: URLSessionDelegate = PinningSessionDelegate()) {
+	public init(configuration: URLSessionConfiguration = .ephemeral, torConfig: URLSessionConfiguration? = nil, delegate: URLSessionDelegate? = nil) {
 		// identifiers must be unique, background and regular sessions schould not be mixed
 		assert((configuration.identifier == nil) == (torConfig?.identifier == nil))
 		assert((configuration.identifier == nil) || (torConfig?.identifier != configuration.identifier))

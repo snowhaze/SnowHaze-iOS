@@ -5,7 +5,7 @@ target 'SnowHaze' do
 
 pod 'SQLCipher', '~> 4.4', :inhibit_warnings => true
 pod 'Sodium', '0.8'
-pod 'Tor', podspec: 'https://raw.githubusercontent.com/iCepa/Tor.framework/v406.5.1/Tor.podspec'
+pod 'Tor', podspec: 'https://raw.githubusercontent.com/iCepa/Tor.framework/v406.8.2/Tor.podspec'
 
 end
 post_install do |installer|

@@ -25,7 +25,6 @@
 		84C7BE9B20961AC6003C25B2 /* SearchSelect.js in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDCC20961AB6003C25B2 /* SearchSelect.js */; };
 		84C7BE9C20961AC6003C25B2 /* MaskingRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDCD20961AB6003C25B2 /* MaskingRule.swift */; };
 		84C7BE9D20961AC6003C25B2 /* MemoryGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDCE20961AB6003C25B2 /* MemoryGame.swift */; };
-		84C7BE9E20961AC6003C25B2 /* api3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDCF20961AB6003C25B2 /* api3.cer */; };
 		84C7BE9F20961AC6003C25B2 /* BrowserPageGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDD020961AB6003C25B2 /* BrowserPageGenerator.swift */; };
 		84C7BEA020961AC6003C25B2 /* FixedNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDD120961AB6003C25B2 /* FixedNavigationController.swift */; };
 		84C7BEA120961AC6003C25B2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BDD320961AB6003C25B2 /* Localizable.strings */; };
@@ -59,7 +58,6 @@
 		84C7BEBE20961AC6003C25B2 /* TabSelectionCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDFB20961AB8003C25B2 /* TabSelectionCollectionViewLayout.swift */; };
 		84C7BEBF20961AC6003C25B2 /* JavaScriptSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDFC20961AB8003C25B2 /* JavaScriptSettingsManager.swift */; };
 		84C7BEC120961AC6003C25B2 /* URLInjectionDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDFE20961AB8003C25B2 /* URLInjectionDetection.swift */; };
-		84C7BEC220961AC6003C25B2 /* PinningSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BDFF20961AB9003C25B2 /* PinningSessionDelegate.swift */; };
 		84C7BEC320961AC6003C25B2 /* BlockReferrers.js in Resources */ = {isa = PBXBuildFile; fileRef = 84C7BE0020961AB9003C25B2 /* BlockReferrers.js */; };
 		84C7BEC420961AC6003C25B2 /* DomainList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE0120961AB9003C25B2 /* DomainList.swift */; };
 		84C7BEC520961AC6003C25B2 /* SecPolicyEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE0220961AB9003C25B2 /* SecPolicyEvaluator.swift */; };
@@ -179,6 +177,7 @@
 		84C7BF3D20961AC6003C25B2 /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE9520961AC6003C25B2 /* TabController.swift */; };
 		D701909421C32C1900180EE8 /* ReviewPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D701909321C32C1900180EE8 /* ReviewPrompt.swift */; };
 		D75D8F6B24C896C000E5542F /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7BE0B20961AB9003C25B2 /* Regex.swift */; };
+		D76352D028156B460073B854 /* ChildSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76352CF28156B460073B854 /* ChildSettingsManager.swift */; };
 		D76821272533B62E00BB2E11 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76821262533B62A00BB2E11 /* Alert.swift */; };
 		D768212B2533B6BB00BB2E11 /* DownloadActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D768212A2533B6BB00BB2E11 /* DownloadActivity.swift */; };
 		D7688F23261632D700EF0E42 /* MultiviewSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7688F22261632D700EF0E42 /* MultiviewSettingsManager.swift */; };
@@ -288,7 +287,6 @@
 		84C7BDCC20961AB6003C25B2 /* SearchSelect.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = SearchSelect.js; sourceTree = "<group>"; };
 		84C7BDCD20961AB6003C25B2 /* MaskingRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MaskingRule.swift; sourceTree = "<group>"; };
 		84C7BDCE20961AB6003C25B2 /* MemoryGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoryGame.swift; sourceTree = "<group>"; };
-		84C7BDCF20961AB6003C25B2 /* api3.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = api3.cer; sourceTree = "<group>"; };
 		84C7BDD020961AB6003C25B2 /* BrowserPageGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserPageGenerator.swift; sourceTree = "<group>"; };
 		84C7BDD120961AB6003C25B2 /* FixedNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FixedNavigationController.swift; sourceTree = "<group>"; };
 		84C7BDD420961AB6003C25B2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = Localizable.strings; sourceTree = "<group>"; };
@@ -322,7 +320,6 @@
 		84C7BDFB20961AB8003C25B2 /* TabSelectionCollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabSelectionCollectionViewLayout.swift; sourceTree = "<group>"; };
 		84C7BDFC20961AB8003C25B2 /* JavaScriptSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JavaScriptSettingsManager.swift; sourceTree = "<group>"; };
 		84C7BDFE20961AB8003C25B2 /* URLInjectionDetection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLInjectionDetection.swift; sourceTree = "<group>"; };
-		84C7BDFF20961AB9003C25B2 /* PinningSessionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinningSessionDelegate.swift; sourceTree = "<group>"; };
 		84C7BE0020961AB9003C25B2 /* BlockReferrers.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = BlockReferrers.js; sourceTree = "<group>"; };
 		84C7BE0120961AB9003C25B2 /* DomainList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DomainList.swift; sourceTree = "<group>"; };
 		84C7BE0220961AB9003C25B2 /* SecPolicyEvaluator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecPolicyEvaluator.swift; sourceTree = "<group>"; };
@@ -446,6 +443,7 @@
 		84C7BE9520961AC6003C25B2 /* TabController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
 		A332F0A3DD107E44A936AAE6 /* Pods-SnowHaze.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SnowHaze.release.xcconfig"; path = "Pods/Target Support Files/Pods-SnowHaze/Pods-SnowHaze.release.xcconfig"; sourceTree = "<group>"; };
 		D701909321C32C1900180EE8 /* ReviewPrompt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviewPrompt.swift; sourceTree = "<group>"; };
+		D76352CF28156B460073B854 /* ChildSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChildSettingsManager.swift; sourceTree = "<group>"; };
 		D76821262533B62A00BB2E11 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		D768212A2533B6BB00BB2E11 /* DownloadActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadActivity.swift; sourceTree = "<group>"; };
 		D7688F22261632D700EF0E42 /* MultiviewSettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiviewSettingsManager.swift; sourceTree = "<group>"; };
@@ -558,7 +556,6 @@
 				84C7BE2220961ABB003C25B2 /* AcknowledgementsSettingsManager.swift */,
 				84C7BDEF20961AB7003C25B2 /* AddBookmarkActivity.swift */,
 				D76821262533B62A00BB2E11 /* Alert.swift */,
-				84C7BDCF20961AB6003C25B2 /* api3.cer */,
 				84C7BDF620961AB8003C25B2 /* AppDelegate.swift */,
 				84C7BE4920961ABF003C25B2 /* AppearanceSettingsManager.swift */,
 				84C7BDE720961AB7003C25B2 /* AppSettingsManager.swift */,
@@ -575,6 +572,7 @@
 				84C7BE8020961AC4003C25B2 /* CanvasProtection.js */,
 				84C7BE7020961AC3003C25B2 /* CaptureSessionManager.swift */,
 				D799507824BA97070039B858 /* Cert.swift */,
+				D76352CF28156B460073B854 /* ChildSettingsManager.swift */,
 				84C7BE5120961AC0003C25B2 /* CodeOverlayView.swift */,
 				84C7BE3820961ABD003C25B2 /* ContactSettingsManager.swift */,
 				84C7BE7120961AC3003C25B2 /* ContentBlockerManager.swift */,
@@ -656,7 +654,6 @@
 				84C7BDF120961AB7003C25B2 /* PasscodeSettingsManager.swift */,
 				D79950A724BA9B210039B858 /* PasswordValidator.swift */,
 				84C7BE6E20961AC3003C25B2 /* Pinger.swift */,
-				84C7BDFF20961AB9003C25B2 /* PinningSessionDelegate.swift */,
 				84C7BDE820961AB7003C25B2 /* PolicyAssessor.swift */,
 				84C7BE8720961AC4003C25B2 /* PolicyManager.swift */,
 				84C7BE1220961ABA003C25B2 /* PopoverBlockingPolicy.swift */,
@@ -1025,7 +1022,6 @@
 				D799508124BA97800039B858 /* geoip6 in Resources */,
 				84C7BF3120961AC6003C25B2 /* InfoPlist.strings in Resources */,
 				84C7BEFE20961AC6003C25B2 /* ScriptBlackListing.js in Resources */,
-				84C7BE9E20961AC6003C25B2 /* api3.cer in Resources */,
 				84C7BF2D20961AC6003C25B2 /* InfoPlist.strings in Resources */,
 				84C7BF3920961AC6003C25B2 /* LaunchScreen.storyboard in Resources */,
 				84C7BEB020961AC6003C25B2 /* InfoPlist.strings in Resources */,
@@ -1120,7 +1116,6 @@
 				84C7BEFF20961AC6003C25B2 /* AppearanceSettingsManager.swift in Sources */,
 				84C7BF2820961AC6003C25B2 /* Redirector.swift in Sources */,
 				84C7BED420961AC6003C25B2 /* ScreenDimmer.swift in Sources */,
-				84C7BEC220961AC6003C25B2 /* PinningSessionDelegate.swift in Sources */,
 				84C7BEFD20961AC6003C25B2 /* ContentBlockerSettingsManager.swift in Sources */,
 				84C7BE9920961AC6003C25B2 /* TabViewController.swift in Sources */,
 				84C7BF2920961AC6003C25B2 /* Bookmark.swift in Sources */,
@@ -1159,6 +1154,7 @@
 				D79950AA24BA9B550039B858 /* SnowHazeURLSession.swift in Sources */,
 				84C7BF0920961AC6003C25B2 /* PasscodeController.swift in Sources */,
 				84C7BE9820961AC6003C25B2 /* HistorySuggestionSource.swift in Sources */,
+				D76352D028156B460073B854 /* ChildSettingsManager.swift in Sources */,
 				84C7BED920961AC6003C25B2 /* Random.swift in Sources */,
 				84C7BF2A20961AC6003C25B2 /* ContentTypes.swift in Sources */,
 				84C7BF1920961AC6003C25B2 /* DataFetcher.swift in Sources */,
@@ -1463,7 +1459,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 95;
 				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1471,7 +1467,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1484,7 +1480,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 95;
 				INFOPLIST_FILE = "SnowHaze VPN/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1492,7 +1488,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier.SnowHaze-VPN";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1626,7 +1622,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SnowHaze/SnowHaze.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 95;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SnowHaze",
@@ -1637,7 +1633,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";
@@ -1656,7 +1652,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SnowHaze/SnowHaze.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 95;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SnowHaze",
@@ -1667,7 +1663,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "unique-identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SnowHaze/SnowHaze-Bridging-Header.h";

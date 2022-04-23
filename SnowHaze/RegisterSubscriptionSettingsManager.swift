@@ -17,16 +17,9 @@ private let formRow = 0
 private let confirmRow = 0
 private let downloadRow = 1
 
-class RegisterSubscriptionSettingsManager: SettingsViewManager {
-	private weak var parent: SubscriptionSettingsManager?
+class RegisterSubscriptionSettingsManager: ChildSettingsManager<SubscriptionSettingsManager> {
 	private var useKey = false
 	private var loading = false
-
-	init(parent: SubscriptionSettingsManager) {
-		self.parent = parent
-		super.init()
-		controller = parent.controller
-	}
 
 	private var registerButton: UIButton?
 	private var copyKeyButton: UIButton?
@@ -41,19 +34,8 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 	private var offlineOK = false
 	private var pwOK = false
 
-	override func setup() {
-		super.setup()
-		header.icon = parent?.header.icon
-		header.delegate = parent?.header.delegate
-		header.color = assessmentResultColor
-	}
-
 	override func html() -> String {
 		return NSLocalizedString("register subscription sub settings explanation", comment: "explanations of the register subscription sub settings tab")
-	}
-
-	override var assessmentResultColor: UIColor {
-		return parent?.assessmentResultColor ?? PolicyAssessmentResult.color(for: .veryBad)
 	}
 
 	override var numberOfSections: Int {
@@ -223,6 +205,16 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 		return section == formSection ? title : nil
 	}
 
+	override func reset() {
+		loading = false
+		emailField?.text = ""
+		emailConfirmField?.text = ""
+		passwordField?.text = ""
+		passwordConfirmField?.text = ""
+		uploadCleartexEmailSwitch?.isOn = true
+		updateUIState()
+	}
+
 	@objc private func toggleUseKey(_ sender: UISwitch) {
 		useKey = sender.isOn
 		updateUIState()
@@ -252,6 +244,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 				let key = V3APIConnection.crcedMasterSecretHex!
 				UIPasteboard.general.string = key
 				self?.parent?.switchToNormal()
+				self?.needsReset()
 			} else {
 				fatalError("invalid result")
 			}
@@ -296,6 +289,7 @@ class RegisterSubscriptionSettingsManager: SettingsViewManager {
 					} else {
 						V3APIConnection.set(masterSecret: secret)
 						self?.parent?.switchToNormal()
+						self?.needsReset()
 					}
 					self?.updateUIState()
 				}

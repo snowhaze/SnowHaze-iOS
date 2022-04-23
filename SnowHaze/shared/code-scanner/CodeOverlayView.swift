@@ -15,7 +15,7 @@ private let labelHeight: CGFloat = 60
 private let backgroundDimming: CGFloat = 0.7
 private let codeLineNumber = 2
 
-protocol CodeOverlayViewDelegate: class {
+protocol CodeOverlayViewDelegate: AnyObject {
 	func codeOverlayView(_ overlay: CodeOverlayView, canPreviewCode code: String) -> Bool
 	func codeOverlayView(_ overlay: CodeOverlayView, previewCode code: String)
 	func codeOverlayView(_ overlay: CodeOverlayView, didSelectCode code: String?)

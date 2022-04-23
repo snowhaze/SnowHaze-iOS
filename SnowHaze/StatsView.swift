@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-protocol StatsViewDelegate: class {
+protocol StatsViewDelegate: AnyObject {
 	func numerOfStats(in statsView: StatsView) -> Int
 	func titleOfStat(_ index: Int, in statsView: StatsView) -> String
 	func countForStat(_ index: Int, in statsView: StatsView) -> Int

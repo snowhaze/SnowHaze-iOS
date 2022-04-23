@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import UIKit
 
-protocol CaptureSessionManagerDelegate: class {
+protocol CaptureSessionManagerDelegate: AnyObject {
 	func sessionManager(_ manger: CaptureSessionManager, didScanBarCode code: String?, withCorners corners: [CGPoint])
 	func sessionManagerAccessGranted(_ manger: CaptureSessionManager)
 }

@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-protocol BookmarkCollectionViewCellDelegate: class {
+protocol BookmarkCollectionViewCellDelegate: AnyObject {
 	func bookmarkCell(_ cell: BookmarkCollectionViewCell, didRequestDeleteBookmark bookmark: Bookmark)
 	func bookmarkCell(_ cell: BookmarkCollectionViewCell, didRequestRefreshBookmark bookmark: Bookmark)
 	func bookmarkCell(_ cell: BookmarkCollectionViewCell, didRequestRenameBookmark bookmark: Bookmark)

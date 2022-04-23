@@ -15,7 +15,7 @@ enum SettingsLevel {
 	case global
 }
 
-protocol SettingsListener: class {
+protocol SettingsListener: AnyObject {
 	/**
 	 *	Is called before the value is changed. Meaning the old value can be deternined via settings.value(for: key) if necessary
 	*/

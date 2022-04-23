@@ -29,7 +29,7 @@ private class ProgressDrawer: UIView {
 	}
 }
 
-@objc protocol DownloadProgressIndicatorDelegate: class {
+@objc protocol DownloadProgressIndicatorDelegate: AnyObject {
 	func downloadProgressIndicatorTapped(_ indicator: DownloadProgressIndicator)
 }
 

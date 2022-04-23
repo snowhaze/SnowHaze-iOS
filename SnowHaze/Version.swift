@@ -6,8 +6,11 @@
 //  Copyright © 2017 Illotros GmbH. All rights reserved.
 //
 
-let currentVersion				= version_3_2_1__092
+let currentVersion				= version_3_3_0__095
 
+let version_3_3_0__095: Int64	= 03030002	// App Store
+let version_3_3_0__094: Int64	= 03030001	// TestFlight Internal
+let version_3_3_0__093: Int64	= 03030000	// TestFlight
 let version_3_2_1__092: Int64	= 03020101	// App Store
 let version_3_2_1__091: Int64	= 03020100	// TestFlight Internal
 let version_3_2_0__090: Int64	= 03020000	// App Store
@@ -93,7 +96,7 @@ let version_0_4_0__009: Int64	= 00040000	// Crashlytics
 let version_0_3_0__008: Int64	= 00000300	// Crashlytics
 let version_0_2_3__005: Int64	= 00000202	// Crashlytics
 
-let buildExpiration: Date = compilationDate.addingTimeInterval(250 * 24 * 60 * 60)
+let buildExpiration: Date = compilationDate.addingTimeInterval(400 * 24 * 60 * 60)
 let compilationDate: Date = {
 	let dateString = String(utf8String: VERSION_TIMESTAMP)!
 	let formater = DateFormatter()
@@ -103,7 +106,7 @@ let compilationDate: Date = {
 	return formater.date(from: dateString)!
 }()
 
-let versionDescription: String	= {
+let versionDescription: String = {
 	let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
 	let buildNr = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
 	let versionFormat = NSLocalizedString("version description format", comment: "format of the human-readable description of the app version")

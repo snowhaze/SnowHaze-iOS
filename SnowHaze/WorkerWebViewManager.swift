@@ -9,7 +9,7 @@
 import Foundation
 import WebKit
 
-protocol WorkerWebViewManagerDelegate: class {
+protocol WorkerWebViewManagerDelegate: AnyObject {
 	func webViewManagerDidFailLoad(_ manager: WorkerWebViewManager)
 	func webViewManagerDidFinishLoad(_ manager: WorkerWebViewManager)
 	func webViewManager(_ manager: WorkerWebViewManager, didMakeProgress progress: Double)

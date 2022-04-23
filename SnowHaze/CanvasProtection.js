@@ -182,7 +182,7 @@
 		if (name == gl2_VERSION) {
 			return "WebGL 2.0";
 		} else if (name == gl2_SL_VERSION) {
-			return "WebGL 2.0 (OpenGL ES 2.0 Metal - 39.9)";
+			return "WebGL GLSL ES 3.00";
 		}
 		Function.prototype.apply = apply;
 		return getParam2.apply(this, arguments);

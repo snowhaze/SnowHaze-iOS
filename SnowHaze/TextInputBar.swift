@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-protocol TextInputBarDelegate: class {
+protocol TextInputBarDelegate: AnyObject {
 	func textInputBar(_ bar: TextInputBar, willUpdateText newText: String)
 	func textInputBarDidDismiss(_ bar: TextInputBar)
 }

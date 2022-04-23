@@ -156,6 +156,7 @@ class PolicyAssessor {
 			case .duckDuckGo:	return 0.85
 			case .qwant:		return 0.85
 			case .custom:		return 0.25
+			case .mojeek:		return 0.55
 			case .none:			return 1
 		}
 	}
@@ -308,8 +309,13 @@ class PolicyAssessor {
 		let minFontSize = double(for: minFontSizeKey)
 		let ignoresViewportScaleLimits = bool(for: ignoresViewportScaleLimitsKey)
 		let webContentScale = integer(for: webContentScaleKey)
-		var result = nightMode ? 0 : 0.5
-		result += 0.25 / (minFontSize * 0.1 + 1)
+		var result = nightMode ? 0 : 0.45
+		result += 0.20 / (minFontSize * 0.1 + 1)
+		var minReaderFontsize = double(for: minReaderFontSizeKey)
+		if minReaderFontsize < 0 {
+			minReaderFontsize = minFontSize
+		}
+		result += 0.5 / (minReaderFontsize * 0.1 + 1)
 		result += ignoresViewportScaleLimits ? 0.0 : 0.1
 		result += webContentScale == 1 * scaleStorageFactor ? 0.15 : 0
 		return result

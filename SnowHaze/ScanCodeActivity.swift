@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import UIKit
 
-protocol ScanCodeActivityDelegate: class {
+protocol ScanCodeActivityDelegate: AnyObject {
 	func activity(_ activity: ScanCodeActivity, didScanCode code: String)
 }
 

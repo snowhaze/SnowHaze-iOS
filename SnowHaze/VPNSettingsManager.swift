@@ -64,6 +64,7 @@ class VPNSettingsManager: SettingsViewManager {
 
 	private var downloading = Set<String>()
 	private var downloadErrors = Set<String>()
+	private var excessiveRetries = Set<String>()
 
 	private static var docController: UIDocumentInteractionController?
 	private static var sendingFile = false
@@ -361,6 +362,8 @@ class VPNSettingsManager: SettingsViewManager {
 			cell.imageView?.image = profile.flag
 			if downloadErrors.contains(profile.id) {
 				cell.detailTextLabel?.text = NSLocalizedString("vpn profile download failed error message", comment: "error message flashed when a vpn profile download the user explicitly requested fails")
+			} else if excessiveRetries.contains(profile.id) {
+				cell.detailTextLabel?.text = NSLocalizedString("excessive vpn profile download attempts message", comment: "message flashed when an excessive ammount of vpn profile downloads are requested by the user")
 			} else {
 				let profileState: String
 				if let date = (profile as? OVPNProfile)?.installedExpiration {
@@ -538,7 +541,7 @@ class VPNSettingsManager: SettingsViewManager {
 						guard let indexPath = self?.currentIndexPath(for: profile) else {
 							return
 						}
-						if success && profile.hasProfile {
+						if let success = success, success && profile.hasProfile {
 							if let profile = profile as? IPSecProfile, let self = self {
 								var reload = [indexPath]
 								if let oldSelectedIndex = self.selectedProfileIndex {
@@ -555,8 +558,10 @@ class VPNSettingsManager: SettingsViewManager {
 							} else if let profile = profile as? OVPNProfile {
 								self?.install(profile, for: cell)
 							}
-						} else {
+						} else if let _ = success {
 							self?.flashDownloadError(for: profile)
+						} else {
+							self?.flashExcessiveRetryMessage(for: profile)
 						}
 						self?.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
 					}
@@ -587,9 +592,14 @@ class VPNSettingsManager: SettingsViewManager {
 				guard let profile = VPNManager.shared.updated(profile) else {
 					continue
 				}
-				if !success || !profile.hasProfile || profile.outdatedConfig {
-					self?.flashDownloadError(for: profile)
+				if let success = success {
+					if !success || !profile.hasProfile || profile.outdatedConfig {
+						self?.flashDownloadError(for: profile)
+					}
+				} else {
+					self?.flashExcessiveRetryMessage(for: profile)
 				}
+				// TODO: do we want to display some 'exsessive downloads' error message?
 				if let indexPath = self?.currentIndexPath(for: profile) {
 					self?.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
 				}
@@ -615,6 +625,21 @@ class VPNSettingsManager: SettingsViewManager {
 		downloadErrors.insert(profile.id)
 		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [weak self] in
 			self?.downloadErrors.remove(profile.id)
+			guard let indexPath = self?.currentIndexPath(for: profile) else {
+				return
+			}
+			self?.controller?.tableView?.reloadRows(at: [indexPath], with: .none)
+		}
+		controller?.tableView?.reloadRows(at: [indexPath], with: .none)
+	}
+
+	private func flashExcessiveRetryMessage(for profile: VPNProfile) {
+		guard let indexPath = currentIndexPath(for: profile) else {
+			return
+		}
+		excessiveRetries.insert(profile.id)
+		DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [weak self] in
+			self?.excessiveRetries.remove(profile.id)
 			guard let indexPath = self?.currentIndexPath(for: profile) else {
 				return
 			}

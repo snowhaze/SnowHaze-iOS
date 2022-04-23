@@ -340,7 +340,7 @@ class VPNManager {
 	}
 
 	private(set) var isDownloading = false
-	private var downloadCompletionHandlers = [(Bool) -> ()]()
+	private var downloadCompletionHandlers = [(Bool?) -> ()]()
 
 	static let shared = VPNManager()
 
@@ -407,13 +407,13 @@ class VPNManager {
 		return ovpnProfiles.contains(where: { !$0.hasProfile }) || ipsecProfiles.contains(where: { !$0.hasProfile })
 	}
 
-	func updateProfileList(minWait: TimeInterval = 24 * 60 * 60, withCompletionHandler completionHandler: ((Bool) -> ())?) {
+	func updateProfileList(minWait: TimeInterval = 24 * 60 * 60, withCompletionHandler completionHandler: ((Bool?) -> ())?) {
 		let timestamp = DataStore.shared.getDouble(for: lastProfileUpdateKey) ?? -Double.infinity
 		let date = Date(timeIntervalSince1970: timestamp)
 		guard date.timeIntervalSinceNow < -minWait || needsProfileUpdate else {
 			if let handler = completionHandler {
 				DispatchQueue.main.async {
-					handler(false)
+					handler(nil)
 				}
 			}
 			return

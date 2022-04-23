@@ -46,6 +46,7 @@ class SearchEngineSuggestionSource: SuggestionSource {
 				case .swisscows:	self.swisscowsSuggestions(for: base, callback: callback)
 				case .duckDuckGo:	self.duckDuckGoSuggestions(for: base, callback: callback)
 				case .qwant:		self.qwantSuggestions(for: base, callback: callback)
+				case .mojeek:		self.mojeekSuggestions(for: base, callback: callback)
 				case .custom:		self.customSuggestions(for: base, callback: callback)
 				case .none:			return
 			}
@@ -394,12 +395,33 @@ class SearchEngineSuggestionSource: SuggestionSource {
 			}
 		}
 	}
+	
+	func mojeekSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
+		let subtitle = NSLocalizedString("mojeek search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from mojeek")
+		guard let url = self.engine.url(for: search, using: self.policy) else {
+			return
+		}
+		let image = #imageLiteral(resourceName: "mojeek")
+		let suggestion = Suggestion(title: search, subtitle: subtitle, url: url, image: image, priority: self.priority(for: 1))
+		callback([suggestion], "mojeek")
+	}
 
 	func customSuggestions(for search: String, callback: @escaping ([Suggestion], String) -> ()) {
 		guard let queryString = search.addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) else {
 			return
 		}
+		func makeFallbackSuggestion() {
+			guard let url = self.engine.url(for: search, using: self.policy) else {
+				return
+			}
+			let subtitle = NSLocalizedString("custom search suggestion subtitle", comment: "subtitle for autocomplete search suggestions from a custom search engine")
+			let image = #imageLiteral(resourceName: "custom-search")
+			let priority = self.priority(for: 1)
+			let suggestion = Suggestion(title: search, subtitle: subtitle, url: url, image: image, priority: priority)
+			callback([suggestion], "custom")
+		}
 		guard let (url, path) = policy.customSearchSuggestionParams(for: queryString) else {
+			makeFallbackSuggestion()
 			return
 		}
 		JSONFetcher(tab: tab).fetchJSON(from: url) { (json) -> () in
@@ -420,6 +442,8 @@ class SearchEngineSuggestionSource: SuggestionSource {
 			}
 			if !suggestions.isEmpty {
 				callback(suggestions, "custom")
+			} else {
+				makeFallbackSuggestion()
 			}
 		}
 	}

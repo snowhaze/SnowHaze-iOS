@@ -12,7 +12,7 @@ import UIKit
 private let defaultLength: CGFloat = 250
 private let borderMargin: CGFloat = 8
 
-protocol SettingsDetailTableViewHeaderDelegate: class {
+protocol SettingsDetailTableViewHeaderDelegate: AnyObject {
 	func showDetails(for header: SettingsDetailTableViewHeader)
 }
 

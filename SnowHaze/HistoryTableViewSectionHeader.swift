@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-protocol HistoryTableViewSectionHeaderDelegate: class {
+protocol HistoryTableViewSectionHeaderDelegate: AnyObject {
 	func historySectionHeader(_ header: HistoryTableViewSectionHeader, commitDeletionOfSection section: Int)
 }
 

@@ -21,6 +21,7 @@ enum SearchEngineType: Int64 {
 	case duckDuckGo
 	case qwant			= 12
 	case custom
+	case mojeek
 }
 
 class SearchEngine {
@@ -85,6 +86,7 @@ class SearchEngine {
 			case .swisscows:	return URL(string: "https://swisscows.com/?query=" + escapedSearch)
 			case .duckDuckGo:	return URL(string: "https://duckduckgo.com/?q=" + escapedSearch)
 			case .qwant:		return URL(string: "https://www.qwant.com/?q=\(escapedSearch)")
+			case .mojeek:		return URL(string: "https://www.mojeek.com/search?q=\(escapedSearch)")
 			case .custom:		return syncToMainThread { policy.customSearchURL(for: search) }
 			case .none:			return nil
 		}

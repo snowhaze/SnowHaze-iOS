@@ -11,7 +11,7 @@ import Foundation
 private let domainsDBLocation = "https://api.snowhaze.com/lists.db"
 private let subscriptionDomainsDBLocation = "https://api.snowhaze.com/index.php"
 
-class DownloadManager: PinningSessionDelegate {
+class DownloadManager: NSObject, URLSessionDelegate {
 	static let shared = DownloadManager()
 
 	private lazy var backgroundSession: SnowHazeURLSession = {
@@ -116,11 +116,11 @@ class DownloadManager: PinningSessionDelegate {
 		}
 	}
 
-	func updateAuthToken(completionHandler: ((Bool) -> ())? = nil) {
+	private func updateAuthToken(completionHandler: ((Bool) -> ())? = nil) {
 		SubscriptionManager.shared.updateAuthToken(completionHandler: completionHandler)
 	}
 
-	func updateVPNList(completionHandler: ((Bool) -> ())? = nil) {
+	private func updateVPNList(completionHandler: ((Bool?) -> ())? = nil) {
 		VPNManager.shared.updateProfileList(withCompletionHandler: completionHandler)
 	}
 

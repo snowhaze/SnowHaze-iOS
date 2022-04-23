@@ -11,7 +11,7 @@ import UIKit
 private let tabSelectionMaxHeight: CGFloat = 45
 private let tabSelectionShinkage: CGFloat = 8
 
-protocol URLBarDelegate: class {
+protocol URLBarDelegate: AnyObject {
 	@available (iOS 14, *)
 	var forwardHistoryMenu: UIMenu? { get }
 	@available (iOS 14, *)
@@ -515,7 +515,7 @@ class URLBar: UIView {
 		containerView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: layoutV, metrics: nil, views: ["view": titleLabel]))
 
 		let pasteAndGo = NSLocalizedString("paste and go menu option title", comment: "title of the option to paste & go in the contexxt menu of the url bar")
-		let item = UIMenuItem(title: pasteAndGo, action: #selector(URLBar.pasteAndGo(_:)))
+		let item = UIMenuItem(title: pasteAndGo, action: #selector(URLBar.customPasteAndGo(_:)))
 		UIMenuController.shared.menuItems = [item]
 		reloadTabActions()
 	}
@@ -547,14 +547,14 @@ class URLBar: UIView {
 	}
 
 	override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-		if action == #selector(URLBar.pasteAndGo(_:)) && sender as? UIMenuController == UIMenuController.shared {
+		if action == #selector(URLBar.customPasteAndGo(_:)) && sender as? UIMenuController == UIMenuController.shared {
 			return isEditing && UIPasteboard.general.hasStrings
 		} else {
 			return super.canPerformAction(action, withSender: sender)
 		}
 	}
 
-	@objc private func pasteAndGo(_ sender: UIMenuController) {
+	@objc private func customPasteAndGo(_ sender: UIMenuController) {
 		guard isEditing, let input = UIPasteboard.general.string else {
 			return
 		}

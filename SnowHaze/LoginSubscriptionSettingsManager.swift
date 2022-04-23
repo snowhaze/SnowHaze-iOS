@@ -14,8 +14,7 @@ private let formSection = 1
 
 private let anyRow = 0
 
-class LoginSubscriptionSettingsManager: SettingsViewManager {
-	private weak var parent: SubscriptionSettingsManager?
+class LoginSubscriptionSettingsManager: ChildSettingsManager<SubscriptionSettingsManager> {
 	private var useKey = false
 	private var loading = false
 
@@ -24,27 +23,10 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 	private var passwordField: UITextField?
 	private var loginButton: UIButton?
 
-	init(parent: SubscriptionSettingsManager) {
-		self.parent = parent
-		super.init()
-		controller = parent.controller
-	}
-
-	override func setup() {
-		super.setup()
-		header.icon = parent?.header.icon
-		header.delegate = parent?.header.delegate
-		header.color = assessmentResultColor
-	}
-
 	override func html() -> String {
 		return NSLocalizedString("login subscription sub settings explanation", comment: "explanations of the login subscription sub settings tab")
 	}
-
-	override var assessmentResultColor: UIColor {
-		return parent?.assessmentResultColor ?? PolicyAssessmentResult.color(for: .veryBad)
-	}
-
+	
 	override var numberOfSections: Int {
 		return 2
 	}
@@ -139,6 +121,14 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 		return section == formSection ? title : nil
 	}
 
+	override func reset() {
+		loading = false
+		keyField?.text = ""
+		emailField?.text = ""
+		passwordField?.text = ""
+		updateUIState()
+	}
+
 	@objc private func login(_ sender: UIButton) {
 		precondition(!loading)
 		loading = true
@@ -158,6 +148,7 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 				} else if let secret = secret {
 					V3APIConnection.set(masterSecret: secret)
 					self?.parent?.switchToNormal()
+					self?.needsReset()
 				} else {
 					fatalError("invalid result")
 				}
@@ -169,6 +160,7 @@ class LoginSubscriptionSettingsManager: SettingsViewManager {
 				if let secret = masterSecret {
 					V3APIConnection.set(masterSecret: secret)
 					self?.parent?.switchToNormal()
+					self?.needsReset()
 				} else {
 					SubscriptionSettingsManager.show(error: error!, in: svc)
 					self?.loading = false

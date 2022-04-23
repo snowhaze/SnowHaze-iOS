@@ -31,6 +31,7 @@ let blockHTTPReferrersKey					= "ch.illotros.snowhaze.blockHTTPReferrers"
 let tryHTTPSfirstKey						= "ch.illotros.snowhaze.tryHTTPSfirst"
 let nightModeKey							= "ch.illotros.snowhaze.nightMode"
 let minFontSizeKey							= "ch.illotros.snowhaze.minFontSize"
+let minReaderFontSizeKey					= "ch.illotros.snowhaze.minReaderFontSize"
 let webContentScaleKey						= "ch.illotros.snowhaze.webContentScale"
 let ignoresViewportScaleLimitsKey			= "ch.illotros.snowhaze.ignoresViewportScaleLimits"
 let blockTrackingScriptsKey					= "ch.illotros.snowhaze.blockTrackingScripts"
@@ -162,6 +163,7 @@ private let defaults: [String: SQLite.Data] = [
 	// Appearence
 	nightModeKey:							.false,
 	minFontSizeKey:							.float(0),
+	minReaderFontSizeKey:					.float(-5),
 	ignoresViewportScaleLimitsKey:			.false,
 	webContentScaleKey:						.integer(scaleStorageFactor),
 
@@ -423,7 +425,12 @@ class PolicyManager {
 	var minFontSize: CGFloat {
 		let data = settingsWrapper.value(for: minFontSizeKey)
 		let value = data.floatValue!
-		return CGFloat(value)
+		if !isInReaderMode {
+			return CGFloat(value)
+		}
+		let readerData = settingsWrapper.value(for: minReaderFontSizeKey)
+		let readerValue = readerData.floatValue!
+		return CGFloat(readerValue < 0 ? value : readerValue)
 	}
 
 	var webContentScale: CGFloat {

@@ -13,7 +13,7 @@ private let rowHeight: CGFloat = 44
 
 private let blockTime: TimeInterval = 0.3
 
-protocol SuggestionViewControllerDelegate: class {
+protocol SuggestionViewControllerDelegate: AnyObject {
 	func suggestionController(_ controller: SuggestionViewController, didSelectURL url: URL)
 }
 

@@ -9,7 +9,7 @@
 import UIKit
 import WebKit
 
-protocol TabViewControllerDelegate: class {
+protocol TabViewControllerDelegate: AnyObject {
 	func tabViewController(_ controller: TabViewController, openTabForRequest request: URLRequest, inForeground: Bool)
 	func showSuggestions(searchString: String)
 	func stopShowingSuggestions()

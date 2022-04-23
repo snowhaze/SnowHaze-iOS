@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol FileDownloadDelegate: class {
+protocol FileDownloadDelegate: AnyObject {
 	func downloadStatusChanged(_ download: FileDownload, index: Int)
 	func downloadDeleted(_ download: FileDownload, index: Int)
 	func newDownloadStarted(_ download: FileDownload)

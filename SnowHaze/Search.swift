@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol SearchListener: class {
+protocol SearchListener: AnyObject {
 	func search(_ search: Search, indexDidUpdateTo index: UInt, of count: UInt)
 }
 

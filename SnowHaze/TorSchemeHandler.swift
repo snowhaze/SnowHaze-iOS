@@ -22,7 +22,7 @@ private func error(for url: URL?, code: Int, subscription: Bool = true) -> NSErr
 	return NSError(domain: "TorErrorDomain", code: code, userInfo: info)
 }
 
-protocol TorSchemeHandlerDelegate: class {
+protocol TorSchemeHandlerDelegate: AnyObject {
 	func torSchemeHandler(_ handler: TorSchemeHandler, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ())
 }
 

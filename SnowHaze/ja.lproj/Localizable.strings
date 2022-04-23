@@ -782,6 +782,9 @@
 /* subtitle for autocomplete search suggestions from qwant */
 "qwant search suggestion subtitle" = "Qwant検索";
 
+/* subtitle for autocomplete search suggestions from mojeek */
+"mojeek search suggestion subtitle" = "Mojeek検索";
+
 /* subtitle for autocomplete search suggestions from a custom search engine */
 "custom search suggestion subtitle" = "カスタム検索";
 
@@ -835,6 +838,12 @@
 
 /* title of minimum font size setting */
 "minimum font size setting title" = "最小フォントサイズ";
+
+/* title of minimum font size in reader mode setting */
+"reader mode minimum font size setting title" = "読書モードのフォント";
+
+/* value of the minimum reader mode stepper label when separate minimum font size is disabled */
+"minimum reader mode disabled stepper label value" = "-";
 
 /* title of ignore scale limits setting */
 "ignore scale limits setting title" = "スケール制限を無視する";
@@ -1126,6 +1135,9 @@
 
 /* error message flashed when a vpn profile download the user explicitly requested fails */
 "vpn profile download failed error message" = "ダウンロードに失敗しました";
+
+/* message flashed when an excessive ammount of vpn profile downloads are requested by the user */
+"excessive vpn profile download attempts message" = "1分後に再試行";
 
 /* format of the notice used to indicate when the vpn profile will expire */
 "vpn profile expiration notice format" = "%@に切れます";
@@ -2542,4 +2554,7 @@
 
 /* name of the sbb app used to confirm opening of url in other app */
 "open url in app sbb app name" = "SBB Mobile";
+
+/* name of mojeek search engine to be displayed to user */
+"mojeek search engine display name" = "Mojeek";
 

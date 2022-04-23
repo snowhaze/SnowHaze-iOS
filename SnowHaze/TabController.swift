@@ -25,12 +25,12 @@ enum TabUIEventType {
 	case tabCreation(request: URLRequest, inForeground: Bool)
 }
 
-protocol TabControllerUIDelegate: class {
+protocol TabControllerUIDelegate: AnyObject {
 	func tabController(_ controller: TabController, displayAlert alert: AlertType, forDomain domain: String?, fallbackHandler: @escaping () -> ()) -> Bool
 	func tabController(_ controller: TabController, createTabForRequest request: URLRequest, inForeground: Bool)
 }
 
-protocol TabControllerNavigationDelegate: class {
+protocol TabControllerNavigationDelegate: AnyObject {
 	func tabController(_ controller: TabController, didLoadTitle title: String?)
 	func tabController(_ controller: TabController, isLoading url: URL?)
 	func tabController(_ controller: TabController, estimatedProgress: Double)
@@ -1306,7 +1306,7 @@ extension TabController {
 	func accept(_ trust: SecTrust, for host: String, completionHandler: @escaping (Bool) -> ()) {
 		let policyEvaluator = SecPolicyEvaluator(domain: host, trust: trust)
 		policyEvaluator.evaluate(sslValidationExeptions[host] ?? .strict) { result in
-			completionHandler(result && (!PinningSessionDelegate.pinnedHosts.contains(host) || policyEvaluator.pin(with: .certs(PinningSessionDelegate.pinnedCerts))))
+			completionHandler(result)
 		}
 	}
 }

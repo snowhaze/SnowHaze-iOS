@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol TabCollectionViewCellDelegate: class {
+protocol TabCollectionViewCellDelegate: AnyObject {
 	func closeTab(for tab: TabCollectionViewCell)
 }
 
@@ -240,6 +240,9 @@ class TabCollectionViewCell: UICollectionViewCell {
 		if ratio < imageRatio {
 			width = bounds.width
 			height = width * imageRatio
+		} else if imageRatio.isNaN {
+			height = (bounds.height - barHeight)
+			width = 0
 		} else {
 			height = (bounds.height - barHeight)
 			width = height / imageRatio

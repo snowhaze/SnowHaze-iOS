@@ -8,13 +8,13 @@
 
 import UIKit
 
-protocol TabSelectionViewDelegate: class {
+protocol TabSelectionViewDelegate: AnyObject {
 	func tabSelectionView(_: TabSelectionView, didSelectTab: Int)
 	func tabSelectionView(_: TabSelectionView, didCloseTab: Int)
 	func tabSelectionView(_: TabSelectionView, didLoadURL: URL, atIndex: Int)
 }
 
-private protocol TabViewDelegate: class {
+private protocol TabViewDelegate: AnyObject {
 	func tabViewDidSelectTitle(_: TabView, atIndex: Int)
 	func tabViewDidClose(_: TabView, atIndex: Int)
 	func tabView(_: TabView, loadUrl: URL, atIndex: Int)
